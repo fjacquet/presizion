@@ -74,7 +74,13 @@ Plans:
   3. Clicking "Download CSV" triggers a file download containing all input fields and output metrics for every scenario in RFC 4180-compliant CSV format
   4. Wizard step indicator is always visible; navigating back to Step 1 or 2 and changing values immediately refreshes Step 3 outputs
   5. Browser prompts the user before navigating away from the page when any input data has been entered
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 03-01-PLAN.md — Install shadcn table and create Nyquist Wave 0 test stubs for all 6 Phase 3 requirements (Wave 1)
+- [ ] 03-02-PLAN.md — ComparisonTable, Step3ReviewExport, clipboard.ts, export.ts (COMP-01, COMP-02, EXPO-01, EXPO-02, UX-04) (Wave 2, parallel)
+- [ ] 03-03-PLAN.md — useBeforeUnload hook, WizardShell Step 2 Next + Step 3 routing (UX-05 + wizard completion) (Wave 2, parallel)
 
 ### Phase 4: Deployment and Polish
 
@@ -98,5 +104,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
 | 2. Input Forms | 3/4 | In progress | - |
-| 3. Comparison, Export, and Wizard Shell | 0/TBD | Not started | - |
+| 3. Comparison, Export, and Wizard Shell | 0/3 | Not started | - |
 | 4. Deployment and Polish | 0/TBD | Not started | - |
