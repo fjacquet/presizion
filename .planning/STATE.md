@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-comparison-export-and-wizard-shell-02-PLAN.md
-last_updated: "2026-03-12T20:58:49.792Z"
+stopped_at: Completed 04-deployment-and-polish-01-PLAN.md
+last_updated: "2026-03-12T21:22:32.844Z"
 last_activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
   percent: 50
 ---
 
@@ -63,6 +63,7 @@ Progress: [█████░░░░░] 50%
 | Phase 03-comparison-export-and-wizard-shell P01 | 1 | 2 tasks | 6 files |
 | Phase 03-comparison-export-and-wizard-shell P02 | 5min | 2 tasks | 7 files |
 | Phase 03-comparison-export-and-wizard-shell P03 | 3 | 2 tasks | 5 files |
+| Phase 04-deployment-and-polish P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase 03-02]: csvEscape exported (not private) for direct unit testing of escape logic
 - [Phase 03-02]: utilizationClass exported from ComparisonTable.tsx so tests can unit-test color logic in isolation
 - [Phase 03-02]: downloadCsv anchor click verified via URL.revokeObjectURL assertion — avoids createElement mock stack overflow in jsdom
+- [Phase 04-deployment-and-polish]: Wave 0 stubs use it.todo (not it.skip) so Vitest counts as pending not failing — suite exits 0
+- [Phase 04-deployment-and-polish]: GitHub Pages deploy workflow triggers on push to main and workflow_dispatch; base: '/presizion/' in vite.config.ts for correct asset resolution
 
 ### Pending Todos
 
@@ -114,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T20:45:17Z
-Stopped at: Completed 03-comparison-export-and-wizard-shell-02-PLAN.md
+Last session: 2026-03-12T21:22:32.841Z
+Stopped at: Completed 04-deployment-and-polish-01-PLAN.md
 Resume file: None
