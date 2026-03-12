@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI (completed 2026-03-12)
 - [ ] **Phase 2: Input Forms** - Steps 1 and 2 with live calculation feedback, per-field validation, and formula display
 - [x] **Phase 3: Comparison, Export, and Wizard Shell** - Step 3 comparison table, all export formats, and full wizard navigation (completed 2026-03-12)
-- [ ] **Phase 4: Deployment and Polish** - GitHub Pages deployment, formula tooltips, utilization indicators, and clipboard feedback
+- [x] **Phase 4: Deployment and Polish** - GitHub Pages deployment, formula tooltips, utilization indicators, and clipboard feedback (completed 2026-03-12)
 
 ## Phase Details
 
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
 | 2. Input Forms | 3/4 | In progress | - |
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
-| 4. Deployment and Polish | 3/4 | In Progress|  |
+| 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
