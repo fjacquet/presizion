@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-input-forms-01-PLAN.md
-last_updated: "2026-03-12T19:42:07.122Z"
+stopped_at: Completed 02-input-forms-03-PLAN.md
+last_updated: "2026-03-12T19:51:00.000Z"
 last_activity: 2026-03-12 — Roadmap created; all 27 v1 requirements mapped to 4 phases
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -35,6 +35,7 @@ Progress: [░░░░░░░░░░] 0%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: — min
 - Total execution time: 0.0 hours
@@ -46,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: —
 - Trend: —
 
@@ -55,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P04 | 3 | 1 tasks | 2 files |
 | Phase 01-foundation P03 | 6 | 2 tasks | 8 files |
 | Phase 02-input-forms P01 | 4min | 2 tasks | 16 files |
+| Phase 02-input-forms P03 | 8min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -78,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: z.preprocess (not z.coerce.number) for numeric Zod fields — empty string inputs throw ZodError, protecting form validation
 - [Phase 01-foundation]: ScenarioResult never stored in Zustand — useScenariosResults derives on demand (derive-on-read pattern)
 - [Phase 01-foundation]: Default values imported from defaults.ts into schemas — single source of truth for DEFAULT_VCPU_TO_PCORE_RATIO and DEFAULT_HEADROOM_PERCENT
+- [Phase 02-input-forms P03]: form.watch(callback) subscription (not useEffect+watched-dep) to avoid infinite Zustand setState loop in ScenarioCard
+- [Phase 02-input-forms P03]: Form wrapper must wrap entire Card (including CardHeader) so FormField can access FormProvider context
+- [Phase 02-input-forms P03]: Use getByText for label assertions (FormControl renders div wrapper, breaking getByLabelText linkage)
 
 ### Pending Todos
 
@@ -90,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T19:42:07.119Z
-Stopped at: Completed 02-input-forms-01-PLAN.md
+Last session: 2026-03-12T19:51:00.000Z
+Stopped at: Completed 02-input-forms-03-PLAN.md
 Resume file: None
