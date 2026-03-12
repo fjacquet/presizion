@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: planning
 stopped_at: Completed 04-deployment-and-polish-04-PLAN.md
-last_updated: "2026-03-12T21:26:16.950Z"
+last_updated: "2026-03-12T21:26:41.592Z"
 last_activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
   percent: 50
 ---
 
@@ -66,6 +66,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04-deployment-and-polish P01 | 2 | 2 tasks | 4 files |
 | Phase 04-deployment-and-polish P02 | 1 | 2 tasks | 3 files |
 | Phase 04-deployment-and-polish P04 | 2min | 1 tasks | 2 files |
+| Phase 04-deployment-and-polish P03 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,7 @@ Recent decisions affecting current work:
 - [Phase 04-deployment-and-polish]: Dark color pairing: text-*-600 (light) / dark:text-*-400 (dark) — lighter 400 shades for adequate contrast on dark backgrounds
 - [Phase 04-deployment-and-polish]: useRef for timeout ID (not useState) — avoids extra re-render for clipboard feedback state
 - [Phase 04-deployment-and-polish]: useEffect cleanup clears setTimeout on unmount — prevents setState-after-unmount warning in UX-06 copied state
+- [Phase 04-deployment-and-polish]: display.ts co-located in src/lib/sizing/ alongside formulas.ts; formula strings show 100+headroomPercent% format; useClusterStore added to ScenarioResults for formula params
 
 ### Pending Todos
 
