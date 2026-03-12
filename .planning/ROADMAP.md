@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI (completed 2026-03-12)
 - [ ] **Phase 2: Input Forms** - Steps 1 and 2 with live calculation feedback, per-field validation, and formula display
-- [ ] **Phase 3: Comparison, Export, and Wizard Shell** - Step 3 comparison table, all export formats, and full wizard navigation
+- [x] **Phase 3: Comparison, Export, and Wizard Shell** - Step 3 comparison table, all export formats, and full wizard navigation (completed 2026-03-12)
 - [ ] **Phase 4: Deployment and Polish** - GitHub Pages deployment, formula tooltips, utilization indicators, and clipboard feedback
 
 ## Phase Details
@@ -84,15 +84,16 @@ Plans:
 
 ### Phase 4: Deployment and Polish
 
-**Goal**: The application is publicly accessible on GitHub Pages and all inline formula displays, utilization indicators, and user feedback elements are complete
+**Goal**: The application is publicly accessible on GitHub Pages, supports dark mode, and all inline formula displays, utilization indicators, and user feedback elements are complete
 **Depends on**: Phase 3
-**Requirements**: DEPLOY-01
+**Requirements**: DEPLOY-01, UX-06
 **Success Criteria** (what must be TRUE):
 
   1. `vite build` produces a `dist/` folder and `npx serve dist` serves the application at the configured base path with no blank page or 404 errors
   2. The deployed GitHub Pages URL loads the application in under 2 seconds on a standard connection and all wizard steps function identically to the local development build
   3. Each key output value in Steps 2 and 3 displays its formula string and the specific parameter values used, visible inline without requiring a tooltip hover
   4. Utilization percentages are color-coded green/amber/red and the limiting resource per scenario is visually highlighted in the comparison table
+  5. The application respects the user's OS dark-mode preference; all text, backgrounds, borders, and color-coded utilization cells render correctly in both light and dark mode
 **Plans**: TBD
 
 ## Progress
@@ -104,5 +105,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
 | 2. Input Forms | 3/4 | In progress | - |
-| 3. Comparison, Export, and Wizard Shell | 2/3 | In Progress|  |
+| 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 0/TBD | Not started | - |

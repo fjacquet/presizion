@@ -52,6 +52,7 @@
 ### Deployment
 
 - [ ] **DEPLOY-01**: App builds as pure static assets (Vite) with correct `base` path configuration for GitHub Pages deployment
+- [ ] **UX-06**: App respects the user's OS dark-mode preference (`prefers-color-scheme`); all text, backgrounds, borders, and utilization color indicators render correctly in both light and dark mode
 
 ## v2 Requirements
 
@@ -67,7 +68,7 @@
 
 ### UI Enhancements
 
-- **UI-01**: App supports light/dark mode toggle
+- **UI-01**: App supports an explicit light/dark mode toggle (manual override beyond OS preference)
 
 ## Out of Scope
 
@@ -114,6 +115,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-04 | Phase 3 | Complete |
 | UX-05 | Phase 3 | Complete |
 | DEPLOY-01 | Phase 4 | Pending |
+| UX-06 | Phase 4 | Pending |
 
 **Coverage:**
 
