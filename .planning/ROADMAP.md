@@ -94,7 +94,14 @@ Plans:
   3. Each key output value in Steps 2 and 3 displays its formula string and the specific parameter values used, visible inline without requiring a tooltip hover
   4. Utilization percentages are color-coded green/amber/red and the limiting resource per scenario is visually highlighted in the comparison table
   5. The application respects the user's OS dark-mode preference; all text, backgrounds, borders, and color-coded utilization cells render correctly in both light and dark mode
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+
+- [ ] 04-01-PLAN.md — Nyquist Wave 0 stubs (darkMode.test.ts, display.test.ts) + vite.config.ts base path + GitHub Actions workflow (DEPLOY-01, UX-06)
+- [ ] 04-02-PLAN.md — Dark mode: anti-flash script in index.html + dark: variants in ComparisonTable (UX-06)
+- [ ] 04-03-PLAN.md — Formula display: create display.ts + wire into ScenarioResults (DEPLOY-01 / CALC-07)
+- [ ] 04-04-PLAN.md — Clipboard feedback: "Copied!" state in Step3ReviewExport (UX-06)
 
 ## Progress
 
@@ -106,4 +113,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
 | 2. Input Forms | 3/4 | In progress | - |
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
-| 4. Deployment and Polish | 0/TBD | Not started | - |
+| 4. Deployment and Polish | 0/4 | Not started | - |
