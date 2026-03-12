@@ -18,7 +18,7 @@ import { useClusterStore } from '@/store/useClusterStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
 import { buildCsvContent, downloadCsv } from '@/lib/utils/export'
 
-export function Step3ReviewExport(): JSX.Element {
+export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
   const scenarios = useScenariosStore((state) => state.scenarios)
   const results = useScenariosResults()

@@ -62,7 +62,7 @@ describe('Step3ReviewExport', () => {
       render(<Step3ReviewExport />)
       fireEvent.click(screen.getByRole('button', { name: /copy summary/i }))
       await vi.waitFor(() => {
-        const callArg = (navigator.clipboard.writeText as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+        const callArg = (navigator.clipboard.writeText as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
         expect(callArg).toContain('2000')
       })
     })
@@ -71,7 +71,7 @@ describe('Step3ReviewExport', () => {
       render(<Step3ReviewExport />)
       fireEvent.click(screen.getByRole('button', { name: /copy summary/i }))
       await vi.waitFor(() => {
-        const callArg = (navigator.clipboard.writeText as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+        const callArg = (navigator.clipboard.writeText as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
         expect(callArg).toContain('Test Scenario')
       })
     })

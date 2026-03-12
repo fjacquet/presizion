@@ -38,7 +38,7 @@ function capitalize(s: string): string {
  * Renders a transposed comparison table.
  * One column per scenario, one row per metric.
  */
-export function ComparisonTable(): JSX.Element {
+export function ComparisonTable() {
   const scenarios = useScenariosStore((state) => state.scenarios)
   const results = useScenariosResults()
 

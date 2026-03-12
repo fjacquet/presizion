@@ -29,7 +29,7 @@ describe('useBeforeUnload', () => {
     it('does NOT add a beforeunload listener when enabled is false', () => {
       renderHook(() => useBeforeUnload(false))
       const beforeunloadCalls = addEventSpy.mock.calls.filter(
-        ([event]) => event === 'beforeunload'
+        ([event]: [string, ...unknown[]]) => event === 'beforeunload'
       )
       expect(beforeunloadCalls).toHaveLength(0)
     })
@@ -43,7 +43,7 @@ describe('useBeforeUnload', () => {
     it('calls event.preventDefault() inside the handler', () => {
       renderHook(() => useBeforeUnload(true))
       const handler = addEventSpy.mock.calls.find(
-        ([event]) => event === 'beforeunload'
+        ([event]: [string, ...unknown[]]) => event === 'beforeunload'
       )?.[1] as EventListener
       const mockEvent = { preventDefault: vi.fn(), returnValue: '' } as unknown as BeforeUnloadEvent
       handler(mockEvent)
@@ -53,7 +53,7 @@ describe('useBeforeUnload', () => {
     it('sets event.returnValue to empty string inside the handler', () => {
       renderHook(() => useBeforeUnload(true))
       const handler = addEventSpy.mock.calls.find(
-        ([event]) => event === 'beforeunload'
+        ([event]: [string, ...unknown[]]) => event === 'beforeunload'
       )?.[1] as EventListener
       const mockEvent = { preventDefault: vi.fn(), returnValue: 'before' } as unknown as BeforeUnloadEvent
       handler(mockEvent)
