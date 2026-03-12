@@ -1,12 +1,17 @@
 import { useWizardStore } from '@/store/useWizardStore'
 import { Step1CurrentCluster } from '@/components/step1/Step1CurrentCluster'
 import { Step2Scenarios } from '@/components/step2/Step2Scenarios'
+import { Step3ReviewExport } from '@/components/step3/Step3ReviewExport'
 import { StepIndicator } from './StepIndicator'
 import { Button } from '@/components/ui/button'
+import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 
 export function WizardShell() {
   const currentStep = useWizardStore((s) => s.currentStep)
   const prevStep = useWizardStore((s) => s.prevStep)
+  const nextStep = useWizardStore((s) => s.nextStep)
+
+  useBeforeUnload(currentStep > 1)
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,18 +28,19 @@ export function WizardShell() {
         <main>
           {currentStep === 1 && <Step1CurrentCluster />}
           {currentStep === 2 && <Step2Scenarios />}
-          {currentStep === 3 && (
-            <div className="text-center py-16 text-muted-foreground">
-              Step 3: Review &amp; Export — Coming in Phase 3
-            </div>
-          )}
+          {currentStep === 3 && <Step3ReviewExport />}
         </main>
 
         {currentStep > 1 && (
-          <div className="mt-8 pt-4 border-t flex justify-start">
+          <div className="mt-8 pt-4 border-t flex justify-between">
             <Button type="button" variant="outline" onClick={prevStep}>
               Back
             </Button>
+            {currentStep === 2 && (
+              <Button type="button" onClick={nextStep}>
+                Next: Review &amp; Export
+              </Button>
+            )}
           </div>
         )}
       </div>

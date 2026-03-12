@@ -1,6 +1,6 @@
 /**
  * WizardShell — Integration tests
- * Requirements: UX-01, UX-02
+ * Requirements: UX-01, UX-02, UX-05
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
@@ -15,11 +15,21 @@ vi.mock('@/components/step2/Step2Scenarios', () => ({
   Step2Scenarios: () => <div data-testid="step2-scenarios">Step 2 Content</div>,
 }))
 
+vi.mock('@/components/step3/Step3ReviewExport', () => ({
+  Step3ReviewExport: () => <div data-testid="step3-review-export">Step 3 Content</div>,
+}))
+
+vi.mock('@/hooks/useBeforeUnload', () => ({
+  useBeforeUnload: vi.fn(),
+}))
+
 // Import after mocks
 import { WizardShell } from '../WizardShell'
+import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 
 beforeEach(() => {
   useWizardStore.setState({ currentStep: 1 })
+  vi.mocked(useBeforeUnload).mockClear()
 })
 
 describe('WizardShell', () => {
@@ -98,6 +108,61 @@ describe('WizardShell', () => {
       const backButton = screen.getByRole('button', { name: /back/i })
       fireEvent.click(backButton)
       expect(useWizardStore.getState().currentStep).toBe(1)
+    })
+  })
+
+  describe('Step 3 routing', () => {
+    it('renders Step3ReviewExport when currentStep is 3', () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      expect(screen.getByTestId('step3-review-export')).toBeInTheDocument()
+    })
+
+    it('does not render Step 3 placeholder text when currentStep is 3', () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      expect(screen.queryByText(/coming in phase 3/i)).not.toBeInTheDocument()
+    })
+
+    it('Back button is rendered on Step 3', () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument()
+    })
+  })
+
+  describe('Step 2 Next button', () => {
+    it('renders a Next button on Step 2', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
+    })
+
+    it('clicking Next on Step 2 advances to Step 3', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      fireEvent.click(screen.getByRole('button', { name: /next/i }))
+      expect(useWizardStore.getState().currentStep).toBe(3)
+    })
+  })
+
+  describe('UX-05: beforeunload guard', () => {
+    it('calls useBeforeUnload with false when on Step 1', () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      expect(useBeforeUnload).toHaveBeenCalledWith(false)
+    })
+
+    it('calls useBeforeUnload with true when on Step 2', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      expect(useBeforeUnload).toHaveBeenCalledWith(true)
+    })
+
+    it('calls useBeforeUnload with true when on Step 3', () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      expect(useBeforeUnload).toHaveBeenCalledWith(true)
     })
   })
 })
