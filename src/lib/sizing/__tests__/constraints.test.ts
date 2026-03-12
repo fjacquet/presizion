@@ -1,6 +1,7 @@
 // VALIDATION.md: CALC-04 (N+1 HA), CALC-05 (max constraint + limiting resource), CALC-06 (utilization metrics)
 // Imported function will come from src/lib/sizing/constraints.ts (Plan 02)
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { computeScenarioResult } from '../constraints';
 
 // CPU-limited full scenario fixture (reused across CALC-04/05/06 tests)
 // OldCluster: totalVcpus=3200, totalVms=100, totalPcores=800
@@ -52,23 +53,74 @@ const DISK_LIMITED_SCENARIO = {
 
 describe('computeScenarioResult', () => {
   describe('CALC-05: constraint selection and limiting resource', () => {
-    it.todo('CPU-limited: finalCount=24, limitingResource=cpu');
-    it.todo('RAM-limited: finalCount=19, limitingResource=ram');
-    it.todo('disk-limited: finalCount=12, limitingResource=disk');
+    it('CPU-limited: finalCount=24, limitingResource=cpu', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.cpuLimitedCount).toBe(24);
+      expect(result.ramLimitedCount).toBe(1);
+      expect(result.diskLimitedCount).toBe(1);
+      expect(result.finalCount).toBe(24);
+      expect(result.limitingResource).toBe('cpu');
+      expect(result.haReserveApplied).toBe(false);
+    });
+    it('RAM-limited: finalCount=19, limitingResource=ram', () => {
+      const result = computeScenarioResult(RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO);
+      expect(result.finalCount).toBe(19);
+      expect(result.limitingResource).toBe('ram');
+    });
+    it('disk-limited: finalCount=12, limitingResource=disk', () => {
+      const result = computeScenarioResult(DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO);
+      expect(result.finalCount).toBe(12);
+      expect(result.limitingResource).toBe('disk');
+    });
   });
 
   describe('CALC-04: N+1 HA reserve', () => {
-    it.todo('haReserveEnabled=false: finalCount equals rawCount');
-    it.todo('haReserveEnabled=true: finalCount equals rawCount + 1');
-    it.todo('HA adds exactly 1 (not a percentage) to final count');
+    it('haReserveEnabled=false: finalCount equals rawCount', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.finalCount).toBe(result.rawCount);
+      expect(result.haReserveApplied).toBe(false);
+    });
+    it('haReserveEnabled=true: finalCount equals rawCount + 1', () => {
+      const haScenario = { ...CPU_LIMITED_SCENARIO, haReserveEnabled: true };
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, haScenario);
+      expect(result.finalCount).toBe(result.rawCount + 1);
+      expect(result.haReserveApplied).toBe(true);
+    });
+    it('HA adds exactly 1 (not a percentage) to final count', () => {
+      const haScenario = { ...CPU_LIMITED_SCENARIO, haReserveEnabled: true };
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, haScenario);
+      expect(result.finalCount).toBe(25);
+    });
   });
 
   describe('CALC-06: utilization metrics', () => {
-    it.todo('achievedVcpuToPCoreRatio is correct for CPU-limited fixture');
-    it.todo('vmsPerServer is correct for CPU-limited fixture');
-    it.todo('cpuUtilizationPercent is in range 0–100');
-    it.todo('ramUtilizationPercent is in range 0–100');
-    it.todo('diskUtilizationPercent is in range 0–100');
+    it('achievedVcpuToPCoreRatio is correct for CPU-limited fixture', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      // 3200 / (24 * 40) ≈ 3.333...
+      const expected = 3200 / (24 * 40);
+      expect(Math.abs(result.achievedVcpuToPCoreRatio - expected)).toBeLessThan(0.01);
+    });
+    it('vmsPerServer is correct for CPU-limited fixture', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      // 100 / 24 ≈ 4.166...
+      const expected = 100 / 24;
+      expect(Math.abs(result.vmsPerServer - expected)).toBeLessThan(0.01);
+    });
+    it('cpuUtilizationPercent is in range 0–100', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.cpuUtilizationPercent).toBeGreaterThanOrEqual(0);
+      expect(result.cpuUtilizationPercent).toBeLessThanOrEqual(100);
+    });
+    it('ramUtilizationPercent is in range 0–100', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.ramUtilizationPercent).toBeGreaterThanOrEqual(0);
+      expect(result.ramUtilizationPercent).toBeLessThanOrEqual(100);
+    });
+    it('diskUtilizationPercent is in range 0–100', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.diskUtilizationPercent).toBeGreaterThanOrEqual(0);
+      expect(result.diskUtilizationPercent).toBeLessThanOrEqual(100);
+    });
   });
 });
 

@@ -1,6 +1,7 @@
 // VALIDATION.md: CALC-01 (CPU-limited), CALC-02 (RAM-limited), CALC-03 (disk-limited)
 // Imported functions will come from src/lib/sizing/formulas.ts (Plan 02)
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { serverCountByCpu, serverCountByRam, serverCountByDisk } from '../formulas';
 
 // === Fixture constants (manually verified against formula spec) ===
 
@@ -21,19 +22,39 @@ const F3 = { totalVms: 200, diskPerVmGb: 500, growthHeadroomFactor: 1.20, diskPe
 const BOUNDARY = { totalVcpus: 3200, growthHeadroomFactor: 1.20, targetVcpuToPCoreRatio: 4, coresPerServer: 40, expectedExact: 24 };
 
 describe('serverCountByCpu', () => {
-  it.todo('returns correct count for CPU-limited fixture (F1)');
-  it.todo('boundary: result is exactly 24, not 23 or 25 (FP safety)');
-  it.todo('headroom factor 1.0 (0% headroom) does not over-provision');
+  it('returns correct count for CPU-limited fixture (F1)', () => {
+    expect(serverCountByCpu(F1.totalVcpus, F1.growthHeadroomFactor, F1.targetVcpuToPCoreRatio, F1.coresPerServer)).toBe(F1.expectedCpuCount);
+  });
+  it('boundary: result is exactly 24, not 23 or 25 (FP safety)', () => {
+    const result = serverCountByCpu(BOUNDARY.totalVcpus, BOUNDARY.growthHeadroomFactor, BOUNDARY.targetVcpuToPCoreRatio, BOUNDARY.coresPerServer);
+    expect(Math.abs(result - BOUNDARY.expectedExact)).toBeLessThan(0.001);
+    expect(result).toBe(BOUNDARY.expectedExact);
+  });
+  it('headroom factor 1.0 (0% headroom) does not over-provision', () => {
+    // ceil(160 * 1.0 / 1.0 / 4 / 40) — but per formula: totalVcpus=160, factor=1.0, ratio=4, coresPerServer=40
+    // = ceil(160 * 1.0 / 4 / 40) = ceil(1) = 1
+    expect(serverCountByCpu(160, 1.0, 4, 40)).toBe(1);
+  });
 });
 
 describe('serverCountByRam', () => {
-  it.todo('returns correct count for RAM-limited fixture (F2)');
-  it.todo('fractional result rounds up to next integer (Math.ceil)');
+  it('returns correct count for RAM-limited fixture (F2)', () => {
+    expect(serverCountByRam(F2.totalVms, F2.ramPerVmGb, F2.growthHeadroomFactor, F2.ramPerServerGb)).toBe(F2.expectedRamCount);
+  });
+  it('fractional result rounds up to next integer (Math.ceil)', () => {
+    // ceil(100 * 8 * 1.20 / 1000) = ceil(0.96) = 1
+    expect(serverCountByRam(100, 8, 1.20, 1000)).toBe(1);
+  });
 });
 
 describe('serverCountByDisk', () => {
-  it.todo('returns correct count for disk-limited fixture (F3)');
-  it.todo('fractional result rounds up to next integer (Math.ceil)');
+  it('returns correct count for disk-limited fixture (F3)', () => {
+    expect(serverCountByDisk(F3.totalVms, F3.diskPerVmGb, F3.growthHeadroomFactor, F3.diskPerServerGb)).toBe(F3.expectedDiskCount);
+  });
+  it('fractional result rounds up to next integer (Math.ceil)', () => {
+    // ceil(100 * 100 * 1.20 / 50000) = ceil(0.24) = 1
+    expect(serverCountByDisk(100, 100, 1.20, 50000)).toBe(1);
+  });
 });
 
 export { F1, F2, F3, BOUNDARY };
