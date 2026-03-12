@@ -77,6 +77,32 @@ describe('Step3ReviewExport', () => {
     })
   })
 
+  describe('UX-06: clipboard visual feedback', () => {
+    it('button label changes to "Copied!" immediately after successful copy', async () => {
+      render(<Step3ReviewExport />)
+      const btn = screen.getByRole('button', { name: /copy summary/i })
+      fireEvent.click(btn)
+      await vi.waitFor(() => {
+        expect(screen.getByRole('button', { name: /copied!/i })).toBeTruthy()
+      })
+    })
+
+    it('button label reverts to "Copy Summary" after timeout', async () => {
+      vi.useFakeTimers()
+      render(<Step3ReviewExport />)
+      const btn = screen.getByRole('button', { name: /copy summary/i })
+      fireEvent.click(btn)
+      await vi.waitFor(() => {
+        expect(screen.getByRole('button', { name: /copied!/i })).toBeTruthy()
+      })
+      vi.advanceTimersByTime(2000)
+      await vi.waitFor(() => {
+        expect(screen.getByRole('button', { name: /copy summary/i })).toBeTruthy()
+      })
+      vi.useRealTimers()
+    })
+  })
+
   describe('EXPO-02: download CSV file', () => {
     it('renders a "Download CSV" button', () => {
       render(<Step3ReviewExport />)
