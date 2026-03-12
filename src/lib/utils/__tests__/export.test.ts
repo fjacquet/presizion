@@ -1,22 +1,115 @@
 /**
  * export utils — Unit tests
  * Requirements: EXPO-02
- *
- * Wave 0 stubs — implementations filled in by plan 03-02.
  */
-import { describe, it } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { buildCsvContent, downloadCsv, csvEscape } from '../export'
+import type { OldCluster, Scenario } from '@/types/cluster'
+import type { ScenarioResult } from '@/types/results'
+
+const cluster: OldCluster = {
+  totalVcpus: 2000,
+  totalPcores: 500,
+  totalVms: 300,
+}
+
+const scenario: Scenario = {
+  id: 'test-scenario-1',
+  name: 'Enterprise 2-socket',
+  socketsPerServer: 2,
+  coresPerSocket: 24,
+  ramPerServerGb: 1024,
+  diskPerServerGb: 20000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 16,
+  diskPerVmGb: 100,
+  headroomPercent: 20,
+  haReserveEnabled: false,
+}
+
+const result: ScenarioResult = {
+  cpuLimitedCount: 24,
+  ramLimitedCount: 19,
+  diskLimitedCount: 12,
+  rawCount: 24,
+  finalCount: 24,
+  limitingResource: 'cpu',
+  haReserveApplied: false,
+  achievedVcpuToPCoreRatio: 4.0,
+  vmsPerServer: 12.5,
+  cpuUtilizationPercent: 85.0,
+  ramUtilizationPercent: 60.0,
+  diskUtilizationPercent: 35.0,
+}
+
+beforeEach(() => {
+  vi.stubGlobal('URL', {
+    createObjectURL: vi.fn().mockReturnValue('blob:mock'),
+    revokeObjectURL: vi.fn(),
+  })
+})
 
 describe('buildCsvContent', () => {
-  it.todo('returns a string starting with a header row')
-  it.todo('includes one data row per scenario')
-  it.todo('includes scenario name in each row')
-  it.todo('includes final server count in each row')
-  it.todo('includes limiting resource in each row')
-  it.todo('escapes fields containing commas by wrapping in double-quotes')
-  it.todo('escapes fields containing double-quotes by doubling them')
+  it('returns a string starting with a header row', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result])
+    const firstLine = csv.split('\n')[0]
+    expect(firstLine).toContain('Name')
+  })
+
+  it('includes one data row per scenario', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result])
+    const lines = csv.split('\n').filter((l) => l.length > 0)
+    // header + 1 data row = 2 lines
+    expect(lines).toHaveLength(1 + 1)
+  })
+
+  it('includes scenario name in each row', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result])
+    expect(csv).toContain('Enterprise 2-socket')
+  })
+
+  it('includes final server count in each row', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result])
+    const lines = csv.split('\n')
+    const dataRow = lines[1]
+    expect(dataRow).toContain('24')
+  })
+
+  it('includes limiting resource in each row', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result])
+    const lines = csv.split('\n')
+    const dataRow = lines[1]
+    expect(dataRow).toContain('cpu')
+  })
+
+  it('escapes fields containing commas by wrapping in double-quotes', () => {
+    expect(csvEscape('value,with,commas')).toBe('"value,with,commas"')
+  })
+
+  it('escapes fields containing double-quotes by doubling them', () => {
+    expect(csvEscape('say "hello"')).toBe('"say ""hello"""')
+  })
 })
 
 describe('downloadCsv', () => {
-  it.todo('calls URL.createObjectURL with a Blob')
-  it.todo('calls URL.revokeObjectURL after the download is triggered')
+  it('calls URL.createObjectURL with a Blob', () => {
+    // Use a real anchor element so jsdom's appendChild accepts it; spy on click
+    const link = document.createElement('a')
+    vi.spyOn(link, 'click').mockImplementation(() => {})
+    vi.spyOn(document, 'createElement').mockReturnValueOnce(link)
+
+    downloadCsv('test.csv', 'header\ndata')
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
+  })
+
+  it('calls URL.revokeObjectURL after the download is triggered', () => {
+    const link = document.createElement('a')
+    vi.spyOn(link, 'click').mockImplementation(() => {})
+    vi.spyOn(document, 'createElement').mockReturnValueOnce(link)
+
+    downloadCsv('test.csv', 'header\ndata')
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock')
+  })
 })
