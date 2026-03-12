@@ -7,19 +7,19 @@
 
 ### Input (Current Cluster)
 
-- [ ] **INPUT-01**: User can enter average VM configuration (vCPUs per VM, RAM GB per VM, disk GB per VM)
-- [ ] **INPUT-02**: User can enter cluster totals (total vCPUs, total pCores, total VMs, total disk GB)
-- [ ] **INPUT-03**: User can enter existing server configuration (sockets per server, cores per socket, RAM per server GB, optional server count)
-- [ ] **INPUT-04**: App auto-calculates and displays derived metrics: vCPU:pCore ratio (user-overridable), total cores per server, VMs/server by CPU and by RAM
-- [ ] **INPUT-05**: All numeric inputs validate non-negative values with inline error messages; user cannot advance without valid required fields
+- [x] **INPUT-01**: User can enter average VM configuration (vCPUs per VM, RAM GB per VM, disk GB per VM)
+- [x] **INPUT-02**: User can enter cluster totals (total vCPUs, total pCores, total VMs, total disk GB)
+- [x] **INPUT-03**: User can enter existing server configuration (sockets per server, cores per socket, RAM per server GB, optional server count)
+- [x] **INPUT-04**: App auto-calculates and displays derived metrics: vCPU:pCore ratio (user-overridable), total cores per server, VMs/server by CPU and by RAM
+- [x] **INPUT-05**: All numeric inputs validate non-negative values with inline error messages; user cannot advance without valid required fields
 
 ### Scenarios (Target Configuration)
 
-- [ ] **SCEN-01**: User can define any number of target scenarios, each with a name, server configuration, and sizing assumptions
-- [ ] **SCEN-02**: Each scenario's server config includes: sockets per server, cores per socket (auto-calculates total cores), RAM per server GB, usable disk per server GB
-- [ ] **SCEN-03**: Each scenario's sizing assumptions include: target vCPU:pCore ratio, RAM per VM GB, disk per VM GB, growth headroom %, N+1 HA reserve toggle
-- [ ] **SCEN-04**: All sizing assumptions pre-filled with editable industry defaults (4:1 vCPU:pCore, 20% headroom, N+1 off)
-- [ ] **SCEN-05**: User can duplicate an existing scenario to quickly create a variant
+- [x] **SCEN-01**: User can define any number of target scenarios, each with a name, server configuration, and sizing assumptions
+- [x] **SCEN-02**: Each scenario's server config includes: sockets per server, cores per socket (auto-calculates total cores), RAM per server GB, usable disk per server GB
+- [x] **SCEN-03**: Each scenario's sizing assumptions include: target vCPU:pCore ratio, RAM per VM GB, disk per VM GB, growth headroom %, N+1 HA reserve toggle
+- [x] **SCEN-04**: All sizing assumptions pre-filled with editable industry defaults (4:1 vCPU:pCore, 20% headroom, N+1 off)
+- [x] **SCEN-05**: User can duplicate an existing scenario to quickly create a variant
 
 ### Sizing Calculations
 
@@ -43,9 +43,9 @@
 
 ### UX & Wizard
 
-- [ ] **UX-01**: App presents a 3-step wizard: Step 1 (Enter Current Cluster) → Step 2 (Define Scenarios) → Step 3 (Review & Export)
-- [ ] **UX-02**: Navigation to the next step is blocked until required inputs on the current step are valid
-- [ ] **UX-03**: Key fields display inline tooltips/info icons explaining the field's meaning and typical acceptable ranges
+- [x] **UX-01**: App presents a 3-step wizard: Step 1 (Enter Current Cluster) → Step 2 (Define Scenarios) → Step 3 (Review & Export)
+- [x] **UX-02**: Navigation to the next step is blocked until required inputs on the current step are valid
+- [x] **UX-03**: Key fields display inline tooltips/info icons explaining the field's meaning and typical acceptable ranges
 - [ ] **UX-04**: App provides color-coded visual indicators (green/amber/red) for utilization levels and highlights the bottleneck resource per scenario
 - [ ] **UX-05**: App warns user before navigating away from the page with unsaved data (beforeunload event)
 
@@ -87,16 +87,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INPUT-01 | Phase 2 | Pending |
-| INPUT-02 | Phase 2 | Pending |
-| INPUT-03 | Phase 2 | Pending |
-| INPUT-04 | Phase 2 | Pending |
-| INPUT-05 | Phase 2 | Pending |
-| SCEN-01 | Phase 2 | Pending |
-| SCEN-02 | Phase 2 | Pending |
-| SCEN-03 | Phase 2 | Pending |
-| SCEN-04 | Phase 2 | Pending |
-| SCEN-05 | Phase 2 | Pending |
+| INPUT-01 | Phase 2 | Complete |
+| INPUT-02 | Phase 2 | Complete |
+| INPUT-03 | Phase 2 | Complete |
+| INPUT-04 | Phase 2 | Complete |
+| INPUT-05 | Phase 2 | Complete |
+| SCEN-01 | Phase 2 | Complete |
+| SCEN-02 | Phase 2 | Complete |
+| SCEN-03 | Phase 2 | Complete |
+| SCEN-04 | Phase 2 | Complete |
+| SCEN-05 | Phase 2 | Complete |
 | CALC-01 | Phase 1 | Complete |
 | CALC-02 | Phase 1 | Complete |
 | CALC-03 | Phase 1 | Complete |
@@ -108,9 +108,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-02 | Phase 3 | Pending |
 | EXPO-01 | Phase 3 | Pending |
 | EXPO-02 | Phase 3 | Pending |
-| UX-01 | Phase 2 | Pending |
-| UX-02 | Phase 2 | Pending |
-| UX-03 | Phase 2 | Pending |
+| UX-01 | Phase 2 | Complete |
+| UX-02 | Phase 2 | Complete |
+| UX-03 | Phase 2 | Complete |
 | UX-04 | Phase 3 | Pending |
 | UX-05 | Phase 3 | Pending |
 | DEPLOY-01 | Phase 4 | Pending |
