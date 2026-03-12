@@ -1,7 +1,5 @@
-function App() {
-  return (
-    <div>Cluster Sizer</div>
-  );
-}
+import { WizardShell } from '@/components/wizard/WizardShell'
 
-export default App;
+export default function App() {
+  return <WizardShell />
+}

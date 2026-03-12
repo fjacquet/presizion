@@ -30,7 +30,10 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const duplicateScenario = useScenariosStore((s) => s.duplicateScenario)
 
   const form = useForm<ScenarioInput>({
-    resolver: zodResolver(scenarioSchema),
+    // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
+    // input type uses `unknown` while useForm expects the output type. Cast to resolve.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(scenarioSchema) as any,
     mode: 'onBlur',
     defaultValues: scenario as ScenarioInput,
   })

@@ -34,7 +34,9 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
 }
 
 interface NumericFieldProps {
-  control: Control<CurrentClusterInput>
+  // Control<TFieldValues, TContext, TTransformedValues> — TTransformedValues matches
+  // the output of zodResolver with z.preprocess schemas (resolved output type)
+  control: Control<CurrentClusterInput, any, CurrentClusterInput> // eslint-disable-line @typescript-eslint/no-explicit-any
   name: keyof CurrentClusterInput
   label: string
   testId: string
@@ -52,7 +54,7 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
             {label}
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                   <Info
                     className="h-3.5 w-3.5 text-muted-foreground cursor-help"
                     aria-label={`Info: ${label}`}
@@ -89,7 +91,10 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
 
   const form = useForm<CurrentClusterInput>({
-    resolver: zodResolver(currentClusterSchema),
+    // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
+    // input type uses `unknown` while useForm expects the output type. Cast to resolve.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(currentClusterSchema) as any,
     mode: 'onBlur',
     defaultValues: {
       totalVcpus: 0,

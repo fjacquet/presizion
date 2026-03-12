@@ -2,7 +2,7 @@
  * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03
  * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03
  */
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { CurrentClusterForm } from '../CurrentClusterForm'
 import { DerivedMetricsPanel } from '../DerivedMetricsPanel'
