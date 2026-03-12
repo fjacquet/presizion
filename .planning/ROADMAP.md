@@ -47,7 +47,13 @@ Plans:
   3. User can create multiple scenarios, each with a distinct name, server configuration, and sizing assumptions; scenario results (CPU-, RAM-, and disk-limited counts) update live as values change
   4. New scenarios are pre-populated with the industry default assumptions (4:1 vCPU:pCore, 20% headroom, N+1 off); user can override any assumption per scenario
   5. User can duplicate an existing scenario and the duplicate is immediately editable as an independent variant with no shared state
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Install UI stack (Tailwind v4/PostCSS, shadcn/ui, react-hook-form) and create Nyquist Wave 0 test stubs (Wave 0)
+- [ ] 02-02-PLAN.md — Step 1: CurrentClusterForm, DerivedMetricsPanel, Step1CurrentCluster (INPUT-01 to INPUT-05, UX-03)
+- [ ] 02-03-PLAN.md — Step 2: ScenarioCard, ScenarioResults, Step2Scenarios (SCEN-01 to SCEN-05)
+- [ ] 02-04-PLAN.md — WizardShell, StepIndicator, App.tsx wiring (UX-01, UX-02)
 
 ### Phase 3: Comparison, Export, and Wizard Shell
 **Goal**: Users can review all scenario results side by side, export a plain-text summary to clipboard and a CSV file, and navigate the full 3-step wizard with guarded transitions
@@ -80,6 +86,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
-| 2. Input Forms | 0/TBD | Not started | - |
+| 2. Input Forms | 0/4 | Planning complete | - |
 | 3. Comparison, Export, and Wizard Shell | 0/TBD | Not started | - |
 | 4. Deployment and Polish | 0/TBD | Not started | - |
