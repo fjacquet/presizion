@@ -23,13 +23,13 @@
 
 ### Sizing Calculations
 
-- [ ] **CALC-01**: App calculates CPU-limited server count: `ceil((totalVcpus × headroom) / targetVcpuToPCoreRatio / coresPerServer)`
-- [ ] **CALC-02**: App calculates RAM-limited server count: `ceil((totalVms × ramPerVmGb × headroom) / ramPerServerGb)`
-- [ ] **CALC-03**: App calculates disk-limited server count: `ceil((totalVms × diskPerVmGb × headroom) / diskPerServerGb)`
-- [ ] **CALC-04**: When N+1 HA reserve is enabled, app adds 1 to the final server count after constraint resolution
-- [ ] **CALC-05**: App identifies the final server count (max of CPU/RAM/disk constraints) and clearly labels the limiting resource
-- [ ] **CALC-06**: App computes achieved vCPU:pCore ratio, VMs per server, and estimated CPU/RAM/disk utilization percentages for each scenario
-- [ ] **CALC-07**: Each key output value displays its formula and the specific input parameters used, inline in the UI
+- [x] **CALC-01**: App calculates CPU-limited server count: `ceil((totalVcpus × headroom) / targetVcpuToPCoreRatio / coresPerServer)`
+- [x] **CALC-02**: App calculates RAM-limited server count: `ceil((totalVms × ramPerVmGb × headroom) / ramPerServerGb)`
+- [x] **CALC-03**: App calculates disk-limited server count: `ceil((totalVms × diskPerVmGb × headroom) / diskPerServerGb)`
+- [x] **CALC-04**: When N+1 HA reserve is enabled, app adds 1 to the final server count after constraint resolution
+- [x] **CALC-05**: App identifies the final server count (max of CPU/RAM/disk constraints) and clearly labels the limiting resource
+- [x] **CALC-06**: App computes achieved vCPU:pCore ratio, VMs per server, and estimated CPU/RAM/disk utilization percentages for each scenario
+- [x] **CALC-07**: Each key output value displays its formula and the specific input parameters used, inline in the UI
 
 ### Comparison
 
@@ -97,13 +97,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCEN-03 | Phase 2 | Pending |
 | SCEN-04 | Phase 2 | Pending |
 | SCEN-05 | Phase 2 | Pending |
-| CALC-01 | Phase 1 | Pending |
-| CALC-02 | Phase 1 | Pending |
-| CALC-03 | Phase 1 | Pending |
-| CALC-04 | Phase 1 | Pending |
-| CALC-05 | Phase 1 | Pending |
-| CALC-06 | Phase 1 | Pending |
-| CALC-07 | Phase 1 | Pending |
+| CALC-01 | Phase 1 | Complete |
+| CALC-02 | Phase 1 | Complete |
+| CALC-03 | Phase 1 | Complete |
+| CALC-04 | Phase 1 | Complete |
+| CALC-05 | Phase 1 | Complete |
+| CALC-06 | Phase 1 | Complete |
+| CALC-07 | Phase 1 | Complete |
 | COMP-01 | Phase 3 | Pending |
 | COMP-02 | Phase 3 | Pending |
 | EXPO-01 | Phase 3 | Pending |
