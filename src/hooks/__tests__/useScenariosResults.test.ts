@@ -74,7 +74,7 @@ describe('useScenariosResults', () => {
     });
 
     const { result } = renderHook(() => useScenariosResults());
-    expect(result.current[0].finalCount).toBe(24);
+    expect(result.current[0]!.finalCount).toBe(24);
   });
 
   it('result updates when cluster store changes', () => {
@@ -84,14 +84,14 @@ describe('useScenariosResults', () => {
     });
 
     const { result } = renderHook(() => useScenariosResults());
-    const initialCount = result.current[0].finalCount;
+    const initialCount = result.current[0]!.finalCount;
 
     act(() => {
       useClusterStore.getState().setCurrentCluster(CPU_LIMITED_CLUSTER);
     });
 
-    expect(result.current[0].finalCount).not.toBe(initialCount);
-    expect(result.current[0].finalCount).toBe(24);
+    expect(result.current[0]!.finalCount).not.toBe(initialCount);
+    expect(result.current[0]!.finalCount).toBe(24);
   });
 
   it('result updates when scenarios store changes', () => {
@@ -149,8 +149,8 @@ describe('useScenariosStore', () => {
       result.current.updateScenario(CPU_LIMITED_SCENARIO.id, { name: 'Updated Name' });
     });
 
-    expect(result.current.scenarios[0].name).toBe('Updated Name');
-    expect(result.current.scenarios[0].socketsPerServer).toBe(2); // unchanged
+    expect(result.current.scenarios[0]!.name).toBe('Updated Name');
+    expect(result.current.scenarios[0]!.socketsPerServer).toBe(2); // unchanged
   });
 
   it('duplicateScenario creates a copy with new id and "(copy)" name suffix', () => {
@@ -165,7 +165,7 @@ describe('useScenariosStore', () => {
     });
 
     expect(result.current.scenarios).toHaveLength(2);
-    const copy = result.current.scenarios[1];
+    const copy = result.current.scenarios[1]!;
     expect(copy.id).not.toBe(CPU_LIMITED_SCENARIO.id);
     expect(copy.name).toBe('CPU-Limited (copy)');
   });

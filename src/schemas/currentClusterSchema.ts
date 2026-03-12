@@ -17,7 +17,7 @@ const numericPreprocess = (val: unknown) => {
  */
 const requiredNonNegativeInt = z.preprocess(
   numericPreprocess,
-  z.number({ required_error: 'This field is required' }).nonnegative().int(),
+  z.number({ error: 'This field is required' }).nonnegative().int(),
 );
 
 /**

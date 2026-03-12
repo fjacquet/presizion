@@ -22,7 +22,7 @@ const numericPreprocess = (val: unknown) => {
  */
 const requiredPositiveNumber = z.preprocess(
   numericPreprocess,
-  z.number({ required_error: 'This field is required' }).positive(),
+  z.number({ error: 'This field is required' }).positive(),
 );
 
 /**
