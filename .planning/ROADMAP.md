@@ -12,7 +12,7 @@ This tool is built bottom-up: math first, state second, UI third. Phase 1 establ
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI
+- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI (completed 2026-03-12)
 - [ ] **Phase 2: Input Forms** - Steps 1 and 2 with live calculation feedback, per-field validation, and formula display
 - [ ] **Phase 3: Comparison, Export, and Wizard Shell** - Step 3 comparison table, all export formats, and full wizard navigation
 - [ ] **Phase 4: Deployment and Polish** - GitHub Pages deployment, formula tooltips, utilization indicators, and clipboard feedback
@@ -79,7 +79,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete   | 2026-03-12 |
 | 2. Input Forms | 0/TBD | Not started | - |
 | 3. Comparison, Export, and Wizard Shell | 0/TBD | Not started | - |
 | 4. Deployment and Polish | 0/TBD | Not started | - |

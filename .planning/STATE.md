@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-foundation-04-PLAN.md
-last_updated: "2026-03-12T18:07:20.453Z"
+stopped_at: Completed 01-foundation-03-PLAN.md
+last_updated: "2026-03-12T18:11:07.561Z"
 last_activity: 2026-03-12 — Roadmap created; all 27 v1 requirements mapped to 4 phases
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P01 | 4 | 2 tasks | 17 files |
 | Phase 01-foundation P02 | 3 | 2 tasks | 9 files |
 | Phase 01-foundation P04 | 3 | 1 tasks | 2 files |
+| Phase 01-foundation P03 | 6 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Object.freeze() on ScenarioResult enforces immutability at runtime; utilization metrics use finalCount as denominator
 - [Phase 01-foundation]: Display functions import from formulas.ts (DRY) rather than duplicating Math.ceil logic — single source of truth for sizing math
 - [Phase 01-foundation]: Display interfaces accept headroomPercent (not headroomFactor) — conversion to multiplicative factor is internal to display module, matches user mental model
+- [Phase 01-foundation]: z.preprocess (not z.coerce.number) for numeric Zod fields — empty string inputs throw ZodError, protecting form validation
+- [Phase 01-foundation]: ScenarioResult never stored in Zustand — useScenariosResults derives on demand (derive-on-read pattern)
+- [Phase 01-foundation]: Default values imported from defaults.ts into schemas — single source of truth for DEFAULT_VCPU_TO_PCORE_RATIO and DEFAULT_HEADROOM_PERCENT
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T18:07:20.450Z
-Stopped at: Completed 01-foundation-04-PLAN.md
+Last session: 2026-03-12T18:11:07.559Z
+Stopped at: Completed 01-foundation-03-PLAN.md
 Resume file: None
