@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-comparison-export-and-wizard-shell-03-PLAN.md
-last_updated: "2026-03-12T20:44:34.641Z"
-last_activity: 2026-03-12 — Phase 2 complete; 105 tests green; ready for Phase 3
+stopped_at: Completed 03-comparison-export-and-wizard-shell-02-PLAN.md
+last_updated: "2026-03-12T20:45:17Z"
+last_activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
 progress:
   total_phases: 4
   completed_phases: 2
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 Phase: 3 of 4 (Comparison, Export & UX Polish)
 Plan: 0 of TBD in current phase
 Status: Ready to plan
-Last activity: 2026-03-12 — Phase 2 complete; 105 tests green; ready for Phase 3
+Last activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
 
 Progress: [█████░░░░░] 50%
 
@@ -61,6 +61,7 @@ Progress: [█████░░░░░] 50%
 | Phase 02-input-forms P03 | 8min | 2 tasks | 4 files |
 | Phase 02-input-forms P04 | 5min | 2 tasks | 7 files |
 | Phase 03-comparison-export-and-wizard-shell P01 | 1 | 2 tasks | 6 files |
+| Phase 03-comparison-export-and-wizard-shell P02 | 5min | 2 tasks | 7 files |
 | Phase 03-comparison-export-and-wizard-shell P03 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
@@ -98,6 +99,9 @@ Recent decisions affecting current work:
 - [Phase 03-comparison-export-and-wizard-shell]: Nyquist Wave 0 stubs use it.todo (not it.skip) so Vitest counts them as pending not failing — test suite exits 0
 - [Phase 03-comparison-export-and-wizard-shell]: shadcn table installed in wave 0 plan so wave 1 implementation plans can import @/components/ui/table without extra CLI step
 - [Phase 03-comparison-export-and-wizard-shell]: Step3ReviewExport stub created by 03-03 so WizardShell import resolves during parallel execution — 03-02 replaces stub with full implementation
+- [Phase 03-02]: csvEscape exported (not private) for direct unit testing of escape logic
+- [Phase 03-02]: utilizationClass exported from ComparisonTable.tsx so tests can unit-test color logic in isolation
+- [Phase 03-02]: downloadCsv anchor click verified via URL.revokeObjectURL assertion — avoids createElement mock stack overflow in jsdom
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T20:44:34.639Z
-Stopped at: Completed 03-comparison-export-and-wizard-shell-03-PLAN.md
+Last session: 2026-03-12T20:45:17Z
+Stopped at: Completed 03-comparison-export-and-wizard-shell-02-PLAN.md
 Resume file: None

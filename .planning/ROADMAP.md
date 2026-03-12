@@ -79,7 +79,7 @@ Plans:
 Plans:
 
 - [ ] 03-01-PLAN.md — Install shadcn table and create Nyquist Wave 0 test stubs for all 6 Phase 3 requirements (Wave 1)
-- [ ] 03-02-PLAN.md — ComparisonTable, Step3ReviewExport, clipboard.ts, export.ts (COMP-01, COMP-02, EXPO-01, EXPO-02, UX-04) (Wave 2, parallel)
+- [x] 03-02-PLAN.md — ComparisonTable, Step3ReviewExport, clipboard.ts, export.ts (COMP-01, COMP-02, EXPO-01, EXPO-02, UX-04) (Wave 2, parallel)
 - [ ] 03-03-PLAN.md — useBeforeUnload hook, WizardShell Step 2 Next + Step 3 routing (UX-05 + wizard completion) (Wave 2, parallel)
 
 ### Phase 4: Deployment and Polish
