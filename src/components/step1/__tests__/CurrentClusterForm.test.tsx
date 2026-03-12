@@ -4,6 +4,8 @@
  *
  * Implement these after CurrentClusterForm.tsx is created in Plan 02.
  */
+import { describe, it } from 'vitest'
+
 describe('CurrentClusterForm', () => {
   describe('INPUT-01: average VM configuration fields', () => {
     it.todo('renders vCPUs per VM field')

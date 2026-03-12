@@ -4,6 +4,8 @@
  *
  * Implement these after ScenarioCard.tsx is created in Plan 03.
  */
+import { describe, it } from 'vitest'
+
 describe('Step2Scenarios / ScenarioCard', () => {
   describe('SCEN-01: add scenario', () => {
     it.todo('Add Scenario button is visible in Step 2')

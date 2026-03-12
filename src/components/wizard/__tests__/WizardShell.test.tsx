@@ -4,6 +4,8 @@
  *
  * Implement these after WizardShell.tsx and StepIndicator.tsx are created in Plan 04.
  */
+import { describe, it } from 'vitest'
+
 describe('WizardShell', () => {
   describe('UX-01: 3-step wizard shell', () => {
     it.todo('renders StepIndicator with 3 steps')
