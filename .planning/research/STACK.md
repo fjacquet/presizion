@@ -119,24 +119,28 @@ npm install -D gh-pages@^6
 ## Stack Patterns by Variant
 
 **For formula-heavy pure logic (the sizing engine):**
+
 - Keep in `src/lib/sizing/` as pure TypeScript functions (no React imports)
 - Export each formula as a named function with explicit typed parameters
 - Test exhaustively with Vitest; these are the correctness-critical units
 - Because they are pure functions, testing is straightforward: input → expected output
 
 **For form state feeding the sizing engine:**
+
 - Zustand store holds the raw inputs and computed outputs
 - react-hook-form controls the form DOM and validation
 - On `handleSubmit` / `onChange`, write validated values to Zustand
 - Sizing functions subscribe to Zustand and recompute; they do not subscribe to RHF directly
 
 **For CSV export:**
+
 - Pull current state from Zustand
 - Pass inputs + outputs object to `Papa.unparse()`
 - Trigger browser download via `URL.createObjectURL(new Blob(...))`
 - No library other than papaparse is needed for this pattern
 
 **For GitHub Pages deployment:**
+
 - Set `base: '/cluster-sizer/'` in `vite.config.ts` (repo name as base)
 - Use `gh-pages` npm script or GitHub Actions workflow with `actions/deploy-pages@v4`
 - The `dist/` folder is the only artifact needed
@@ -155,13 +159,13 @@ npm install -D gh-pages@^6
 ## Sources
 
 - npm registry — react 19.2.4, vite 7.3.1, @vitejs/plugin-react 5.1.4, vitest 4.0.18, zustand 5.0.11, papaparse 5.5.3, tailwindcss 4.2.1, shadcn 4.0.5, react-hook-form 7.71.2, typescript 5.9.3 (verified March 2026)
-- https://vite.dev/guide/static-deploy — GitHub Pages base path configuration (HIGH confidence)
-- https://ui.shadcn.com/docs/tailwind-v4 — shadcn Tailwind v4 support status (HIGH confidence)
-- https://ui.shadcn.com/docs/changelog/2026-03-cli-v4 — shadcn CLI v4 Vite template support (HIGH confidence)
-- https://zod.dev/v4 — Zod v4 release notes, perf benchmarks, migration guide (HIGH confidence)
-- https://react-hook-form.com/ — controlled vs. uncontrolled input performance rationale (HIGH confidence)
-- https://zustand.docs.pmnd.rs/ — Zustand v5 useSyncExternalStore notes (HIGH confidence)
-- https://www.papaparse.com/docs — unparse() API for CSV export without backend (HIGH confidence)
+- <https://vite.dev/guide/static-deploy> — GitHub Pages base path configuration (HIGH confidence)
+- <https://ui.shadcn.com/docs/tailwind-v4> — shadcn Tailwind v4 support status (HIGH confidence)
+- <https://ui.shadcn.com/docs/changelog/2026-03-cli-v4> — shadcn CLI v4 Vite template support (HIGH confidence)
+- <https://zod.dev/v4> — Zod v4 release notes, perf benchmarks, migration guide (HIGH confidence)
+- <https://react-hook-form.com/> — controlled vs. uncontrolled input performance rationale (HIGH confidence)
+- <https://zustand.docs.pmnd.rs/> — Zustand v5 useSyncExternalStore notes (HIGH confidence)
+- <https://www.papaparse.com/docs> — unparse() API for CSV export without backend (HIGH confidence)
 - WebSearch — recharts vs Chart.js for React TypeScript (MEDIUM confidence, corroborated by multiple sources)
 - WebSearch — Zustand vs Jotai vs Context 2025 (MEDIUM confidence, corroborated by multiple sources)
 

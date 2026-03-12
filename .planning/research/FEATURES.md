@@ -189,6 +189,7 @@ Features to defer until product-market fit is established.
 | Workload profile presets | LOW | MEDIUM | P3 |
 
 **Priority key:**
+
 - P1: Must have for launch
 - P2: Should have, add when possible
 - P3: Nice to have, future consideration
@@ -220,15 +221,15 @@ Features to defer until product-market fit is established.
 
 ## Sources
 
-- Nutanix Sizer product page: https://www.nutanix.com/products/sizer
-- Nutanix sizing and capacity planning blog: https://www.nutanix.com/tech-center/blog/hybrid-cloud-sizing-and-capacity-planning
-- WintelGuy Virtualization Calculator (live tool analysis): https://wintelguy.com/vmcalc.pl
-- VMware vCPU-to-pCPU ratio guidelines (2025): https://blogs.vmware.com/cloud-foundation/2025/06/04/vcpu-to-pcpu-ratio-guidelines/
-- vSphere Cluster Calculator user guide: https://vmusketeers.com/userguide-vsphere-cluster-calculator/
-- Dell Technologies Enterprise Infrastructure Planning Tool: https://www.dell.com/calc
-- Generic cluster sizing calculator (formula analysis): https://codingace.net/dev/cluster_sizing.html
-- Azure VMware Solution storage sizing formulas: https://dinocloud.net/2025/02/06/sizing-azure-vmware-solution-cluster-storage-capacity/
-- ITRS Capacity Planner headroom and N+1 features: https://docs.itrsgroup.com/docs/capacity-planner/latest/get-started/headroom/index.html
+- Nutanix Sizer product page: <https://www.nutanix.com/products/sizer>
+- Nutanix sizing and capacity planning blog: <https://www.nutanix.com/tech-center/blog/hybrid-cloud-sizing-and-capacity-planning>
+- WintelGuy Virtualization Calculator (live tool analysis): <https://wintelguy.com/vmcalc.pl>
+- VMware vCPU-to-pCPU ratio guidelines (2025): <https://blogs.vmware.com/cloud-foundation/2025/06/04/vcpu-to-pcpu-ratio-guidelines/>
+- vSphere Cluster Calculator user guide: <https://vmusketeers.com/userguide-vsphere-cluster-calculator/>
+- Dell Technologies Enterprise Infrastructure Planning Tool: <https://www.dell.com/calc>
+- Generic cluster sizing calculator (formula analysis): <https://codingace.net/dev/cluster_sizing.html>
+- Azure VMware Solution storage sizing formulas: <https://dinocloud.net/2025/02/06/sizing-azure-vmware-solution-cluster-storage-capacity/>
+- ITRS Capacity Planner headroom and N+1 features: <https://docs.itrsgroup.com/docs/capacity-planner/latest/get-started/headroom/index.html>
 
 ---
 

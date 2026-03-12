@@ -7,6 +7,7 @@
 ---
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -70,6 +71,7 @@ npm install -D tailwindcss @tailwindcss/postcss postcss
 ```
 
 Then configure in `vite.config.ts`:
+
 ```typescript
 import tailwindcss from '@tailwindcss/postcss'
 
@@ -102,6 +104,7 @@ npx shadcn@latest add form input label button card tabs tooltip switch badge sep
 ### Path Alias (required by shadcn)
 
 `tsconfig.json` must include:
+
 ```json
 {
   "compilerOptions": {
@@ -112,6 +115,7 @@ npx shadcn@latest add form input label button card tabs tooltip switch badge sep
 ```
 
 `vite.config.ts` must include:
+
 ```typescript
 import path from 'path'
 resolve: { aliases: { '@': path.resolve(__dirname, './src') } }
@@ -403,6 +407,7 @@ function FieldLabelWithTooltip({ label, tip }: { label: string; tip: string }) {
 **Why it happens:** shadcn reads `tsconfig.json` during init to determine the `@/` path resolution. If the alias is absent, components are generated with incorrect imports.
 
 **How to avoid:** Configure both files before running `npx shadcn@latest init`:
+
 1. `tsconfig.json`: add `"baseUrl": ".", "paths": { "@/*": ["./src/*"] }`
 2. `vite.config.ts`: add `resolve: { alias: { '@': path.resolve(__dirname, './src') } }`
 
@@ -559,6 +564,7 @@ export function WizardShell() {
 | shadcn FormField wraps `register()` | shadcn FormField wraps `Controller` (via `<Field>` pattern) | shadcn v4 update | Controller pattern is now preferred for shadcn forms |
 
 **Deprecated/outdated:**
+
 - `tailwindcss-animate`: replaced by `tw-animate-css` for Tailwind v4 projects
 - `z.coerce.number()` for form inputs: produces silent `0` from empty string; use `z.preprocess` (already done in Phase 1)
 - `watch(callback)` overload in RHF: deprecated; use `form.watch()` in `useEffect` deps instead
@@ -634,18 +640,18 @@ export function WizardShell() {
 ### Primary (HIGH confidence)
 
 - npm registry (March 2026) — all version numbers verified: react-hook-form@7.71.2, @hookform/resolvers@5.2.2, tailwindcss@4.2.1, @tailwindcss/postcss@4.2.1, @tailwindcss/vite@4.2.1
-- https://react-hook-form.com/docs/useform — mode option, trigger(), watch(), resolver
-- https://react-hook-form.com/docs/usewatch — useWatch API, execution order warning
-- https://ui.shadcn.com/docs/installation/vite — shadcn Vite init command
-- https://ui.shadcn.com/docs/installation/manual — manual shadcn install packages
-- https://ui.shadcn.com/docs/tailwind-v4 — Tailwind v4 migration status
+- <https://react-hook-form.com/docs/useform> — mode option, trigger(), watch(), resolver
+- <https://react-hook-form.com/docs/usewatch> — useWatch API, execution order warning
+- <https://ui.shadcn.com/docs/installation/vite> — shadcn Vite init command
+- <https://ui.shadcn.com/docs/installation/manual> — manual shadcn install packages
+- <https://ui.shadcn.com/docs/tailwind-v4> — Tailwind v4 migration status
 - Phase 1 source code (examined directly) — confirms existing Zod schemas, Zustand stores, types, hooks, and defaults
 
 ### Secondary (MEDIUM confidence)
 
-- https://github.com/tailwindlabs/tailwindcss/discussions/19624 — @tailwindcss/vite Vite 8 incompatibility, PostCSS workaround confirmed
-- https://github.com/react-hook-form/resolvers — resolvers v5 Zod v4 support announcement
-- https://github.com/react-hook-form/react-hook-form/discussions/4028 — multi-step form trigger() pattern
+- <https://github.com/tailwindlabs/tailwindcss/discussions/19624> — @tailwindcss/vite Vite 8 incompatibility, PostCSS workaround confirmed
+- <https://github.com/react-hook-form/resolvers> — resolvers v5 Zod v4 support announcement
+- <https://github.com/react-hook-form/react-hook-form/discussions/4028> — multi-step form trigger() pattern
 - WebSearch (cross-verified): number input string-vs-number issue; Controller pattern fix
 
 ### Tertiary (LOW confidence)
@@ -657,6 +663,7 @@ export function WizardShell() {
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — all package versions verified against npm registry March 2026; peer dependency matrix checked
 - Architecture: HIGH — patterns derived from Phase 1 source code (actual codebase) + official RHF and shadcn docs
 - Vite 8 + Tailwind workaround: MEDIUM — confirmed via GitHub discussion, not official Tailwind docs (issue open, not resolved)

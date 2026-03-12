@@ -22,6 +22,7 @@ The stack is modern, stable, and verified against npm registry as of March 2026.
 State management uses Zustand v5 (not React Context) because the scenario data is accessed across many subtrees and Context would trigger full subtree re-renders — unacceptable given the <200ms recalculation budget. Form management uses React Hook Form v7 (not Formik) because uncontrolled inputs prevent per-keystroke full-form re-renders. Zod v4 provides schema validation and TypeScript type inference from a single schema definition.
 
 **Core technologies:**
+
 - React 19.2.4: UI rendering — native `use()` hook, improved concurrent rendering, no server features needed
 - TypeScript 5.9.3: Static typing — strict mode required; sizing formulas are safety-critical
 - Vite 7.3.1: Build tooling — produces pure static assets, trivial GitHub Pages deployment via `base` config
@@ -37,6 +38,7 @@ State management uses Zustand v5 (not React Context) because the scenario data i
 The MVP feature set is defined by what presales engineers need to replace a reference spreadsheet for a standard cluster refresh. The key competitive insight is that multi-scenario comparison with scenario duplication and a copy-paste text summary are gaps in all existing tools — these are the primary differentiators.
 
 **Must have (table stakes) — v1:**
+
 - Current environment input form (VMs, vCPUs, RAM, disk, existing server config) — raw material for all calculations
 - Derived metric auto-calculation (vCPU:pCore ratio, RAM/VM, VMs/server) with <200ms re-render
 - Target server configuration input (cores/socket, sockets, RAM, disk) per scenario
@@ -52,6 +54,7 @@ The MVP feature set is defined by what presales engineers need to replace a refe
 - JSON and CSV download — auditable record of inputs and outputs
 
 **Should have (competitive) — v1.x after validation:**
+
 - N+1 HA-aware server count toggle (separate from utilization headroom)
 - Growth buffer input (% VM growth over N months)
 - localStorage persistence
@@ -59,12 +62,14 @@ The MVP feature set is defined by what presales engineers need to replace a refe
 - Printable / PDF-ready layout (CSS @media print)
 
 **Defer (v2+):**
+
 - Assumption-sensitivity delta table
 - More than 3 simultaneous scenarios
 - Workload profile presets (VDI-heavy, DB-heavy)
 - Dark mode / theming
 
 **Anti-features to reject regardless of request:**
+
 - Pre-defined hardware SKU catalog (goes stale, kills vendor-neutral positioning)
 - TCO / pricing / BOM output (price data changes constantly, wrong product category)
 - Backend user accounts (turns static tool into a web app requiring auth and GDPR compliance)
@@ -76,6 +81,7 @@ The MVP feature set is defined by what presales engineers need to replace a refe
 The architecture is a 3-step wizard (Current Environment → Scenarios → Review and Export) built on three strictly separated layers: a Presentation Layer (WizardShell, step components, ExportToolbar), a State Layer (three narrow Zustand slices for wizard navigation, cluster data, and scenarios), and a Calculation Layer (`src/lib/sizing/` — pure TypeScript, zero React imports). Derived results (`ScenarioResult[]`) are never stored in Zustand; they are computed on-demand in the `useScenariosResults()` hook which calls the sizing library. This prevents cache invalidation bugs and is fast enough given the O(n) arithmetic with n ≤ 10 scenarios.
 
 **Major components:**
+
 1. `WizardShell` + `StepIndicator` — step routing, navigation guards, progress display
 2. `Step1CurrentCluster` (form + `DerivedMetricsPanel`) — current environment input with live derived metrics
 3. `Step2Scenarios` (tabbed `ScenarioCard` instances + `ScenarioResults`) — per-scenario server config input with live calculation preview
@@ -85,6 +91,7 @@ The architecture is a 3-step wizard (Current Environment → Scenarios → Revie
 7. `src/store/` (3 Zustand slices), `src/hooks/` (`useScenariosResults`, `useWizardNavigation`), `src/schemas/` (Zod schemas)
 
 **Key architectural rules:**
+
 - Components never call sizing lib functions directly — only through hooks
 - Sizing lib never imports from React — fully decoupled and unit-testable
 - Export utilities are pure functions called from click handlers — not reactive state
@@ -154,10 +161,12 @@ The research unanimously points to a bottom-up build order: math first, state se
 ### Research Flags
 
 Phases likely needing deeper research during planning:
+
 - **Phase 5 (Shareable URL):** URL hash state encoding/decoding strategy and size limits for large scenario sets need validation before implementation
 - **Phase 5 (localStorage persistence):** Zustand persist middleware has schema migration concerns if the state shape evolves; migration strategy needs design
 
 Phases with standard, well-documented patterns (skip research-phase):
+
 - **Phase 1 (Sizing library):** Pure TypeScript math with Vitest — textbook unit testing, no novel patterns
 - **Phase 2 (React Hook Form + Zod + Zustand):** Multiple high-quality reference implementations exist; the exact pipeline is documented in detail in ARCHITECTURE.md
 - **Phase 3 (Export utilities):** Clipboard API, Blob download, and papaparse are all well-documented with no gotchas beyond what PITFALLS.md already captures
@@ -184,17 +193,19 @@ Phases with standard, well-documented patterns (skip research-phase):
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - npm registry — all version numbers verified March 2026
-- https://vite.dev/guide/static-deploy — GitHub Pages base path configuration
-- https://ui.shadcn.com/docs/tailwind-v4 — shadcn Tailwind v4 support status
-- https://zod.dev/v4 — Zod v4 release notes, performance benchmarks, migration guide
-- https://react-hook-form.com/ — controlled vs. uncontrolled performance rationale
-- https://zustand.docs.pmnd.rs/ — Zustand v5 useSyncExternalStore notes
-- https://www.papaparse.com/docs — unparse() API for CSV export
+- <https://vite.dev/guide/static-deploy> — GitHub Pages base path configuration
+- <https://ui.shadcn.com/docs/tailwind-v4> — shadcn Tailwind v4 support status
+- <https://zod.dev/v4> — Zod v4 release notes, performance benchmarks, migration guide
+- <https://react-hook-form.com/> — controlled vs. uncontrolled performance rationale
+- <https://zustand.docs.pmnd.rs/> — Zustand v5 useSyncExternalStore notes
+- <https://www.papaparse.com/docs> — unparse() API for CSV export
 - React issues #7779 and #1549 — controlled/uncontrolled input behavior
 - Zod discussions #2814 and #2461 — coerce.number() empty-string-to-zero behavior
 
 ### Secondary (MEDIUM confidence)
+
 - Nutanix Sizer product page — feature competitive analysis
 - WintelGuy vmcalc.pl — live tool analysis, feature gaps
 - vSphere Cluster Calculator user guide — feature gaps
@@ -206,6 +217,7 @@ Phases with standard, well-documented patterns (skip research-phase):
 - Broadcom Community — CPU overcommit hyperthreading mistake
 
 ### Tertiary (LOW confidence, corroborated)
+
 - WebSearch — recharts vs Chart.js for React TypeScript (multiple sources agree)
 - WebSearch — Zustand vs Jotai vs Context 2025 (multiple sources agree)
 

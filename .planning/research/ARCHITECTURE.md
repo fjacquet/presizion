@@ -139,6 +139,7 @@ src/
 **Trade-offs:** Requires discipline to not add React dependencies into lib files. Pays off massively in testability — the most critical business logic can be verified with plain `vitest` unit tests, no component rendering required.
 
 **Example:**
+
 ```typescript
 // src/lib/sizing/formulas.ts
 export interface CpuConstraintInput {
@@ -164,6 +165,7 @@ export function serverCountByCpu(input: CpuConstraintInput): number {
 **Trade-offs:** Re-computation on every render. Acceptable here because calculations are O(n) arithmetic with n <= 10 scenarios and the <200 ms constraint is easily met. With React 19 compiler or selective `useMemo`, this is not a concern.
 
 **Example:**
+
 ```typescript
 // src/hooks/useScenariosResults.ts
 import { useScenariosStore } from '../store/useScenariosStore';
@@ -188,6 +190,7 @@ export function useScenariosResults() {
 **Trade-offs:** Two copies of data exist briefly (form state + store state). This is intentional — it means navigating backwards re-populates the form from the store's last-saved values cleanly.
 
 **Example:**
+
 ```typescript
 // src/components/steps/Step1CurrentCluster/CurrentClusterForm.tsx
 const form = useForm<CurrentClusterFormData>({

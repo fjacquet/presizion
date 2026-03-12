@@ -120,6 +120,7 @@ No blockers or warnings detected.
 | None | — | — | — | No stubs, placeholders, TODO/FIXME, empty implementations, or React imports in lib/ found |
 
 Key negative results confirmed:
+
 - `grep -r "from 'react'" src/lib/` — no matches
 - `grep -r "z.coerce" src/schemas/` — no actual usage (comments only)
 - `grep -r "ScenarioResult" src/store/` — only a warning comment, no stored result

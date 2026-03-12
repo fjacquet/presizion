@@ -126,5 +126,5 @@ None - no external service configuration required.
 - Any component importing from src/lib/sizing/ can rely on the frozen, typed return value
 
 ---
-*Phase: 01-foundation*
-*Completed: 2026-03-12*
+_Phase: 01-foundation_
+_Completed: 2026-03-12_

@@ -5,34 +5,40 @@
 **Confidence:** HIGH
 
 <user_constraints>
+
 ## User Constraints (from CONTEXT.md)
 
 ### Locked Decisions
 
 **Test Fixtures**
+
 - No external reference spreadsheet — the PRD Figure 1 data was illustrative only; the app defines its own formulas from the spec
 - Use hand-crafted fixtures that isolate each constraint: one CPU-limited case, one RAM-limited case, one disk-limited case
 - Boundary/rounding edge cases must be explicitly tested — inputs designed to land near integer boundaries verify `Math.ceil()` correctness (pitfalls research flagged this as highest-risk formula bug)
 - Tests live in Vitest; strict mode TS build must pass with zero errors
 
 **Formula API Shape**
+
 - Single exported function: `computeScenarioResult(cluster: OldCluster, scenario: Scenario): ScenarioResult`
 - One call per scenario update returns the full result object (server counts per constraint, final count, limiting resource, utilization percentages)
 - Internal helper functions per constraint (CPU/RAM/disk) are fine but are implementation details — only `computeScenarioResult` is the public contract
 - Formula display strings (for CALC-07 inline rendering in UI) live in a **separate display module** (`src/lib/display/` or similar), not inside `src/lib/sizing/` — keeps pure math isolated from presentation concerns
 
 **Type Definitions**
+
 - Plain TypeScript numbers throughout — no branded types; TypeScript strict mode + descriptive field names (`totalVcpus`, `ramPerServerGb`) provide sufficient protection
 - `OldCluster` and `Scenario` are `readonly` interfaces — all mutations go through Zustand actions to prevent accidental direct state mutation
 - `ScenarioResult` is also readonly (derived, never mutated)
 
 **Defaults Location**
+
 - All industry defaults defined in a single constants file: `src/lib/sizing/defaults.ts`
 - This file is the single source of truth — imported by Zod schemas and Zustand store initializer
 - Each constant includes a rationale comment explaining why that value (e.g., `// 4:1 is VMware's general-purpose recommendation for mixed workloads — adjust for VDI or compute-heavy profiles`)
 - Initial defaults: `DEFAULT_VCPU_TO_PCORE_RATIO = 4`, `DEFAULT_HEADROOM_PERCENT = 20`, `DEFAULT_HA_RESERVE_ENABLED = false`
 
 ### Claude's Discretion
+
 - Internal file naming within `src/lib/sizing/` (e.g., `constraints.ts` vs `formulas.ts`)
 - `parseNumericInput` helper implementation details
 - Zustand slice naming conventions (as long as they match ARCHITECTURE.md's three-slice pattern)
@@ -44,6 +50,7 @@ None — discussion stayed within phase scope.
 </user_constraints>
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -99,6 +106,7 @@ The secondary risk is structural: the formula's public contract (`computeScenari
 | Vitest | Jest | Jest requires separate babel config. Vitest reuses Vite config — zero extra setup for a Vite project. |
 
 **Installation (Phase 1 scope):**
+
 ```bash
 npm create vite@latest cluster-sizer -- --template react-ts
 cd cluster-sizer
@@ -148,6 +156,7 @@ src/
 **When to use:** Always, for every formula. This is the non-negotiable correctness pattern per the project constitution and CONTEXT.md.
 
 **How to implement:**
+
 ```typescript
 // src/lib/sizing/formulas.ts
 // Intermediate values held at full precision; Math.ceil applied ONLY at final output.
@@ -190,6 +199,7 @@ export function serverCountByDisk(
 **What:** `computeScenarioResult` is the single exported function that Phase 2+ code calls. Internal helpers (serverCountByCpu etc.) are not exported from `constraints.ts` — they are implementation details.
 
 **Implementation:**
+
 ```typescript
 // src/lib/sizing/constraints.ts
 import { serverCountByCpu, serverCountByRam, serverCountByDisk } from './formulas';
@@ -249,6 +259,7 @@ export function computeScenarioResult(
 **What:** Three narrow stores, each with a single concern. Components subscribe to the minimum store needed. No derived results stored — only raw inputs.
 
 **Implementation:**
+
 ```typescript
 // src/store/useClusterStore.ts
 import { create } from 'zustand';
@@ -465,10 +476,12 @@ export function createDefaultScenario(): import('../types/cluster').Scenario {
 **What goes wrong:** HA reserve (fault tolerance: 1 extra host survives a host failure) is conceptually different from headroom % (performance buffer: cluster runs at 80% utilization). Conflating them into a single % produces a cluster that is either over-provisioned (user sets 40% to cover both) or has no fault tolerance (user thinks 20% covers HA).
 
 **How to avoid:** Keep them as separate formula parameters. The CONTEXT.md decision is clear: `DEFAULT_HA_RESERVE_ENABLED = false`, and when enabled, N+1 adds exactly 1 server AFTER the max-constraint resolution. The formula is:
+
 ```
 rawCount = Math.max(cpuCount, ramCount, diskCount)
 finalCount = haReserveEnabled ? rawCount + 1 : rawCount
 ```
+
 CALC-04 is explicit: "adds 1 to the final server count after constraint resolution." The `+1` is not a percentage — it is a literal integer added to `rawCount`.
 
 **Warning signs:** The HA toggle has no visible effect on output. Or HA is expressed as a percentage of the server count rather than a fixed +1.
@@ -484,9 +497,11 @@ CALC-04 is explicit: "adds 1 to the final server count after constraint resoluti
 **What goes wrong:** A developer adds a `useState` or `useCallback` import to a formula file for convenience. The sizing lib is no longer a pure TypeScript module — it now requires a React render context to call. Vitest tests that called formula functions directly now need `renderHook` wrappers. The correctness foundation is polluted.
 
 **How to avoid:** Add an ESLint `no-restricted-imports` rule scoped to `src/lib/`:
+
 ```json
 { "patterns": [{ "group": ["react", "react-dom"], "message": "src/lib must not import React" }] }
 ```
+
 The TypeScript strict build will not catch this — ESLint must.
 
 ### Pitfall 6: `ScenarioResult` Stored in Zustand
@@ -656,6 +671,7 @@ export default defineConfig({
 | Jest (standalone) | Vitest | 2022–2023 | Zero config for Vite projects; same API surface |
 
 **Deprecated/outdated:**
+
 - `z.coerce.number()` for required numeric inputs: causes silent `0` for empty fields — use `z.preprocess` always
 - Enzyme: incompatible with React 19 — use `@testing-library/react` v16
 - Storing derived `ScenarioResult` in Zustand: cache invalidation anti-pattern — compute on demand in hook
@@ -739,8 +755,8 @@ export default defineConfig({
 
 ### Secondary (MEDIUM confidence)
 
-- Zod v4 docs (https://zod.dev/v4) — `z.preprocess` vs `z.coerce.number()` behavior confirmed
-- Zustand docs (https://zustand.docs.pmnd.rs/) — slice pattern, `useSyncExternalStore`
+- Zod v4 docs (<https://zod.dev/v4>) — `z.preprocess` vs `z.coerce.number()` behavior confirmed
+- Zustand docs (<https://zustand.docs.pmnd.rs/>) — slice pattern, `useSyncExternalStore`
 - React issue #7779 — `<input type="number">` empty string returns `""`
 - Zod discussion #2814 — `coerce.number()` empty-string-to-zero behavior
 
@@ -753,6 +769,7 @@ None — all critical claims supported by primary or secondary sources.
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — all versions confirmed against prior project research which was verified against npm registry March 2026
 - Architecture: HIGH — patterns sourced from prior project research (ARCHITECTURE.md), which cited multiple production React multi-step form guides
 - Formula correctness: HIGH — formulas are explicit in REQUIREMENTS.md; pitfall mitigations are grounded in primary sources (React issues, Zod issues, IEEE 754 behavior)

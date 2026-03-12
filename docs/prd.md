@@ -14,7 +14,6 @@ Figure 1 shows an example of the current data typically available to the user:
 ![example current cluster sizing spreadsheet](https://dell-aws-poc-2-be.glean.com/api/v1/downloadchatfile/2ccc055f31714e29ba1831acd6a7627a)
 *Figure 1: Example input data for an existing cluster (“old”) including VM, total, server, and per-server statistics.*
 
-
 ## 2. Problem Statement
 
 When planning a **cluster refresh** (e.g., moving to newer server generations or different configurations), engineers typically:
@@ -30,7 +29,6 @@ This approach is:
 - **Inconsistent** – different people use different formulas and assumptions.
 
 We need a **consistent, repeatable, and fast** way to go from **“current cluster stats” → “proposed refreshed cluster”**, entirely in the browser, with transparent assumptions.
-
 
 ## 3. Goals & Non-Goals
 
@@ -64,7 +62,6 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 - No formal TCO/ROI calculations (only capacity/sizing in v1).
 - No per-VM-level modeling; calculations are **aggregate-based** (e.g., totals, averages).
 
-
 ## 4. Users & Personas
 
 ### Primary Persona – **Presales / Systems Engineer**
@@ -81,7 +78,6 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 ### Tertiary Persona – **Sales Representative (Read-Only)**
 
 - Uses the output summaries (not the full UI) to understand the proposed configuration and share with customers.
-
 
 ## 5. Scope
 
@@ -130,7 +126,6 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 - Automated mapping of workloads to specific servers.
 - Detailed capacity planning beyond a multi-year headroom factor.
 
-
 ## 6. Key User Stories
 
 1. **Input current cluster metrics**
@@ -150,7 +145,6 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 
 6. **Understand how numbers are derived**
    - *As a solution architect, I want to see the formulas and assumptions behind each key output value so that I can validate and refine the sizing.*
-
 
 ## 7. Functional Requirements
 
@@ -310,7 +304,6 @@ For each scenario, the app shall compute:
 
 - Nice-to-have: basic support for light/dark themes consistent with modern UI expectations.
 
-
 ## 8. Non-Functional Requirements
 
 ### 8.1 Performance
@@ -343,7 +336,6 @@ For each scenario, the app shall compute:
 - Implemented in a **modular**, well-documented codebase using a mainstream framework (e.g., React + TypeScript) or well-structured vanilla JavaScript.
 - Sizing formulas and constants should be centralized in a single configuration/module, making it easy to adjust as best practices evolve.
 
-
 ## 9. Technical Design Constraints
 
 - **Client-side only**:
@@ -353,7 +345,6 @@ For each scenario, the app shall compute:
   - UI: HTML5, CSS (or lightweight CSS framework), JavaScript/TypeScript (optionally React).
   - Packaging: simple static build (e.g., Webpack, Vite, or similar) that outputs static assets.
 - **No external tracking/analytics** by default (unless explicitly added in future scope).
-
 
 ## 10. Data Model (Conceptual)
 
@@ -404,7 +395,6 @@ For each scenario, the app shall compute:
    - `ramUtilizationPercent`
    - `diskUtilizationPercent`
 
-
 ## 11. UX Sketch (Conceptual)
 
 1. **Step 1: Current Cluster Input**
@@ -424,7 +414,6 @@ For each scenario, the app shall compute:
    - “Download JSON/CSV” button.
 
 Wireframes are not included here but can be added in a future UX deliverable.
-
 
 ## 12. Acceptance Criteria
 
@@ -446,7 +435,6 @@ Wireframes are not included here but can be added in a future UX deliverable.
    - “Copy Summary” produces a self-contained text block with clear context, assumptions, and results.
    - JSON/CSV export contains all expected fields and can be re-imported to reproduce the same results (future enhancement).
 
-
 ## 13. Risks & Open Questions
 
 - **Sizing formulas & best practices**:
@@ -466,7 +454,6 @@ Wireframes are not included here but can be added in a future UX deliverable.
 
 - **Governance**:
   - Who owns maintenance of sizing rules as hardware generations and best practices change?
-
 
 ## 14. Future Enhancements (Beyond v1)
 

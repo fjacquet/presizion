@@ -3,6 +3,7 @@
 ## Pre-existing Issues (Out of Scope)
 
 ### schemas test stub fails with missing implementation
+
 - **Discovered during:** Plan 04 (01-04)
 - **File:** `src/schemas/__tests__/schemas.test.ts`
 - **Issue:** Test file imports `../currentClusterSchema` and `../scenarioSchema` which do not exist yet. The `src/schemas/` directory has only the test stub — no implementation files.

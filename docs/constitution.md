@@ -342,4 +342,3 @@ Before merging a PR:
    - Is the code **functional, typed, and testable**?
 
 If the answer to any of these is “no”, fix the code or open a follow‑up issue before merging.
-

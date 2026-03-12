@@ -20,6 +20,7 @@ Developers treat JavaScript numbers as reliable decimal arithmetic. The IEEE 754
 Centralize all sizing formulas in `src/lib/sizing/` (per the project constitution). Inside these functions, carry all intermediate values to full precision, then apply a single rounding gate only at the final output stage. For display, use `Number.toFixed(2)` or similar, but never round intermediate values. For equality checks between formula outputs and reference values, use a tolerance band (e.g., `Math.abs(a - b) < 0.001`) rather than strict equality. Add a unit test fixture with at least three known input/output pairs verified against the reference spreadsheet.
 
 **Warning signs:**
+
 - Formula outputs differ from the reference spreadsheet by exactly 1 server on boundary-condition inputs.
 - Tests pass for round numbers (4, 8, 16) but fail for fractional inputs (3.7 servers needed).
 - Different browsers return marginally different final numbers.
@@ -41,6 +42,7 @@ Operating system tools (`nproc`, Task Manager, vSphere host summary) all report 
 Label the input field explicitly as "Physical cores per server (NOT hyperthreaded logical CPUs)". Add inline help text: "If your server shows 64 logical CPUs with HT enabled, enter 32." Apply a defensive validation rule: if pCores > (sockets × 32), warn the user they may have entered logical threads instead of physical cores. In the formula-transparency panel, show the calculation `vCPU:pCore = total_vCPUs / total_pCores` and annotate which input was used.
 
 **Warning signs:**
+
 - A user inputs a pCore value that is exactly double a plausible core count (e.g., 48 "cores" on a 2-socket system — likely 24 physical + HT).
 - Output server count seems suspiciously low compared to current environment size.
 - The vCPU:pCore ratio output is less than 1:1 (impossible in any real cluster).
@@ -62,6 +64,7 @@ This is a long-standing React issue (tracked since React issue #7779 and #1869 i
 Store numeric input fields as `string | number` in React state during editing — only parse to number at the point of calculation. Write a dedicated `parseNumericInput(raw: string): number | null` helper that handles empty string, "0", negative input, and non-numeric characters explicitly. Use `z.preprocess` with explicit empty-string-to-undefined conversion before `z.number()`. Never pass a raw form value directly into a sizing formula function — always go through the parse helper first.
 
 **Warning signs:**
+
 - Any output field shows `NaN`, `Infinity`, or `undefined` when any input is cleared.
 - Deleting a digit mid-edit (e.g., "12" → "1" → "") triggers visible corruption in the results panel.
 - The export file contains `null` or `NaN` values for fields the user had previously filled.
@@ -83,6 +86,7 @@ The formula is conceptually simpler without the HA factor. Developers add the he
 Treat HA headroom as a separate, explicit input with a distinct default (1 host failure reserved). Compute `required_raw = Math.ceil(workload / per_host_capacity)`, then compute `required_with_ha = required_raw + ha_reserve_hosts`. Display both numbers in the results panel so the user can see the contribution of HA separately from the utilization headroom. Default `ha_reserve_hosts` to 1 and document why. In the formula transparency panel, show "N+1 HA reserve: +1 host".
 
 **Warning signs:**
+
 - Output server count in a scenario with 20% headroom equals exactly the mathematically minimum number — there is no HA buffer.
 - Users can set headroom to 0% without a warning.
 - The formula never references a fault-tolerance variable.
@@ -104,6 +108,7 @@ TypeScript optional object properties (`field?: number`) initialize to `undefine
 Define a `createEmptyScenario()` factory function that returns a complete object with every field initialized to an explicit default (`""` for string inputs, `0` for number display, etc.). Use this factory everywhere a new scenario is created (initial state, duplication). Add a TypeScript `Required<ScenarioInput>` constraint on the factory return type so incomplete initialization fails at compile time.
 
 **Warning signs:**
+
 - React console warning "changing uncontrolled input to controlled" appears during testing.
 - Duplicating a scenario and editing the copy causes the original to update (or vice versa).
 - A field in a newly created scenario does not accept user input on the first keystroke.
@@ -125,6 +130,7 @@ Per-step validation is the natural pattern. Cross-step dependencies require a gl
 Keep all form state in a single top-level store (Zustand or `useReducer`). Run the full sizing calculation on every state change, not just on the final step. Display derived warnings — not blocking errors — in a persistent summary panel visible at all steps. Do not gate the final "Calculate" action on per-step schemas alone; re-run a holistic Zod validation at submission time.
 
 **Warning signs:**
+
 - Editing Step 1 values does not update the real-time calculation panel until the user reaches Step 3.
 - Users can reach the "results" view with logically inconsistent inputs that produce nonsensical server counts.
 - Back-navigation triggers a "your data may be lost" confirmation (indicates state is not persisted correctly across steps).
