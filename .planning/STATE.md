@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-input-forms-02-PLAN.md
-last_updated: "2026-03-12T20:35:00.000Z"
+stopped_at: Completed 02-input-forms-04-PLAN.md
+last_updated: "2026-03-12T20:02:00.000Z"
 last_activity: 2026-03-12 — Roadmap created; all 27 v1 requirements mapped to 4 phases
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-input-forms P01 | 4min | 2 tasks | 16 files |
 | Phase 02-input-forms P02 | 35min | 4 tasks | 6 files |
 | Phase 02-input-forms P03 | 8min | 2 tasks | 4 files |
+| Phase 02-input-forms P04 | 5min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,10 @@ Recent decisions affecting current work:
 - [Phase 02-input-forms P03]: form.watch(callback) subscription (not useEffect+watched-dep) to avoid infinite Zustand setState loop in ScenarioCard
 - [Phase 02-input-forms P03]: Form wrapper must wrap entire Card (including CardHeader) so FormField can access FormProvider context
 - [Phase 02-input-forms P03]: Use getByText for label assertions (FormControl renders div wrapper, breaking getByLabelText linkage)
+- [Phase 02-input-forms P04]: vi.mock step components in WizardShell tests to isolate routing from form rendering
+- [Phase 02-input-forms P04]: zodResolver with z.preprocess schemas requires as any cast — input type is unknown but useForm expects concrete output type
+- [Phase 02-input-forms P04]: Control<T, any, T> third type param required in NumericFormField interface when z.preprocess resolver is used
+- [Phase 02-input-forms P04]: TooltipTrigger from base-ui/react does not support asChild prop — remove to fix TypeScript error
 
 ### Pending Todos
 
@@ -100,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T20:35:00.000Z
-Stopped at: Completed 02-input-forms-02-PLAN.md
+Last session: 2026-03-12T20:02:00.000Z
+Stopped at: Completed 02-input-forms-04-PLAN.md
 Resume file: None
