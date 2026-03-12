@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed Phase 2 (02-input-forms) — verified 13/13, 105 tests green
-last_updated: "2026-03-12T21:00:00.000Z"
-last_activity: 2026-03-12 — Phase 2 complete; all INPUT/SCEN/UX-01-03 requirements satisfied
+status: planning
+stopped_at: Completed 03-comparison-export-and-wizard-shell-01-PLAN.md
+last_updated: "2026-03-12T20:39:18.037Z"
+last_activity: 2026-03-12 — Phase 2 complete; 105 tests green; ready for Phase 3
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
   percent: 50
 ---
 
@@ -60,6 +60,7 @@ Progress: [█████░░░░░] 50%
 | Phase 02-input-forms P02 | 35min | 4 tasks | 6 files |
 | Phase 02-input-forms P03 | 8min | 2 tasks | 4 files |
 | Phase 02-input-forms P04 | 5min | 2 tasks | 7 files |
+| Phase 03-comparison-export-and-wizard-shell P01 | 1 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase 02-input-forms P04]: zodResolver with z.preprocess schemas requires as any cast — input type is unknown but useForm expects concrete output type
 - [Phase 02-input-forms P04]: Control<T, any, T> third type param required in NumericFormField interface when z.preprocess resolver is used
 - [Phase 02-input-forms P04]: TooltipTrigger from base-ui/react does not support asChild prop — remove to fix TypeScript error
+- [Phase 03-comparison-export-and-wizard-shell]: Nyquist Wave 0 stubs use it.todo (not it.skip) so Vitest counts them as pending not failing — test suite exits 0
+- [Phase 03-comparison-export-and-wizard-shell]: shadcn table installed in wave 0 plan so wave 1 implementation plans can import @/components/ui/table without extra CLI step
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T20:02:00.000Z
-Stopped at: Completed 02-input-forms-04-PLAN.md
+Last session: 2026-03-12T20:39:18.035Z
+Stopped at: Completed 03-comparison-export-and-wizard-shell-01-PLAN.md
 Resume file: None

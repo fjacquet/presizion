@@ -33,21 +33,21 @@
 
 ### Comparison
 
-- [ ] **COMP-01**: App displays a side-by-side comparison table for all defined scenarios
-- [ ] **COMP-02**: Comparison table includes: scenario name, final server count, limiting resource, vCPU:pCore ratio, VMs/server, headroom %, estimated CPU/RAM/disk utilization
+- [x] **COMP-01**: App displays a side-by-side comparison table for all defined scenarios
+- [x] **COMP-02**: Comparison table includes: scenario name, final server count, limiting resource, vCPU:pCore ratio, VMs/server, headroom %, estimated CPU/RAM/disk utilization
 
 ### Export
 
-- [ ] **EXPO-01**: User can copy a plain-text summary to clipboard — includes current cluster inputs, key assumptions, and results per scenario; suitable for pasting into email or slides
-- [ ] **EXPO-02**: User can download a CSV file containing all input fields and output metrics for all scenarios
+- [x] **EXPO-01**: User can copy a plain-text summary to clipboard — includes current cluster inputs, key assumptions, and results per scenario; suitable for pasting into email or slides
+- [x] **EXPO-02**: User can download a CSV file containing all input fields and output metrics for all scenarios
 
 ### UX & Wizard
 
 - [x] **UX-01**: App presents a 3-step wizard: Step 1 (Enter Current Cluster) → Step 2 (Define Scenarios) → Step 3 (Review & Export)
 - [x] **UX-02**: Navigation to the next step is blocked until required inputs on the current step are valid
 - [x] **UX-03**: Key fields display inline tooltips/info icons explaining the field's meaning and typical acceptable ranges
-- [ ] **UX-04**: App provides color-coded visual indicators (green/amber/red) for utilization levels and highlights the bottleneck resource per scenario
-- [ ] **UX-05**: App warns user before navigating away from the page with unsaved data (beforeunload event)
+- [x] **UX-04**: App provides color-coded visual indicators (green/amber/red) for utilization levels and highlights the bottleneck resource per scenario
+- [x] **UX-05**: App warns user before navigating away from the page with unsaved data (beforeunload event)
 
 ### Deployment
 
@@ -104,15 +104,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CALC-05 | Phase 1 | Complete |
 | CALC-06 | Phase 1 | Complete |
 | CALC-07 | Phase 1 | Complete |
-| COMP-01 | Phase 3 | Pending |
-| COMP-02 | Phase 3 | Pending |
-| EXPO-01 | Phase 3 | Pending |
-| EXPO-02 | Phase 3 | Pending |
+| COMP-01 | Phase 3 | Complete |
+| COMP-02 | Phase 3 | Complete |
+| EXPO-01 | Phase 3 | Complete |
+| EXPO-02 | Phase 3 | Complete |
 | UX-01 | Phase 2 | Complete |
 | UX-02 | Phase 2 | Complete |
 | UX-03 | Phase 2 | Complete |
-| UX-04 | Phase 3 | Pending |
-| UX-05 | Phase 3 | Pending |
+| UX-04 | Phase 3 | Complete |
+| UX-05 | Phase 3 | Complete |
 | DEPLOY-01 | Phase 4 | Pending |
 
 **Coverage:**
