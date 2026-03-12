@@ -29,7 +29,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. N+1 HA reserve is a first-class formula parameter in `constraints.ts` — server count with HA enabled equals server count without HA plus one
   4. All three Zustand slices (wizard navigation, cluster data, scenarios) are defined and typed; `useScenariosResults` hook returns correct `ScenarioResult[]` for fixture inputs
   5. TypeScript strict-mode build completes with zero errors across `src/lib/sizing/`, `src/store/`, and `src/schemas/`
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Vite project and create all test stubs (Wave 0)
+- [ ] 01-02-PLAN.md — Type contracts, defaults, formula functions, computeScenarioResult (CALC-01 to CALC-06)
+- [ ] 01-03-PLAN.md — Zod schemas, Zustand stores, useScenariosResults hook
+- [ ] 01-04-PLAN.md — Formula display strings module (CALC-07)
 
 ### Phase 2: Input Forms
 **Goal**: Users can enter current cluster data and define scenarios, with live server count outputs visible and full inline validation enforced at each field
@@ -73,7 +79,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
 | 2. Input Forms | 0/TBD | Not started | - |
 | 3. Comparison, Export, and Wizard Shell | 0/TBD | Not started | - |
 | 4. Deployment and Polish | 0/TBD | Not started | - |
