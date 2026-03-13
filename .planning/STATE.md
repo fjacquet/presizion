@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
 status: planning
-stopped_at: Completed 07-enhanced-export-and-as-is-to-be-report-01-PLAN.md
-last_updated: "2026-03-13T08:51:39.471Z"
+stopped_at: Completed 07-enhanced-export-and-as-is-to-be-report-02-PLAN.md
+last_updated: "2026-03-13T09:42:14.459Z"
 last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 23
-  completed_plans: 21
+  completed_plans: 23
   percent: 50
 ---
 
@@ -73,6 +73,8 @@ Progress: [█████░░░░░] 50%
 | Phase 06-conditional-ui-wiring P01 | 2 | 2 tasks | 4 files |
 | Phase 06-conditional-ui-wiring P02 | 6 | 2 tasks | 7 files |
 | Phase 07-enhanced-export-and-as-is-to-be-report P01 | 10 | 2 tasks | 4 files |
+| Phase 07-enhanced-export-and-as-is-to-be-report P03 | 5 | 2 tasks | 5 files |
+| Phase 07-enhanced-export-and-as-is-to-be-report P02 | 27 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -136,6 +138,9 @@ Recent decisions affecting current work:
 - [Phase 06-conditional-ui-wiring]: SPECint formula row in ScenarioResults renders outside the 3-col grid as a separate row below to avoid disrupting layout
 - [Phase 07-enhanced-export-and-as-is-to-be-report]: printCss.test.ts uses real it() (not it.todo) for print-color-adjust check — intentionally RED as EXPO-04 leading indicator until Plan 03 adds print CSS
 - [Phase 07-enhanced-export-and-as-is-to-be-report]: REPT-02 stubs placed in top-level describe block (not nested in CurrentClusterForm describe) to preserve existing test structure
+- [Phase 07-enhanced-export-and-as-is-to-be-report]: normaliseCluster() enumerates all OldCluster optional fields with ?? null before JSON.stringify — replacer alone cannot produce null for absent (not undefined) keys
+- [Phase 07-enhanced-export-and-as-is-to-be-report]: existingServerCount moved to always-visible Existing Server Config section; SPECint section now contains only specintPerServer
+- [Phase 07-enhanced-export-and-as-is-to-be-report]: As-Is cells read directly from useClusterStore (not ScenarioResult type) per RESEARCH.md
 
 ### Pending Todos
 
@@ -149,6 +154,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T08:51:39.468Z
-Stopped at: Completed 07-enhanced-export-and-as-is-to-be-report-01-PLAN.md
+Last session: 2026-03-13T09:42:14.457Z
+Stopped at: Completed 07-enhanced-export-and-as-is-to-be-report-02-PLAN.md
 Resume file: None

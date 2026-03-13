@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 5: SPECint and Utilization Formula Engine** - Schema extensions, formula rewrites, and unit test coverage for SPECint mode and utilization right-sizing — no UI changes (completed 2026-03-13)
 - [x] **Phase 6: Conditional UI Wiring** - Step 1 and ScenarioCard conditional fields for SPECint and utilization inputs, with updated results and comparison displays (completed 2026-03-13)
-- [ ] **Phase 7: Enhanced Export and As-Is/To-Be Report** - As-Is reference column in Step 3, JSON download, print/PDF layout, and Step 1 server config cleanup
+- [x] **Phase 7: Enhanced Export and As-Is/To-Be Report** - As-Is reference column in Step 3, JSON download, print/PDF layout, and Step 1 server config cleanup (completed 2026-03-13)
 
 ## Phase Details
 
@@ -185,4 +185,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
 | 6. Conditional UI Wiring | 2/2 | Complete    | 2026-03-13 |
-| 7. Enhanced Export | 1/3 | In Progress|  |
+| 7. Enhanced Export | 3/3 | Complete   | 2026-03-13 |
