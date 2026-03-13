@@ -16,7 +16,8 @@ Phase 4 has two hard requirements: DEPLOY-01 (static build with correct base pat
 
 ---
 
-<phase_requirements>
+<phase_requirements>   s s s
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -30,6 +31,7 @@ Phase 4 has two hard requirements: DEPLOY-01 (static build with correct base pat
 ## Standard Stack
 
 ### Core
+
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
 | Vite | ^8.0.0 (already installed) | Build tool with `base` config | Official GitHub Pages deployment method |
@@ -38,12 +40,14 @@ Phase 4 has two hard requirements: DEPLOY-01 (static build with correct base pat
 | `actions/upload-pages-artifact@v3` | v3 | Upload build output as artifact | Required by deploy-pages |
 
 ### Supporting
+
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
 | `npx serve` | any | Local verification of `dist/` build | Manual smoke test post-build |
 | Tailwind v4 `@custom-variant` | already installed | Override dark mode selector | Required to combine class + media |
 
 ### Alternatives Considered
+
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
 | GitHub Actions deploy | `gh-pages` npm package | Actions is official; no extra dep needed |
@@ -56,6 +60,7 @@ Phase 4 has two hard requirements: DEPLOY-01 (static build with correct base pat
 ## Architecture Patterns
 
 ### Recommended Project Structure
+
 ```
 .github/
   workflows/
@@ -73,6 +78,7 @@ vite.config.ts           # MODIFIED: add base: '/presizion/'
 **When to use:** Always for project repositories (not org-level pages).
 
 **Example:**
+
 ```typescript
 // Source: https://vite.dev/guide/static-deploy#github-pages
 // vite.config.ts
@@ -104,6 +110,7 @@ export default defineConfig({
 **When to use:** Every push to main; requires Pages enabled in repo settings with Source = "GitHub Actions".
 
 **Example:**
+
 ```yaml
 # Source: https://vite.dev/guide/static-deploy#github-pages
 # .github/workflows/deploy.yml
@@ -167,9 +174,11 @@ jobs:
 ### Pattern 3: Dark Mode Fix — Two-Strategy Approach
 
 **Critical finding:** The current `src/index.css` has:
+
 ```css
 @custom-variant dark (&:is(.dark *));
 ```
+
 This means `dark:` Tailwind utilities ONLY activate when a `.dark` class is present on an ancestor element. Without a `ThemeProvider` or JavaScript that adds `.dark` to `<html>`, the OS dark mode preference is completely ignored. This directly violates UX-06.
 
 **The CSS already has** `.dark { ... }` variable overrides (lines 181–212 of `src/index.css`) and `@media (prefers-color-scheme: dark)` overrides for `--bg`, `--text`, etc. (lines 100–118). But these only cover the custom CSS variables (`--bg`, `--text-h`, etc.) — the shadcn/ui CSS variables (`--background`, `--foreground`, `--card`, etc.) in the `.dark` block are NOT covered by any media query.
@@ -234,30 +243,35 @@ Replace `.dark { ... }` block with `@media (prefers-color-scheme: dark) { :root 
 ## Common Pitfalls
 
 ### Pitfall 1: Blank Page on GitHub Pages After Deployment
+
 **What goes wrong:** Assets are served from the wrong path; `index.html` loads but JS/CSS 404.
 **Why it happens:** Vite's default `base: '/'` generates asset URLs like `/assets/index-abc.js`, which resolves to `https://fjacquet.github.io/assets/...` instead of `https://fjacquet.github.io/presizion/assets/...`.
 **How to avoid:** Set `base: '/presizion/'` in `vite.config.ts` before running `npm run build`.
 **Warning signs:** Browser console shows net::ERR_ABORTED 404 for JS/CSS files after deploy.
 
 ### Pitfall 2: Dark Mode Flash (FOUC)
+
 **What goes wrong:** Page renders in light mode for ~100ms then switches to dark if OS prefers dark.
 **Why it happens:** React hydration applies the `.dark` class after initial paint.
 **How to avoid:** Add the synchronous blocking script to `index.html` `<head>` before `<script type="module">`.
 **Warning signs:** Visible white flash on load in dark OS environments.
 
 ### Pitfall 3: Dark Mode Ignores Utilization Colors
+
 **What goes wrong:** `text-red-600`, `text-amber-600`, `text-green-600` look incorrect in dark mode.
 **Why it happens:** Tailwind's named colors (red-600 etc.) do not have dark: variants applied in ComparisonTable; the `utilizationClass()` function returns fixed color classes.
 **How to avoid:** Use `dark:text-red-400`, `dark:text-amber-400`, `dark:text-green-400` variants alongside the existing light-mode classes OR use semantic color tokens (`text-destructive`, etc.) that already have dark mode CSS variable overrides.
 **Warning signs:** In dark mode the table cells appear to use insufficiently contrasting colors.
 
 ### Pitfall 4: SPA Routing 404 on Refresh
+
 **What goes wrong:** Navigating to `https://fjacquet.github.io/presizion/step/2` returns a 404 from GitHub Pages.
 **Why it happens:** GitHub Pages serves only static files; it doesn't know to route all paths to `index.html`.
 **How to avoid:** This app uses Zustand state (not URL routing), so no actual URL routing exists — this pitfall does NOT apply here. Confirm there is no `react-router` or similar in `package.json`. Confirmed: no router present.
 **Warning signs:** Any navigation that changes the browser URL path.
 
 ### Pitfall 5: `npm run build` Fails TypeScript Errors
+
 **What goes wrong:** `tsc -b && vite build` (the build script) fails on TypeScript errors before Vite runs.
 **Why it happens:** `npm run build` includes `tsc -b` — any type errors in source files will block the build.
 **How to avoid:** Run `npm run build` locally and fix all TypeScript errors before setting up the CI workflow.
@@ -270,6 +284,7 @@ Replace `.dark { ... }` block with `@media (prefers-color-scheme: dark) { :root 
 Verified patterns from official sources:
 
 ### Anti-Flash Dark Mode Script (index.html)
+
 ```html
 <!-- Source: https://ui.shadcn.com/docs/dark-mode/vite -->
 <!-- Place in <head> before <script type="module"> -->
@@ -283,6 +298,7 @@ Verified patterns from official sources:
 ```
 
 ### Clipboard Feedback (useState pattern)
+
 ```typescript
 // Source: React useState + setTimeout pattern
 import { useState } from 'react'
@@ -303,6 +319,7 @@ const handleCopy = async (): Promise<void> => {
 ```
 
 ### Dark Mode Utilization Colors (safe dark-mode variants)
+
 ```typescript
 // Source: project pattern, extends existing utilizationClass()
 // In ComparisonTable.tsx, update utilizationClass():
@@ -340,6 +357,7 @@ export function utilizationClass(pct: number): string {
 | `tailwindcss/vite` plugin | `@tailwindcss/postcss` plugin | Tailwind v4 | Project already uses postcss path |
 
 **Deprecated/outdated:**
+
 - `tailwindcss-animate`: Replaced by `tw-animate-css` in this project (already done).
 - `peaceiris/actions-gh-pages`: Replaced by official `actions/deploy-pages`. Both work, but official is preferred.
 
@@ -369,6 +387,7 @@ export function utilizationClass(pct: number): string {
 > `workflow.nyquist_validation` is `true` in `.planning/config.json` — this section is REQUIRED.
 
 ### Test Framework
+
 | Property | Value |
 |----------|-------|
 | Framework | Vitest ^4.1.0 with jsdom |
@@ -390,11 +409,13 @@ export function utilizationClass(pct: number): string {
 | CALC-07 (carried from P1) | `ScenarioResults.tsx` renders formula strings inline | unit | `src/components/step2/__tests__/ScenarioResults.test.tsx` | ✅ exists, needs extension |
 
 ### Sampling Rate
+
 - **Per task commit:** `npm run test`
 - **Per wave merge:** `npm run test`
 - **Phase gate:** Full suite green + manual dark mode smoke test before `/gsd:verify-work`
 
 ### Wave 0 Gaps
+
 - [ ] `src/__tests__/darkMode.test.ts` — unit tests for the anti-flash script behavior (mock `window.matchMedia`)
 - [ ] `src/lib/sizing/__tests__/display.test.ts` — unit tests for formula string functions in display.ts (if display.ts is created as part of this phase)
 - [ ] GitHub Actions workflow: `.github/workflows/deploy.yml` — deployment config (not a test file, but must exist before deploy plan executes)
@@ -407,16 +428,19 @@ Note: The `darkMode.test.ts` is inherently limited in jsdom — `window.matchMed
 ## Sources
 
 ### Primary (HIGH confidence)
-- https://vite.dev/guide/static-deploy — Official Vite static deployment guide; GitHub Pages section reviewed
-- https://tailwindcss.com/docs/dark-mode — Tailwind v4 official dark mode documentation; `@custom-variant` syntax verified
+
+- <https://vite.dev/guide/static-deploy> — Official Vite static deployment guide; GitHub Pages section reviewed
+- <https://tailwindcss.com/docs/dark-mode> — Tailwind v4 official dark mode documentation; `@custom-variant` syntax verified
 - `src/index.css` (project file) — Current `@custom-variant dark (&:is(.dark *))` confirmed; `.dark` CSS variable block confirmed; `@media (prefers-color-scheme: dark)` block for legacy vars confirmed
 
 ### Secondary (MEDIUM confidence)
-- https://ui.shadcn.com/docs/dark-mode/vite — shadcn/ui Vite dark mode guide; anti-flash script pattern
-- https://ui.shadcn.com/docs/tailwind-v4 — Tailwind v4 integration notes for shadcn
+
+- <https://ui.shadcn.com/docs/dark-mode/vite> — shadcn/ui Vite dark mode guide; anti-flash script pattern
+- <https://ui.shadcn.com/docs/tailwind-v4> — Tailwind v4 integration notes for shadcn
 - `git remote -v` output — Confirmed repo slug is `presizion`; base path derived from this
 
 ### Tertiary (LOW confidence)
+
 - WebSearch results for GitHub Actions YAML — workflow structure confirmed against official Vite docs pattern
 
 ---
@@ -424,6 +448,7 @@ Note: The `darkMode.test.ts` is inherently limited in jsdom — `window.matchMed
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — Vite, GitHub Actions, Tailwind v4 all verified via official docs
 - Architecture: HIGH — `base` path value derived from actual git remote; dark mode diagnosis from reading actual index.css
 - Pitfalls: HIGH — Flash-of-wrong-theme and blank-page pitfalls verified against Vite/Tailwind official docs; routing pitfall verified as N/A (no router in project)

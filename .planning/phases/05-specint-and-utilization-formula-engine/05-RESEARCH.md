@@ -7,6 +7,7 @@
 ---
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -184,6 +185,7 @@ The ADR specifies adding optional `cpuUtilPct` and `ramUtilPct` parameters with 
 **Warning:** Under `noUncheckedIndexedAccess` and strict TypeScript, optional parameters with defaults are safe. However, the existing `serverCountByCpu` function signature cannot change its parameter count without updating all call sites. Two options:
 
 **Option A (recommended): New parameter with default value**
+
 ```typescript
 // Add cpuUtilPct with default 100 — backward compatible
 export function serverCountByCpu(
@@ -200,6 +202,7 @@ export function serverCountByCpu(
 ```
 
 **Option B: Extract effective demand before calling**
+
 ```typescript
 // Caller computes effectiveTotalVcpus = totalVcpus * (cpuUtilPct / 100) before calling
 // serverCountByCpu signature unchanged
@@ -323,19 +326,23 @@ export function useScenariosResults(): readonly ScenarioResult[] {
 There are two display modules: `src/lib/sizing/display.ts` (used by Phase 4 tests) and `src/lib/display/formulaStrings.ts` (used by components). Both need extending. The ADR states "display.ts formula strings must branch on mode."
 
 **For `src/lib/sizing/display.ts` (existing):**
+
 - Add `cpuUtilizationPercent?: number` to `CpuFormulaParams` and branch when it's not 100
 - Add a new `SpecintFormulaParams` interface and `specintFormulaString` export function
 
 **For `src/lib/display/formulaStrings.ts` (component-facing):**
+
 - `getCpuFormulaString` receives `cpuUtilizationPercent?: number` and conditionally shows the scaler
 - New `getSpecintFormulaString(params: SpecintFormulaParams): string`
 
 **SPECint display string format:**
+
 ```
 "ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint) = 6 servers"
 ```
 
 **vCPU with utilization display string format (when utilization is not 100):**
+
 ```
 "ceil(2000 × 70% × 120% / 4 / 48) = 9 servers"
 ```
@@ -369,6 +376,7 @@ There are two display modules: `src/lib/sizing/display.ts` (used by Phase 4 test
 **Why it happens:** `exactOptionalPropertyTypes` distinguishes `{ x?: number }` (property absent) from `{ x: number | undefined }` (property present with undefined value). TypeScript 4.4+ enforces this strictly.
 
 **How to avoid:** When constructing objects from form data, only include the field if the value is defined:
+
 ```typescript
 const cluster: OldCluster = {
   totalVcpus: formData.totalVcpus,
@@ -388,6 +396,7 @@ const cluster: OldCluster = {
 **Why it happens:** `existingServerCount`, `specintPerServer`, and `targetSpecint` are all optional in the schemas (Phase 5 adds them as optional; Phase 6 makes them conditionally required in UI validation). At the formula layer, we have no guarantee they are present.
 
 **How to avoid:** Guard against zero/undefined at the formula call site:
+
 ```typescript
 const existingServers = cluster.existingServerCount ?? 0;
 const oldSPECint = cluster.specintPerServer ?? 0;
@@ -501,6 +510,7 @@ const optionalPercent = z.preprocess(
 | Zustand v4 selector pattern | Zustand v5 — same `create`, same selector pattern | v5.0 | No API change; existing `create<Store>((set) => ...)` is valid in v5 |
 
 **Deprecated/outdated:**
+
 - `z.coerce.number()`: Project explicitly avoids this in favor of `z.preprocess`. Do not use for any new fields.
 - Inline arithmetic on optional fields without nullish coalescing: TypeScript strict mode rejects this.
 
@@ -554,23 +564,28 @@ const optionalPercent = z.preprocess(
 The following fixture scenarios must be added to `constraints.test.ts` with concrete arithmetic:
 
 **SPECint-limited fixture:**
+
 - `existingServerCount=10, specintPerServer=1200, headroom=20%, targetSpecint=2400`
 - Expected: `cpuLimitedCount = ceil(10 × 1200 × 1.20 / 2400) = 6`
 - RAM and disk limited counts should be lower → `limitingResource = 'specint'`
 
 **vCPU mode unchanged (regression fixture):**
+
 - Existing `CPU_LIMITED_CLUSTER` + `CPU_LIMITED_SCENARIO` from `constraints.test.ts` with `sizingMode='vcpu'` (explicit)
 - Expected: same result as before (24) — verifies backward compatibility
 
 **Utilization-scaled CPU fixture:**
+
 - `totalVcpus=1000, cpuUtilizationPercent=60, headroom=20%, ratio=4, cores=40`
 - Expected: `cpuLimitedCount = ceil(1000 × 0.60 × 1.20 / 4 / 40) = ceil(4.5) = 5`
 
 **Utilization-scaled RAM fixture:**
+
 - `totalVms=500, ramPerVmGb=16, ramUtilizationPercent=80, headroom=20%, ramPerServer=512`
 - Expected: `ramLimitedCount = ceil(500 × 16 × 0.80 × 1.20 / 512) = ceil(15) = 15` (vs 19 without scaling)
 
 **Combined SPECint + utilization fixture:**
+
 - SPECint mode with `cpuUtilizationPercent` provided: specint mode uses specint formula only; utilization percent has no effect on specint formula (scaling is a vCPU-mode concept)
 - Verify: utilization fields are irrelevant in specint mode
 
@@ -619,6 +634,7 @@ The following fixture scenarios must be added to `constraints.test.ts` with conc
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — all packages already installed, versions confirmed
 - Architecture: HIGH — ADRs are authoritative, patterns verified in existing codebase
 - TypeScript strict mode patterns: HIGH — verified against tsconfig.app.json flags
