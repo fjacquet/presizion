@@ -107,7 +107,11 @@ Plans:
   2. The scope badge includes an edit affordance (icon/link) that opens the scope selector
   3. Changing the scope selection in Step 1 immediately re-aggregates and updates all Step 1 fields
   4. The scope badge is not shown when no file has been imported or the file had only one cluster
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+
+- [ ] 14-01-PLAN.md — useImportStore (Zustand) with re-aggregation wiring + ImportPreviewModal setImportBuffer call on Apply
+- [ ] 14-02-PLAN.md — ScopeBadge component with edit dialog + Step1CurrentCluster integration
 
 ### Phase 15: Persistence
 
@@ -139,5 +143,5 @@ Plans:
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
 | 13. Import Scope Filter | v1.3 | 0/2 | Not started | - |
-| 14. Persistent Scope Widget | v1.3 | 0/? | Not started | - |
+| 14. Persistent Scope Widget | v1.3 | 0/2 | Not started | - |
 | 15. Persistence | v1.3 | 0/? | Not started | - |
