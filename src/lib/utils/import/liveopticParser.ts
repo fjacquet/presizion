@@ -50,9 +50,11 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<Omit<ClusterImportResult,
         if (socketCounts.size > 1) base.warnings.push('Mixed CPU socket counts detected — using first host as representative.')
         base.existingServerCount = hosts.length
         base.totalPcores = hosts.reduce((s, h) => s + num(h, cols['cpu_cores']), 0)
-        base.socketsPerServer = sockets || undefined
-        base.coresPerSocket = sockets > 0 ? Math.round(coresFirst / sockets) || undefined : undefined
-        base.ramPerServerGb = Math.round(num(firstHost, cols['memory_kib']) / 1024 / 1024) || undefined
+        if (sockets) base.socketsPerServer = sockets
+        const derivedCores = sockets > 0 ? Math.round(coresFirst / sockets) : 0
+        if (derivedCores) base.coresPerSocket = derivedCores
+        const ramGb = Math.round(num(firstHost, cols['memory_kib']) / 1024 / 1024)
+        if (ramGb) base.ramPerServerGb = ramGb
       }
     }
   }
