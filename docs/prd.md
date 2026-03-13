@@ -56,7 +56,7 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
    For every key output metric, show the **formula and input parameters** used, so users can validate and adjust.
 
 6. **Performance-based sizing (v1.1)**
-   - Support a **SPECint-based sizing mode** as an alternative to vCPU-ratio sizing, enabling performance-equivalence calculations between server generations.
+   - Support a **SPECrate2017_int_base-based sizing mode** as an alternative to vCPU-ratio sizing, enabling performance-equivalence calculations between server generations.
 
 7. **Right-sizing from observed utilization (v1.1)**
    - Accept observed CPU % and RAM % utilization of the existing cluster to size to **actual consumption** rather than installed capacity.
@@ -189,17 +189,21 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 
 **FR-2b – Sizing mode selection (v1.1)**
 
-- The app shall provide a global **sizing mode toggle**: vCPU-based (default) or SPECint-based (mutually exclusive — see ADR-001).
-- In **SPECint mode**:
-  - Step 1 displays an additional field: SPECint benchmark score for the existing server model.
-  - Each scenario card displays an additional field: SPECint score for the target server model.
-  - The CPU constraint formula becomes: `ceil(existingServers × oldSPECint × headroom / targetSPECint)`.
-  - The limiting resource label shows "SPECint" when this constraint drives the final server count.
-- In **vCPU mode**: SPECint fields are hidden; behavior is identical to v1.0.
+- The app shall provide a global **sizing mode toggle**: vCPU-based (default) or SPECrate2017-based (mutually exclusive — see ADR-001, ADR-005).
+- In **SPECrate2017 mode**:
+  - Step 1 displays an additional field: `SPECrate2017_int_base` score for the existing server model.
+  - Each scenario card displays an additional field: `SPECrate2017_int_base` score for the target server model.
+  - The CPU constraint formula becomes: `ceil(existingServers × oldSPECrate2017_int_base × headroom / targetSPECrate2017_int_base)`.
+  - The limiting resource label shows "SPECrate2017" when this constraint drives the final server count.
+- In **vCPU mode**: SPECrate2017 fields are hidden; behavior is identical to v1.0.
 
-**FR-2c – File import (v1.2, planned)**
+**FR-2c – File import (v1.2, shipped)**
 
-- The app will accept LiveOptics zip files and RVTools xlsx files to auto-populate Step 1 cluster inputs, eliminating manual data entry.
+- The app accepts the following file formats to auto-populate Step 1 cluster inputs, eliminating manual data entry:
+  - **RVTools xlsx** — reads VM inventory (vCPUs, disk) and ESX host sheet (server config).
+  - **LiveOptics xlsx** — reads VMs sheet, ESX Hosts sheet (server count/config), and ESX Performance sheet (avg CPU/RAM utilization). Supports both single-file and ZIP exports.
+  - **LiveOptics ZIP** — intelligently selects the richest xlsx within the archive (VMWARE file with ESX Hosts preferred over GENERAL file).
+  - **Presizion JSON** — full session restore: re-imports a previously exported JSON file, restoring the current cluster data and all scenario configurations.
 
 ### 7.2 Target Cluster Scenarios
 
@@ -394,8 +398,8 @@ For each scenario, the app shall compute:
    - `socketsPerServer`
    - `coresPerSocket`
    - `memoryPerServerGb`
-   - `serverCount` (optional, required for SPECint mode)
-   - `specintPerServer` (optional — v1.1, SPECint mode only)
+   - `serverCount` (optional, required for SPECrate2017 mode)
+   - `specintPerServer` (optional — v1.1, SPECrate2017 mode; stores `SPECrate2017_int_base` score)
    - `cpuUtilizationPercent` (optional — v1.1, right-sizing scaler)
    - `ramUtilizationPercent` (optional — v1.1, right-sizing scaler)
    - Derived:
@@ -410,24 +414,24 @@ For each scenario, the app shall compute:
    - `memoryPerServerGb`
    - `diskPerServerGb`
    - `targetVcpuToPCoreRatio` (vCPU mode only)
-   - `targetSpecint` (optional — v1.1, SPECint mode only)
+   - `targetSpecint` (optional — v1.1, SPECrate2017 mode; stores `SPECrate2017_int_base` score for target server)
    - `ramPerVmGb`
    - `diskPerVmGb`
    - `growthHeadroomPercent`
    - `haReserveEnabled` (boolean)
 
 3. **WizardState** (global)
-   - `sizingMode: 'vcpu' | 'specint'` (v1.1)
+   - `sizingMode: 'vcpu' | 'specint'` (v1.1; 'specint' mode uses `SPECrate2017_int_base` metric)
 
 4. **ScenarioResult** (derived — never stored, see ADR-002)
    - `requiredVcpus`
    - `requiredRamGb`
    - `requiredDiskGb`
-   - `serverCountCpuLimited` (or `serverCountSpecintLimited` in SPECint mode)
+   - `serverCountCpuLimited` (or `serverCountSpecintLimited` in SPECrate2017 mode)
    - `serverCountRamLimited`
    - `serverCountDiskLimited`
    - `finalServerCount`
-   - `limitingResource: 'CPU' | 'RAM' | 'Disk' | 'SPECint'`
+   - `limitingResource: 'CPU' | 'RAM' | 'Disk' | 'SPECrate2017'`
    - `vmsPerServer`
    - `achievedVcpuToPCoreRatio`
    - `cpuUtilizationPercent`
@@ -496,17 +500,20 @@ Wireframes are not included here but can be added in a future UX deliverable.
 
 ## 14. Future Enhancements
 
-### v1.1 (in progress)
+### v1.1 (shipped)
 
-- **SPECint-based sizing mode** — performance-equivalence sizing using SPECint delta between old and new server generations (PERF-01–05).
+- **SPECrate2017_int_base sizing mode** — performance-equivalence sizing using `SPECrate2017_int_base` delta between old and new server generations (PERF-01–05). Default server profile: Dell R660, 2× Xeon Gold 6526Y (score: 337).
 - **Observed utilization inputs** — right-size to actual CPU/RAM consumption rather than installed capacity (UTIL-01–03).
 - **JSON download** — export all inputs and outputs as JSON (EXPO-03).
 - **Print / PDF layout** — clean browser-printable layout of Step 3 results (EXPO-04).
+- **As-Is reference column** — Step 3 comparison table includes the existing cluster as a reference column (REPT-01).
 
-### v1.2 (planned)
+### v1.2 (shipped)
 
-- **LiveOptics zip import** — parse LiveOptics data collection zip to auto-fill Step 1.
-- **RVTools xlsx import** — parse RVTools Excel export to auto-fill Step 1.
+- **LiveOptics zip/xlsx import** — parse LiveOptics data collection ZIP and single XLSX exports to auto-fill Step 1; reads ESX Hosts sheet (server count/config) and ESX Performance sheet (avg CPU/RAM utilization).
+- **RVTools xlsx import** — parse RVTools Excel export (vInfo sheet) to auto-fill Step 1.
+- **Presizion JSON import** — full session restore from a previously exported JSON file.
+- **Lazy IT seeding** — after any file import, existing scenarios automatically inherit `avgRamPerVmGb` and `diskPerVmGb` from the imported cluster data.
 
 ### v2+ (backlog)
 
