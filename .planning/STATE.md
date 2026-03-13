@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 14-persistent-scope-widget-01-PLAN.md
-last_updated: "2026-03-13T21:10:11.152Z"
+stopped_at: "Checkpoint: 14-persistent-scope-widget-02 awaiting human-verify (Task 3)"
+last_updated: "2026-03-13T21:36:16.310Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 13-import-scope-filter P01 | 4 | 1 tasks | 9 files |
 | Phase 13-import-scope-filter P02 | 15 | 1 tasks | 4 files |
 | Phase 14-persistent-scope-widget P01 | 6 | 2 tasks | 4 files |
+| Phase 14-persistent-scope-widget P02 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - [Phase 14-persistent-scope-widget]: useImportStore calls useClusterStore.getState().setCurrentCluster() directly inside setActiveScope — avoids hook-in-hook constraint while keeping re-aggregation logic in the store
 - [Phase 14-persistent-scope-widget]: setImportBuffer called only when result.rawByScope != null — JSON imports bypass useImportStore entirely
 - [Phase 14-persistent-scope-widget]: vi.mock factories must not reference outer variables; use vi.mocked() in beforeEach to set return values
+- [Phase 14-persistent-scope-widget]: ScopeBadge self-hides via return null when scopeOptions.length <= 1 — no conditional wrapper needed in Step1CurrentCluster
+- [Phase 14-persistent-scope-widget]: Dialog pending state initialized from activeScope on open — prevents live mutations while user is selecting; shadcn dialog.tsx added via npx shadcn@latest add dialog using base-ui/react/dialog primitives
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T21:10:11.149Z
-Stopped at: Completed 14-persistent-scope-widget-01-PLAN.md
+Last session: 2026-03-13T21:36:16.307Z
+Stopped at: Checkpoint: 14-persistent-scope-widget-02 awaiting human-verify (Task 3)
 Resume file: None
