@@ -144,7 +144,12 @@ Plans:
   2. The SPECint score fields in Step 1 and each scenario card validate as positive numbers; the user cannot advance past the relevant step while a required SPECint field is empty or invalid when SPECint mode is active
   3. ScenarioResults and the comparison table display the "SPECint" limiting resource label — with the correct server count — when SPECint mode is active and that constraint is the bottleneck
   4. CPU and RAM utilization % fields appear in Step 1; when values are entered, scenario server counts and formula display strings update live to reflect right-sized demand
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+
+- [ ] 06-01-PLAN.md — Wave 0 test stubs (SizingModeToggle, ComparisonTable) + SizingModeToggle component wired into WizardShell (Wave 1)
+- [ ] 06-02-PLAN.md — Conditional SPECint fields in CurrentClusterForm and ScenarioCard + ScenarioResults SPECint row + ComparisonTable label fix (Wave 2)
 
 ### Phase 7: Enhanced Export
 
@@ -171,5 +176,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
-| 6. Conditional UI Wiring | 0/TBD | Not started | - |
+| 6. Conditional UI Wiring | 0/2 | Not started | - |
 | 7. Enhanced Export | 0/TBD | Not started | - |
