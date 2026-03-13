@@ -1,30 +1,40 @@
 import { Dialog } from '@base-ui/react/dialog'
 import { Button } from '@/components/ui/button'
 import { useClusterStore } from '@/store/useClusterStore'
-import type { ClusterImportResult } from '@/lib/utils/import'
+import { useScenariosStore } from '@/store/useScenariosStore'
+import type { AnyImportResult } from '@/lib/utils/import'
 
 interface ImportPreviewModalProps {
-  result: ClusterImportResult
+  result: AnyImportResult
   open: boolean
   onClose: () => void
 }
 
-const FORMAT_LABELS: Record<ClusterImportResult['sourceFormat'], string> = {
+const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
   rvtools: 'RVTools',
   'liveoptics-xlsx': 'LiveOptics (xlsx)',
   'liveoptics-csv': 'LiveOptics (csv)',
+  'presizion-json': 'Presizion JSON export',
 }
 
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
+  const setScenarios = useScenariosStore((s) => s.setScenarios)
+
+  const isJson = result.sourceFormat === 'presizion-json'
 
   const handleApply = () => {
-    setCurrentCluster({
-      totalVcpus: result.totalVcpus,
-      totalPcores: 0,
-      totalVms: result.totalVms,
-      totalDiskGb: result.totalDiskGb,
-    })
+    if (isJson) {
+      setCurrentCluster({ ...result.cluster })
+      setScenarios(result.scenarios)
+    } else {
+      setCurrentCluster({
+        totalVcpus: result.totalVcpus,
+        totalPcores: 0,
+        totalVms: result.totalVms,
+        totalDiskGb: result.totalDiskGb,
+      })
+    }
     onClose()
   }
 
@@ -40,26 +50,43 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
           <div className="space-y-1 text-sm">
             <p><span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}</p>
-            <p><span className="font-medium">VMs found:</span> {result.vmCount}</p>
-            <p><span className="font-medium">Total vCPUs:</span> {result.totalVcpus}</p>
-            <p><span className="font-medium">Total VMs:</span> {result.totalVms}</p>
-            <p><span className="font-medium">Total Disk:</span> {result.totalDiskGb} GB</p>
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
-              {result.avgRamPerVmGb} GB — not auto-populated
-            </p>
+
+            {isJson ? (
+              <>
+                <p><span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}</p>
+                <p><span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}</p>
+                <p><span className="font-medium">Total VMs:</span> {result.cluster.totalVms}</p>
+                {result.cluster.totalDiskGb != null && (
+                  <p><span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB</p>
+                )}
+                <p><span className="font-medium">Scenarios:</span> {result.scenarios.length}</p>
+              </>
+            ) : (
+              <>
+                <p><span className="font-medium">VMs found:</span> {result.vmCount}</p>
+                <p><span className="font-medium">Total vCPUs:</span> {result.totalVcpus}</p>
+                <p><span className="font-medium">Total VMs:</span> {result.totalVms}</p>
+                <p><span className="font-medium">Total Disk:</span> {result.totalDiskGb} GB</p>
+                <p className="text-muted-foreground">
+                  <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
+                  {result.avgRamPerVmGb} GB — not auto-populated
+                </p>
+              </>
+            )}
           </div>
 
-          {result.warnings.length > 0 && (
+          {'warnings' in result && result.warnings.length > 0 && (
             <div className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
               {result.warnings.map((w, i) => <p key={i}>⚠ {w}</p>)}
             </div>
           )}
 
-          <p className="text-xs text-muted-foreground">
-            <strong>Note:</strong> Total pCores is not available in this export format and must be
-            entered manually before advancing to Step 2.
-          </p>
+          {!isJson && (
+            <p className="text-xs text-muted-foreground">
+              <strong>Note:</strong> Total pCores is not available in this export format and must be
+              entered manually before advancing to Step 2.
+            </p>
+          )}
 
           <div className="flex gap-3 justify-end">
             <Button variant="outline" onClick={onClose}>Cancel</Button>

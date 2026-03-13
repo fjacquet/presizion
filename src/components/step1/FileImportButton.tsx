@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { importFile, ImportError } from '@/lib/utils/import'
-import type { ClusterImportResult } from '@/lib/utils/import'
+import type { AnyImportResult } from '@/lib/utils/import'
 import { ImportPreviewModal } from './ImportPreviewModal'
 
 export function FileImportButton() {
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const [importResult, setImportResult] = useState<ClusterImportResult | null>(null)
+  const [importResult, setImportResult] = useState<AnyImportResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -36,7 +36,7 @@ export function FileImportButton() {
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.csv,.zip"
+        accept=".xlsx,.csv,.zip,.json"
         className="hidden"
         onChange={(e) => { void handleFileChange(e) }}
         aria-label="Upload cluster export file"

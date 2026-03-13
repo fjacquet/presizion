@@ -19,6 +19,8 @@ interface ScenariosStore {
   removeScenario: (id: string) => void;
   /** Merge a partial update into a scenario identified by UUID */
   updateScenario: (id: string, partial: Partial<Scenario>) => void;
+  /** Replace the entire scenarios list (used by JSON session import) */
+  setScenarios: (scenarios: Scenario[]) => void;
 }
 
 export const useScenariosStore = create<ScenariosStore>((set) => ({
@@ -52,4 +54,6 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
         s.id === id ? { ...s, ...partial } : s,
       ),
     })),
+
+  setScenarios: (scenarios) => set({ scenarios }),
 }));
