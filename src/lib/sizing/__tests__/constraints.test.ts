@@ -124,17 +124,104 @@ describe('computeScenarioResult', () => {
   });
 });
 
+// SPECint mode fixtures
+// OldCluster: existingServers=10, specintPerServer=1200, totalVms=50, totalVcpus=500, totalPcores=100
+// Scenario: targetSpecint=2400, headroom=20%, socketsPerServer=2, coresPerSocket=20, ram=512GB, disk=50000GB, ratio=4, ramPerVm=2, diskPerVm=10
+// SPECint count: ceil(10*1200*1.20/2400) = ceil(14400/2400) = 6
+// RAM count: ceil(50*2*1.20/512) = ceil(120/512) = ceil(0.23) = 1
+// Disk count: ceil(50*10*1.20/50000) = ceil(0.012) = 1
+// => finalCount=6, limitingResource='specint'
+const SPECINT_CLUSTER = {
+  totalVcpus: 500, totalVms: 50, totalPcores: 100,
+  existingServerCount: 10, specintPerServer: 1200,
+};
+const SPECINT_SCENARIO = {
+  id: '00000000-0000-0000-0000-000000000004',
+  name: 'SPECint',
+  socketsPerServer: 2, coresPerSocket: 20,
+  ramPerServerGb: 512, diskPerServerGb: 50000,
+  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
+  headroomPercent: 20, haReserveEnabled: false,
+  targetSpecint: 2400,
+};
+
+// Utilization scaling fixtures
+// CPU cluster: totalVcpus=1000, cpuUtilizationPercent=60
+// With ratio=4, coresPerServer=40, headroom=20%:
+// ceil(1000 * (60/100) * 1.20 / 4 / 40) = ceil(4.5) = 5
+const UTIL_CPU_CLUSTER = {
+  totalVcpus: 1000, totalVms: 100, totalPcores: 250,
+  cpuUtilizationPercent: 60,
+};
+const UTIL_CPU_SCENARIO = {
+  id: '00000000-0000-0000-0000-000000000005',
+  name: 'Util-CPU',
+  socketsPerServer: 2, coresPerSocket: 20,
+  ramPerServerGb: 2048, diskPerServerGb: 100000,
+  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
+  headroomPercent: 20, haReserveEnabled: false,
+};
+
+// RAM cluster: totalVms=500, ramUtilizationPercent=80
+// ceil(500 * 16 * (80/100) * 1.20 / 512) = ceil(15) = 15
+const UTIL_RAM_CLUSTER = {
+  totalVcpus: 200, totalVms: 500, totalPcores: 100,
+  ramUtilizationPercent: 80,
+};
+const UTIL_RAM_SCENARIO = {
+  id: '00000000-0000-0000-0000-000000000006',
+  name: 'Util-RAM',
+  socketsPerServer: 2, coresPerSocket: 20,
+  ramPerServerGb: 512, diskPerServerGb: 100000,
+  targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 10,
+  headroomPercent: 20, haReserveEnabled: false,
+};
+
 describe('computeScenarioResult — SPECint mode (PERF-04, PERF-05)', () => {
-  it.todo('sizingMode=specint: cpuLimitedCount=ceil(10×1200×1.20/2400)=6, limitingResource=specint');
-  it.todo('sizingMode=vcpu explicit: same result as default (regression)');
-  it.todo('limitingResource=specint only when specint count exceeds ram and disk');
-  it.todo('combined: specint mode ignores cpuUtilizationPercent (utilization is vcpu-mode only)');
+  it('sizingMode=specint: cpuLimitedCount=ceil(10×1200×1.20/2400)=6, limitingResource=specint', () => {
+    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'specint');
+    expect(result.cpuLimitedCount).toBe(6);
+    expect(result.limitingResource).toBe('specint');
+    expect(result.finalCount).toBe(6);
+  });
+  it('sizingMode=vcpu explicit: same result as default (regression)', () => {
+    const withExplicit = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, 'vcpu');
+    const withDefault = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+    expect(withExplicit.finalCount).toBe(withDefault.finalCount);
+    expect(withExplicit.limitingResource).toBe(withDefault.limitingResource);
+    expect(withDefault.finalCount).toBe(24);
+  });
+  it('limitingResource=specint only when specint count exceeds ram and disk', () => {
+    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'specint');
+    // specint count (6) > ram count (1) and disk count (1), so specint is limiting
+    expect(result.limitingResource).toBe('specint');
+  });
+  it('combined: specint mode ignores cpuUtilizationPercent (utilization is vcpu-mode only)', () => {
+    // Even with cpuUtilizationPercent set, specint mode uses the specint formula
+    const clusterWithUtil = { ...SPECINT_CLUSTER, cpuUtilizationPercent: 60 };
+    const result = computeScenarioResult(clusterWithUtil, SPECINT_SCENARIO, 'specint');
+    // Should still use specint formula: ceil(10*1200*1.20/2400) = 6
+    expect(result.cpuLimitedCount).toBe(6);
+    expect(result.limitingResource).toBe('specint');
+  });
 });
 
 describe('computeScenarioResult — utilization scaling (UTIL-03)', () => {
-  it.todo('cpuUtilizationPercent=60: cpuLimitedCount = ceil(1000×0.60×1.20/4/40)=5');
-  it.todo('ramUtilizationPercent=80: ramLimitedCount = ceil(500×16×0.80×1.20/512)=15');
-  it.todo('utilization=100 on both: same result as no utilization fields (regression)');
+  it('cpuUtilizationPercent=60: cpuLimitedCount = ceil(1000×0.60×1.20/4/40)=5', () => {
+    const result = computeScenarioResult(UTIL_CPU_CLUSTER, UTIL_CPU_SCENARIO, 'vcpu');
+    expect(result.cpuLimitedCount).toBe(5);
+  });
+  it('ramUtilizationPercent=80: ramLimitedCount = ceil(500×16×0.80×1.20/512)=15', () => {
+    const result = computeScenarioResult(UTIL_RAM_CLUSTER, UTIL_RAM_SCENARIO, 'vcpu');
+    expect(result.ramLimitedCount).toBe(15);
+  });
+  it('utilization=100 on both: same result as no utilization fields (regression)', () => {
+    const clusterWith100 = { ...CPU_LIMITED_CLUSTER, cpuUtilizationPercent: 100, ramUtilizationPercent: 100 };
+    const withUtil = computeScenarioResult(clusterWith100, CPU_LIMITED_SCENARIO);
+    const withoutUtil = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+    expect(withUtil.finalCount).toBe(withoutUtil.finalCount);
+    expect(withUtil.limitingResource).toBe(withoutUtil.limitingResource);
+  });
 });
 
 export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };

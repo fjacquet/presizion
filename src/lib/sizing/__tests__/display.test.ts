@@ -6,7 +6,7 @@
  * Conversion to multiplicative factor (1 + percent/100) is internal to display module.
  */
 import { describe, it, expect } from 'vitest'
-import { cpuFormulaString, ramFormulaString, diskFormulaString } from '../display'
+import { cpuFormulaString, ramFormulaString, diskFormulaString, specintFormulaString } from '../display'
 
 describe('display: formula string generators', () => {
   describe('CALC-07: cpuFormulaString', () => {
@@ -92,10 +92,38 @@ describe('display: formula string generators', () => {
 })
 
 describe('specintFormulaString (PERF-04 display)', () => {
-  it.todo('formats: ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)');
+  it('formats: ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)', () => {
+    const result = specintFormulaString({
+      existingServers: 10,
+      specintPerServer: 1200,
+      headroomPercent: 20,
+      targetSpecint: 2400,
+    });
+    expect(result).toBe('ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)');
+  });
 });
 
 describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
-  it.todo('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)');
-  it.todo('omits utilization factor when cpuUtilizationPercent is absent');
+  it('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)', () => {
+    const result = cpuFormulaString({
+      totalVcpus: 2000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 48,
+      cpuUtilizationPercent: 70,
+    });
+    expect(result).toContain('70%');
+    expect(result).toContain('ceil');
+    expect(result).toContain('2000');
+  });
+  it('omits utilization factor when cpuUtilizationPercent is absent', () => {
+    const result = cpuFormulaString({
+      totalVcpus: 2000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 48,
+    });
+    // Should not contain a separate utilization percentage (only the headroom)
+    expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
+  });
 });

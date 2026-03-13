@@ -1,7 +1,7 @@
 // VALIDATION.md: CALC-07 — formula display strings for inline UI rendering
 // Imported functions will come from src/lib/display/formulaStrings.ts (Plan 04)
 import { describe, it, expect } from 'vitest';
-import { getCpuFormulaString, getRamFormulaString, getDiskFormulaString } from '../formulaStrings';
+import { getCpuFormulaString, getRamFormulaString, getDiskFormulaString, getSpecintFormulaString } from '../formulaStrings';
 
 // The display module returns a human-readable formula string showing
 // both the formula template and the substituted values.
@@ -71,5 +71,52 @@ describe('getDiskFormulaString', () => {
     expect(result).toContain('ceil');
     // ceil(200 * 500 * 1.20 / 10000) = ceil(12) = 12
     expect(result).toContain('12');
+  });
+});
+
+describe('getSpecintFormulaString (PERF-04)', () => {
+  it('returns formula string with specint values and computed result', () => {
+    // ceil(10 * 1200 * 1.20 / 2400) = ceil(6) = 6
+    const result = getSpecintFormulaString({
+      existingServers: 10,
+      specintPerServer: 1200,
+      headroomPercent: 20,
+      targetSpecint: 2400,
+    });
+    expect(typeof result).toBe('string');
+    expect(result).toContain('10');
+    expect(result).toContain('1200');
+    expect(result).toContain('1.20');
+    expect(result).toContain('2400');
+    expect(result).toContain('SPECint');
+    expect(result).toContain('6');
+  });
+});
+
+describe('getCpuFormulaString with utilization (UTIL-03)', () => {
+  it('includes utilization percentage when cpuUtilizationPercent is not 100', () => {
+    const result = getCpuFormulaString({
+      totalVcpus: 1000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 40,
+      cpuUtilizationPercent: 60,
+    });
+    expect(result).toContain('60%');
+    expect(result).toContain('ceil');
+    // ceil(1000 * (60/100) * 1.20 / 4 / 40) = ceil(4.5) = 5
+    expect(result).toContain('5');
+  });
+  it('omits utilization when cpuUtilizationPercent is absent (backward compat)', () => {
+    const result = getCpuFormulaString({
+      totalVcpus: 3200,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 40,
+    });
+    // Should NOT contain a separate utilization percentage line
+    expect(result).not.toContain('100%');
+    // Should contain the result: 24
+    expect(result).toContain('24');
   });
 });

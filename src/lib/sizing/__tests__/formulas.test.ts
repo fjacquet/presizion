@@ -1,7 +1,7 @@
 // VALIDATION.md: CALC-01 (CPU-limited), CALC-02 (RAM-limited), CALC-03 (disk-limited)
 // Imported functions will come from src/lib/sizing/formulas.ts (Plan 02)
 import { describe, it, expect } from 'vitest';
-import { serverCountByCpu, serverCountByRam, serverCountByDisk } from '../formulas';
+import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint } from '../formulas';
 
 // === Fixture constants (manually verified against formula spec) ===
 
@@ -58,19 +58,42 @@ describe('serverCountByDisk', () => {
 });
 
 describe('serverCountBySpecint (PERF-04)', () => {
-  it.todo('ceil(10 × 1200 × 1.20 / 2400) = 6 — standard specint fixture');
-  it.todo('returns 0 when targetSPECint is 0 — zero-guard');
-  it.todo('returns 0 when existingServers is 0');
+  it('ceil(10 × 1200 × 1.20 / 2400) = 6 — standard specint fixture', () => {
+    // ceil((10 * 1200 * 1.20) / 2400) = ceil(14400 / 2400) = ceil(6) = 6
+    expect(serverCountBySpecint(10, 1200, 1.20, 2400)).toBe(6);
+  });
+  it('returns 0 when targetSPECint is 0 — zero-guard', () => {
+    expect(serverCountBySpecint(10, 1200, 1.20, 0)).toBe(0);
+  });
+  it('returns 0 when existingServers is 0', () => {
+    expect(serverCountBySpecint(0, 1200, 1.20, 2400)).toBe(0);
+  });
 });
 
 describe('serverCountByCpu with cpuUtilPct (UTIL-03)', () => {
-  it.todo('ceil(1000 × (60/100) × 1.20 / 4 / 40) = 5 — utilization scaling');
-  it.todo('cpuUtilPct=100 produces same result as current signature — regression');
+  it('ceil(1000 × (60/100) × 1.20 / 4 / 40) = 5 — utilization scaling', () => {
+    // ceil(1000 * (60/100) * 1.20 / 4 / 40) = ceil(600 * 1.20 / 4 / 40) = ceil(720 / 160) = ceil(4.5) = 5
+    expect(serverCountByCpu(1000, 1.20, 4, 40, 60)).toBe(5);
+  });
+  it('cpuUtilPct=100 produces same result as current signature — regression', () => {
+    // With utlPct=100: ceil(3200 * 1.0 * 1.20 / 4 / 40) = ceil(24) = 24
+    expect(serverCountByCpu(3200, 1.20, 4, 40, 100)).toBe(24);
+    // Default (no 5th arg) should also give 24
+    expect(serverCountByCpu(3200, 1.20, 4, 40)).toBe(24);
+  });
 });
 
 describe('serverCountByRam with ramUtilPct (UTIL-03)', () => {
-  it.todo('ceil(500 × 16 × (80/100) × 1.20 / 512) = 15 — utilization scaling');
-  it.todo('ramUtilPct=100 produces same result as current signature — regression');
+  it('ceil(500 × 16 × (80/100) × 1.20 / 512) = 15 — utilization scaling', () => {
+    // ceil(500 * 16 * (80/100) * 1.20 / 512) = ceil(500 * 16 * 0.80 * 1.20 / 512) = ceil(7680 / 512) = ceil(15) = 15
+    expect(serverCountByRam(500, 16, 1.20, 512, 80)).toBe(15);
+  });
+  it('ramUtilPct=100 produces same result as current signature — regression', () => {
+    // ceil(500 * 16 * 1.0 * 1.20 / 512) = ceil(9600 / 512) = ceil(18.75) = 19
+    expect(serverCountByRam(500, 16, 1.20, 512, 100)).toBe(19);
+    // Default (no 5th arg) should also give 19
+    expect(serverCountByRam(500, 16, 1.20, 512)).toBe(19);
+  });
 });
 
 export { F1, F2, F3, BOUNDARY };
