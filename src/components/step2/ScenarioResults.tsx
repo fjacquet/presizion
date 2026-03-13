@@ -1,8 +1,9 @@
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import { Badge } from '@/components/ui/badge'
-import { cpuFormulaString, ramFormulaString, diskFormulaString } from '@/lib/sizing/display'
+import { cpuFormulaString, ramFormulaString, diskFormulaString, specintFormulaString } from '@/lib/sizing/display'
 import type { LimitingResource } from '@/types/results'
 
 const RESOURCE_LABELS: Record<LimitingResource, string> = {
@@ -20,6 +21,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
   const results = useScenariosResults()
   const scenarios = useScenariosStore((s) => s.scenarios)
   const currentCluster = useClusterStore((s) => s.currentCluster)
+  const sizingMode = useWizardStore((s) => s.sizingMode)
 
   const idx = scenarios.findIndex((s) => s.id === scenarioId)
   const result = idx >= 0 ? results[idx] : undefined
@@ -80,6 +82,23 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
           <div className="text-xs text-muted-foreground font-mono mt-0.5">{diskFormula}</div>
         </div>
       </div>
+      {sizingMode === 'specint' &&
+       currentCluster.existingServerCount != null &&
+       currentCluster.specintPerServer != null &&
+       scenario.targetSpecint != null && (
+        <div className="text-sm mt-2">
+          <span className="text-muted-foreground">SPECint-limited: </span>
+          <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
+          <div className="text-xs text-muted-foreground font-mono mt-0.5">
+            {specintFormulaString({
+              existingServers: currentCluster.existingServerCount,
+              specintPerServer: currentCluster.specintPerServer,
+              headroomPercent: scenario.headroomPercent,
+              targetSpecint: scenario.targetSpecint,
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

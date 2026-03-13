@@ -15,6 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import type { LimitingResource } from '@/types/results'
+
+/**
+ * Maps LimitingResource values to human-readable display labels.
+ * Uses 'SPECint' (not 'Specint') for the specint variant.
+ * Uses briefer labels in table context (without '-limited' for specint).
+ */
+const RESOURCE_LABELS: Record<LimitingResource, string> = {
+  cpu: 'CPU-limited',
+  ram: 'RAM-limited',
+  disk: 'Disk-limited',
+  specint: 'SPECint',
+}
 
 /**
  * Maps a utilization percentage to a Tailwind color className.
@@ -26,12 +39,6 @@ export function utilizationClass(pct: number): string {
   if (pct >= 90) return 'text-red-600 dark:text-red-400 font-semibold'
   if (pct >= 70) return 'text-amber-600 dark:text-amber-400'
   return 'text-green-600 dark:text-green-400'
-}
-
-/** Capitalize the first letter of a string */
-function capitalize(s: string): string {
-  if (!s) return s
-  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 /**
@@ -75,7 +82,7 @@ export function ComparisonTable() {
                 key={scenarios[i]?.id ?? i}
                 className="text-center font-bold"
               >
-                {capitalize(result.limitingResource)}
+                {RESOURCE_LABELS[result.limitingResource]}
               </TableCell>
             ))}
           </TableRow>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2, Copy } from 'lucide-react'
 import {
@@ -13,10 +13,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { scenarioSchema, type ScenarioInput } from '@/schemas/scenarioSchema'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import type { Scenario } from '@/types/cluster'
 
 interface ScenarioCardProps {
@@ -28,6 +30,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const updateScenario = useScenariosStore((s) => s.updateScenario)
   const removeScenario = useScenariosStore((s) => s.removeScenario)
   const duplicateScenario = useScenariosStore((s) => s.duplicateScenario)
+  const sizingMode = useWizardStore((s) => s.sizingMode)
 
   const form = useForm<ScenarioInput>({
     // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
@@ -268,6 +271,35 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 />
               </div>
             </section>
+
+            {sizingMode === 'specint' && (
+              <div className="mt-4 border-t pt-4">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  SPECint Target (required in SPECint mode)
+                </p>
+                <Controller
+                  control={form.control}
+                  name="targetSpecint"
+                  render={({ field, fieldState }) => (
+                    <div className="space-y-1">
+                      <Label htmlFor={`${scenarioId}-targetSpecint`}>Target SPECint/Server</Label>
+                      <Input
+                        id={`${scenarioId}-targetSpecint`}
+                        type="number"
+                        min={1}
+                        data-testid={`input-targetSpecint-${scenarioId}`}
+                        {...field}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                      />
+                      {fieldState.error && (
+                        <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                      )}
+                    </div>
+                  )}
+                />
+              </div>
+            )}
           </CardContent>
         </form>
       </Form>

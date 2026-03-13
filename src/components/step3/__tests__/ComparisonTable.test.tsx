@@ -1,12 +1,19 @@
 /**
  * ComparisonTable — Unit tests
- * Requirements: COMP-01, COMP-02, UX-04
+ * Requirements: COMP-01, COMP-02, UX-04, PERF-03
  */
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen, act } from '@testing-library/react'
 import { ComparisonTable, utilizationClass } from '../ComparisonTable'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useWizardStore } from '@/store/useWizardStore'
+
+// Mock useScenariosResults so we can control limitingResource
+vi.mock('@/hooks/useScenariosResults', () => ({
+  useScenariosResults: vi.fn(),
+}))
+import { useScenariosResults } from '@/hooks/useScenariosResults'
 
 const baseScenario = {
   id: 'a',
@@ -22,6 +29,21 @@ const baseScenario = {
   haReserveEnabled: false,
 }
 
+const baseResult = {
+  cpuLimitedCount: 13,
+  ramLimitedCount: 12,
+  diskLimitedCount: 2,
+  rawCount: 13,
+  finalCount: 13,
+  limitingResource: 'cpu' as const,
+  haReserveApplied: false,
+  achievedVcpuToPCoreRatio: 3.2,
+  vmsPerServer: 7.7,
+  cpuUtilizationPercent: 48.0,
+  ramUtilizationPercent: 37.5,
+  diskUtilizationPercent: 1.5,
+}
+
 beforeEach(() => {
   useClusterStore.setState({
     currentCluster: { totalVcpus: 2000, totalPcores: 500, totalVms: 300 },
@@ -29,6 +51,8 @@ beforeEach(() => {
   useScenariosStore.setState({
     scenarios: [baseScenario],
   })
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
+  vi.mocked(useScenariosResults).mockReturnValue([baseResult])
 })
 
 describe('ComparisonTable', () => {
@@ -63,18 +87,12 @@ describe('ComparisonTable', () => {
   describe('COMP-02: correct values in table cells', () => {
     it('displays final server count for each scenario', () => {
       render(<ComparisonTable />)
-      // With 2000 vcpus, ratio 4, 48 cores/server, headroom 1.20:
-      // cpuLimited = ceil((2000 * 1.2) / 4 / 48) = ceil(12.5) = 13
-      // ramLimited = ceil((300 * 16 * 1.2) / 512) = ceil(11.25) = 12
-      // diskLimited = ceil((300 * 100 * 1.2) / 20000) = ceil(1.8) = 2
-      // finalCount = 13 (cpu-limited)
       expect(screen.getByText('13')).toBeTruthy()
     })
 
-    it('displays limiting resource label (cpu, ram, or disk) for each scenario', () => {
+    it('displays limiting resource label (CPU-limited) for cpu limiting resource', () => {
       render(<ComparisonTable />)
-      // The limiting resource cell should display "Cpu" (capitalized)
-      expect(screen.getByText('Cpu')).toBeTruthy()
+      expect(screen.getByText('CPU-limited')).toBeTruthy()
     })
 
     it('displays achieved vCPU:pCore ratio for each scenario', () => {
@@ -109,8 +127,24 @@ describe('ComparisonTable', () => {
   })
 
   describe('PERF-03: SPECint mode label correctness', () => {
-    it.todo('shows SPECint (not Specint) in limiting resource column when specint mode active')
-    it.todo('shows CPU-limited label when cpu is limiting resource')
+    it('shows SPECint (not Specint) in limiting resource column when specint is limiting resource', () => {
+      vi.mocked(useScenariosResults).mockReturnValue([
+        { ...baseResult, limitingResource: 'specint' as const },
+      ])
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      render(<ComparisonTable />)
+      // Should show 'SPECint' not 'Specint'
+      expect(screen.getByText('SPECint')).toBeTruthy()
+      expect(screen.queryByText('Specint')).toBeNull()
+    })
+
+    it('shows CPU-limited label when cpu is limiting resource', () => {
+      // baseResult already has limitingResource: 'cpu'
+      render(<ComparisonTable />)
+      expect(screen.getByText('CPU-limited')).toBeTruthy()
+    })
   })
 
   describe('UX-04: color-coded utilization indicators', () => {
@@ -131,7 +165,7 @@ describe('ComparisonTable', () => {
     it('highlights the limiting resource cell for each scenario', () => {
       render(<ComparisonTable />)
       // The limiting resource cell should have font-bold class
-      const limitingCell = screen.getByText('Cpu')
+      const limitingCell = screen.getByText('CPU-limited')
       expect(limitingCell.className).toMatch(/font-bold/)
     })
   })

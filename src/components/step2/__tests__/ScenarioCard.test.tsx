@@ -1,6 +1,6 @@
 /**
- * ScenarioCard — Tests for SCEN-01 through SCEN-05
- * Requirements: SCEN-01, SCEN-02, SCEN-03, SCEN-04, SCEN-05
+ * ScenarioCard — Tests for SCEN-01 through SCEN-05, PERF-03
+ * Requirements: SCEN-01, SCEN-02, SCEN-03, SCEN-04, SCEN-05, PERF-03
  */
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
@@ -9,6 +9,7 @@ import { Step2Scenarios } from '../Step2Scenarios'
 import { ScenarioResults } from '../ScenarioResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import { createDefaultScenario } from '@/lib/sizing/defaults'
 import {
   DEFAULT_VCPU_TO_PCORE_RATIO,
@@ -20,6 +21,7 @@ beforeEach(() => {
   const defaultScenario = createDefaultScenario()
   useScenariosStore.setState({ scenarios: [defaultScenario] })
   useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } })
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
 })
 
 describe('Step2Scenarios / ScenarioCard', () => {
@@ -207,6 +209,26 @@ describe('Step2Scenarios / ScenarioCard', () => {
       // Original should be unchanged
       const originalAfter = useScenariosStore.getState().scenarios.find((s) => s.id === originalScenario.id)
       expect(originalAfter?.name).toBe(originalName)
+    })
+  })
+
+  describe('PERF-03: targetSpecint conditional field', () => {
+    it('targetSpecint input is present when sizingMode is specint', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+      const scenario0Id = scenario.id
+      expect(screen.getByTestId(`input-targetSpecint-${scenario0Id}`)).toBeInTheDocument()
+    })
+
+    it('targetSpecint input is absent when sizingMode is vcpu', () => {
+      // sizingMode is 'vcpu' by default (set in beforeEach)
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+      const scenario0Id = scenario.id
+      expect(screen.queryByTestId(`input-targetSpecint-${scenario0Id}`)).not.toBeInTheDocument()
     })
   })
 })
