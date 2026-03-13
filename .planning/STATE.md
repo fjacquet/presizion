@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 13-import-scope-filter-01-PLAN.md
-last_updated: "2026-03-13T20:46:22.535Z"
+stopped_at: Completed 13-import-scope-filter-02-PLAN.md
+last_updated: "2026-03-13T20:56:09.661Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 12-dark-mode-toggle P01 | 3 | 2 tasks | 3 files |
 | Phase 12-dark-mode-toggle P02 | 3 | 2 tasks | 3 files |
 | Phase 13-import-scope-filter P01 | 4 | 1 tasks | 9 files |
+| Phase 13-import-scope-filter P02 | 15 | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Recent decisions affecting current work:
 - [Phase 13-import-scope-filter]: ScopeData type alias defined in index.ts to avoid circular imports; rawByScope optional in interface but always populated by parsers
 - [Phase 13-import-scope-filter]: Scope key format: dc||cluster when both present, cluster alone when cluster-only, __all__ when neither column exists
 - [Phase 13-import-scope-filter]: aggregateScopes() copies ESX fields from first selected scope that has them; per-scope rawByScope omits ESX data (host-to-cluster mapping unavailable)
+- [Phase 13-import-scope-filter]: Checkbox component wraps @base-ui/react/checkbox; ScopeSelector extracted as sub-component to keep ImportPreviewModal under 150 lines; prevResult state comparison pattern avoids react-hooks/set-state-in-effect; ESX fields read from result directly, not previewCluster
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T20:46:22.532Z
-Stopped at: Completed 13-import-scope-filter-01-PLAN.md
+Last session: 2026-03-13T20:56:09.659Z
+Stopped at: Completed 13-import-scope-filter-02-PLAN.md
 Resume file: None

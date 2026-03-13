@@ -39,7 +39,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 
 - [x] **Phase 11: Branding & Tech Debt** — Presizion logo, custom favicon, and RAM formula display fix (completed 2026-03-13)
 - [x] **Phase 12: Dark Mode Toggle** — Header theme toggle with localStorage persistence and OS fallback (completed 2026-03-13)
-- [ ] **Phase 13: Import Scope Filter** — Parser detects clusters/datacenters; modal lets user select scope before populating Step 1
+- [x] **Phase 13: Import Scope Filter** — Parser detects clusters/datacenters; modal lets user select scope before populating Step 1 (completed 2026-03-13)
 - [ ] **Phase 14: Persistent Scope Widget** — Step 1 scope badge shows active clusters; re-aggregates data on scope change
 - [ ] **Phase 15: Persistence** — localStorage auto-restore and shareable URL hash encoding full session state
 
@@ -142,6 +142,6 @@ Plans:
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
-| 13. Import Scope Filter | 1/2 | In Progress|  | - |
+| 13. Import Scope Filter | 2/2 | Complete   | 2026-03-13 | - |
 | 14. Persistent Scope Widget | v1.3 | 0/2 | Not started | - |
 | 15. Persistence | v1.3 | 0/? | Not started | - |
