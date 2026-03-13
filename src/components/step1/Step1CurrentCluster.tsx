@@ -1,6 +1,7 @@
 import { CurrentClusterForm } from './CurrentClusterForm'
 import { DerivedMetricsPanel } from './DerivedMetricsPanel'
 import { FileImportButton } from './FileImportButton'
+import { ScopeBadge } from './ScopeBadge'
 import { useWizardStore } from '@/store/useWizardStore'
 
 export function Step1CurrentCluster() {
@@ -17,6 +18,7 @@ export function Step1CurrentCluster() {
         </div>
         <FileImportButton />
       </div>
+      <ScopeBadge />
       <CurrentClusterForm onNext={nextStep} />
       <DerivedMetricsPanel />
     </div>
