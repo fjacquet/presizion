@@ -77,13 +77,13 @@ No orphaned requirements: all three requirements mapped to Phase 11 in REQUIREME
 
 #### 1. Browser Tab Favicon
 
-**Test:** Run `npm run dev`, open http://localhost:5173/presizion/ in a browser, observe the browser tab icon.
+**Test:** Run `npm run dev`, open <http://localhost:5173/presizion/> in a browser, observe the browser tab icon.
 **Expected:** Blue geometric "P" mark on blue rounded-square background (not the purple Vite bolt).
 **Why human:** Browser tab favicon rendering cannot be verified programmatically — requires a live browser.
 
 #### 2. Header Logo Rendering
 
-**Test:** Run `npm run dev`, open http://localhost:5173/presizion/, inspect the page header.
+**Test:** Run `npm run dev`, open <http://localhost:5173/presizion/>, inspect the page header.
 **Expected:** Presizion logo (geometric P + "Presizion" wordmark in slate) appears centered above the "Cluster Refresh Sizing" heading, height 32px, proportional width, blue/slate palette, no distortion.
 **Why human:** SVG visual rendering and layout require a browser; automated checks only confirm the img tag exists with correct src.
 

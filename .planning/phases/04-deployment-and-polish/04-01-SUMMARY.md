@@ -99,7 +99,8 @@ None - `npm run build` succeeded on first attempt; Vitest confirmed 8 pending st
 **External services require manual configuration.**
 
 GitHub Pages must be enabled before the deploy workflow can publish:
-- Visit: https://github.com/fjacquet/presizion/settings/pages
+
+- Visit: <https://github.com/fjacquet/presizion/settings/pages>
 - Set Source to "GitHub Actions"
 - First push to main after this setup will trigger the deploy workflow
 
@@ -114,8 +115,8 @@ GitHub Pages must be enabled before the deploy workflow can publish:
 
 - FOUND: vite.config.ts (contains `base: '/presizion/'`)
 - FOUND: .github/workflows/deploy.yml
-- FOUND: src/__tests__/darkMode.test.ts
-- FOUND: src/lib/sizing/__tests__/display.test.ts
+- FOUND: src/**tests**/darkMode.test.ts
+- FOUND: src/lib/sizing/**tests**/display.test.ts
 - FOUND: 04-01-SUMMARY.md
 - FOUND: commit ffba12d (Task 1 — vite.config.ts + deploy.yml)
 - FOUND: commit decdbd0 (Task 2 — Wave 0 stubs)

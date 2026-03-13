@@ -109,6 +109,7 @@ Each task was committed atomically:
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] vitest config missing resolve alias for @ path**
+
 - **Found during:** Task 1 pre-execution (verifying test infrastructure)
 - **Issue:** `vitest.config.ts` had no `resolve.alias` for `@`, causing `@/components/ui/form` imports to fail in tests
 - **Fix:** Added `resolve: { alias: { '@': path.resolve(__dirname, './src') } }` to `vitest.config.ts`
@@ -117,6 +118,7 @@ Each task was committed atomically:
 - **Committed in:** `22742ae`
 
 **2. [Rule 3 - Blocking] Missing jest-dom matchers setup for component tests**
+
 - **Found during:** Task 1 pre-execution (checking test infrastructure)
 - **Issue:** No `setupFiles` in `vitest.config.ts` means `toBeInTheDocument()` and other jest-dom matchers are unavailable
 - **Fix:** Created `src/test-setup.ts` importing `@testing-library/jest-dom`, added `setupFiles` to vitest config
@@ -125,6 +127,7 @@ Each task was committed atomically:
 - **Committed in:** `22742ae`
 
 **3. [Rule 1 - Bug] shadcn FormControl label/input linkage prevents standard RTL queries**
+
 - **Found during:** Task 1 RED execution (first test run showed fireEvent.change errors)
 - **Issue:** `getByLabelText()` returns the `FormControl` div (not the `input`) because shadcn links label `htmlFor` to the div's id; `fireEvent.change` on a div fails with "element does not have a value setter"; `getByRole('spinbutton', { name })` also fails because the accessible name doesn't propagate through the div wrapper
 - **Fix:** Added `data-testid` prop to each numeric `Input` component; tests use `getByTestId`

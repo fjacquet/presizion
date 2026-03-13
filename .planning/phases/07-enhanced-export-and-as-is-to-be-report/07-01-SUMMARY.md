@@ -65,6 +65,7 @@ completed: 2026-03-13
 - **Files modified:** 4 (1 created, 3 extended)
 
 ## Accomplishments
+
 - Extended export.test.ts with 6 it.todo stubs for buildJsonContent (4) and downloadJson (2) covering EXPO-03
 - Created printCss.test.ts with a real RED test asserting index.css contains 'print-color-adjust: exact' as EXPO-04 leading indicator
 - Extended ComparisonTable.test.tsx with 5 it.todo stubs for As-Is column rendering (REPT-01)
@@ -78,12 +79,14 @@ Each task was committed atomically:
 2. **Task 2: Add REPT-01 and REPT-02 component test stubs** - `5acdc98` (test)
 
 ## Files Created/Modified
+
 - `src/__tests__/printCss.test.ts` - New: EXPO-04 leading indicator test; real assertion on index.css for print-color-adjust: exact
 - `src/lib/utils/__tests__/export.test.ts` - Extended: added describe('buildJsonContent') and describe('downloadJson') with it.todo stubs (EXPO-03)
 - `src/components/step3/__tests__/ComparisonTable.test.tsx` - Extended: added describe('REPT-01') with 5 it.todo stubs for As-Is column
 - `src/components/step1/__tests__/CurrentClusterForm.test.tsx` - Extended: added describe('REPT-02') with 4 it.todo stubs for existingServerCount/totalPcores
 
 ## Decisions Made
+
 - printCss.test.ts uses `it()` not `it.todo()` for the print-color-adjust assertion — intentionally red as EXPO-04 leading indicator per plan specification
 - Path to index.css from `src/__tests__/` is `../index.css` since index.css lives at `src/index.css` (not project root)
 - REPT-02 stubs placed in a new top-level `describe('REPT-02')` block (not nested inside 'CurrentClusterForm') to preserve existing test structure
@@ -91,6 +94,7 @@ Each task was committed atomically:
 ## Deviations from Plan
 
 **1. [Rule 1 - Bug] Fixed incorrect CSS file path in printCss.test.ts**
+
 - **Found during:** Task 1 verification
 - **Issue:** Initial resolve used `../../index.css` (would point to project root) but index.css lives at `src/index.css`, requiring `../index.css`
 - **Fix:** Changed `resolve(__dirname, '../../index.css')` to `resolve(__dirname, '../index.css')`
@@ -104,12 +108,15 @@ Each task was committed atomically:
 **Impact on plan:** Minor correction during Task 1; test infrastructure now correct. No scope creep.
 
 ## Issues Encountered
+
 - printCss.test.ts initially threw ENOENT because `../../index.css` resolved to project root; fixed by using `../index.css` (index.css is at src/index.css)
 
 ## User Setup Required
+
 None - no external service configuration required.
 
 ## Next Phase Readiness
+
 - All 4 requirement stubs are planted; Plans 02-04 have clear red/green targets
 - printCss.test.ts will turn green once Plan 03 adds `@media print { * { print-color-adjust: exact } }` to index.css
 - ComparisonTable and CurrentClusterForm stubs will activate when Plans 02 and 04 implement REPT-01 and REPT-02 respectively
@@ -117,10 +124,10 @@ None - no external service configuration required.
 
 ## Self-Check: PASSED
 
-- FOUND: src/__tests__/printCss.test.ts
-- FOUND: src/lib/utils/__tests__/export.test.ts
-- FOUND: src/components/step3/__tests__/ComparisonTable.test.tsx
-- FOUND: src/components/step1/__tests__/CurrentClusterForm.test.tsx
+- FOUND: src/**tests**/printCss.test.ts
+- FOUND: src/lib/utils/**tests**/export.test.ts
+- FOUND: src/components/step3/**tests**/ComparisonTable.test.tsx
+- FOUND: src/components/step1/**tests**/CurrentClusterForm.test.tsx
 - FOUND commit: baa8042 (Task 1)
 - FOUND commit: 5acdc98 (Task 2)
 

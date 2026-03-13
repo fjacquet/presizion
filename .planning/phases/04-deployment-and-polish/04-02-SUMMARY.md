@@ -59,6 +59,7 @@ completed: 2026-03-12
 - **Files modified:** 3
 
 ## Accomplishments
+
 - Replaced 3 it.todo stubs in darkMode.test.ts with real passing tests (pure function approach)
 - Added synchronous blocking anti-flash script to index.html `<head>` (reads matchMedia, sets .dark class before React hydration)
 - Updated page title from "cluster-sizer-scaffold" to "Presizion — Cluster Refresh Sizing"
@@ -77,29 +78,34 @@ Each task was committed atomically:
 _Note: TDD tasks — tests written first, verified passing, then implementation added_
 
 ## Files Created/Modified
+
 - `index.html` - Added synchronous anti-flash script in `<head>`, updated title to "Presizion — Cluster Refresh Sizing"
 - `src/__tests__/darkMode.test.ts` - Replaced 3 it.todo stubs with real unit tests using applyDarkModeClass() pure function pattern
 - `src/components/step3/ComparisonTable.tsx` - Added dark:text-red-400 / dark:text-amber-400 / dark:text-green-400 variants to utilizationClass()
 
 ## Decisions Made
+
 - Pure function extraction for anti-flash script: test the logic as applyDarkModeClass() rather than DOM-testing index.html directly — cleaner, framework-agnostic, avoids jsdom matchMedia mocking complexity
-- Dark color pairing: text-*-600 (light) / dark:text-*-400 (dark) — 400 shades are lighter and provide adequate contrast on dark backgrounds
+- Dark color pairing: text-_-600 (light) / dark:text-_-400 (dark) — 400 shades are lighter and provide adequate contrast on dark backgrounds
 
 ## Deviations from Plan
 
 None - plan executed exactly as written.
 
 ## Issues Encountered
+
 None - both TDD cycles completed cleanly.
 
 ## User Setup Required
+
 None - no external service configuration required.
 
 ## Next Phase Readiness
+
 - Dark mode is fully wired: OS preference detected before first paint, all color-coded cells render correctly in both modes
-- Manual smoke test needed: set OS to dark mode, run `npm run dev`, visit http://localhost:5173/presizion/ to confirm no white flash and dark colors are applied
+- Manual smoke test needed: set OS to dark mode, run `npm run dev`, visit <http://localhost:5173/presizion/> to confirm no white flash and dark colors are applied
 - Phase 04-03 (if any) can build on the established dark mode infrastructure
 
 ---
-*Phase: 04-deployment-and-polish*
-*Completed: 2026-03-12*
+_Phase: 04-deployment-and-polish_
+_Completed: 2026-03-12_

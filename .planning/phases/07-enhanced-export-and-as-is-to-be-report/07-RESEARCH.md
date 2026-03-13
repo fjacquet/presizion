@@ -13,6 +13,7 @@ The hardest part of this phase is EXPO-04 (print CSS) because Tailwind v4 requir
 **Primary recommendation:** Wave 0 adds test stubs for all four requirements. Then implement in two parallel waves: (Wave 2a) `buildJsonContent` + `downloadJson` in `export.ts` and the As-Is column in `ComparisonTable.tsx`; (Wave 2b) `@media print` block in `index.css` and the unconditional `existingServerCount` in `CurrentClusterForm.tsx`. Both wave 2 plans can be executed in parallel because they touch different files.
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -28,6 +29,7 @@ The hardest part of this phase is EXPO-04 (print CSS) because Tailwind v4 requir
 ## Standard Stack
 
 ### Core
+
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
 | TypeScript | ~5.9.3 | All new code; strict mode required | Already in project; no change |
@@ -41,6 +43,7 @@ The hardest part of this phase is EXPO-04 (print CSS) because Tailwind v4 requir
 All four requirements are implementable with existing stack. `JSON.stringify` (built-in) handles serialization. `Blob` + `URL.createObjectURL` (already used in `downloadCsv`) handles file download. `@media print` CSS (built-in browser mechanism) handles print layout.
 
 **Installation:**
+
 ```bash
 # No new packages — existing stack is sufficient
 ```
@@ -50,6 +53,7 @@ All four requirements are implementable with existing stack. `JSON.stringify` (b
 ## Architecture Patterns
 
 ### Recommended File Changes
+
 ```
 src/
   lib/utils/
@@ -69,9 +73,11 @@ src/
 ```
 
 ### Pattern 1: JSON Download (EXPO-03) — Same as CSV pattern
+
 **What:** Build a JSON string from cluster + scenarios + results, then trigger Blob download.
 **When to use:** Adding "Download JSON" button to `Step3ReviewExport`.
 **Example:**
+
 ```typescript
 // Following the existing downloadCsv pattern in src/lib/utils/export.ts
 export function buildJsonContent(
@@ -102,9 +108,11 @@ export function downloadJson(filename: string, json: string): void {
   URL.revokeObjectURL(url)
 }
 ```
+
 **Key decision:** Scenarios and results are interleaved in the JSON (same index) to make the file human-readable without cross-referencing. Field names use the application's internal TypeScript names verbatim (no renaming).
 
 ### Pattern 2: Print CSS (EXPO-04) — @media print in index.css
+
 **What:** A `@media print` block that hides non-report UI and forces single-column layout.
 **When to use:** Added to `index.css`; no component changes required beyond adding `print:hidden` classes to buttons/chrome in JSX.
 
@@ -120,6 +128,7 @@ export function downloadJson(filename: string, json: string): void {
 | `#root` has fixed max-width 1126px with border-inline | Override to `max-width: 100%; border: none` in print block |
 
 **Example `@media print` block structure (add to `index.css`):**
+
 ```css
 @media print {
   /* Remove page chrome */
@@ -157,12 +166,14 @@ export function downloadJson(filename: string, json: string): void {
 **Color preservation:** The existing utilization colors use `text-green-600 dark:text-green-400` etc. The `print-color-adjust: exact` property forces browsers to print background colors and text colors exactly. Without this, browsers strip colors by default in print preview. Confidence: HIGH (MDN verified).
 
 ### Pattern 3: As-Is Reference Column (REPT-01)
+
 **What:** Prepend a fixed "As-Is" column to `ComparisonTable` with current-cluster metrics.
 **When to use:** Always visible in Step 3; data sourced from `useClusterStore`.
 
 **ComparisonTable already calls `useClusterStore`** — confirmed in `ComparisonTable.test.tsx` line 8, the store is imported and used in `beforeEach` setup. However, looking at the actual `ComparisonTable.tsx`, the store is NOT currently read there — only `useScenariosStore` and `useScenariosResults` are used. `useClusterStore` must be added.
 
 **As-Is column values to compute:**
+
 ```typescript
 // Derived from OldCluster fields
 const asIs = {
@@ -182,9 +193,11 @@ const asIs = {
 **Anti-pattern:** Do NOT add As-Is data to `ScenarioResult` type — that type is for computed results, not source data. Read directly from `useClusterStore` in `ComparisonTable`.
 
 ### Pattern 4: Unconditional existingServerCount + Auto-derive totalPcores (REPT-02)
+
 **What:** Move `existingServerCount` field out of the SPECint guard in `CurrentClusterForm.tsx`; add reactive logic to auto-derive `totalPcores` from `existingServerCount × socketsPerServer × coresPerSocket`.
 
 **Current code (to change):**
+
 ```typescript
 // In CurrentClusterForm.tsx (lines 181-191):
 {sizingMode === 'specint' && (
@@ -197,11 +210,13 @@ const asIs = {
 ```
 
 **After change:**
+
 - `existingServerCount` moves to the "Existing Server Config" section (always visible, optional)
 - `specintPerServer` stays in the SPECint-only section
 - Auto-derive `totalPcores` when `existingServerCount`, `socketsPerServer`, and `coresPerSocket` are all numeric and > 0
 
 **Auto-derive approach (using existing `form.watch()` pattern):**
+
 ```typescript
 // In CurrentClusterForm's useEffect or via form.watch subscription:
 const watched = form.watch()
@@ -246,36 +261,42 @@ useEffect(() => {
 ## Common Pitfalls
 
 ### Pitfall 1: Browser Strips Colors in Print Preview
+
 **What goes wrong:** `text-green-600` / `text-amber-600` / `text-red-600` classes render as black text in print preview, destroying the utilization color coding.
 **Why it happens:** Browsers default to "Simplified" print mode which strips background colors and some text colors to save ink.
 **How to avoid:** Add `print-color-adjust: exact; -webkit-print-color-adjust: exact` to the print CSS block (on `*` or the table element). The `-webkit-` prefix is required for Safari/Chrome.
 **Warning signs:** Print preview shows all utilization cells as black text.
 
 ### Pitfall 2: `overflow-x-auto` Wrapper Clips Print
+
 **What goes wrong:** The `ComparisonTable` is wrapped in `<div className="overflow-x-auto rounded-md border">`. In print mode this clips the table, causing the rightmost scenario columns to be cut off.
 **Why it happens:** `overflow: auto` applies even in print, and the print viewport is narrower than the screen.
 **How to avoid:** Add `@media print { .overflow-x-auto { overflow: visible !important; } }` to the print block.
 **Warning signs:** Rightmost columns in print preview are invisible or scrollable.
 
 ### Pitfall 3: JSON `undefined` Fields Are Dropped
+
 **What goes wrong:** `OldCluster` has many optional fields typed as `number | undefined`. When `JSON.stringify` encounters `undefined`, it silently omits the key. The resulting JSON is missing optional fields entirely rather than showing `null`.
 **Why it happens:** `JSON.stringify` spec: `undefined` values in objects are omitted.
 **How to avoid:** In `buildJsonContent`, explicitly replace `undefined` with `null` for optional numeric fields, or use a replacer function: `JSON.stringify(payload, (k, v) => v === undefined ? null : v, 2)`.
 **Warning signs:** Downloaded JSON file lacks `existingServerCount`, `cpuUtilizationPercent`, etc. even when not entered.
 
 ### Pitfall 4: `totalPcores` Auto-Derive Creates Infinite useEffect Loop
+
 **What goes wrong:** `form.setValue('totalPcores', derived)` triggers a re-render which causes `watched` to update which triggers the `useEffect` again.
 **Why it happens:** `form.watch()` returns a new object on every call; `watched` as a dependency causes continuous re-firing.
 **How to avoid:** The existing project decision (STATE.md, Phase 02-input-forms P02): "form.watch(callback) subscription (not useEffect+watched-dep) to avoid infinite Zustand setState loop in ScenarioCard". Apply the same pattern here — use `form.watch((data, { name }) => { if (name && ['existingServerCount', 'socketsPerServer', 'coresPerSocket'].includes(name)) { ... } })` callback form to react only when the relevant fields change.
 **Warning signs:** Browser console shows "Maximum update depth exceeded" or high CPU usage when typing.
 
 ### Pitfall 5: As-Is Column Breaks Existing Tests
+
 **What goes wrong:** Adding a leading column to `ComparisonTable` shifts the column count, breaking tests that assert `columnheader` count or column positions.
 **Why it happens:** Tests in `ComparisonTable.test.tsx` use `screen.getAllByRole('columnheader')` and positional selectors.
 **How to avoid:** Update existing tests when adding the As-Is column. The test already uses `toBeGreaterThanOrEqual(1)` for column count, which is safe. But test setup uses `useClusterStore.setState(...)` — the As-Is column data will render, so tests should set `currentCluster` with meaningful values.
 **Warning signs:** `ComparisonTable.test.tsx` fails with `Expected 2 columns, got 3`.
 
 ### Pitfall 6: Print CSS Overrides Dark Mode in Screen View
+
 **What goes wrong:** Placing CSS rules outside `@media print` accidentally overrides the dark-mode styles globally.
 **Why it happens:** CSS specificity; rules added to `index.css` without media query scope apply to all contexts.
 **How to avoid:** All print rules must be inside a single `@media print { }` block. Test both light and dark mode screen rendering after adding print CSS.
@@ -287,6 +308,7 @@ useEffect(() => {
 Verified patterns from existing codebase:
 
 ### Existing downloadCsv Pattern (to replicate for JSON)
+
 ```typescript
 // src/lib/utils/export.ts — downloadCsv (lines 98-108)
 export function downloadCsv(filename: string, csv: string): void {
@@ -304,6 +326,7 @@ export function downloadCsv(filename: string, csv: string): void {
 ```
 
 ### Existing form.watch() Callback Pattern (safe, no infinite loop)
+
 ```typescript
 // Pattern from STATE.md decision [Phase 02-input-forms P02]:
 // "form.watch(callback) subscription (not useEffect+watched-dep)"
@@ -322,6 +345,7 @@ form.watch((data, { name }) => {
 ```
 
 ### ComparisonTable Column Extension Pattern
+
 ```typescript
 // In ComparisonTable.tsx — add useClusterStore read:
 const currentCluster = useClusterStore((state) => state.currentCluster)
@@ -341,6 +365,7 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 ```
 
 ### Print CSS (Tailwind v4 compatible)
+
 ```css
 /* Add to src/index.css */
 @media print {
@@ -372,6 +397,7 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 | `window.print()` listener for print detection | `@media print` CSS | Always | CSS approach is more reliable |
 
 **Deprecated/outdated:**
+
 - `color-adjust: exact` (without `print-`): Still works but unprefixed `print-color-adjust: exact` is now spec. Use both for safety.
 
 ---
@@ -398,6 +424,7 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 ## Validation Architecture
 
 ### Test Framework
+
 | Property | Value |
 |----------|-------|
 | Framework | Vitest 4.1.0 |
@@ -406,6 +433,7 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 | Full suite command | `rtk vitest run --reporter=verbose` |
 
 ### Phase Requirements → Test Map
+
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
 | EXPO-03 | `buildJsonContent` returns valid pretty-printed JSON with all inputs + outputs | unit | `rtk vitest run src/lib/utils/__tests__/export.test.ts` | ❌ Wave 0 |
@@ -420,11 +448,13 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 | REPT-02 | `totalPcores` is auto-derived when count + sockets + cores are all provided | component | `rtk vitest run src/components/step1/__tests__/CurrentClusterForm.test.tsx` | ✅ (file exists, add tests) |
 
 ### Sampling Rate
+
 - **Per task commit:** `rtk vitest run`
 - **Per wave merge:** `rtk vitest run --reporter=verbose`
 - **Phase gate:** Full suite green before `/gsd:verify-work`
 
 ### Wave 0 Gaps
+
 - [ ] `src/lib/utils/__tests__/export.test.ts` — add EXPO-03 test stubs (`it.todo`) to existing file (covers EXPO-03)
 - [ ] `src/__tests__/printCss.test.ts` — new file, checks `index.css` string for `print-color-adjust` (covers EXPO-04 automatable portion)
 - [ ] `src/components/step3/__tests__/ComparisonTable.test.tsx` — add REPT-01 `it.todo` stubs to existing describe blocks
@@ -435,18 +465,21 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 ## Sources
 
 ### Primary (HIGH confidence)
-- MDN Web Docs: `print-color-adjust` — https://developer.mozilla.org/en-US/docs/Web/CSS/print-color-adjust
-- MDN Web Docs: `@media print` — https://developer.mozilla.org/en-US/docs/Web/CSS/@media
-- MDN Web Docs: `URL.createObjectURL` — https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
-- MDN Web Docs: `JSON.stringify` undefined behavior — https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description
+
+- MDN Web Docs: `print-color-adjust` — <https://developer.mozilla.org/en-US/docs/Web/CSS/print-color-adjust>
+- MDN Web Docs: `@media print` — <https://developer.mozilla.org/en-US/docs/Web/CSS/@media>
+- MDN Web Docs: `URL.createObjectURL` — <https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL>
+- MDN Web Docs: `JSON.stringify` undefined behavior — <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description>
 - Existing codebase: `src/lib/utils/export.ts` — `downloadCsv` pattern (confirmed working, 222 tests pass)
 - Existing codebase: `src/components/step1/CurrentClusterForm.tsx` — `form.watch()` callback pattern
 - Tailwind v4 docs (verified via project usage): `print:` variant supported natively
 
 ### Secondary (MEDIUM confidence)
+
 - Tailwind CSS v4 print variant — inferred from project's Tailwind v4 usage; `print:hidden` class compiles to `@media print { display: none }`
 
 ### Tertiary (LOW confidence)
+
 - None — all findings are verified from codebase inspection or official MDN docs
 
 ---
@@ -454,6 +487,7 @@ const currentCluster = useClusterStore((state) => state.currentCluster)
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — All libraries already installed, no new deps needed
 - Architecture: HIGH — Four discrete, well-bounded changes; patterns verified from existing code
 - Pitfalls: HIGH — Based on direct inspection of existing CSS, form patterns, and test structure

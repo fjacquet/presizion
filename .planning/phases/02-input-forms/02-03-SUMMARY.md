@@ -68,6 +68,7 @@ completed: 2026-03-12
 - **Files modified:** 4
 
 ## Accomplishments
+
 - ScenarioCard with independent `useForm` instance per scenario, server config and sizing assumption fields, derived total-cores metric, and haReserveEnabled Switch toggle syncing to store
 - ScenarioResults read-only panel reading from `useScenariosResults()` hook — no result storage in Zustand
 - Step2Scenarios tabbed container with Add Scenario button, `key={scenario.id}` for fresh form on duplicate
@@ -81,6 +82,7 @@ completed: 2026-03-12
 **Plan metadata:** (pending docs commit)
 
 ## Files Created/Modified
+
 - `src/components/step2/ScenarioCard.tsx` - Per-scenario RHF form with own useForm instance, server config fields, sizing assumption fields, haReserveEnabled Switch, store sync via form.watch subscription
 - `src/components/step2/ScenarioResults.tsx` - Read-only server count panel from useScenariosResults, correlates by scenario index
 - `src/components/step2/Step2Scenarios.tsx` - Tabbed container, Add Scenario button, key=scenario.id for SCEN-05
@@ -101,6 +103,7 @@ completed: 2026-03-12
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Fixed infinite re-render loop in store sync useEffect**
+
 - **Found during:** Task 1 (ScenarioCard GREEN phase, first test run)
 - **Issue:** `useEffect` with `watched = form.watch()` in dependencies caused infinite loop: each `updateScenario` call changed Zustand state → re-render → new `watched` object → `useEffect` fires → `updateScenario` again
 - **Fix:** Replaced `useEffect([watched, ...])` with `form.watch(callback)` subscription pattern; used refs to hold stable `scenarioId` and `updateScenario` references
@@ -109,6 +112,7 @@ completed: 2026-03-12
 - **Committed in:** 8515b67 (Task 1+2 commit)
 
 **2. [Rule 1 - Bug] Fixed FormField outside FormProvider scope**
+
 - **Found during:** Task 1 (ScenarioCard GREEN phase, first test run)
 - **Issue:** Initial implementation placed `<CardHeader>` (with name FormField) outside the `<Form>` wrapper; `useFormField` called `useFormContext()` which returned null
 - **Fix:** Restructured so `<Form {...form}><form>` wraps both `<CardHeader>` and `<CardContent>`
@@ -117,10 +121,11 @@ completed: 2026-03-12
 - **Committed in:** 8515b67 (Task 1+2 commit)
 
 **3. [Rule 1 - Bug] Fixed test query strategy for shadcn FormControl wrapper**
+
 - **Found during:** Task 1 (test RED phase — tests failing for wrong reason after component created)
 - **Issue:** `getByLabelText(/sockets\/server/i)` threw "element associated with label is non-labellable" because `FormControl` renders a `<div>` not a native `<input>` as the label target
 - **Fix:** Used `getByText` for label presence checks, `getAllByRole('spinbutton')` for input value checks
-- **Files modified:** src/components/step2/__tests__/ScenarioCard.test.tsx
+- **Files modified:** src/components/step2/**tests**/ScenarioCard.test.tsx
 - **Verification:** 21 tests pass green
 - **Committed in:** 8515b67 (Task 1+2 commit)
 
@@ -130,9 +135,11 @@ completed: 2026-03-12
 **Impact on plan:** All auto-fixes necessary for correct behavior; no scope creep. The patterns are documented for future ScenarioCard-style forms.
 
 ## Issues Encountered
+
 - @base-ui/react Switch has `checked` + `onCheckedChange` (same API as shadcn radix Switch) — no adaptation needed, the plan's specified binding worked directly.
 
 ## Next Phase Readiness
+
 - ScenarioCard, ScenarioResults, and Step2Scenarios ready for wizard integration (02-04)
 - All SCEN-01 through SCEN-05 requirements satisfied
 - TypeScript strict mode passes, no linting errors in new files
@@ -146,7 +153,7 @@ completed: 2026-03-12
 - FOUND: src/components/step2/ScenarioCard.tsx
 - FOUND: src/components/step2/ScenarioResults.tsx
 - FOUND: src/components/step2/Step2Scenarios.tsx
-- FOUND: src/components/step2/__tests__/ScenarioCard.test.tsx
+- FOUND: src/components/step2/**tests**/ScenarioCard.test.tsx
 - FOUND commit: 8515b67 in git log
 - Tests: 21 passed / 0 failed for step2 suite
 - Full suite: 96 passed / 0 failed

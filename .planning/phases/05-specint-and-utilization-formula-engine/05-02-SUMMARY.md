@@ -79,6 +79,7 @@ completed: 2026-03-13
 ## Regression Verification
 
 All existing fixtures confirmed still passing:
+
 - `computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO).finalCount === 24`
 - `computeScenarioResult(RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO).finalCount === 19`
 - `computeScenarioResult(DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO).finalCount === 12`

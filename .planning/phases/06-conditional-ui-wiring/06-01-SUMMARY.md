@@ -50,6 +50,7 @@ requirements:
 ### SizingModeToggle component (`src/components/wizard/SizingModeToggle.tsx`)
 
 A simple but correctly-structured toggle button group that:
+
 - Uses `role="group"` with `aria-label="Sizing mode"` for accessibility
 - Has two `type="button"` buttons: "vCPU" and "SPECint"
 - Reads `sizingMode` and `setSizingMode` from `useWizardStore` via selector pattern
@@ -79,6 +80,7 @@ A simple but correctly-structured toggle button group that:
 ### Auto-fixed Issues
 
 **1. [Rule 2 - Missing feature] ComparisonTable.test.tsx already existed with full tests**
+
 - **Found during:** Task 1
 - **Issue:** The plan described creating ComparisonTable.test.tsx with stubs, but the file already existed from Phase 03 with 13 real passing tests
 - **Fix:** Added a new `PERF-03` describe block with `it.todo` stubs alongside the existing tests rather than replacing them — preserving existing test coverage

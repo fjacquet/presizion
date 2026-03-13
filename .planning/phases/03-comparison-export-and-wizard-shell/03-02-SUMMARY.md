@@ -162,10 +162,10 @@ None — no external services, API keys, or browser configuration required.
 - FOUND: src/lib/utils/export.ts
 - FOUND: src/components/step3/ComparisonTable.tsx
 - FOUND: src/components/step3/Step3ReviewExport.tsx (updated from stub)
-- FOUND: src/lib/utils/__tests__/clipboard.test.ts (17 tests promoted from it.todo)
-- FOUND: src/lib/utils/__tests__/export.test.ts (9 tests promoted from it.todo)
-- FOUND: src/components/step3/__tests__/ComparisonTable.test.tsx (13 tests promoted)
-- FOUND: src/components/step3/__tests__/Step3ReviewExport.test.tsx (7 tests promoted)
+- FOUND: src/lib/utils/**tests**/clipboard.test.ts (17 tests promoted from it.todo)
+- FOUND: src/lib/utils/**tests**/export.test.ts (9 tests promoted from it.todo)
+- FOUND: src/components/step3/**tests**/ComparisonTable.test.tsx (13 tests promoted)
+- FOUND: src/components/step3/**tests**/Step3ReviewExport.test.tsx (7 tests promoted)
 - FOUND commit: 57095a9 (feat: clipboard and CSV export utility functions)
 - FOUND commit: 499cd18 (feat: ComparisonTable and Step3ReviewExport)
 - Test suite: 155 PASSING, 0 FAILING (14 test files)

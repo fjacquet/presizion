@@ -89,6 +89,7 @@ human_verification: []
 ### Anti-Patterns Found
 
 No anti-patterns detected in phase 5 production files:
+
 - Zero `TODO`/`FIXME`/`PLACEHOLDER` comments in formula, constraint, display, or hook files
 - No stub return values (`return null`, `return {}`, `return []`) in implementation functions
 - No `it.todo` or `it.skip` remaining in any test file — all stubs converted to real passing assertions
@@ -119,5 +120,5 @@ Phase 6 (SPECint UI wiring) has all prerequisites in place.
 
 ---
 
-_Verified: 2026-03-13T07:10:00Z_
-_Verifier: Claude (gsd-verifier)_
+*Verified: 2026-03-13T07:10:00Z*
+*Verifier: Claude (gsd-verifier)*

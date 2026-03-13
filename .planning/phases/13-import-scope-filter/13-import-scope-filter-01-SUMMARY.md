@@ -104,7 +104,7 @@ _Note: TDD tasks may have multiple commits (test -> feat -> refactor); RED and G
 - rawByScope marked optional (?: Map<...>) in ClusterImportResult to avoid JSON.stringify issues; parsers always populate it
 - Per-scope rawByScope entries omit ESX fields — host-to-cluster mapping not available at parse time
 - aggregateScopes copies ESX fields from first selected scope that has them defined
-- scopeLabels format: 'cluster (dc)' when both present, cluster name alone when cluster-only, 'All' for __all__
+- scopeLabels format: 'cluster (dc)' when both present, cluster name alone when cluster-only, 'All' for **all**
 
 ## Deviations from Plan
 
@@ -125,5 +125,5 @@ None - no external service configuration required.
 - All 296 tests passing; TypeScript strict mode; 0 ESLint errors expected
 
 ---
-*Phase: 13-import-scope-filter*
-*Completed: 2026-03-13*
+_Phase: 13-import-scope-filter_
+_Completed: 2026-03-13_

@@ -79,6 +79,7 @@ No orphaned requirements found — both PERF-02 and PERF-03 map exclusively to P
 ### Anti-Patterns Found
 
 No anti-patterns detected. Scan of all 6 modified files found:
+
 - Zero TODO/FIXME/HACK/PLACEHOLDER comments
 - Zero empty handler stubs (`() => {}`, `console.log`-only handlers)
 - Zero `return null` stubs (the single `return null` in `ScenarioCard.tsx` is a legitimate guard for missing scenario)

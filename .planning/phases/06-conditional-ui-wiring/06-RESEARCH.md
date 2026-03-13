@@ -13,6 +13,7 @@ The project uses react-hook-form v7 with zodResolver for form validation, Zustan
 **Primary recommendation:** Add a `SizingModeToggle` component consumed by `WizardShell` (or the header area), read `sizingMode` from `useWizardStore` in `CurrentClusterForm` and `ScenarioCard`, conditionally render the new fields, and extend `handleNext` / Step 2 "Next" guard to include SPECint fields when mode is active.
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -324,6 +325,7 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
 | No utilization inputs in UI | CPU/RAM util % fields in Step 1 (optional) | Phase 6 | Live right-sizing feedback |
 
 **Deprecated/outdated:**
+
 - `capitalize(result.limitingResource)` in ComparisonTable: unsafe for 'specint'; should use RESOURCE_LABELS lookup
 
 ## Open Questions
@@ -404,6 +406,7 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — all libraries already installed and in active use; no new dependencies
 - Architecture: HIGH — all schema fields, formula functions, and store actions already exist; work is additive UI wiring
 - Pitfalls: HIGH — identified from direct code inspection of existing component patterns

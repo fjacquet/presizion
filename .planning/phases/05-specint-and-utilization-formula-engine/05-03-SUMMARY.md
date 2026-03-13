@@ -95,6 +95,7 @@ Each task was committed atomically:
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Fixed CurrentClusterForm.tsx TOOLTIPS record missing new fields**
+
 - **Found during:** Task 2 (build verification)
 - **Issue:** `TOOLTIPS: Record<keyof CurrentClusterInput, string>` was missing `existingServerCount`, `specintPerServer`, `cpuUtilizationPercent`, `ramUtilizationPercent` — TypeScript error TS2739
 - **Fix:** Added 4 tooltip string entries for the new schema fields
@@ -103,6 +104,7 @@ Each task was committed atomically:
 - **Committed in:** `ccf64b8` (Task 2 commit)
 
 **2. [Rule 1 - Bug] Fixed ScenarioResults.tsx RESOURCE_LABELS missing specint member**
+
 - **Found during:** Task 2 (build verification)
 - **Issue:** `RESOURCE_LABELS: Record<LimitingResource, string>` was missing `specint` after 05-02 extended `LimitingResource` union — TypeScript error TS2741
 - **Fix:** Added `specint: 'SPECint-limited'` to the record

@@ -107,6 +107,7 @@ Each task was committed atomically:
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Removed unused capitalize() function in ComparisonTable.tsx**
+
 - **Found during:** Task 2 (npm run build verification)
 - **Issue:** After replacing capitalize(result.limitingResource) with RESOURCE_LABELS[result.limitingResource], TypeScript reported TS6133 — capitalize declared but its value is never read
 - **Fix:** Removed the capitalize() function entirely since it was only used for limitingResource display

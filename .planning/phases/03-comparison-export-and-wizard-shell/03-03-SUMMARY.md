@@ -91,6 +91,7 @@ Each task was committed atomically:
 ### Auto-fixed Issues
 
 **1. [Rule 3 - Blocking] Created Step3ReviewExport stub to resolve parallel import**
+
 - **Found during:** Task 2 GREEN phase
 - **Issue:** Vite module resolution fails when WizardShell.tsx imports Step3ReviewExport and the file doesn't exist, even though vi.mock intercepts it in tests — the importer's module transform fails before mocks apply
 - **Fix:** Created minimal `src/components/step3/Step3ReviewExport.tsx` stub; 03-02 will replace with full implementation
@@ -114,9 +115,9 @@ None - no external service configuration required.
 ## Self-Check: PASSED
 
 - FOUND: src/hooks/useBeforeUnload.ts
-- FOUND: src/hooks/__tests__/useBeforeUnload.test.ts
+- FOUND: src/hooks/**tests**/useBeforeUnload.test.ts
 - FOUND: src/components/wizard/WizardShell.tsx
-- FOUND: src/components/wizard/__tests__/WizardShell.test.tsx
+- FOUND: src/components/wizard/**tests**/WizardShell.test.tsx
 - FOUND: src/components/step3/Step3ReviewExport.tsx
 - FOUND commit: e8d3331 (feat: useBeforeUnload hook)
 - FOUND commit: d113761 (feat: WizardShell updates)

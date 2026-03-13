@@ -106,6 +106,7 @@ completed: 2026-03-12
 ### Auto-fixed Issues
 
 **1. [Rule 1 - Bug] Pre-existing TypeScript errors surfaced only in npm run build**
+
 - **Found during:** Task 2 (running npm run build as required by task done criteria)
 - **Issue:** `tsc -b` in npm run build is stricter than `npx tsc --noEmit` (which uses a different tsconfig path); three categories of errors: (1) `vi` missing from vitest imports in test file, (2) `zodResolver` with `z.preprocess` creates `Resolver<unknown-input>` incompatible with `useForm<ConcreteType>`, (3) `TooltipTrigger asChild` not supported by base-ui Trigger
 - **Fix:** Added `vi` to test imports; cast `zodResolver(schema) as any` in both `CurrentClusterForm` and `ScenarioCard`; fixed `NumericFormField` control prop type; removed `asChild` from `TooltipTrigger`
