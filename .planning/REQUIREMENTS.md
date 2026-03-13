@@ -42,7 +42,7 @@
 | THEME-01 | Phase 12 | Complete |
 | THEME-02 | Phase 12 | Complete |
 | THEME-03 | Phase 12 | Complete |
-| SCOPE-01 | Phase 13 | Pending |
+| SCOPE-01 | Phase 13 | Complete |
 | SCOPE-02 | Phase 13 | Pending |
 | SCOPE-03 | Phase 14 | Pending |
 | SCOPE-04 | Phase 14 | Pending |

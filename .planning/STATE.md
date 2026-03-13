@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 12-dark-mode-toggle-02-PLAN.md
-last_updated: "2026-03-13T20:39:18.505Z"
+stopped_at: Completed 13-import-scope-filter-01-PLAN.md
+last_updated: "2026-03-13T20:46:22.535Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 4
+  total_plans: 8
+  completed_plans: 5
   percent: 0
 ---
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 11-branding-and-tech-debt P01 | 5 | 2 tasks | 3 files |
 | Phase 12-dark-mode-toggle P01 | 3 | 2 tasks | 3 files |
 | Phase 12-dark-mode-toggle P02 | 3 | 2 tasks | 3 files |
+| Phase 13-import-scope-filter P01 | 4 | 1 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 12-dark-mode-toggle]: Anti-flash script uses var (not const/let) for pre-parse context compatibility
 - [Phase 12-dark-mode-toggle]: STORAGE_KEY 'presizion-theme' is single source of truth across useThemeStore and anti-flash script
 - [Phase 12-dark-mode-toggle]: ThemeToggle uses relative+absolute Tailwind pattern in WizardShell header to keep centered layout intact
+- [Phase 13-import-scope-filter]: ScopeData type alias defined in index.ts to avoid circular imports; rawByScope optional in interface but always populated by parsers
+- [Phase 13-import-scope-filter]: Scope key format: dc||cluster when both present, cluster alone when cluster-only, __all__ when neither column exists
+- [Phase 13-import-scope-filter]: aggregateScopes() copies ESX fields from first selected scope that has them; per-scope rawByScope omits ESX data (host-to-cluster mapping unavailable)
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T20:35:11.079Z
-Stopped at: Completed 12-dark-mode-toggle-02-PLAN.md
+Last session: 2026-03-13T20:46:22.532Z
+Stopped at: Completed 13-import-scope-filter-01-PLAN.md
 Resume file: None
