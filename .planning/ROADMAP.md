@@ -176,5 +176,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
-| 6. Conditional UI Wiring | 0/2 | Not started | - |
+| 6. Conditional UI Wiring | 1/2 | In Progress|  |
 | 7. Enhanced Export | 0/TBD | Not started | - |

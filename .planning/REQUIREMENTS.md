@@ -59,8 +59,8 @@
 ### Performance (SPECint Sizing Mode)
 
 - [x] **PERF-01**: User can select a global sizing mode: vCPU-based (default) or SPECint-based (mutually exclusive toggle)
-- [ ] **PERF-02**: In SPECint mode, Step 1 shows an additional field: SPECint benchmark score for the existing server model
-- [ ] **PERF-03**: In SPECint mode, each scenario shows an additional field: SPECint benchmark score for the target server model
+- [x] **PERF-02**: In SPECint mode, Step 1 shows an additional field: SPECint benchmark score for the existing server model
+- [x] **PERF-03**: In SPECint mode, each scenario shows an additional field: SPECint benchmark score for the target server model
 - [x] **PERF-04**: In SPECint mode the CPU constraint uses `ceil(existingServers × oldSPECint × headroom / targetSPECint)`; RAM and disk formulas are unchanged
 - [x] **PERF-05**: The limiting resource label shows "SPECint" when SPECint mode is active and that constraint drives the final server count
 
@@ -149,8 +149,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | PERF-01 | Phase 5 | Complete |
-| PERF-02 | Phase 6 | Pending |
-| PERF-03 | Phase 6 | Pending |
+| PERF-02 | Phase 6 | Complete |
+| PERF-03 | Phase 6 | Complete |
 | PERF-04 | Phase 5 | Complete |
 | PERF-05 | Phase 5 | Complete |
 | UTIL-01 | Phase 5 | Complete |
