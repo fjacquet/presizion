@@ -7,7 +7,8 @@
     <title>Presizion — Cluster Refresh Sizing</title>
     <script>
       try {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        var s = localStorage.getItem('presizion-theme')
+        if (s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.classList.add('dark')
         }
       } catch (_) {}
