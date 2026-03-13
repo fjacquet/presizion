@@ -55,9 +55,15 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 6. **Traceable assumptions**
    For every key output metric, show the **formula and input parameters** used, so users can validate and adjust.
 
-### 3.2 Non-Goals (for v1)
+6. **Performance-based sizing (v1.1)**
+   - Support a **SPECint-based sizing mode** as an alternative to vCPU-ratio sizing, enabling performance-equivalence calculations between server generations.
 
-- No integration with external systems (vCenter, CloudIQ, etc.).
+7. **Right-sizing from observed utilization (v1.1)**
+   - Accept observed CPU % and RAM % utilization of the existing cluster to size to **actual consumption** rather than installed capacity.
+
+### 3.2 Non-Goals (for v1 / v1.1)
+
+- No integration with external systems (vCenter, CloudIQ, etc.) — planned for v1.2 (LiveOptics/RVTools file import).
 - No authentication, user accounts, or persistent server-side storage.
 - No formal TCO/ROI calculations (only capacity/sizing in v1).
 - No per-VM-level modeling; calculations are **aggregate-based** (e.g., totals, averages).
@@ -173,9 +179,27 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
     - VMs per server based on cores
     - VMs per server based on RAM
 
-**FR-2 – Optional CSV/JSON paste input**
+**FR-2 – Observed utilization inputs (v1.1)**
 
-- Stretch (v1.1): The app may accept a CSV/JSON paste area where users can paste a minimal dataset, which is then parsed to fill in the form fields.
+- The app shall accept two optional fields in the current cluster form:
+  - **CPU utilization %** (0–100): the observed average CPU utilization of the existing cluster.
+  - **RAM utilization %** (0–100): the observed average RAM utilization of the existing cluster.
+- When provided, the sizing formulas scale effective demand by these percentages, enabling right-sizing to actual consumption rather than installed capacity (see ADR-004).
+- When not provided (blank), formulas default to 100% — backward-compatible with v1.0 behavior.
+
+**FR-2b – Sizing mode selection (v1.1)**
+
+- The app shall provide a global **sizing mode toggle**: vCPU-based (default) or SPECint-based (mutually exclusive — see ADR-001).
+- In **SPECint mode**:
+  - Step 1 displays an additional field: SPECint benchmark score for the existing server model.
+  - Each scenario card displays an additional field: SPECint score for the target server model.
+  - The CPU constraint formula becomes: `ceil(existingServers × oldSPECint × headroom / targetSPECint)`.
+  - The limiting resource label shows "SPECint" when this constraint drives the final server count.
+- In **vCPU mode**: SPECint fields are hidden; behavior is identical to v1.0.
+
+**FR-2c – File import (v1.2, planned)**
+
+- The app will accept LiveOptics zip files and RVTools xlsx files to auto-populate Step 1 cluster inputs, eliminating manual data entry.
 
 ### 7.2 Target Cluster Scenarios
 
@@ -273,10 +297,18 @@ For each scenario, the app shall compute:
 
 **FR-12 – Data download**
 
-- The app shall allow the user to download a JSON/CSV file containing:
-  - All input fields.
-  - All derived fields and output metrics.
+- The app shall allow the user to download a CSV file containing all input fields and output metrics (v1.0 — shipped).
+- **FR-12b (v1.1)**: The app shall additionally allow downloading a **JSON file** containing all inputs, scenario configs, and outputs in pretty-printed format — suitable for archiving or future re-import.
 - All generation happens client-side using browser APIs (no server interaction).
+
+**FR-16b – Print / PDF layout (v1.1)**
+
+- The app shall provide a **print-optimized stylesheet** (`@media print`) that:
+  - Hides wizard chrome (step indicator, navigation buttons).
+  - Renders the Step 3 comparison table in a clean single-column layout.
+  - Fits A4/Letter paper width without horizontal overflow.
+  - Preserves utilization color coding.
+- Users can produce a PDF hardcopy via browser Print → Save as PDF.
 
 ### 7.6 UX & Interaction
 
@@ -362,7 +394,10 @@ For each scenario, the app shall compute:
    - `socketsPerServer`
    - `coresPerSocket`
    - `memoryPerServerGb`
-   - `serverCount` (optional)
+   - `serverCount` (optional, required for SPECint mode)
+   - `specintPerServer` (optional — v1.1, SPECint mode only)
+   - `cpuUtilizationPercent` (optional — v1.1, right-sizing scaler)
+   - `ramUtilizationPercent` (optional — v1.1, right-sizing scaler)
    - Derived:
      - `coresPerServer`
      - `vmsPerServerCoreBased`
@@ -374,21 +409,25 @@ For each scenario, the app shall compute:
    - `coresPerSocket`
    - `memoryPerServerGb`
    - `diskPerServerGb`
-   - `targetVcpuToPCoreRatio`
+   - `targetVcpuToPCoreRatio` (vCPU mode only)
+   - `targetSpecint` (optional — v1.1, SPECint mode only)
    - `ramPerVmGb`
    - `diskPerVmGb`
    - `growthHeadroomPercent`
-   - Optional utilization targets: `maxCpuUtilPercent`, `maxRamUtilPercent`, `maxDiskUtilPercent`
+   - `haReserveEnabled` (boolean)
 
-3. **ScenarioResult** (derived)
+3. **WizardState** (global)
+   - `sizingMode: 'vcpu' | 'specint'` (v1.1)
+
+4. **ScenarioResult** (derived — never stored, see ADR-002)
    - `requiredVcpus`
    - `requiredRamGb`
    - `requiredDiskGb`
-   - `serverCountCpuLimited`
+   - `serverCountCpuLimited` (or `serverCountSpecintLimited` in SPECint mode)
    - `serverCountRamLimited`
    - `serverCountDiskLimited`
    - `finalServerCount`
-   - `limitingResource`
+   - `limitingResource: 'CPU' | 'RAM' | 'Disk' | 'SPECint'`
    - `vmsPerServer`
    - `achievedVcpuToPCoreRatio`
    - `cpuUtilizationPercent`
@@ -455,10 +494,26 @@ Wireframes are not included here but can be added in a future UX deliverable.
 - **Governance**:
   - Who owns maintenance of sizing rules as hardware generations and best practices change?
 
-## 14. Future Enhancements (Beyond v1)
+## 14. Future Enhancements
 
-- Support for **saving/loading** scenarios via browser storage or downloadable files.
+### v1.1 (in progress)
+
+- **SPECint-based sizing mode** — performance-equivalence sizing using SPECint delta between old and new server generations (PERF-01–05).
+- **Observed utilization inputs** — right-size to actual CPU/RAM consumption rather than installed capacity (UTIL-01–03).
+- **JSON download** — export all inputs and outputs as JSON (EXPO-03).
+- **Print / PDF layout** — clean browser-printable layout of Step 3 results (EXPO-04).
+
+### v1.2 (planned)
+
+- **LiveOptics zip import** — parse LiveOptics data collection zip to auto-fill Step 1.
+- **RVTools xlsx import** — parse RVTools Excel export to auto-fill Step 1.
+
+### v2+ (backlog)
+
+- **localStorage persistence** — restore last-used inputs on next visit (PERS-01).
+- **Shareable URL** — hash-encoded state for sharing pre-filled scenarios (PERS-02).
+- **Manual dark/light mode toggle** — override OS preference (UI-01).
 - Integration with **price books** or BOM tools to estimate cost impact.
-- Support for **different workload profiles** (e.g., compute-heavy vs. memory-heavy) with separate assumptions per profile.
+- Support for **different workload profiles** (compute-heavy vs. memory-heavy) with separate assumptions per profile.
 - Advanced **what-if analysis** (e.g., “What if we target 50% CPU utilization instead of 70%?”).
-- Improved **visualization**, such as bar charts comparing server counts and utilization across scenarios.
+- Improved **visualization**: bar charts comparing server counts and utilization across scenarios.
