@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
+milestone: v1.2
+milestone_name: "Visualization, File Import & Tech Debt"
 status: planning
-stopped_at: Completed 07-enhanced-export-and-as-is-to-be-report-03-PLAN.md
-last_updated: "2026-03-13T10:26:55.404Z"
-last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
+stopped_at: —
+last_updated: "2026-03-13T11:30:00.000Z"
+last_activity: 2026-03-13 — Milestone v1.2 started; defining requirements
 progress:
   total_phases: 7
   completed_phases: 7
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 ## Current Position
 
-Phase: 5 of 7 (SPECint and Utilization Formula Engine)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-13 — Milestone v1.2 started
 
 Progress: [█████░░░░░] 50%
 

@@ -10,16 +10,15 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 
 ## Requirements
 
-## Current Milestone: v1.1 — SPECint, Utilization & Enhanced Export
+## Current Milestone: v1.2 — Visualization, File Import & Tech Debt
 
-**Goal:** Add performance-based sizing via SPECint delta, right-sizing from observed cluster utilization, and enhanced export (JSON download + print/PDF layout).
+**Goal:** Add graphical sizing charts, client-side RVTools/LiveOptics file import, and resolve v1.1 display tech debt items.
 
 **Target features:**
 
-- SPECint-based sizing mode (alternative to vCPU mode, mutually exclusive)
-- Observed CPU % and RAM % utilization inputs for right-sizing to actual consumption
-- JSON export of all inputs and outputs
-- Print-optimized layout for PDF hardcopy via browser print
+- Bar/comparison charts in Step 3 showing server counts and constraint breakdown across scenarios
+- RVTools (.xlsx) and LiveOptics (.zip) drag-and-drop file upload → auto-fill Step 1 cluster inputs
+- Three tech debt display fixes (formula string, SPECint duplicate row, dead code removal)
 
 ---
 
@@ -28,18 +27,25 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ User can enter current cluster metrics and define scenarios — v1.0 / Phase 2
 - ✓ App calculates server counts (CPU/RAM/disk constraints) with live updates — v1.0 / Phase 1–2
 - ✓ Side-by-side comparison table with utilization color-coding — v1.0 / Phase 3
-- ✓ Clipboard copy and CSV download — v1.0 / Phase 3
+- ✓ Clipboard copy, CSV download, JSON download — v1.0–1.1 / Phase 3, 7
 - ✓ 3-step wizard with validation guards and beforeunload warning — v1.0 / Phase 2–3
 - ✓ GitHub Pages deployment with dark mode support — v1.0 / Phase 4
 - ✓ Inline formula display for all key outputs — v1.0 / Phase 4
+- ✓ SPECint-based sizing mode (global toggle, delta formula) — v1.1 / Phase 5–6
+- ✓ CPU & RAM utilization % inputs for right-sizing — v1.1 / Phase 5–6
+- ✓ As-Is reference column in Step 3 (server count, config, pCores, ratio) — v1.1 / Phase 7
+- ✓ Print/PDF-optimized layout — v1.1 / Phase 7
 
 ### Active
 
-- [ ] User can switch between vCPU-based and SPECint-based sizing mode (mutually exclusive, global)
-- [ ] In SPECint mode, user enters SPECint score for existing and target servers; CPU constraint uses delta formula
-- [ ] User can enter observed current CPU % and RAM % utilization; formulas scale to actual consumption
-- [ ] User can download a JSON file of all inputs and outputs
-- [ ] App provides a print-optimized layout for PDF hardcopy via browser print
+- [ ] User can view a bar/comparison chart in Step 3 comparing server counts across scenarios
+- [ ] Chart shows per-constraint breakdown (CPU/RAM/disk or SPECint) per scenario
+- [ ] User can download chart as PNG for use in external reports
+- [ ] User can upload an RVTools .xlsx file; app auto-fills Step 1 cluster inputs
+- [ ] User can upload a LiveOptics .zip file; app auto-fills Step 1 cluster inputs
+- [ ] After upload, user reviews and confirms extracted data before form population
+- [ ] Step 2 CPU formula display string shows utilization factor (× N%) when utilization % entered
+- [ ] In SPECint mode, Step 2 results panel shows only the SPECint row (not a duplicate CPU row)
 
 ### Out of Scope
 
