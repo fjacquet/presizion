@@ -20,6 +20,7 @@ const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
   const setScenarios = useScenariosStore((s) => s.setScenarios)
+  const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
 
   const isJson = result.sourceFormat === 'presizion-json'
 
@@ -28,18 +29,21 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       setCurrentCluster({ ...result.cluster })
       setScenarios(result.scenarios)
     } else {
-      setCurrentCluster({
+      const cluster = {
         totalVcpus: result.totalVcpus,
         totalPcores: result.totalPcores ?? 0,
         totalVms: result.totalVms,
         totalDiskGb: result.totalDiskGb,
+        avgRamPerVmGb: result.avgRamPerVmGb,
         ...(result.existingServerCount != null && { existingServerCount: result.existingServerCount }),
         ...(result.socketsPerServer != null && { socketsPerServer: result.socketsPerServer }),
         ...(result.coresPerSocket != null && { coresPerSocket: result.coresPerSocket }),
         ...(result.ramPerServerGb != null && { ramPerServerGb: result.ramPerServerGb }),
         ...(result.cpuUtilizationPercent != null && { cpuUtilizationPercent: result.cpuUtilizationPercent }),
         ...(result.ramUtilizationPercent != null && { ramUtilizationPercent: result.ramUtilizationPercent }),
-      })
+      }
+      setCurrentCluster(cluster)
+      seedFromCluster(cluster)
     }
     onClose()
   }

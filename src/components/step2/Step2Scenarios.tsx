@@ -26,11 +26,16 @@ export function Step2Scenarios() {
           type="button"
           variant="outline"
           onClick={() => {
+            const ramPerVmGb = currentCluster.avgRamPerVmGb
             const diskPerVmGb =
               currentCluster.totalDiskGb && currentCluster.totalVms
                 ? Math.round((currentCluster.totalDiskGb / currentCluster.totalVms) * 10) / 10
                 : undefined
-            addScenario(diskPerVmGb != null ? { diskPerVmGb } : undefined)
+            addScenario(
+              ramPerVmGb != null || diskPerVmGb != null
+                ? { ...(ramPerVmGb != null && { ramPerVmGb }), ...(diskPerVmGb != null && { diskPerVmGb }) }
+                : undefined
+            )
           }}
           aria-label="Add Scenario"
         >

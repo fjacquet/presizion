@@ -20,15 +20,32 @@ async function detectXlsx(buffer: ArrayBuffer): Promise<DetectionResult> {
 
 async function detectZip(buffer: ArrayBuffer): Promise<DetectionResult> {
   const JSZip = (await import('jszip')).default
+  const XLSX = await import('xlsx')
   const zip = await JSZip.loadAsync(buffer)
-  const xlsxEntry = Object.values(zip.files).find(
+
+  const xlsxEntries = Object.values(zip.files).filter(
     (f) => !f.dir && f.name.toLowerCase().endsWith('.xlsx'),
   )
-  if (!xlsxEntry) {
-    throw new ImportError('No .xlsx file found inside the zip archive.')
+  if (xlsxEntries.length === 0) throw new ImportError('No .xlsx file found inside the zip archive.')
+
+  // Rank xlsx files: prefer ESX-level data (VMWARE type) > VM-only (GENERAL type) > unknown (AIR/other)
+  let bestBuffer: ArrayBuffer | null = null
+  let bestScore = -1
+
+  for (const entry of xlsxEntries) {
+    const buf = await entry.async('arraybuffer')
+    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' })
+    const score = wb.SheetNames.includes('vInfo') ? 3         // RVTools
+      : wb.SheetNames.includes('ESX Hosts') ? 2               // LiveOptics VMWARE
+      : wb.SheetNames.includes('VMs') ? 1                     // LiveOptics GENERAL
+      : 0                                                      // AIR or unknown
+    if (score > bestScore) { bestScore = score; bestBuffer = buf }
   }
-  const innerBuffer = await xlsxEntry.async('arraybuffer')
-  return detectXlsx(innerBuffer)
+
+  if (!bestBuffer || bestScore === 0) {
+    throw new ImportError('No suitable xlsx found in zip. Expected RVTools (vInfo sheet) or LiveOptics (VMs or ESX Hosts sheet).')
+  }
+  return detectXlsx(bestBuffer)
 }
 
 function detectCsv(buffer: ArrayBuffer): DetectionResult {

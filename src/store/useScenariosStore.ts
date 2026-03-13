@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Scenario } from '../types/cluster';
+import type { OldCluster, Scenario } from '../types/cluster';
 import { createDefaultScenario } from '../lib/sizing/defaults';
 
 /**
@@ -21,6 +21,8 @@ interface ScenariosStore {
   updateScenario: (id: string, partial: Partial<Scenario>) => void;
   /** Replace the entire scenarios list (used by JSON session import) */
   setScenarios: (scenarios: Scenario[]) => void;
+  /** Seed all existing scenarios with avg VM sizes derived from imported cluster data */
+  seedFromCluster: (cluster: OldCluster) => void;
 }
 
 export const useScenariosStore = create<ScenariosStore>((set) => ({
@@ -56,4 +58,21 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
     })),
 
   setScenarios: (scenarios) => set({ scenarios }),
+
+  seedFromCluster: (cluster) =>
+    set((state) => {
+      const ramPerVmGb = cluster.avgRamPerVmGb
+      const diskPerVmGb =
+        cluster.totalDiskGb && cluster.totalVms
+          ? Math.round((cluster.totalDiskGb / cluster.totalVms) * 10) / 10
+          : undefined
+      if (ramPerVmGb == null && diskPerVmGb == null) return state
+      return {
+        scenarios: state.scenarios.map((s) => ({
+          ...s,
+          ...(ramPerVmGb != null && { ramPerVmGb }),
+          ...(diskPerVmGb != null && { diskPerVmGb }),
+        })),
+      }
+    }),
 }));

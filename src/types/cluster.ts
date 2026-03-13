@@ -14,6 +14,7 @@ export interface OldCluster {
   readonly specintPerServer?: number;       // SPECint benchmark score per existing server (SPECint mode)
   readonly cpuUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
   readonly ramUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
+  readonly avgRamPerVmGb?: number;          // average RAM per VM (GB) — seeds Step 2 scenario defaults
 }
 
 /**
