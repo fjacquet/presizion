@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
 status: planning
 stopped_at: Completed 07-enhanced-export-and-as-is-to-be-report-02-PLAN.md
-last_updated: "2026-03-13T09:42:14.459Z"
+last_updated: "2026-03-13T10:01:56.367Z"
 last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
   total_phases: 7
@@ -75,6 +75,7 @@ Progress: [█████░░░░░] 50%
 | Phase 07-enhanced-export-and-as-is-to-be-report P01 | 10 | 2 tasks | 4 files |
 | Phase 07-enhanced-export-and-as-is-to-be-report P03 | 5 | 2 tasks | 5 files |
 | Phase 07-enhanced-export-and-as-is-to-be-report P02 | 27 | 2 tasks | 4 files |
+| Phase 07-enhanced-export-and-as-is-to-be-report P02 | 27 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,8 @@ Recent decisions affecting current work:
 - [Phase 07-enhanced-export-and-as-is-to-be-report]: normaliseCluster() enumerates all OldCluster optional fields with ?? null before JSON.stringify — replacer alone cannot produce null for absent (not undefined) keys
 - [Phase 07-enhanced-export-and-as-is-to-be-report]: existingServerCount moved to always-visible Existing Server Config section; SPECint section now contains only specintPerServer
 - [Phase 07-enhanced-export-and-as-is-to-be-report]: As-Is cells read directly from useClusterStore (not ScenarioResult type) per RESEARCH.md
+- [Phase 07-enhanced-export-and-as-is-to-be-report]: existingServerCount moved to always-visible Existing Server Config section; SPECint section now contains only specintPerServer
+- [Phase 07-enhanced-export-and-as-is-to-be-report]: As-Is cells read directly from useClusterStore (not ScenarioResult type) per RESEARCH.md
 
 ### Pending Todos
 
@@ -154,6 +157,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T09:42:14.457Z
+Last session: 2026-03-13T10:01:56.364Z
 Stopped at: Completed 07-enhanced-export-and-as-is-to-be-report-02-PLAN.md
 Resume file: None
