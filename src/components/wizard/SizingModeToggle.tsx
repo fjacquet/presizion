@@ -30,7 +30,7 @@ export function SizingModeToggle() {
         onClick={() => setSizingMode('specint' as SizingMode)}
         className={sizingMode === 'specint' ? activeClass : inactiveClass}
       >
-        SPECint
+        SPECrate2017
       </button>
     </div>
   )

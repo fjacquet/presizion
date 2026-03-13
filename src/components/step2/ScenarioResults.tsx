@@ -10,7 +10,7 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   cpu: 'CPU-limited',
   ram: 'RAM-limited',
   disk: 'Disk-limited',
-  specint: 'SPECint-limited',
+  specint: 'SPECrate-limited',
 }
 
 interface ScenarioResultsProps {
@@ -71,7 +71,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
       <div className="grid grid-cols-3 gap-3 text-sm">
         <div>
           <span className="text-muted-foreground">
-            {sizingMode === 'specint' ? 'SPECint-limited: ' : 'CPU-limited: '}
+            {sizingMode === 'specint' ? 'SPECrate-limited: ' : 'CPU-limited: '}
           </span>
           <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
           <div className="text-xs text-muted-foreground font-mono mt-0.5">

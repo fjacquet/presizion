@@ -17,14 +17,14 @@ describe('SizingModeToggle', () => {
     render(<SizingModeToggle />)
     const vcpuBtn = screen.getByRole('button', { name: /vcpu/i })
     expect(vcpuBtn).toHaveAttribute('aria-pressed', 'true')
-    const specintBtn = screen.getByRole('button', { name: /specint/i })
+    const specintBtn = screen.getByRole('button', { name: /specrate2017/i })
     expect(specintBtn).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('renders SPECint button with aria-pressed=true when sizingMode is specint', () => {
     useWizardStore.setState({ sizingMode: 'specint' })
     render(<SizingModeToggle />)
-    const specintBtn = screen.getByRole('button', { name: /specint/i })
+    const specintBtn = screen.getByRole('button', { name: /specrate2017/i })
     expect(specintBtn).toHaveAttribute('aria-pressed', 'true')
     const vcpuBtn = screen.getByRole('button', { name: /vcpu/i })
     expect(vcpuBtn).toHaveAttribute('aria-pressed', 'false')
@@ -34,7 +34,7 @@ describe('SizingModeToggle', () => {
     const setSizingMode = vi.fn()
     useWizardStore.setState({ sizingMode: 'vcpu', setSizingMode })
     render(<SizingModeToggle />)
-    fireEvent.click(screen.getByRole('button', { name: /specint/i }))
+    fireEvent.click(screen.getByRole('button', { name: /specrate2017/i }))
     expect(setSizingMode).toHaveBeenCalledWith('specint')
   })
 

@@ -22,7 +22,15 @@ export const DEFAULT_HEADROOM_PERCENT = 20;
 export const DEFAULT_HA_RESERVE_ENABLED = false;
 
 /**
+ * SPECrate2017_int_base score for a Dell PowerEdge R660 with 2× Intel Xeon Gold 6526Y
+ * (2 sockets × 16 cores = 32 pCores). Measured result from spec.org/cpu2017/results/
+ * (res2024q1/cpu2017-20240112-40552). Replace with the actual score for the target hardware.
+ */
+export const DEFAULT_TARGET_SPECINT = 337;
+
+/**
  * Returns a Scenario populated with industry-standard defaults.
+ * Default server profile: Dell PowerEdge R660, 2× Intel Xeon Gold 6526Y.
  * Generates a fresh UUID for the scenario id each time it is called.
  */
 export function createDefaultScenario(): Scenario {
@@ -30,7 +38,7 @@ export function createDefaultScenario(): Scenario {
     id: crypto.randomUUID(),
     name: 'New Scenario',
     socketsPerServer: 2,
-    coresPerSocket: 20,
+    coresPerSocket: 16,
     ramPerServerGb: 512,
     diskPerServerGb: 10000,
     targetVcpuToPCoreRatio: DEFAULT_VCPU_TO_PCORE_RATIO,
@@ -38,5 +46,6 @@ export function createDefaultScenario(): Scenario {
     diskPerVmGb: 50,
     headroomPercent: DEFAULT_HEADROOM_PERCENT,
     haReserveEnabled: DEFAULT_HA_RESERVE_ENABLED,
+    targetSpecint: DEFAULT_TARGET_SPECINT,
   };
 }

@@ -33,7 +33,7 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
   coresPerSocket: 'Physical cores per socket from spec sheet — NOT OS-reported logical processors.',
   ramPerServerGb: 'Total RAM installed per existing server (GB).',
   existingServerCount: 'Number of physical servers currently in the cluster (used for SPECint sizing).',
-  specintPerServer: 'SPECint benchmark score per existing server (used for SPECint sizing mode).',
+  specintPerServer: 'SPECrate2017_int_base score per existing server. Find at spec.org/cpu2017/results/ → filter by server model. Default is Dell R660 with 2× Xeon Gold 6526Y (~337). Both existing and target must use the same metric.',
   cpuUtilizationPercent: 'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
   ramUtilizationPercent: 'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
 }
@@ -132,7 +132,8 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.coresPerSocket !== currentCluster.coresPerSocket ||
       formVals.ramPerServerGb !== currentCluster.ramPerServerGb ||
       formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
-      formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent
+      formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent ||
+      formVals.specintPerServer !== currentCluster.specintPerServer
     if (changed) {
       form.reset({
         ...formVals,
@@ -146,6 +147,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         ramPerServerGb: currentCluster.ramPerServerGb,
         cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
         ramUtilizationPercent: currentCluster.ramUtilizationPercent,
+        specintPerServer: currentCluster.specintPerServer,
       })
     }
   }, [currentCluster, form])
@@ -236,10 +238,10 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         {sizingMode === 'specint' && (
           <section>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-              SPECint Mode (required)
+              SPECrate2017 Mode (required)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <NumericFormField control={form.control} name="specintPerServer" label="SPECint/Server (existing)" testId="input-specintPerServer" optional />
+              <NumericFormField control={form.control} name="specintPerServer" label="SPECrate2017_int_base / Server (existing)" testId="input-specintPerServer" optional />
             </div>
           </section>
         )}

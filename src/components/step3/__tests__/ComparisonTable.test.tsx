@@ -126,8 +126,8 @@ describe('ComparisonTable', () => {
     })
   })
 
-  describe('PERF-03: SPECint mode label correctness', () => {
-    it('shows SPECint (not Specint) in limiting resource column when specint is limiting resource', () => {
+  describe('PERF-03: SPECrate2017 mode label correctness', () => {
+    it('shows SPECrate2017 (not SPECint) in limiting resource column when specint is limiting resource', () => {
       vi.mocked(useScenariosResults).mockReturnValue([
         { ...baseResult, limitingResource: 'specint' as const },
       ])
@@ -135,8 +135,8 @@ describe('ComparisonTable', () => {
         useWizardStore.setState({ sizingMode: 'specint' })
       })
       render(<ComparisonTable />)
-      // Should show 'SPECint' not 'Specint'
-      expect(screen.getByText('SPECint')).toBeTruthy()
+      // Should show 'SPECrate2017' not 'SPECint'
+      expect(screen.getByText('SPECrate2017')).toBeTruthy()
       expect(screen.queryByText('Specint')).toBeNull()
     })
 

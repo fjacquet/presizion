@@ -92,14 +92,14 @@ describe('display: formula string generators', () => {
 })
 
 describe('specintFormulaString (PERF-04 display)', () => {
-  it('formats: ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)', () => {
+  it('formats: ceil(10 servers × 1200 SPECrate2017_int_base × 1.20 / 2400 SPECrate2017_int_base)', () => {
     const result = specintFormulaString({
       existingServers: 10,
       specintPerServer: 1200,
       headroomPercent: 20,
       targetSpecint: 2400,
     });
-    expect(result).toBe('ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)');
+    expect(result).toBe('ceil(10 servers × 1200 SPECrate2017_int_base × 1.20 / 2400 SPECrate2017_int_base)');
   });
 });
 

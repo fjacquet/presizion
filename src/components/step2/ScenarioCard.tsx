@@ -37,6 +37,7 @@ const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
   diskPerVmGb:             'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
   headroomPercent:         '20% means the sized cluster runs at 80% utilization, leaving buffer for spikes and growth.',
   haReserveEnabled:        'Adds one extra server to absorb a single host failure without breaching capacity. Recommended for production vSphere HA clusters.',
+  targetSpecint:           'SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).',
 }
 
 function FieldLabel({ name, children }: { name: keyof ScenarioInput; children: React.ReactNode }) {
@@ -312,14 +313,14 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
             {sizingMode === 'specint' && (
               <div className="mt-4 border-t pt-4">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  SPECint Target (required in SPECint mode)
+                  SPECrate2017 Target (required in SPECrate mode)
                 </p>
                 <Controller
                   control={form.control}
                   name="targetSpecint"
                   render={({ field, fieldState }) => (
                     <div className="space-y-1">
-                      <Label htmlFor={`${scenarioId}-targetSpecint`}>Target SPECint/Server</Label>
+                      <Label htmlFor={`${scenarioId}-targetSpecint`}>SPECrate2017_int_base / Server (target)</Label>
                       <Input
                         id={`${scenarioId}-targetSpecint`}
                         type="number"

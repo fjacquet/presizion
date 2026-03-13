@@ -84,13 +84,13 @@ export function diskFormulaString(params: DiskFormulaParams): string {
 }
 
 /**
- * Returns a human-readable formula string for the SPECint-limited server count.
- * Format: ceil(existingServers servers × specintPerServer SPECint × headroomFactor / targetSpecint SPECint)
+ * Returns a human-readable formula string for the SPECrate2017_int_base-limited server count.
+ * Format: ceil(existingServers servers × specintPerServer SPECrate2017_int_base × headroomFactor / targetSpecint SPECrate2017_int_base)
  *
- * Example: "ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)"
+ * Example: "ceil(10 servers × 337 SPECrate2017_int_base × 1.20 / 450 SPECrate2017_int_base)"
  */
 export function specintFormulaString(params: SpecintFormulaParams): string {
   const { existingServers, specintPerServer, headroomPercent, targetSpecint } = params
   const headroomFactor = (1 + headroomPercent / 100).toFixed(2)
-  return `ceil(${existingServers} servers × ${specintPerServer} SPECint × ${headroomFactor} / ${targetSpecint} SPECint)`
+  return `ceil(${existingServers} servers × ${specintPerServer} SPECrate2017_int_base × ${headroomFactor} / ${targetSpecint} SPECrate2017_int_base)`
 }
