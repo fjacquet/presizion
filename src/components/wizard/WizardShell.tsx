@@ -18,6 +18,11 @@ export function WizardShell() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="mb-6 text-center print:hidden">
+          <img
+            src="/presizion/logo.svg"
+            alt="Presizion"
+            className="mx-auto mb-3 h-8 w-auto"
+          />
           <h1 className="text-2xl font-bold tracking-tight">Cluster Refresh Sizing</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Size your refreshed cluster based on existing metrics
