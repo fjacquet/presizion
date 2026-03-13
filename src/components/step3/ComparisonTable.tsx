@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { LimitingResource } from '@/types/results'
+import { utilizationClass } from '@/lib/utils/utilizationClass'
 
 /**
  * Maps LimitingResource values to human-readable display labels.
@@ -28,18 +29,6 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   ram: 'RAM-limited',
   disk: 'Disk-limited',
   specint: 'SPECrate2017',
-}
-
-/**
- * Maps a utilization percentage to a Tailwind color className.
- * < 70%  → green (healthy)
- * 70-89% → amber (watch)
- * >= 90% → red (danger)
- */
-export function utilizationClass(pct: number): string {
-  if (pct >= 90) return 'text-red-600 dark:text-red-400 font-semibold'
-  if (pct >= 70) return 'text-amber-600 dark:text-amber-400'
-  return 'text-green-600 dark:text-green-400'
 }
 
 /**

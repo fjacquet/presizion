@@ -17,7 +17,7 @@ function applyDarkModeClass(
     if (matchMedia?.('(prefers-color-scheme: dark)').matches) {
       classList.add('dark')
     }
-  } catch (_) {}
+  } catch { /* expected: swallow matchMedia errors in tests/old browsers */ }
 }
 
 describe('darkMode: anti-flash script behavior', () => {

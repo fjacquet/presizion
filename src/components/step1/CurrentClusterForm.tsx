@@ -156,6 +156,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   // Uses watch(callback) subscription to fire only on actual value changes,
   // not on every render (avoids infinite setState loop with new object refs).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/incompatible-library
     const { unsubscribe } = form.watch(() => {
       if (form.formState.isValid) {
         setCurrentCluster(form.getValues() as OldCluster)

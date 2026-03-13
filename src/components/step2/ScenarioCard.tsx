@@ -88,6 +88,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
 
   useEffect(() => {
     // Subscribe to form value changes; returns an unsubscribe function
+    // eslint-disable-next-line react-hooks/incompatible-library
     const subscription = form.watch((values) => {
       const result = scenarioSchema.safeParse(values)
       if (result.success) {

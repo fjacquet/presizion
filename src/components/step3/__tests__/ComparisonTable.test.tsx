@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
-import { ComparisonTable, utilizationClass } from '../ComparisonTable'
+import { ComparisonTable } from '../ComparisonTable'
+import { utilizationClass } from '@/lib/utils/utilizationClass'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
