@@ -125,6 +125,23 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     }
   }, [watched, form.formState.isValid, setCurrentCluster])
 
+  // Auto-derive totalPcores from existingServerCount × socketsPerServer × coresPerSocket
+  // Only fires when totalPcores is 0/falsy (does not override manually entered values)
+  useEffect(() => {
+    const subscription = form.watch((data, { name }) => {
+      if (name && ['existingServerCount', 'socketsPerServer', 'coresPerSocket'].includes(name)) {
+        const { existingServerCount, socketsPerServer, coresPerSocket } = data
+        if (existingServerCount && socketsPerServer && coresPerSocket) {
+          const derived = existingServerCount * socketsPerServer * coresPerSocket
+          if (!form.getValues('totalPcores')) {
+            form.setValue('totalPcores', derived, { shouldValidate: true })
+          }
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
   // Navigation guard: trigger validation on required fields before advancing.
   // In SPECint mode, also require specintPerServer to have a value.
   async function handleNext() {
@@ -162,6 +179,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             Existing Server Config (optional)
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />
             <NumericFormField control={form.control} name="socketsPerServer" label="Sockets/Server" testId="input-socketsPerServer" optional />
             <NumericFormField control={form.control} name="coresPerSocket" label="Cores/Socket (physical)" testId="input-coresPerSocket" optional />
             <NumericFormField control={form.control} name="ramPerServerGb" label="RAM/Server GB" testId="input-ramPerServerGb" optional />
@@ -184,7 +202,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               SPECint Mode (required)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />
               <NumericFormField control={form.control} name="specintPerServer" label="SPECint/Server (existing)" testId="input-specintPerServer" optional />
             </div>
           </section>

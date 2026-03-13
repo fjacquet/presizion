@@ -285,8 +285,55 @@ describe('Step1CurrentCluster', () => {
 })
 
 describe('REPT-02: unconditional existingServerCount and totalPcores auto-derive', () => {
-  it.todo('renders existingServerCount field when sizingMode is vcpu (unconditional)')
-  it.todo('renders existingServerCount field when sizingMode is specint')
-  it.todo('auto-derives totalPcores when existingServerCount, socketsPerServer, and coresPerSocket are all provided')
-  it.todo('does not override a manually entered totalPcores value')
+  it('renders existingServerCount field when sizingMode is vcpu (unconditional)', () => {
+    // sizingMode is 'vcpu' by default (set in beforeEach)
+    render(<CurrentClusterForm onNext={() => {}} />)
+    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
+  })
+
+  it('renders existingServerCount field when sizingMode is specint', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+    })
+    render(<CurrentClusterForm onNext={() => {}} />)
+    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
+  })
+
+  it('auto-derives totalPcores when existingServerCount, socketsPerServer, and coresPerSocket are all provided', async () => {
+    render(<CurrentClusterForm onNext={() => {}} />)
+
+    act(() => {
+      fireEvent.change(screen.getByTestId('input-existingServerCount'), { target: { value: '10' } })
+      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } })
+      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } })
+    })
+
+    // totalPcores should be auto-derived as 10 * 2 * 24 = 480
+    await waitFor(() => {
+      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement
+      expect(totalPcoresInput.value).toBe('480')
+    })
+  })
+
+  it('does not override a manually entered totalPcores value', async () => {
+    render(<CurrentClusterForm onNext={() => {}} />)
+
+    // Manually set totalPcores to 200
+    act(() => {
+      fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '200' } })
+    })
+
+    // Now set the auto-derive source fields
+    act(() => {
+      fireEvent.change(screen.getByTestId('input-existingServerCount'), { target: { value: '10' } })
+      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } })
+      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } })
+    })
+
+    // totalPcores should remain 200 (manually entered), not 480 (auto-derived)
+    await waitFor(() => {
+      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement
+      expect(totalPcoresInput.value).toBe('200')
+    })
+  })
 })
