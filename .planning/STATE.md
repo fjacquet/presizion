@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: SPECint, Utilization and Enhanced Export
+milestone: v1.0
+milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
 status: planning
-stopped_at: Roadmap created for v1.1 — phases 5, 6, 7 defined
-last_updated: "2026-03-13T00:00:00.000Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-13T06:32:55.882Z"
 last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
   percent: 50
 ---
 
@@ -67,6 +67,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04-deployment-and-polish P02 | 1 | 2 tasks | 3 files |
 | Phase 04-deployment-and-polish P04 | 2min | 1 tasks | 2 files |
 | Phase 04-deployment-and-polish P03 | 2 | 2 tasks | 3 files |
+| Phase 05-specint-and-utilization-formula-engine P01 | 3 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,9 @@ Recent decisions affecting current work:
 - [v1.1 Roadmap]: SPECint mode is a global store toggle — formula engine changes (Phase 5) must precede all UI wiring (Phase 6) to maintain math-before-UI discipline
 - [v1.1 Roadmap]: UTIL-01/02 are Step 1 inputs extending OldCluster schema; UTIL-03 scales CPU/RAM effective demand before ceiling — same pattern as headroom factor
 - [v1.1 Roadmap]: EXPO-03 (JSON) extends export.ts; EXPO-04 (print CSS) is pure @media print in index.css — both are self-contained and grouped in Phase 7
+- [Phase 05-specint-and-utilization-formula-engine]: SizingMode exported as type alias from useWizardStore.ts for consumer imports
+- [Phase 05-specint-and-utilization-formula-engine]: optionalPercent uses z.number().min(0).max(100) with z.preprocess — consistent with project pattern
+- [Phase 05-specint-and-utilization-formula-engine]: LimitingResource extended to 4-way union including specint — TypeScript validates exhaustive switch coverage
 
 ### Pending Todos
 
@@ -129,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T00:00:00.000Z
-Stopped at: v1.1 roadmap created — phases 5, 6, 7 defined; ready to plan Phase 5
+Last session: 2026-03-13T06:32:55.879Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None

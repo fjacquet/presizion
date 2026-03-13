@@ -170,6 +170,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Input Forms | 3/4 | In progress | - |
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
-| 5. SPECint and Utilization Formula Engine | 0/3 | Not started | - |
+| 5. SPECint and Utilization Formula Engine | 1/3 | In Progress|  |
 | 6. Conditional UI Wiring | 0/TBD | Not started | - |
 | 7. Enhanced Export | 0/TBD | Not started | - |
