@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
 status: planning
-stopped_at: Completed 06-conditional-ui-wiring-01-PLAN.md
-last_updated: "2026-03-13T07:04:59.067Z"
+stopped_at: Completed 06-conditional-ui-wiring-02-PLAN.md
+last_updated: "2026-03-13T07:13:40.063Z"
 last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
   percent: 50
 ---
 
@@ -71,6 +71,7 @@ Progress: [█████░░░░░] 50%
 | Phase 05-specint-and-utilization-formula-engine P02 | 4 | 2 tasks | 8 files |
 | Phase 05-specint-and-utilization-formula-engine P03 | 8 | 2 tasks | 6 files |
 | Phase 06-conditional-ui-wiring P01 | 2 | 2 tasks | 4 files |
+| Phase 06-conditional-ui-wiring P02 | 6 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -129,6 +130,9 @@ Recent decisions affecting current work:
 - [Phase 05-specint-and-utilization-formula-engine]: Integration tests for useScenariosResults test computeScenarioResult directly (not renderHook) — pure formula testing avoids React test setup overhead
 - [Phase 05-specint-and-utilization-formula-engine]: Exhaustive Record<LimitingResource, string> in ScenarioResults and Record<keyof CurrentClusterInput, string> in CurrentClusterForm — TypeScript enforces coverage of all union members at build time
 - [Phase 06-conditional-ui-wiring]: SizingModeToggle uses aria-pressed boolean for toggle state; Wave 0 stubs use it.todo; PERF-03 stubs added to existing ComparisonTable.test.tsx describe block
+- [Phase 06-conditional-ui-wiring]: RESOURCE_LABELS in ComparisonTable uses 'SPECint' (not 'SPECint-limited') for brevity in table cells; ScenarioResults uses 'SPECint-limited' for clarity
+- [Phase 06-conditional-ui-wiring]: capitalize() removed from ComparisonTable.tsx after RESOURCE_LABELS replaced its only usage — TS6133 auto-fix
+- [Phase 06-conditional-ui-wiring]: SPECint formula row in ScenarioResults renders outside the 3-col grid as a separate row below to avoid disrupting layout
 
 ### Pending Todos
 
@@ -142,6 +146,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T07:04:59.064Z
-Stopped at: Completed 06-conditional-ui-wiring-01-PLAN.md
+Last session: 2026-03-13T07:13:40.061Z
+Stopped at: Completed 06-conditional-ui-wiring-02-PLAN.md
 Resume file: None
