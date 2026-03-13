@@ -36,8 +36,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | Phase 11 | Pending |
-| BRAND-02 | Phase 11 | Pending |
+| BRAND-01 | Phase 11 | Complete |
+| BRAND-02 | Phase 11 | Complete |
 | TD-04 | Phase 11 | Pending |
 | THEME-01 | Phase 12 | Pending |
 | THEME-02 | Phase 12 | Pending |

@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.3
-milestone_name: "Scope, Persistence & Branding"
+milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: —
-last_updated: "2026-03-13T16:30:00.000Z"
-last_activity: 2026-03-13 — Roadmap created; phases 11-15 defined
+stopped_at: Completed 11-branding-and-tech-debt 11-02-PLAN.md
+last_updated: "2026-03-13T20:12:14.420Z"
+last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 0
 ---
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 11-branding-and-tech-debt P02 | 2 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - [v1.3 start]: Phases start at 11 (continuing from v1.2 phase numbering)
 - [v1.3 scope]: TD-04 (RAM formula display) merged into Phase 11 alongside branding — small fix
 - [v1.3 roadmap]: 5 phases defined (11-15); 13/13 requirements mapped; plan counts TBD
+- [Phase 11-branding-and-tech-debt]: Logo uses /presizion/logo.svg absolute path with Vite base path; img tag (not inline SVG) keeps WizardShell small
+- [Phase 11-branding-and-tech-debt]: Favicon: blue #3B82F6 rounded-square background with white P mark for maximum contrast at small sizes
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T16:30:00.000Z
-Stopped at: Roadmap written, awaiting phase planning
+Last session: 2026-03-13T20:12:14.418Z
+Stopped at: Completed 11-branding-and-tech-debt 11-02-PLAN.md
 Resume file: None
