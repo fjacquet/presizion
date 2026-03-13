@@ -10,6 +10,10 @@ export interface OldCluster {
   readonly socketsPerServer?: number;
   readonly coresPerSocket?: number;
   readonly ramPerServerGb?: number;
+  readonly existingServerCount?: number;   // number of existing servers (SPECint mode)
+  readonly specintPerServer?: number;       // SPECint benchmark score per existing server (SPECint mode)
+  readonly cpuUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
+  readonly ramUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
 }
 
 /**
@@ -28,4 +32,5 @@ export interface Scenario {
   readonly diskPerVmGb: number;
   readonly headroomPercent: number;
   readonly haReserveEnabled: boolean;
+  readonly targetSpecint?: number;          // SPECint benchmark score for target server (SPECint mode)
 }

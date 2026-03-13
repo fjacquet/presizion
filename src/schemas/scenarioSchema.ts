@@ -26,6 +26,15 @@ const requiredPositiveNumber = z.preprocess(
 );
 
 /**
+ * Optional positive number field.
+ * Absent or empty string → undefined (no error); provided value must be > 0.
+ */
+const optionalPositiveNumber = z.preprocess(
+  numericPreprocess,
+  z.number().positive().optional(),
+);
+
+/**
  * Zod schema for Scenario form input.
  *
  * Validates user-entered target server configuration and sizing assumptions.
@@ -50,6 +59,7 @@ export const scenarioSchema = z.object({
     .preprocess(numericPreprocess, z.number().min(0).max(100).optional())
     .default(DEFAULT_HEADROOM_PERCENT),
   haReserveEnabled: z.boolean().default(DEFAULT_HA_RESERVE_ENABLED),
+  targetSpecint: optionalPositiveNumber,
 });
 
 export type ScenarioInput = z.infer<typeof scenarioSchema>;

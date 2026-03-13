@@ -30,6 +30,24 @@ const optionalNonNegativeNumber = z.preprocess(
 );
 
 /**
+ * Optional percentage field (0–100).
+ * Absent or empty string → undefined (no error); provided value must be in range [0, 100].
+ */
+const optionalPercent = z.preprocess(
+  numericPreprocess,
+  z.number().min(0).max(100).optional(),
+);
+
+/**
+ * Optional positive number field.
+ * Absent or empty string → undefined (no error); provided value must be > 0.
+ */
+const optionalPositiveNumber = z.preprocess(
+  numericPreprocess,
+  z.number().positive().optional(),
+);
+
+/**
  * Zod schema for OldCluster form input.
  *
  * Validates user-entered cluster metrics before they are stored.
@@ -46,6 +64,10 @@ export const currentClusterSchema = z.object({
   socketsPerServer: optionalNonNegativeNumber,
   coresPerSocket: optionalNonNegativeNumber,
   ramPerServerGb: optionalNonNegativeNumber,
+  existingServerCount: optionalNonNegativeNumber,
+  specintPerServer: optionalPositiveNumber,
+  cpuUtilizationPercent: optionalPercent,
+  ramUtilizationPercent: optionalPercent,
 });
 
 export type CurrentClusterInput = z.infer<typeof currentClusterSchema>;

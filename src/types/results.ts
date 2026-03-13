@@ -2,7 +2,7 @@
  * The resource type that drove the final server count.
  * Whichever constraint produces the highest server count is the limiting resource.
  */
-export type LimitingResource = 'cpu' | 'ram' | 'disk';
+export type LimitingResource = 'cpu' | 'ram' | 'disk' | 'specint';
 
 /**
  * The computed output from a sizing calculation for a given OldCluster + Scenario pair.
