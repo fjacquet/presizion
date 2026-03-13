@@ -190,20 +190,59 @@ Plans:
 
 Plans:
 
-- [ ] 08-01-PLAN.md — Backfill planning artifacts for v1.2 sprint + delete parseNumericInput dead code
+- [x] 08-01-PLAN.md — Backfill planning artifacts for v1.2 sprint + delete parseNumericInput dead code
+
+### Phase 9: v1.2 Charts
+
+**Goal**: Bar chart comparison of server counts across all scenarios with PNG download
+**Depends on**: Phase 7
+**Requirements**: CHART-01, CHART-02, CHART-03
+**Success Criteria** (what must be TRUE):
+
+  1. Step 3 displays a Recharts BarChart comparing CPU/RAM/disk-limited counts per scenario
+  2. CPU bar label shows "SPECint-limited" when sizingMode is specint
+  3. "Download PNG" button triggers SVG→canvas→PNG download of the chart
+
+**Plans**: 2 plans
+
+Plans:
+
+- [x] 09-01-PLAN.md — Install recharts + Wave 0 stubs (Wave 1)
+- [x] 09-02-PLAN.md — SizingChart component + Step 3 integration (Wave 2)
+
+### Phase 10: v1.2 File Import
+
+**Goal**: RVTools xlsx and LiveOptics zip/xlsx/csv file import with preview modal
+**Depends on**: Phase 7
+**Requirements**: IMPORT-01, IMPORT-02, IMPORT-03
+**Success Criteria** (what must be TRUE):
+
+  1. FileImportButton in Step 1 accepts .xlsx/.csv/.zip and detects RVTools vs LiveOptics format
+  2. ImportPreviewModal shows derived metrics and requires "Apply" before populating CurrentClusterForm
+  3. After Apply, CurrentClusterForm fields update to reflect imported cluster values
+
+**Plans**: 3 plans
+
+Plans:
+
+- [x] 10-01-PLAN.md — Install xlsx + jszip + Wave 0 stubs (Wave 1)
+- [x] 10-02-PLAN.md — Port parsers: fileValidation, columnResolver, formatDetector, rvtoolsParser, liveopticParser (Wave 2)
+- [x] 10-03-PLAN.md — FileImportButton + ImportPreviewModal + Step 1 wiring + form sync (Wave 2)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-03-12 |
-| 2. Input Forms | 3/4 | In progress | - |
-| 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
-| 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
+| 2. Input Forms | 4/4 | Complete    | 2026-03-12 |
+| 3. Comparison, Export, and Wizard Shell | 3/3 | Complete    | 2026-03-12 |
+| 4. Deployment and Polish | 4/4 | Complete    | 2026-03-12 |
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
 | 6. Conditional UI Wiring | 2/2 | Complete    | 2026-03-13 |
 | 7. Enhanced Export | 3/3 | Complete    | 2026-03-13 |
-| 8. v1.2 Planning Backfill | 0/1 | Pending     | - |
+| 8. v1.2 Planning Backfill | 1/1 | Complete    | 2026-03-13 |
+| 9. v1.2 Charts | 2/2 | Complete    | 2026-03-13 |
+| 10. v1.2 File Import | 3/3 | Complete    | 2026-03-13 |
