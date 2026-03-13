@@ -3,6 +3,7 @@
 ## Milestones
 
 - ✅ **v1.2 — Visualization, File Import & Tech Debt** — Phases 1-10 (shipped 2026-03-13)
+- 🚧 **v1.3 — Scope, Persistence & Branding** — Phases 11-15 (in progress)
 
 ## Phases
 
@@ -32,6 +33,73 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 
 </details>
 
+### 🚧 v1.3 — Scope, Persistence & Branding (In Progress)
+
+**Milestone Goal:** Add cluster-scoped import filtering, localStorage/URL-share persistence, manual dark-mode toggle, and Presizion brand assets.
+
+- [ ] **Phase 11: Branding & Tech Debt** — Presizion logo, custom favicon, and RAM formula display fix
+- [ ] **Phase 12: Dark Mode Toggle** — Header theme toggle with localStorage persistence and OS fallback
+- [ ] **Phase 13: Import Scope Filter** — Parser detects clusters/datacenters; modal lets user select scope before populating Step 1
+- [ ] **Phase 14: Persistent Scope Widget** — Step 1 scope badge shows active clusters; re-aggregates data on scope change
+- [ ] **Phase 15: Persistence** — localStorage auto-restore and shareable URL hash encoding full session state
+
+## Phase Details
+
+### Phase 11: Branding & Tech Debt
+**Goal**: Users see the Presizion brand identity in the app and the RAM formula display is accurate
+**Depends on**: Phase 10
+**Requirements**: BRAND-01, BRAND-02, TD-04
+**Success Criteria** (what must be TRUE):
+  1. The Presizion logo appears in the app header (modern abstract, blue/slate palette)
+  2. The browser tab shows a custom Presizion favicon instead of the Vite default
+  3. When a RAM utilization % is entered in Step 2, the RAM formula display includes the utilization factor (e.g., "× 80%")
+  4. RAM formula display behavior mirrors the existing CPU formula display (TD-01 parity)
+**Plans**: TBD
+
+### Phase 12: Dark Mode Toggle
+**Goal**: Users can manually switch between light and dark mode; the choice persists across sessions
+**Depends on**: Phase 11
+**Requirements**: THEME-01, THEME-02, THEME-03
+**Success Criteria** (what must be TRUE):
+  1. A Sun/Moon toggle button is visible in the app header on every step
+  2. Clicking the toggle switches the entire app between light and dark mode immediately
+  3. Refreshing or reopening the page restores the last manually-chosen theme
+  4. On first visit (no stored preference), the app respects the user's OS dark/light mode setting
+**Plans**: TBD
+
+### Phase 13: Import Scope Filter
+**Goal**: Users importing multi-cluster files can choose which cluster(s) to include before Step 1 is populated
+**Depends on**: Phase 12
+**Requirements**: SCOPE-01, SCOPE-02
+**Success Criteria** (what must be TRUE):
+  1. Importing a file with multiple distinct clusters or datacenters surfaces those names after parsing
+  2. The import preview modal shows a scope selector (checkboxes) defaulting to all clusters selected
+  3. Confirming the import with a subset of clusters populates Step 1 with only the selected scope's aggregated data
+  4. Importing a single-cluster file skips the scope selector (no unnecessary UI)
+**Plans**: TBD
+
+### Phase 14: Persistent Scope Widget
+**Goal**: Users can see and change the active scope filter from Step 1 at any time without re-importing the file
+**Depends on**: Phase 13
+**Requirements**: SCOPE-03, SCOPE-04
+**Success Criteria** (what must be TRUE):
+  1. After a multi-cluster import, a scope badge appears in the Step 1 header showing active cluster names
+  2. The scope badge includes an edit affordance (icon/link) that opens the scope selector
+  3. Changing the scope selection in Step 1 immediately re-aggregates and updates all Step 1 fields
+  4. The scope badge is not shown when no file has been imported or the file had only one cluster
+**Plans**: TBD
+
+### Phase 15: Persistence
+**Goal**: Users never lose their work — session state auto-saves and can be shared via URL
+**Depends on**: Phase 14
+**Requirements**: PERS-01, PERS-02, PERS-03
+**Success Criteria** (what must be TRUE):
+  1. Refreshing or closing and reopening the app restores the last-entered cluster inputs and all scenarios automatically
+  2. A Share button in Step 3 copies a URL containing the full session state encoded as a base64 hash
+  3. Opening a shared URL restores the sender's exact cluster inputs and scenarios on load
+  4. A URL hash takes priority over localStorage when both are present
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -46,3 +114,8 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 | 8. v1.2 Planning Backfill | v1.2 | 1/1 | Complete | 2026-03-13 |
 | 9. v1.2 Charts | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
+| 11. Branding & Tech Debt | v1.3 | 0/? | Not started | - |
+| 12. Dark Mode Toggle | v1.3 | 0/? | Not started | - |
+| 13. Import Scope Filter | v1.3 | 0/? | Not started | - |
+| 14. Persistent Scope Widget | v1.3 | 0/? | Not started | - |
+| 15. Persistence | v1.3 | 0/? | Not started | - |
