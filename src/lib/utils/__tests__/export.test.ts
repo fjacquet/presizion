@@ -1,9 +1,9 @@
 /**
  * export utils — Unit tests
- * Requirements: EXPO-02
+ * Requirements: EXPO-02, EXPO-03
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { buildCsvContent, downloadCsv, csvEscape } from '../export'
+import { buildCsvContent, downloadCsv, csvEscape, buildJsonContent, downloadJson } from '../export'
 import type { OldCluster, Scenario } from '@/types/cluster'
 import type { ScenarioResult } from '@/types/results'
 
@@ -115,13 +115,63 @@ describe('downloadCsv', () => {
 })
 
 describe('buildJsonContent', () => {
-  it.todo('returns a valid pretty-printed JSON string')
-  it.todo('includes currentCluster, scenarios, and computed results')
-  it.todo('sets undefined optional fields to null (not omitted)')
-  it.todo('includes schemaVersion: "1.1" at top level')
+  it('returns a valid pretty-printed JSON string', () => {
+    const json = buildJsonContent(cluster, [scenario], [result])
+    expect(() => JSON.parse(json)).not.toThrow()
+    // pretty-printed: should contain newlines and indentation
+    expect(json).toContain('\n')
+  })
+
+  it('includes currentCluster, scenarios, and computed results', () => {
+    const json = buildJsonContent(cluster, [scenario], [result])
+    const parsed = JSON.parse(json) as Record<string, unknown>
+    expect(parsed).toHaveProperty('currentCluster')
+    expect(parsed).toHaveProperty('scenarios')
+    const scenarios = parsed.scenarios as Array<Record<string, unknown>>
+    expect(scenarios).toHaveLength(1)
+    expect(scenarios[0]).toHaveProperty('result')
+  })
+
+  it('sets undefined optional fields to null (not omitted)', () => {
+    // OldCluster with no optional fields — they should appear as null in JSON
+    const minimalCluster: OldCluster = {
+      totalVcpus: 100,
+      totalPcores: 25,
+      totalVms: 50,
+    }
+    const json = buildJsonContent(minimalCluster, [], [])
+    const parsed = JSON.parse(json) as { currentCluster: Record<string, unknown> }
+    // existingServerCount is optional; if undefined it must be null (not omitted)
+    expect(parsed.currentCluster).toHaveProperty('existingServerCount', null)
+  })
+
+  it('includes schemaVersion: "1.1" at top level', () => {
+    const json = buildJsonContent(cluster, [scenario], [result])
+    const parsed = JSON.parse(json) as { schemaVersion: string }
+    expect(parsed.schemaVersion).toBe('1.1')
+  })
 })
 
 describe('downloadJson', () => {
-  it.todo('calls URL.createObjectURL with a Blob of type application/json')
-  it.todo('calls URL.revokeObjectURL after download is triggered')
+  it('calls URL.createObjectURL with a Blob of type application/json', () => {
+    const link = document.createElement('a')
+    vi.spyOn(link, 'click').mockImplementation(() => {})
+    vi.spyOn(document, 'createElement').mockReturnValueOnce(link)
+
+    downloadJson('test.json', '{"key":"value"}')
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'application/json;charset=utf-8;' }),
+    )
+  })
+
+  it('calls URL.revokeObjectURL after download is triggered', () => {
+    const link = document.createElement('a')
+    vi.spyOn(link, 'click').mockImplementation(() => {})
+    vi.spyOn(document, 'createElement').mockReturnValueOnce(link)
+
+    downloadJson('test.json', '{"key":"value"}')
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock')
+  })
 })
