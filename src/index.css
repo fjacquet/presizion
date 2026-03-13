@@ -260,3 +260,28 @@ code {
     @apply bg-background text-foreground;}
   html {
     @apply font-sans;}}
+
+@media print {
+  /* Preserve utilization color coding in print — required for green/amber/red cells */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Override root max-width so table can use full page width */
+  #root {
+    max-width: 100%;
+    border: none;
+    width: 100%;
+  }
+
+  /* Remove overflow clipping so comparison table columns are not cut off */
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  /* Keep table on one page when possible */
+  table {
+    page-break-inside: avoid;
+  }
+}

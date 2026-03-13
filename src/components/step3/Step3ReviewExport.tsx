@@ -67,7 +67,7 @@ export function Step3ReviewExport() {
         </p>
       </div>
 
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-3 mb-6 print:hidden">
         <Button variant="outline" onClick={() => { void handleCopy() }}>
           {copied ? 'Copied!' : 'Copy Summary'}
         </Button>
