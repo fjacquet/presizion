@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 13-import-scope-filter-02-PLAN.md
-last_updated: "2026-03-13T20:59:38.813Z"
+stopped_at: Completed 14-persistent-scope-widget-01-PLAN.md
+last_updated: "2026-03-13T21:10:11.152Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 12-dark-mode-toggle P02 | 3 | 2 tasks | 3 files |
 | Phase 13-import-scope-filter P01 | 4 | 1 tasks | 9 files |
 | Phase 13-import-scope-filter P02 | 15 | 1 tasks | 4 files |
+| Phase 14-persistent-scope-widget P01 | 6 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - [Phase 13-import-scope-filter]: Scope key format: dc||cluster when both present, cluster alone when cluster-only, __all__ when neither column exists
 - [Phase 13-import-scope-filter]: aggregateScopes() copies ESX fields from first selected scope that has them; per-scope rawByScope omits ESX data (host-to-cluster mapping unavailable)
 - [Phase 13-import-scope-filter]: Checkbox component wraps @base-ui/react/checkbox; ScopeSelector extracted as sub-component to keep ImportPreviewModal under 150 lines; prevResult state comparison pattern avoids react-hooks/set-state-in-effect; ESX fields read from result directly, not previewCluster
+- [Phase 14-persistent-scope-widget]: useImportStore calls useClusterStore.getState().setCurrentCluster() directly inside setActiveScope — avoids hook-in-hook constraint while keeping re-aggregation logic in the store
+- [Phase 14-persistent-scope-widget]: setImportBuffer called only when result.rawByScope != null — JSON imports bypass useImportStore entirely
+- [Phase 14-persistent-scope-widget]: vi.mock factories must not reference outer variables; use vi.mocked() in beforeEach to set return values
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T20:56:09.659Z
-Stopped at: Completed 13-import-scope-filter-02-PLAN.md
+Last session: 2026-03-13T21:10:11.149Z
+Stopped at: Completed 14-persistent-scope-widget-01-PLAN.md
 Resume file: None
