@@ -42,7 +42,9 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     headroomPercent: scenario.headroomPercent,
     targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
     coresPerServer,
-    cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
+    ...(currentCluster.cpuUtilizationPercent !== undefined && {
+      cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
+    }),
   })
 
   const ramFormula = ramFormulaString({

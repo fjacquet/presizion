@@ -94,6 +94,7 @@ interface CurrentClusterFormProps {
 
 export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
+  const currentCluster = useClusterStore((s) => s.currentCluster)
   const sizingMode = useWizardStore((s) => s.sizingMode)
 
   const form = useForm<CurrentClusterInput>({
@@ -116,6 +117,26 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       existingServerCount: undefined,
     },
   })
+
+  // Sync Zustand store → form when cluster data is updated externally (e.g. file import).
+  // Guard with value-equality to prevent infinite re-render loop.
+  useEffect(() => {
+    const formVals = form.getValues()
+    const changed =
+      formVals.totalVcpus !== (currentCluster.totalVcpus ?? 0) ||
+      formVals.totalPcores !== (currentCluster.totalPcores ?? 0) ||
+      formVals.totalVms !== (currentCluster.totalVms ?? 0) ||
+      formVals.totalDiskGb !== currentCluster.totalDiskGb
+    if (changed) {
+      form.reset({
+        ...formVals,
+        totalVcpus: currentCluster.totalVcpus ?? 0,
+        totalPcores: currentCluster.totalPcores ?? 0,
+        totalVms: currentCluster.totalVms ?? 0,
+        totalDiskGb: currentCluster.totalDiskGb,
+      })
+    }
+  }, [currentCluster, form])
 
   // Sync valid form values to Zustand store for live DerivedMetricsPanel updates
   const watched = form.watch()

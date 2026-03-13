@@ -1,3 +1,5 @@
+import { ImportError } from './fileValidation'
+
 export type ColumnAliasMap = Record<string, string[]>
 
 export const RVTOOLS_ALIASES: ColumnAliasMap = {
@@ -16,10 +18,32 @@ export const LIVEOPTICS_ALIASES: ColumnAliasMap = {
   is_template: ['Template'],
 }
 
+/**
+ * Resolves header names in a spreadsheet to canonical field names.
+ * Trims whitespace from headers (common in exported files).
+ * Returns a map of canonical → actual header name, or undefined if absent.
+ * Throws ImportError listing any required columns that could not be resolved.
+ */
 export function resolveColumns(
-  _headers: string[],
-  _aliases: ColumnAliasMap,
-  _required: Set<string>,
+  headers: string[],
+  aliases: ColumnAliasMap,
+  required: Set<string>,
 ): Record<string, string | undefined> {
-  throw new Error('not implemented')
+  const trimmed = headers.map((h) => h.trim())
+  const result: Record<string, string | undefined> = {}
+  const missing: string[] = []
+
+  for (const [canonical, candidates] of Object.entries(aliases)) {
+    const matched = candidates.find((alias) => trimmed.includes(alias))
+    result[canonical] = matched
+    if (!matched && required.has(canonical)) {
+      missing.push(`${canonical} (tried: ${candidates.join(', ')})`)
+    }
+  }
+
+  if (missing.length > 0) {
+    throw new ImportError(`Missing required columns: ${missing.join('; ')}`)
+  }
+
+  return result
 }
