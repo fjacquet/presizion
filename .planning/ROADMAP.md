@@ -142,6 +142,6 @@ Plans:
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
-| 13. Import Scope Filter | 2/2 | Complete   | 2026-03-13 | - |
+| 13. Import Scope Filter | 2/2 | Complete    | 2026-03-13 | - |
 | 14. Persistent Scope Widget | v1.3 | 0/2 | Not started | - |
 | 15. Persistence | v1.3 | 0/? | Not started | - |
