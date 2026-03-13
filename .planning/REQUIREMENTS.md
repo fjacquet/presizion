@@ -72,13 +72,13 @@
 
 ### Enhanced Export
 
-- [ ] **EXPO-03**: User can download a JSON file containing all inputs and outputs for all scenarios
-- [ ] **EXPO-04**: App provides a print-optimized stylesheet; browser print / Save as PDF produces a clean layout of the Step 3 results
+- [x] **EXPO-03**: User can download a JSON file containing all inputs and outputs for all scenarios
+- [x] **EXPO-04**: App provides a print-optimized stylesheet; browser print / Save as PDF produces a clean layout of the Step 3 results
 
 ### Report Clarity
 
-- [ ] **REPT-01**: Step 3 comparison table includes an "As-Is" reference column showing current cluster: server count, sockets × cores per server, total pCores (derived or entered), and observed vCPU:pCore ratio — giving the report a clear before/after shape
-- [ ] **REPT-02**: `existingServerCount` appears in Step 1 "Existing Server Config" section unconditionally (not hidden behind SPECint mode); `totalPcores` becomes optional and is derived automatically when server count + sockets + cores/socket are all provided
+- [x] **REPT-01**: Step 3 comparison table includes an "As-Is" reference column showing current cluster: server count, sockets × cores per server, total pCores (derived or entered), and observed vCPU:pCore ratio — giving the report a clear before/after shape
+- [x] **REPT-02**: `existingServerCount` appears in Step 1 "Existing Server Config" section unconditionally (not hidden behind SPECint mode); `totalPcores` becomes optional and is derived automatically when server count + sockets + cores/socket are all provided
 
 ## v2 Requirements
 
@@ -161,10 +161,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UTIL-01 | Phase 5 | Complete |
 | UTIL-02 | Phase 5 | Complete |
 | UTIL-03 | Phase 5 | Complete |
-| EXPO-03 | Phase 7 | Pending |
-| EXPO-04 | Phase 7 | Pending |
-| REPT-01 | Phase 7 | Pending |
-| REPT-02 | Phase 7 | Pending |
+| EXPO-03 | Phase 7 | Complete |
+| EXPO-04 | Phase 7 | Complete |
+| REPT-01 | Phase 7 | Complete |
+| REPT-02 | Phase 7 | Complete |
 
 - v1.1 requirements: 12 total
 - Mapped to phases: 12
