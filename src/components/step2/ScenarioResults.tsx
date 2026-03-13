@@ -42,6 +42,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     headroomPercent: scenario.headroomPercent,
     targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
     coresPerServer,
+    cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
   })
 
   const ramFormula = ramFormulaString({
@@ -67,9 +68,23 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
       </div>
       <div className="grid grid-cols-3 gap-3 text-sm">
         <div>
-          <span className="text-muted-foreground">CPU-limited: </span>
+          <span className="text-muted-foreground">
+            {sizingMode === 'specint' ? 'SPECint-limited: ' : 'CPU-limited: '}
+          </span>
           <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
-          <div className="text-xs text-muted-foreground font-mono mt-0.5">{cpuFormula}</div>
+          <div className="text-xs text-muted-foreground font-mono mt-0.5">
+            {sizingMode === 'specint' &&
+             currentCluster.existingServerCount != null &&
+             currentCluster.specintPerServer != null &&
+             scenario.targetSpecint != null
+              ? specintFormulaString({
+                  existingServers: currentCluster.existingServerCount,
+                  specintPerServer: currentCluster.specintPerServer,
+                  headroomPercent: scenario.headroomPercent,
+                  targetSpecint: scenario.targetSpecint,
+                })
+              : cpuFormula}
+          </div>
         </div>
         <div>
           <span className="text-muted-foreground">RAM-limited: </span>
@@ -82,23 +97,6 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
           <div className="text-xs text-muted-foreground font-mono mt-0.5">{diskFormula}</div>
         </div>
       </div>
-      {sizingMode === 'specint' &&
-       currentCluster.existingServerCount != null &&
-       currentCluster.specintPerServer != null &&
-       scenario.targetSpecint != null && (
-        <div className="text-sm mt-2">
-          <span className="text-muted-foreground">SPECint-limited: </span>
-          <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
-          <div className="text-xs text-muted-foreground font-mono mt-0.5">
-            {specintFormulaString({
-              existingServers: currentCluster.existingServerCount,
-              specintPerServer: currentCluster.specintPerServer,
-              headroomPercent: scenario.headroomPercent,
-              targetSpecint: scenario.targetSpecint,
-            })}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
