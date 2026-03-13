@@ -171,10 +171,69 @@ describe('ComparisonTable', () => {
   })
 
   describe('REPT-01: As-Is column in comparison table', () => {
-    it.todo('renders an "As-Is" column header')
-    it.todo('As-Is column shows existingServerCount from useClusterStore')
-    it.todo('As-Is column shows "—" when existingServerCount is undefined')
-    it.todo('As-Is column shows sockets x cores server config string')
-    it.todo('As-Is column shows observed vCPU:pCore ratio')
+    it('renders an "As-Is" column header', () => {
+      render(<ComparisonTable />)
+      expect(screen.getByRole('columnheader', { name: 'As-Is' })).toBeInTheDocument()
+    })
+
+    it('As-Is column shows existingServerCount from useClusterStore', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000,
+          totalPcores: 500,
+          totalVms: 300,
+          existingServerCount: 20,
+          socketsPerServer: 2,
+          coresPerSocket: 24,
+        },
+      })
+      render(<ComparisonTable />)
+      const serversRow = screen.getByText(/servers required/i).closest('tr')
+      expect(serversRow).toBeTruthy()
+      expect(serversRow?.textContent).toContain('20')
+    })
+
+    it('As-Is column shows "—" when existingServerCount is undefined', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000,
+          totalPcores: 500,
+          totalVms: 300,
+          // existingServerCount intentionally not set
+        },
+      })
+      render(<ComparisonTable />)
+      const serversRow = screen.getByText(/servers required/i).closest('tr')
+      expect(serversRow?.textContent).toContain('—')
+    })
+
+    it('As-Is column shows sockets x cores server config string', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000,
+          totalPcores: 500,
+          totalVms: 300,
+          socketsPerServer: 2,
+          coresPerSocket: 24,
+        },
+      })
+      render(<ComparisonTable />)
+      const configRow = screen.getByText(/server config/i).closest('tr')
+      expect(configRow?.textContent).toContain('2s × 24c')
+    })
+
+    it('As-Is column shows observed vCPU:pCore ratio', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000,
+          totalPcores: 500,
+          totalVms: 300,
+        },
+      })
+      render(<ComparisonTable />)
+      // vCPU:pCore ratio = 2000/500 = 4.0
+      const ratioRow = screen.getByText(/vcpu.*pcore/i).closest('tr')
+      expect(ratioRow?.textContent).toContain('4.0')
+    })
   })
 })

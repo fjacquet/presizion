@@ -7,6 +7,7 @@
  */
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useClusterStore } from '@/store/useClusterStore'
 import {
   Table,
   TableBody,
@@ -48,6 +49,7 @@ export function utilizationClass(pct: number): string {
 export function ComparisonTable() {
   const scenarios = useScenariosStore((state) => state.scenarios)
   const results = useScenariosResults()
+  const currentCluster = useClusterStore((state) => state.currentCluster)
 
   return (
     <div className="overflow-x-auto rounded-md border">
@@ -55,6 +57,7 @@ export function ComparisonTable() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-48 font-semibold">Metric</TableHead>
+            <TableHead className="font-semibold text-center bg-muted/30">As-Is</TableHead>
             {scenarios.map((scenario) => (
               <TableHead key={scenario.id} className="font-semibold text-center">
                 {scenario.name}
@@ -66,6 +69,9 @@ export function ComparisonTable() {
           {/* Row 1: Servers Required */}
           <TableRow>
             <TableCell className="font-medium">Servers Required</TableCell>
+            <TableCell className="text-center bg-muted/30">
+              {currentCluster.existingServerCount ?? '—'}
+            </TableCell>
             {results.map((result, i) => (
               <TableCell key={scenarios[i]?.id ?? i} className="text-center">
                 {result.finalCount}
@@ -74,9 +80,38 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 2: Limiting Resource */}
+          {/* Row 2: Server Config (REPT-01) */}
+          <TableRow>
+            <TableCell className="font-medium">Server Config</TableCell>
+            <TableCell className="text-center bg-muted/30">
+              {currentCluster.socketsPerServer && currentCluster.coresPerSocket
+                ? `${currentCluster.socketsPerServer}s × ${currentCluster.coresPerSocket}c`
+                : '—'}
+            </TableCell>
+            {scenarios.map((scenario) => (
+              <TableCell key={scenario.id} className="text-center">
+                {`${scenario.socketsPerServer}s × ${scenario.coresPerSocket}c`}
+              </TableCell>
+            ))}
+          </TableRow>
+
+          {/* Row 3: Total pCores (REPT-01) */}
+          <TableRow>
+            <TableCell className="font-medium">Total pCores</TableCell>
+            <TableCell className="text-center bg-muted/30">
+              {currentCluster.totalPcores}
+            </TableCell>
+            {scenarios.map((scenario) => (
+              <TableCell key={scenario.id} className="text-center">
+                {scenario.socketsPerServer * scenario.coresPerSocket}
+              </TableCell>
+            ))}
+          </TableRow>
+
+          {/* Row 4: Limiting Resource */}
           <TableRow>
             <TableCell className="font-medium">Limiting Resource</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {results.map((result, i) => (
               <TableCell
                 key={scenarios[i]?.id ?? i}
@@ -87,9 +122,14 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 3: Achieved vCPU:pCore Ratio */}
+          {/* Row 5: Achieved vCPU:pCore Ratio */}
           <TableRow>
             <TableCell className="font-medium">vCPU:pCore Ratio</TableCell>
+            <TableCell className="text-center bg-muted/30">
+              {currentCluster.totalPcores > 0
+                ? (currentCluster.totalVcpus / currentCluster.totalPcores).toFixed(1)
+                : '—'}
+            </TableCell>
             {results.map((result, i) => (
               <TableCell key={scenarios[i]?.id ?? i} className="text-center">
                 {result.achievedVcpuToPCoreRatio.toFixed(1)}
@@ -97,9 +137,10 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 4: VMs/Server */}
+          {/* Row 6: VMs/Server */}
           <TableRow>
             <TableCell className="font-medium">VMs/Server</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {results.map((result, i) => (
               <TableCell key={scenarios[i]?.id ?? i} className="text-center">
                 {result.vmsPerServer.toFixed(1)}
@@ -107,9 +148,10 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 5: Headroom % */}
+          {/* Row 7: Headroom % */}
           <TableRow>
             <TableCell className="font-medium">Headroom</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {scenarios.map((scenario) => (
               <TableCell key={scenario.id} className="text-center">
                 {scenario.headroomPercent}%
@@ -117,9 +159,10 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 6: CPU Util % */}
+          {/* Row 8: CPU Util % */}
           <TableRow>
             <TableCell className="font-medium">CPU Util %</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {results.map((result, i) => (
               <TableCell
                 key={scenarios[i]?.id ?? i}
@@ -130,9 +173,10 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 7: RAM Util % */}
+          {/* Row 9: RAM Util % */}
           <TableRow>
             <TableCell className="font-medium">RAM Util %</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {results.map((result, i) => (
               <TableCell
                 key={scenarios[i]?.id ?? i}
@@ -143,9 +187,10 @@ export function ComparisonTable() {
             ))}
           </TableRow>
 
-          {/* Row 8: Disk Util % */}
+          {/* Row 10: Disk Util % */}
           <TableRow>
             <TableCell className="font-medium">Disk Util %</TableCell>
+            <TableCell className="text-center bg-muted/30">—</TableCell>
             {results.map((result, i) => (
               <TableCell
                 key={scenarios[i]?.id ?? i}
