@@ -48,6 +48,7 @@
 **Codebase at completion:** ~6,445 lines TypeScript, 254 Vitest tests
 
 **Archive:**
+
 - Roadmap: `.planning/milestones/v1.2-ROADMAP.md`
 - Requirements: `.planning/milestones/v1.2-REQUIREMENTS.md`
 - Audit: `.planning/v1.2-MILESTONE-AUDIT.md`

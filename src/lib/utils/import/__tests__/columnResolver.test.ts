@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { resolveColumns, RVTOOLS_ALIASES, LIVEOPTICS_ALIASES } from '../columnResolver'
+import { resolveColumns, RVTOOLS_ALIASES, LIVEOPTICS_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES } from '../columnResolver'
 import { ImportError } from '../fileValidation'
 
 describe('columnResolver', () => {
@@ -35,5 +35,39 @@ describe('columnResolver', () => {
     expect(Object.keys(LIVEOPTICS_ALIASES)).toEqual(
       expect.arrayContaining(['vm_name', 'num_cpus', 'memory_mib', 'provisioned_mib', 'is_template']),
     )
+  })
+
+  describe('CLUSTER_ALIASES', () => {
+    it("resolves 'Cluster' to 'cluster_name'", () => {
+      const result = resolveColumns(['Cluster'], CLUSTER_ALIASES, new Set())
+      expect(result['cluster_name']).toBe('Cluster')
+    })
+
+    it("resolves 'ClusterName' to 'cluster_name'", () => {
+      const result = resolveColumns(['ClusterName'], CLUSTER_ALIASES, new Set())
+      expect(result['cluster_name']).toBe('ClusterName')
+    })
+
+    it("resolves 'Cluster Name' to 'cluster_name'", () => {
+      const result = resolveColumns(['Cluster Name'], CLUSTER_ALIASES, new Set())
+      expect(result['cluster_name']).toBe('Cluster Name')
+    })
+  })
+
+  describe('DATACENTER_ALIASES', () => {
+    it("resolves 'Datacenter' to 'datacenter_name'", () => {
+      const result = resolveColumns(['Datacenter'], DATACENTER_ALIASES, new Set())
+      expect(result['datacenter_name']).toBe('Datacenter')
+    })
+
+    it("resolves 'DC' to 'datacenter_name'", () => {
+      const result = resolveColumns(['DC'], DATACENTER_ALIASES, new Set())
+      expect(result['datacenter_name']).toBe('DC')
+    })
+
+    it("resolves 'DataCenter' to 'datacenter_name'", () => {
+      const result = resolveColumns(['DataCenter'], DATACENTER_ALIASES, new Set())
+      expect(result['datacenter_name']).toBe('DataCenter')
+    })
   })
 })

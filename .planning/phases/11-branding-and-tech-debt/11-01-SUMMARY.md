@@ -72,7 +72,7 @@ Each task was committed atomically:
 1. **Task 1: Fix RamFormulaParams and ramFormulaString to include utilization factor** - `f26650b` (feat)
 2. **Task 2: Wire ramUtilizationPercent from currentCluster into ScenarioResults** - `049611e` (feat)
 
-**Plan metadata:** `[pending]` (docs: complete plan)
+**Plan metadata:** `63a0081` (docs: complete plan)
 
 _Note: Task 1 used TDD — tests written first (RED: 2 failures), then implementation (GREEN: all pass)_
 

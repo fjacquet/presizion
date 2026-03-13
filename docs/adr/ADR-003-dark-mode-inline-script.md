@@ -9,6 +9,7 @@
 The app uses Tailwind v4's `@custom-variant dark (&:is(.dark *))` — dark-mode utilities activate only when a `.dark` class is present on an ancestor element. No JS was setting this class, so OS dark-mode preference was ignored.
 
 Options considered:
+
 1. **Inline `<script>` in `<head>`**: Synchronously reads `window.matchMedia` and sets `.dark` on `<html>` before first paint.
 2. **React ThemeProvider**: A React component reads OS preference and sets `.dark` via `useEffect`.
 3. **Pure CSS `@media` query**: Replace the `.dark` block with `@media (prefers-color-scheme: dark) { :root { ... } }`.

@@ -105,13 +105,13 @@ None - no external service configuration required.
 - No blockers for Phase 13
 
 ---
-*Phase: 12-dark-mode-toggle*
-*Completed: 2026-03-13*
+_Phase: 12-dark-mode-toggle_
+_Completed: 2026-03-13_
 
 ## Self-Check: PASSED
 
 - src/components/wizard/ThemeToggle.tsx: FOUND
-- src/components/wizard/__tests__/ThemeToggle.test.tsx: FOUND
+- src/components/wizard/**tests**/ThemeToggle.test.tsx: FOUND
 - src/components/wizard/WizardShell.tsx: FOUND
 - .planning/phases/12-dark-mode-toggle/12-02-SUMMARY.md: FOUND
 - Commit ecd6a84: FOUND

@@ -27,6 +27,7 @@ You need at least these three numbers (from vCenter, RVTools, LiveOptics, or a c
 | **Total VMs** | vCenter → powered-on VM count; or RVTools row count |
 
 Optional but recommended:
+
 - **Total Disk GB** — enables disk-constrained sizing
 - **Existing server count + sockets + cores/socket** — enables SPECrate2017 mode and auto-derives pCores
 - **CPU % / RAM % utilization** — enables right-sizing to actual consumption
@@ -42,10 +43,12 @@ Click **Next: Define Scenarios** when the required fields are filled.
 Each scenario card represents one server model you're evaluating. Fill in:
 
 **Target Server Config:**
+
 - Sockets/Server and Cores/Socket — from the vendor spec sheet (use physical cores, not hyperthreaded)
 - RAM/Server GB and Disk/Server GB — from the server configuration
 
 **Sizing Assumptions:**
+
 - **vCPU:pCore Ratio** — how many virtual CPUs per physical core. Start with 4:1 (VMware general-purpose default). Use 2:1 for CPU-intensive or database workloads.
 - **RAM/VM GB** — average RAM per VM. Auto-filled from import if available; otherwise check vCenter → Monitor → Memory.
 - **Disk/VM GB** — average provisioned disk per VM. Auto-filled when Total Disk and Total VMs are provided.
@@ -72,6 +75,7 @@ The comparison table shows all scenarios side-by-side with the existing cluster 
 | **CPU/RAM/Disk Util %** | Projected utilization (green < 70%, amber < 90%, red ≥ 90%) |
 
 **Export options:**
+
 - **Copy Summary** — Markdown text for email or presentation slides
 - **Download CSV** — all inputs and outputs in a spreadsheet-compatible format
 - **Download JSON** — complete session (can be re-imported later)
@@ -84,18 +88,23 @@ The comparison table shows all scenarios side-by-side with the existing cluster 
 The **Import from file** button in Step 1 accepts four formats:
 
 ### RVTools xlsx
+
 Export from RVTools → File → Export All to xlsx. Presizion reads the `vInfo` sheet for VM inventory (vCPUs, disk, VM count). Server configuration must be entered manually or derived from the existing server spec.
 
 ### LiveOptics xlsx (single file)
+
 From a LiveOptics VMWARE export file. Presizion reads:
+
 - **VMs sheet** — VM inventory (vCPUs, disk, count)
 - **ESX Hosts sheet** — server count, sockets, cores/socket, RAM/server
 - **ESX Performance sheet** — average CPU % and RAM % utilization across hosts
 
 ### LiveOptics ZIP
+
 Upload the full LiveOptics ZIP export. Presizion selects the richest XLSX inside (the VMWARE file with ESX Hosts data, not the GENERAL or AIR files).
 
 ### Presizion JSON
+
 Re-import a previously downloaded JSON file to restore a complete session: current cluster data and all scenario configurations.
 
 > **After import:** An Import Preview modal shows the extracted data. Click **Apply** to populate Step 1. All existing scenario cards will automatically inherit the derived `RAM/VM GB` and `Disk/VM GB` values from the imported cluster.
@@ -125,6 +134,7 @@ CPU-limited servers = ceil(existingServers × oldSPECrate2017_int_base × headro
 Use this when migrating to a significantly different server generation where raw core counts are misleading (e.g., Xeon v4 → Xeon 6). A modern 32-core server may outperform an older 48-core server — SPECrate captures this.
 
 **Finding SPECrate2017_int_base scores:**
+
 1. Go to [spec.org/cpu2017/results/](https://www.spec.org/cpu2017/results/)
 2. Filter by "Integer Rate" and search for your server model
 3. Use the `SPECrate2017_int_base` column (not peak; not speed)

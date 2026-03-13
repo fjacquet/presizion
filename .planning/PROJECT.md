@@ -15,6 +15,7 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 **Goal:** Add cluster-scoped import filtering, localStorage/URL-share persistence, manual dark-mode toggle, and Presizion brand assets.
 
 **Target features:**
+
 - BRAND-01/02: Presizion logo + custom favicon (modern abstract, blue/slate via Nano-Banana)
 - THEME-01/02/03: Manual light/dark toggle (Sun/Moon button, localStorage, OS fallback)
 - SCOPE-01–04: Cluster/datacenter scope filter in import flow + persistent badge in Step 1

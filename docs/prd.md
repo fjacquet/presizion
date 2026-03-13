@@ -55,10 +55,10 @@ We need a **consistent, repeatable, and fast** way to go from **“current clust
 6. **Traceable assumptions**
    For every key output metric, show the **formula and input parameters** used, so users can validate and adjust.
 
-6. **Performance-based sizing (v1.1)**
+7. **Performance-based sizing (v1.1)**
    - Support a **SPECrate2017_int_base-based sizing mode** as an alternative to vCPU-ratio sizing, enabling performance-equivalence calculations between server generations.
 
-7. **Right-sizing from observed utilization (v1.1)**
+8. **Right-sizing from observed utilization (v1.1)**
    - Accept observed CPU % and RAM % utilization of the existing cluster to size to **actual consumption** rather than installed capacity.
 
 ### 3.2 Non-Goals (for v1 / v1.1)

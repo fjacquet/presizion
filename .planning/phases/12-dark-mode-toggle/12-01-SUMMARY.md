@@ -99,13 +99,13 @@ The test approach deviated slightly from the plan's suggestion of `vi.stubGlobal
 - No blockers
 
 ---
-*Phase: 12-dark-mode-toggle*
-*Completed: 2026-03-13*
+_Phase: 12-dark-mode-toggle_
+_Completed: 2026-03-13_
 
 ## Self-Check: PASSED
 
 - src/store/useThemeStore.ts: FOUND
-- src/store/__tests__/useThemeStore.test.ts: FOUND
+- src/store/**tests**/useThemeStore.test.ts: FOUND
 - .planning/phases/12-dark-mode-toggle/12-01-SUMMARY.md: FOUND
 - Commit e528a9c: FOUND
 - Commit ddd9997: FOUND

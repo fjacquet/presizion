@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed
+
 - SPECint metric label corrected to `SPECrate2017_int_base` across all UI labels, tooltips, and formula strings (ADR-005).
 - Default target server updated to Dell PowerEdge R660, 2× Intel Xeon Gold 6526Y (32 pCores, `SPECrate2017_int_base` = 337 per spec.org).
 
@@ -16,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.2.0] — 2026-03-13
 
 ### Added
+
 - **File import** — single "Import from file" button accepts four formats:
   - **RVTools xlsx** — extracts vCPU, VM count, disk totals from the `vInfo` sheet.
   - **LiveOptics xlsx** — extracts VM inventory (VMs sheet) + server configuration (ESX Hosts sheet) + average CPU/RAM utilization (ESX Performance sheet).
@@ -28,6 +30,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Error boundary + loading skeleton** — prevents blank white page on unexpected render errors; provides visual feedback during initial app hydration.
 
 ### Fixed
+
 - `form.watch()` polling caused infinite re-render loop (React error #185); replaced with `form.watch(callback)` subscription pattern.
 - Store→form sync in `CurrentClusterForm` now includes all new server config fields and `specintPerServer`, so JSON session import correctly restores all fields.
 
@@ -36,6 +39,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.1.0] — 2026-03-13
 
 ### Added
+
 - **SPECrate2017 sizing mode** — global toggle between vCPU-ratio and `SPECrate2017_int_base`-based sizing. In SPECrate mode, the CPU constraint uses:
   `ceil(existingServers × oldScore × headroomFactor / targetScore)`
   Default target score: 337 (Dell R660, 2× Xeon Gold 6526Y).
@@ -48,6 +52,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Clipboard feedback** — Copy Summary button shows "Copied!" confirmation for 2 seconds (UX-05).
 
 ### Changed
+
 - `existingServerCount` is always shown in Step 1 (was previously only shown in SPECrate mode).
 - `totalPcores` can now be left at 0 and will be auto-derived from server count × sockets × cores when the server config fields are filled.
 
@@ -56,6 +61,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.0.0] — 2026-03-12
 
 ### Added
+
 - **3-step wizard** — Enter Current Cluster → Define Target Scenarios → Review & Export.
 - **Step 1: Current cluster form** — input fields for total vCPUs, total pCores, total VMs, total disk, and optional server configuration. Live derived metrics panel shows vCPU:pCore ratio, VMs/server estimates.
 - **Step 2: Scenario cards** — tabbed cards, each with target server config (sockets, cores/socket, RAM, disk) and sizing assumptions (vCPU:pCore ratio, RAM/VM, disk/VM, headroom %, N+1 HA reserve). Results panel updates live.

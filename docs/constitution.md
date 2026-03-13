@@ -1,8 +1,8 @@
 
 # Engineering Constitution
 
-**Project:** `fjacquet/icons`  
-**Scope:** React + TypeScript + GitHub Pages + MCP server (future)  
+**Project:** `fjacquet/icons`
+**Scope:** React + TypeScript + GitHub Pages + MCP server (future)
 
 This document is the **constitution** for this project: it defines how we write code, how we keep it simple, and which practices are non‑negotiable.
 
