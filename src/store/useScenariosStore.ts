@@ -11,8 +11,8 @@ import { createDefaultScenario } from '../lib/sizing/defaults';
 interface ScenariosStore {
   /** List of target server scenarios */
   scenarios: Scenario[];
-  /** Append a new scenario initialized with industry-standard defaults */
-  addScenario: () => void;
+  /** Append a new scenario initialized with industry-standard defaults, with optional overrides */
+  addScenario: (overrides?: Partial<Scenario>) => void;
   /** Create a copy of an existing scenario with a new UUID and "(copy)" name suffix */
   duplicateScenario: (id: string) => void;
   /** Remove a scenario by its UUID */
@@ -26,9 +26,9 @@ interface ScenariosStore {
 export const useScenariosStore = create<ScenariosStore>((set) => ({
   scenarios: [createDefaultScenario()],
 
-  addScenario: () =>
+  addScenario: (overrides) =>
     set((state) => ({
-      scenarios: [...state.scenarios, createDefaultScenario()],
+      scenarios: [...state.scenarios, { ...createDefaultScenario(), ...overrides }],
     })),
 
   duplicateScenario: (id) =>

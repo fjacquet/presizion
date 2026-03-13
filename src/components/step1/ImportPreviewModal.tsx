@@ -30,13 +30,21 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
     } else {
       setCurrentCluster({
         totalVcpus: result.totalVcpus,
-        totalPcores: 0,
+        totalPcores: result.totalPcores ?? 0,
         totalVms: result.totalVms,
         totalDiskGb: result.totalDiskGb,
+        ...(result.existingServerCount != null && { existingServerCount: result.existingServerCount }),
+        ...(result.socketsPerServer != null && { socketsPerServer: result.socketsPerServer }),
+        ...(result.coresPerSocket != null && { coresPerSocket: result.coresPerSocket }),
+        ...(result.ramPerServerGb != null && { ramPerServerGb: result.ramPerServerGb }),
+        ...(result.cpuUtilizationPercent != null && { cpuUtilizationPercent: result.cpuUtilizationPercent }),
+        ...(result.ramUtilizationPercent != null && { ramUtilizationPercent: result.ramUtilizationPercent }),
       })
     }
     onClose()
   }
+
+  const pcoresKnown = !isJson && result.totalPcores != null && result.totalPcores > 0
 
   return (
     <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
@@ -69,8 +77,29 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
                 <p><span className="font-medium">Total Disk:</span> {result.totalDiskGb} GB</p>
                 <p className="text-muted-foreground">
                   <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
-                  {result.avgRamPerVmGb} GB — not auto-populated
+                  {result.avgRamPerVmGb} GB
                 </p>
+                {result.totalPcores != null && (
+                  <p><span className="font-medium">Total pCores:</span> {result.totalPcores}</p>
+                )}
+                {result.existingServerCount != null && (
+                  <p><span className="font-medium">Existing servers:</span> {result.existingServerCount}</p>
+                )}
+                {result.socketsPerServer != null && (
+                  <p><span className="font-medium">Sockets/server:</span> {result.socketsPerServer}</p>
+                )}
+                {result.coresPerSocket != null && (
+                  <p><span className="font-medium">Cores/socket:</span> {result.coresPerSocket}</p>
+                )}
+                {result.ramPerServerGb != null && (
+                  <p><span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB</p>
+                )}
+                {result.cpuUtilizationPercent != null && (
+                  <p><span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%</p>
+                )}
+                {result.ramUtilizationPercent != null && (
+                  <p><span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%</p>
+                )}
               </>
             )}
           </div>
@@ -81,9 +110,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             </div>
           )}
 
-          {!isJson && (
+          {!isJson && !pcoresKnown && (
             <p className="text-xs text-muted-foreground">
-              <strong>Note:</strong> Total pCores is not available in this export format and must be
+              <strong>Note:</strong> Total pCores could not be read from this file and must be
               entered manually before advancing to Step 2.
             </p>
           )}

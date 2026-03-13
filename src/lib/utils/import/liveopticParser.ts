@@ -1,5 +1,10 @@
 import type { ClusterImportResult } from './index'
-import { LIVEOPTICS_ALIASES, resolveColumns } from './columnResolver'
+import {
+  LIVEOPTICS_ALIASES,
+  LIVEOPTICS_ESX_HOSTS_ALIASES,
+  LIVEOPTICS_ESX_PERF_ALIASES,
+  resolveColumns,
+} from './columnResolver'
 import { ImportError } from './fileValidation'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
@@ -27,7 +32,47 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<Omit<ClusterImportResult,
   if (!sheet) throw new ImportError('VMs sheet not found in LiveOptics xlsx.')
 
   const rows = XLSX.utils.sheet_to_json<VmRow>(sheet, { defval: null })
-  return aggregate(rows)
+  const base = aggregate(rows)
+
+  // ESX Hosts sheet → server count, sockets, cores/socket, RAM/server, totalPcores
+  const hostsSheet = wb.Sheets['ESX Hosts']
+  if (hostsSheet) {
+    const hostRows = XLSX.utils.sheet_to_json<VmRow>(hostsSheet, { defval: '' })
+    const firstRow = hostRows[0]
+    if (firstRow) {
+      const cols = resolveColumns(Object.keys(firstRow), LIVEOPTICS_ESX_HOSTS_ALIASES, new Set())
+      const hosts = hostRows.filter((r) => String(r[cols['host_name'] ?? ''] ?? '').trim() !== '')
+      const firstHost = hosts[0]
+      if (firstHost && hosts.length > 0) {
+        const sockets = num(firstHost, cols['cpu_sockets'])
+        const coresFirst = num(firstHost, cols['cpu_cores'])
+        const socketCounts = new Set(hosts.map((h) => num(h, cols['cpu_sockets'])))
+        if (socketCounts.size > 1) base.warnings.push('Mixed CPU socket counts detected — using first host as representative.')
+        base.existingServerCount = hosts.length
+        base.totalPcores = hosts.reduce((s, h) => s + num(h, cols['cpu_cores']), 0)
+        base.socketsPerServer = sockets || undefined
+        base.coresPerSocket = sockets > 0 ? Math.round(coresFirst / sockets) || undefined : undefined
+        base.ramPerServerGb = Math.round(num(firstHost, cols['memory_kib']) / 1024 / 1024) || undefined
+      }
+    }
+  }
+
+  // ESX Performance sheet → average CPU + RAM utilization across hosts
+  const perfSheet = wb.Sheets['ESX Performance']
+  if (perfSheet) {
+    const perfRows = XLSX.utils.sheet_to_json<VmRow>(perfSheet, { defval: '' })
+    const firstRow = perfRows[0]
+    if (firstRow) {
+      const cols = resolveColumns(Object.keys(firstRow), LIVEOPTICS_ESX_PERF_ALIASES, new Set())
+      const valid = perfRows.filter((r) => String(r[cols['host_name'] ?? ''] ?? '').trim() !== '')
+      if (valid.length > 0) {
+        base.cpuUtilizationPercent = Math.round(valid.reduce((s, r) => s + num(r, cols['avg_cpu_pct']), 0) / valid.length)
+        base.ramUtilizationPercent = Math.round(valid.reduce((s, r) => s + num(r, cols['avg_mem_pct']), 0) / valid.length)
+      }
+    }
+  }
+
+  return base
 }
 
 function parseCsvBuffer(buffer: ArrayBuffer): Omit<ClusterImportResult, 'sourceFormat'> {

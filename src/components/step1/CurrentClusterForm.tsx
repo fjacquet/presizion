@@ -126,7 +126,13 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.totalVcpus !== (currentCluster.totalVcpus ?? 0) ||
       formVals.totalPcores !== (currentCluster.totalPcores ?? 0) ||
       formVals.totalVms !== (currentCluster.totalVms ?? 0) ||
-      formVals.totalDiskGb !== currentCluster.totalDiskGb
+      formVals.totalDiskGb !== currentCluster.totalDiskGb ||
+      formVals.existingServerCount !== currentCluster.existingServerCount ||
+      formVals.socketsPerServer !== currentCluster.socketsPerServer ||
+      formVals.coresPerSocket !== currentCluster.coresPerSocket ||
+      formVals.ramPerServerGb !== currentCluster.ramPerServerGb ||
+      formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
+      formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent
     if (changed) {
       form.reset({
         ...formVals,
@@ -134,6 +140,12 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         totalPcores: currentCluster.totalPcores ?? 0,
         totalVms: currentCluster.totalVms ?? 0,
         totalDiskGb: currentCluster.totalDiskGb,
+        existingServerCount: currentCluster.existingServerCount,
+        socketsPerServer: currentCluster.socketsPerServer,
+        coresPerSocket: currentCluster.coresPerSocket,
+        ramPerServerGb: currentCluster.ramPerServerGb,
+        cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
+        ramUtilizationPercent: currentCluster.ramUtilizationPercent,
       })
     }
   }, [currentCluster, form])

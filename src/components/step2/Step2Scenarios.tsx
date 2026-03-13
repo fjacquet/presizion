@@ -2,12 +2,14 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useClusterStore } from '@/store/useClusterStore'
 import { ScenarioCard } from './ScenarioCard'
 import { ScenarioResults } from './ScenarioResults'
 
 export function Step2Scenarios() {
   const scenarios = useScenariosStore((s) => s.scenarios)
   const addScenario = useScenariosStore((s) => s.addScenario)
+  const currentCluster = useClusterStore((s) => s.currentCluster)
 
   const firstScenarioId = scenarios[0]?.id ?? ''
 
@@ -23,7 +25,13 @@ export function Step2Scenarios() {
         <Button
           type="button"
           variant="outline"
-          onClick={addScenario}
+          onClick={() => {
+            const diskPerVmGb =
+              currentCluster.totalDiskGb && currentCluster.totalVms
+                ? Math.round((currentCluster.totalDiskGb / currentCluster.totalVms) * 10) / 10
+                : undefined
+            addScenario(diskPerVmGb != null ? { diskPerVmGb } : undefined)
+          }}
           aria-label="Add Scenario"
         >
           <Plus className="h-4 w-4 mr-2" />

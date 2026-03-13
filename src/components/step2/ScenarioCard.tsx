@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash2, Copy } from 'lucide-react'
+import { Trash2, Copy, Info } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -16,10 +16,47 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { scenarioSchema, type ScenarioInput } from '@/schemas/scenarioSchema'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
 import type { Scenario } from '@/types/cluster'
+
+const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
+  socketsPerServer:        'Physical CPU sockets per target server. Check the vendor spec sheet.',
+  coresPerSocket:          'Physical cores per socket — NOT hyperthreaded logical CPUs.',
+  ramPerServerGb:          'Total RAM installed per target server (GB).',
+  diskPerServerGb:         'Total usable storage per target server (GB).',
+  targetVcpuToPCoreRatio:  'CPU oversubscription ratio. VMware recommends 4:1 for mixed workloads; use 2:1 for databases or CPU-intensive workloads.',
+  ramPerVmGb:              'Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.',
+  diskPerVmGb:             'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
+  headroomPercent:         '20% means the sized cluster runs at 80% utilization, leaving buffer for spikes and growth.',
+  haReserveEnabled:        'Adds one extra server to absorb a single host failure without breaching capacity. Recommended for production vSphere HA clusters.',
+}
+
+function FieldLabel({ name, children }: { name: keyof ScenarioInput; children: React.ReactNode }) {
+  const tip = TOOLTIPS[name]
+  return (
+    <FormLabel className="flex items-center gap-1">
+      {children}
+      {tip && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" aria-label={`Info: ${String(children)}`} />
+            </TooltipTrigger>
+            <TooltipContent><p className="max-w-xs text-sm">{tip}</p></TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </FormLabel>
+  )
+}
 
 interface ScenarioCardProps {
   scenarioId: string
@@ -134,7 +171,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="socketsPerServer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sockets/Server</FormLabel>
+                      <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
                       <FormControl>
                         <Input type="number" min={1} {...numericField(field)} />
                       </FormControl>
@@ -147,7 +184,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="coresPerSocket"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cores/Socket</FormLabel>
+                      <FieldLabel name="coresPerSocket">Cores/Socket</FieldLabel>
                       <FormControl>
                         <Input type="number" min={1} {...numericField(field)} />
                       </FormControl>
@@ -160,7 +197,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="ramPerServerGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>RAM/Server GB</FormLabel>
+                      <FieldLabel name="ramPerServerGb">RAM/Server GB</FieldLabel>
                       <FormControl>
                         <Input type="number" min={1} {...numericField(field)} />
                       </FormControl>
@@ -173,7 +210,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="diskPerServerGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Disk/Server GB</FormLabel>
+                      <FieldLabel name="diskPerServerGb">Disk/Server GB</FieldLabel>
                       <FormControl>
                         <Input type="number" min={1} {...numericField(field)} />
                       </FormControl>
@@ -203,7 +240,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="targetVcpuToPCoreRatio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>vCPU:pCore Ratio</FormLabel>
+                      <FieldLabel name="targetVcpuToPCoreRatio">vCPU:pCore Ratio</FieldLabel>
                       <FormControl>
                         <Input type="number" min={0.1} step={0.5} {...numericField(field)} />
                       </FormControl>
@@ -216,7 +253,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="ramPerVmGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>RAM/VM GB</FormLabel>
+                      <FieldLabel name="ramPerVmGb">RAM/VM GB</FieldLabel>
                       <FormControl>
                         <Input type="number" min={0.1} {...numericField(field)} />
                       </FormControl>
@@ -229,7 +266,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="diskPerVmGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Disk/VM GB</FormLabel>
+                      <FieldLabel name="diskPerVmGb">Disk/VM GB</FieldLabel>
                       <FormControl>
                         <Input type="number" min={0.1} {...numericField(field)} />
                       </FormControl>
@@ -242,7 +279,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="headroomPercent"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Headroom %</FormLabel>
+                      <FieldLabel name="headroomPercent">Headroom %</FieldLabel>
                       <FormControl>
                         <Input type="number" min={0} max={100} {...numericField(field)} />
                       </FormControl>
@@ -264,7 +301,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                           aria-label="N+1 HA Reserve"
                         />
                       </FormControl>
-                      <FormLabel className="!mt-0 cursor-pointer">N+1 HA Reserve</FormLabel>
+                      <FieldLabel name="haReserveEnabled">N+1 HA Reserve</FieldLabel>
                       <FormMessage />
                     </FormItem>
                   )}

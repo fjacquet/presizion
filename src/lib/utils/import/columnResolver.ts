@@ -18,6 +18,19 @@ export const LIVEOPTICS_ALIASES: ColumnAliasMap = {
   is_template: ['Template'],
 }
 
+export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {
+  host_name:   ['Host Name', 'ESX Host', 'Host'],
+  cpu_sockets: ['CPU Sockets', 'Sockets'],
+  cpu_cores:   ['CPU Cores', 'Cores'],
+  memory_kib:  ['Memory (KiB)', 'Memory KiB', 'Memory'],
+}
+
+export const LIVEOPTICS_ESX_PERF_ALIASES: ColumnAliasMap = {
+  host_name:   ['Host Name', 'ESX Host', 'Host'],
+  avg_cpu_pct: ['Average CPU %', 'Avg CPU %', 'CPU %'],
+  avg_mem_pct: ['Average Memory %', 'Avg Memory %', 'Memory %'],
+}
+
 /**
  * Resolves header names in a spreadsheet to canonical field names.
  * Trims whitespace from headers (common in exported files).

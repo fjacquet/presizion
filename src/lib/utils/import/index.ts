@@ -6,6 +6,14 @@ export interface ClusterImportResult {
   sourceFormat: 'rvtools' | 'liveoptics-xlsx' | 'liveoptics-csv'
   vmCount: number
   warnings: string[]
+  // Populated when ESX-level sheets are available (LiveOptics xlsx, RVTools with vHost)
+  totalPcores?: number
+  existingServerCount?: number
+  socketsPerServer?: number
+  coresPerSocket?: number
+  ramPerServerGb?: number
+  cpuUtilizationPercent?: number
+  ramUtilizationPercent?: number
 }
 
 export { ImportError } from './fileValidation'
