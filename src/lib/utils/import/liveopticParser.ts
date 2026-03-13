@@ -1,8 +1,10 @@
-import type { ClusterImportResult } from './index'
+import type { ClusterImportResult, ScopeData } from './index'
 import {
   LIVEOPTICS_ALIASES,
   LIVEOPTICS_ESX_HOSTS_ALIASES,
   LIVEOPTICS_ESX_PERF_ALIASES,
+  CLUSTER_ALIASES,
+  DATACENTER_ALIASES,
   resolveColumns,
 } from './columnResolver'
 import { ImportError } from './fileValidation'
@@ -25,7 +27,31 @@ function isTruthy(row: VmRow, col: string | undefined): boolean {
   return v === true || v === 'TRUE' || v === 'true' || v === 1
 }
 
-async function parseXlsx(buffer: ArrayBuffer): Promise<Omit<ClusterImportResult, 'sourceFormat'>> {
+function str(row: VmRow, col: string | undefined): string {
+  if (!col) return ''
+  const v = row[col]
+  return v == null ? '' : String(v).trim()
+}
+
+function buildScopeLabel(scopeKey: string): string {
+  if (scopeKey === '__all__') return 'All'
+  if (scopeKey.includes('||')) {
+    const [dc, cluster] = scopeKey.split('||')
+    return `${cluster} (${dc})`
+  }
+  return scopeKey
+}
+
+interface ScopeAccum {
+  totalVcpus: number
+  totalMemMib: number
+  totalDiskMib: number
+  vmCount: number
+}
+
+type AggregateResult = Omit<ClusterImportResult, 'sourceFormat'>
+
+async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
   const XLSX = await import('@e965/xlsx')
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' })
   const sheet = wb.Sheets['VMs']
@@ -77,7 +103,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<Omit<ClusterImportResult,
   return base
 }
 
-function parseCsvBuffer(buffer: ArrayBuffer): Omit<ClusterImportResult, 'sourceFormat'> {
+function parseCsvBuffer(buffer: ArrayBuffer): AggregateResult {
   const text = new TextDecoder().decode(buffer)
   const lines = text.split('\n').filter((l) => l.trim())
   const headers = (lines[0] ?? '').split(',').map((h) => h.trim().replace(/^"|"$/g, ''))
@@ -90,11 +116,16 @@ function parseCsvBuffer(buffer: ArrayBuffer): Omit<ClusterImportResult, 'sourceF
   return aggregate(rows)
 }
 
-function aggregate(rows: VmRow[]): Omit<ClusterImportResult, 'sourceFormat'> {
-  if (rows.length === 0) return { totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0, warnings: [] }
+function aggregate(rows: VmRow[]): AggregateResult {
+  if (rows.length === 0) return {
+    totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0, warnings: [],
+    detectedScopes: ['__all__'], scopeLabels: { __all__: 'All' }, rawByScope: new Map(),
+  }
 
   const headers = Object.keys(rows[0] ?? {})
   const colMap = resolveColumns(headers, LIVEOPTICS_ALIASES, REQUIRED)
+  const colMapCluster = resolveColumns(headers, CLUSTER_ALIASES, new Set())
+  const colMapDc = resolveColumns(headers, DATACENTER_ALIASES, new Set())
 
   let totalVcpus = 0
   let totalMemMib = 0
@@ -102,15 +133,48 @@ function aggregate(rows: VmRow[]): Omit<ClusterImportResult, 'sourceFormat'> {
   let vmCount = 0
   const warnings: string[] = []
 
+  const scopeMap = new Map<string, ScopeAccum>()
+
   for (const row of rows) {
     if (isTruthy(row, colMap['is_template'])) continue
     vmCount++
-    totalVcpus += num(row, colMap['num_cpus'])
-    totalMemMib += num(row, colMap['memory_mib'])
-    totalDiskMib += num(row, colMap['provisioned_mib'])
+    const cpus = num(row, colMap['num_cpus'])
+    const mem = num(row, colMap['memory_mib'])
+    const disk = num(row, colMap['provisioned_mib'])
+    totalVcpus += cpus
+    totalMemMib += mem
+    totalDiskMib += disk
+
+    const cluster = str(row, colMapCluster['cluster_name'])
+    const dc = str(row, colMapDc['datacenter_name'])
+    const scopeKey = dc && cluster ? `${dc}||${cluster}` : cluster ? cluster : '__all__'
+
+    const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
+    scopeMap.set(scopeKey, {
+      totalVcpus: existing.totalVcpus + cpus,
+      totalMemMib: existing.totalMemMib + mem,
+      totalDiskMib: existing.totalDiskMib + disk,
+      vmCount: existing.vmCount + 1,
+    })
   }
 
   if (vmCount === 0) warnings.push('No non-template VMs found.')
+
+  const detectedScopes = [...scopeMap.keys()]
+  const scopeLabels: Record<string, string> = {}
+  const rawByScope = new Map<string, ScopeData>()
+
+  for (const [key, accum] of scopeMap.entries()) {
+    scopeLabels[key] = buildScopeLabel(key)
+    rawByScope.set(key, {
+      totalVcpus: accum.totalVcpus,
+      totalVms: accum.vmCount,
+      totalDiskGb: Math.round((accum.totalDiskMib / 1024) * 10) / 10,
+      avgRamPerVmGb: accum.vmCount > 0 ? Math.round((accum.totalMemMib / accum.vmCount / 1024) * 10) / 10 : 0,
+      vmCount: accum.vmCount,
+      warnings: [],
+    })
+  }
 
   return {
     totalVcpus,
@@ -119,6 +183,9 @@ function aggregate(rows: VmRow[]): Omit<ClusterImportResult, 'sourceFormat'> {
     avgRamPerVmGb: vmCount > 0 ? Math.round((totalMemMib / vmCount / 1024) * 10) / 10 : 0,
     vmCount,
     warnings,
+    detectedScopes,
+    scopeLabels,
+    rawByScope,
   }
 }
 

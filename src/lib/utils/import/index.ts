@@ -1,3 +1,5 @@
+export type ScopeData = Omit<ClusterImportResult, 'sourceFormat' | 'detectedScopes' | 'scopeLabels' | 'rawByScope'>
+
 export interface ClusterImportResult {
   totalVcpus: number
   totalVms: number
@@ -14,6 +16,10 @@ export interface ClusterImportResult {
   ramPerServerGb?: number
   cpuUtilizationPercent?: number
   ramUtilizationPercent?: number
+  // Scope detection fields — populated by parsers
+  detectedScopes?: string[]
+  scopeLabels?: Record<string, string>
+  rawByScope?: Map<string, ScopeData>
 }
 
 export { ImportError } from './fileValidation'

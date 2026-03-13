@@ -31,6 +31,14 @@ export const LIVEOPTICS_ESX_PERF_ALIASES: ColumnAliasMap = {
   avg_mem_pct: ['Average Memory %', 'Avg Memory %', 'Memory %'],
 }
 
+export const CLUSTER_ALIASES: ColumnAliasMap = {
+  cluster_name: ['Cluster', 'cluster', 'ClusterName', 'cluster_name', 'Cluster Name'],
+}
+
+export const DATACENTER_ALIASES: ColumnAliasMap = {
+  datacenter_name: ['Datacenter', 'datacenter', 'DC', 'DataCenter', 'data_center'],
+}
+
 /**
  * Resolves header names in a spreadsheet to canonical field names.
  * Trims whitespace from headers (common in exported files).

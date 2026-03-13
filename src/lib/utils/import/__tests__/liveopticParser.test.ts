@@ -54,4 +54,44 @@ describe('liveopticParser', () => {
     const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
     expect(result.avgRamPerVmGb).toBe(12)
   })
+
+  describe('scope detection (xlsx path)', () => {
+    it('single-cluster rows produce detectedScopes with one entry', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { 'VM Name': 'web-01', 'Virtual CPU': 4, 'Provisioned Memory (MiB)': 8192, 'Virtual Disk Size (MiB)': 102400, Template: false, Cluster: 'CL-A' },
+        { 'VM Name': 'db-01', 'Virtual CPU': 8, 'Provisioned Memory (MiB)': 16384, 'Virtual Disk Size (MiB)': 204800, Template: false, Cluster: 'CL-A' },
+      ])
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.detectedScopes).toHaveLength(1)
+      expect(result.detectedScopes).toContain('CL-A')
+    })
+
+    it('multi-cluster rows produce detectedScopes with N distinct keys', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { 'VM Name': 'web-01', 'Virtual CPU': 4, 'Provisioned Memory (MiB)': 8192, 'Virtual Disk Size (MiB)': 102400, Template: false, Cluster: 'CL-A' },
+        { 'VM Name': 'db-01', 'Virtual CPU': 8, 'Provisioned Memory (MiB)': 16384, 'Virtual Disk Size (MiB)': 204800, Template: false, Cluster: 'CL-B' },
+        { 'VM Name': 'app-01', 'Virtual CPU': 2, 'Provisioned Memory (MiB)': 4096, 'Virtual Disk Size (MiB)': 51200, Template: false, Cluster: 'CL-C' },
+      ])
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.detectedScopes).toHaveLength(3)
+    })
+
+    it('rawByScope is populated with per-cluster aggregates', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { 'VM Name': 'web-01', 'Virtual CPU': 4, 'Provisioned Memory (MiB)': 8192, 'Virtual Disk Size (MiB)': 102400, Template: false, Cluster: 'CL-A' },
+        { 'VM Name': 'db-01', 'Virtual CPU': 8, 'Provisioned Memory (MiB)': 16384, 'Virtual Disk Size (MiB)': 204800, Template: false, Cluster: 'CL-B' },
+      ])
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.rawByScope?.get('CL-A')?.totalVcpus).toBe(4)
+      expect(result.rawByScope?.get('CL-B')?.totalVcpus).toBe(8)
+    })
+
+    it("file with no cluster column defaults to '__all__'", async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { 'VM Name': 'web-01', 'Virtual CPU': 4, 'Provisioned Memory (MiB)': 8192, 'Virtual Disk Size (MiB)': 102400, Template: false },
+      ])
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.detectedScopes).toEqual(['__all__'])
+    })
+  })
 })
