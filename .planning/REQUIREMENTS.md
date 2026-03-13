@@ -40,8 +40,8 @@
 | BRAND-02 | Phase 11 | Complete |
 | TD-04 | Phase 11 | Complete |
 | THEME-01 | Phase 12 | Pending |
-| THEME-02 | Phase 12 | Pending |
-| THEME-03 | Phase 12 | Pending |
+| THEME-02 | Phase 12 | Complete |
+| THEME-03 | Phase 12 | Complete |
 | SCOPE-01 | Phase 13 | Pending |
 | SCOPE-02 | Phase 13 | Pending |
 | SCOPE-03 | Phase 14 | Pending |
