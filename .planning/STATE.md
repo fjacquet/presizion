@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: "- [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI"
 status: planning
-stopped_at: Completed 05-specint-and-utilization-formula-engine-02-PLAN.md
-last_updated: "2026-03-13T06:41:18.332Z"
+stopped_at: Completed 05-specint-and-utilization-formula-engine-03-PLAN.md
+last_updated: "2026-03-13T06:46:40.472Z"
 last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 18
   percent: 50
 ---
 
@@ -69,6 +69,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04-deployment-and-polish P03 | 2 | 2 tasks | 3 files |
 | Phase 05-specint-and-utilization-formula-engine P01 | 3 | 2 tasks | 9 files |
 | Phase 05-specint-and-utilization-formula-engine P02 | 4 | 2 tasks | 8 files |
+| Phase 05-specint-and-utilization-formula-engine P03 | 8 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 05-specint-and-utilization-formula-engine]: sizingMode passed as optional 3rd param to computeScenarioResult (default 'vcpu') — no breaking change to existing callers
 - [Phase 05-specint-and-utilization-formula-engine]: cpuUtilPct and ramUtilPct use default=100 — division by 100 yields 1.0 multiplier, identity for existing math ensuring zero regression
 - [Phase 05-specint-and-utilization-formula-engine]: determineLimitingResource returns 'specint' when sizingMode='specint' and cpu-slot wins — consistent tie-breaking priority, avoids 4-arg refactor
+- [Phase 05-specint-and-utilization-formula-engine]: Integration tests for useScenariosResults test computeScenarioResult directly (not renderHook) — pure formula testing avoids React test setup overhead
+- [Phase 05-specint-and-utilization-formula-engine]: Exhaustive Record<LimitingResource, string> in ScenarioResults and Record<keyof CurrentClusterInput, string> in CurrentClusterForm — TypeScript enforces coverage of all union members at build time
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T06:41:18.329Z
-Stopped at: Completed 05-specint-and-utilization-formula-engine-02-PLAN.md
+Last session: 2026-03-13T06:46:40.469Z
+Stopped at: Completed 05-specint-and-utilization-formula-engine-03-PLAN.md
 Resume file: None
