@@ -31,6 +31,10 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
   socketsPerServer: 'Number of physical CPU sockets per existing server.',
   coresPerSocket: 'Physical cores per socket from spec sheet — NOT OS-reported logical processors.',
   ramPerServerGb: 'Total RAM installed per existing server (GB).',
+  existingServerCount: 'Number of physical servers currently in the cluster (used for SPECint sizing).',
+  specintPerServer: 'SPECint benchmark score per existing server (used for SPECint sizing mode).',
+  cpuUtilizationPercent: 'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
+  ramUtilizationPercent: 'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
 }
 
 interface NumericFieldProps {

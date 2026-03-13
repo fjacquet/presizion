@@ -117,23 +117,83 @@ describe('scenarioSchema', () => {
 });
 
 describe('currentClusterSchema — utilization fields (UTIL-01, UTIL-02)', () => {
-  it.todo('accepts cpuUtilizationPercent: 70');
-  it.todo('rejects cpuUtilizationPercent: -5 (below 0)');
-  it.todo('rejects cpuUtilizationPercent: 110 (above 100)');
-  it.todo('accepts cpuUtilizationPercent absent (field is optional)');
-  it.todo('accepts ramUtilizationPercent: 80');
-  it.todo('rejects ramUtilizationPercent: 110 (above 100)');
+  const BASE = { totalVcpus: 100, totalPcores: 50, totalVms: 20 };
+
+  it('accepts cpuUtilizationPercent: 70', () => {
+    const result = currentClusterSchema.parse({ ...BASE, cpuUtilizationPercent: 70 });
+    expect(result.cpuUtilizationPercent).toBe(70);
+  });
+
+  it('rejects cpuUtilizationPercent: -5 (below 0)', () => {
+    expect(() => currentClusterSchema.parse({ ...BASE, cpuUtilizationPercent: -5 })).toThrow();
+  });
+
+  it('rejects cpuUtilizationPercent: 110 (above 100)', () => {
+    expect(() => currentClusterSchema.parse({ ...BASE, cpuUtilizationPercent: 110 })).toThrow();
+  });
+
+  it('accepts cpuUtilizationPercent absent (field is optional)', () => {
+    const result = currentClusterSchema.parse(BASE);
+    expect(result.cpuUtilizationPercent).toBeUndefined();
+  });
+
+  it('accepts ramUtilizationPercent: 80', () => {
+    const result = currentClusterSchema.parse({ ...BASE, ramUtilizationPercent: 80 });
+    expect(result.ramUtilizationPercent).toBe(80);
+  });
+
+  it('rejects ramUtilizationPercent: 110 (above 100)', () => {
+    expect(() => currentClusterSchema.parse({ ...BASE, ramUtilizationPercent: 110 })).toThrow();
+  });
 });
 
 describe('currentClusterSchema — SPECint fields (PERF-01)', () => {
-  it.todo('accepts existingServerCount: 10');
-  it.todo('accepts specintPerServer: 1200');
-  it.todo('rejects specintPerServer: -100 (must be positive)');
-  it.todo('accepts all SPECint fields absent (all optional)');
+  const BASE = { totalVcpus: 100, totalPcores: 50, totalVms: 20 };
+
+  it('accepts existingServerCount: 10', () => {
+    const result = currentClusterSchema.parse({ ...BASE, existingServerCount: 10 });
+    expect(result.existingServerCount).toBe(10);
+  });
+
+  it('accepts specintPerServer: 1200', () => {
+    const result = currentClusterSchema.parse({ ...BASE, specintPerServer: 1200 });
+    expect(result.specintPerServer).toBe(1200);
+  });
+
+  it('rejects specintPerServer: -100 (must be positive)', () => {
+    expect(() => currentClusterSchema.parse({ ...BASE, specintPerServer: -100 })).toThrow();
+  });
+
+  it('accepts all SPECint fields absent (all optional)', () => {
+    const result = currentClusterSchema.parse(BASE);
+    expect(result.existingServerCount).toBeUndefined();
+    expect(result.specintPerServer).toBeUndefined();
+  });
 });
 
+const SCENARIO_BASE_FULL = {
+  id: VALID_UUID,
+  name: 'Test',
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 10000,
+  ramPerVmGb: 4,
+  diskPerVmGb: 50,
+};
+
 describe('scenarioSchema — targetSpecint (PERF-03)', () => {
-  it.todo('accepts targetSpecint: 2400');
-  it.todo('rejects targetSpecint: 0 (must be positive)');
-  it.todo('accepts targetSpecint absent (optional field)');
+  it('accepts targetSpecint: 2400', () => {
+    const result = scenarioSchema.parse({ ...SCENARIO_BASE_FULL, targetSpecint: 2400 });
+    expect(result.targetSpecint).toBe(2400);
+  });
+
+  it('rejects targetSpecint: 0 (must be positive)', () => {
+    expect(() => scenarioSchema.parse({ ...SCENARIO_BASE_FULL, targetSpecint: 0 })).toThrow();
+  });
+
+  it('accepts targetSpecint absent (optional field)', () => {
+    const result = scenarioSchema.parse(SCENARIO_BASE_FULL);
+    expect(result.targetSpecint).toBeUndefined();
+  });
 });

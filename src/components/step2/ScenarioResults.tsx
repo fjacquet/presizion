@@ -9,6 +9,7 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   cpu: 'CPU-limited',
   ram: 'RAM-limited',
   disk: 'Disk-limited',
+  specint: 'SPECint-limited',
 }
 
 interface ScenarioResultsProps {
