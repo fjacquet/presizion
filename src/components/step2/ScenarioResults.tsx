@@ -52,6 +52,9 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     ramPerVmGb: scenario.ramPerVmGb,
     headroomPercent: scenario.headroomPercent,
     ramPerServerGb: scenario.ramPerServerGb,
+    ...(currentCluster.ramUtilizationPercent !== undefined && {
+      ramUtilizationPercent: currentCluster.ramUtilizationPercent,
+    }),
   })
 
   const diskFormula = diskFormulaString({
