@@ -12,6 +12,7 @@
  */
 import { useState, useRef, useEffect } from 'react'
 import { ComparisonTable } from './ComparisonTable'
+import { SizingChart } from './SizingChart'
 import { Button } from '@/components/ui/button'
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
@@ -80,6 +81,10 @@ export function Step3ReviewExport() {
       </div>
 
       <ComparisonTable />
+
+      <div className="print:hidden">
+        <SizingChart />
+      </div>
     </div>
   )
 }
