@@ -113,3 +113,15 @@ describe('downloadCsv', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock')
   })
 })
+
+describe('buildJsonContent', () => {
+  it.todo('returns a valid pretty-printed JSON string')
+  it.todo('includes currentCluster, scenarios, and computed results')
+  it.todo('sets undefined optional fields to null (not omitted)')
+  it.todo('includes schemaVersion: "1.1" at top level')
+})
+
+describe('downloadJson', () => {
+  it.todo('calls URL.createObjectURL with a Blob of type application/json')
+  it.todo('calls URL.revokeObjectURL after download is triggered')
+})
