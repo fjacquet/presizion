@@ -38,7 +38,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 **Milestone Goal:** Add cluster-scoped import filtering, localStorage/URL-share persistence, manual dark-mode toggle, and Presizion brand assets.
 
 - [x] **Phase 11: Branding & Tech Debt** — Presizion logo, custom favicon, and RAM formula display fix (completed 2026-03-13)
-- [ ] **Phase 12: Dark Mode Toggle** — Header theme toggle with localStorage persistence and OS fallback
+- [x] **Phase 12: Dark Mode Toggle** — Header theme toggle with localStorage persistence and OS fallback (completed 2026-03-13)
 - [ ] **Phase 13: Import Scope Filter** — Parser detects clusters/datacenters; modal lets user select scope before populating Step 1
 - [ ] **Phase 14: Persistent Scope Widget** — Step 1 scope badge shows active clusters; re-aggregates data on scope change
 - [ ] **Phase 15: Persistence** — localStorage auto-restore and shareable URL hash encoding full session state
@@ -46,49 +46,63 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 ## Phase Details
 
 ### Phase 11: Branding & Tech Debt
+
 **Goal**: Users see the Presizion brand identity in the app and the RAM formula display is accurate
 **Depends on**: Phase 10
 **Requirements**: BRAND-01, BRAND-02, TD-04
 **Success Criteria** (what must be TRUE):
+
   1. The Presizion logo appears in the app header (modern abstract, blue/slate palette)
   2. The browser tab shows a custom Presizion favicon instead of the Vite default
   3. When a RAM utilization % is entered in Step 2, the RAM formula display includes the utilization factor (e.g., "× 80%")
   4. RAM formula display behavior mirrors the existing CPU formula display (TD-01 parity)
 **Plans**: 2 plans
 Plans:
+
 - [ ] 11-01-PLAN.md — RAM formula display fix (TD-04): add ramUtilizationPercent to RamFormulaParams and ramFormulaString; wire from ScenarioResults
 - [ ] 11-02-PLAN.md — Presizion branding assets: create logo.svg and favicon.svg; integrate logo in WizardShell header
 
 ### Phase 12: Dark Mode Toggle
+
 **Goal**: Users can manually switch between light and dark mode; the choice persists across sessions
 **Depends on**: Phase 11
 **Requirements**: THEME-01, THEME-02, THEME-03
 **Success Criteria** (what must be TRUE):
+
   1. A Sun/Moon toggle button is visible in the app header on every step
   2. Clicking the toggle switches the entire app between light and dark mode immediately
   3. Refreshing or reopening the page restores the last manually-chosen theme
   4. On first visit (no stored preference), the app respects the user's OS dark/light mode setting
 **Plans**: 2 plans
 Plans:
+
 - [ ] 12-01-PLAN.md — useThemeStore (Zustand) with localStorage persistence + updated index.html anti-flash script
 - [ ] 12-02-PLAN.md — ThemeToggle Sun/Moon component + WizardShell header integration
 
 ### Phase 13: Import Scope Filter
+
 **Goal**: Users importing multi-cluster files can choose which cluster(s) to include before Step 1 is populated
 **Depends on**: Phase 12
 **Requirements**: SCOPE-01, SCOPE-02
 **Success Criteria** (what must be TRUE):
+
   1. Importing a file with multiple distinct clusters or datacenters surfaces those names after parsing
   2. The import preview modal shows a scope selector (checkboxes) defaulting to all clusters selected
   3. Confirming the import with a subset of clusters populates Step 1 with only the selected scope's aggregated data
   4. Importing a single-cluster file skips the scope selector (no unnecessary UI)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+
+- [ ] 13-01-PLAN.md — Parser scope detection: extend ClusterImportResult, add cluster/datacenter alias maps, update rvtoolsParser + liveopticParser, create scopeAggregator.ts utility (TDD)
+- [ ] 13-02-PLAN.md — ImportPreviewModal scope selector UI: checkboxes for multi-cluster imports, live re-aggregation preview, Apply with selected scope
 
 ### Phase 14: Persistent Scope Widget
+
 **Goal**: Users can see and change the active scope filter from Step 1 at any time without re-importing the file
 **Depends on**: Phase 13
 **Requirements**: SCOPE-03, SCOPE-04
 **Success Criteria** (what must be TRUE):
+
   1. After a multi-cluster import, a scope badge appears in the Step 1 header showing active cluster names
   2. The scope badge includes an edit affordance (icon/link) that opens the scope selector
   3. Changing the scope selection in Step 1 immediately re-aggregates and updates all Step 1 fields
@@ -96,10 +110,12 @@ Plans:
 **Plans**: TBD
 
 ### Phase 15: Persistence
+
 **Goal**: Users never lose their work — session state auto-saves and can be shared via URL
 **Depends on**: Phase 14
 **Requirements**: PERS-01, PERS-02, PERS-03
 **Success Criteria** (what must be TRUE):
+
   1. Refreshing or closing and reopening the app restores the last-entered cluster inputs and all scenarios automatically
   2. A Share button in Step 3 copies a URL containing the full session state encoded as a base64 hash
   3. Opening a shared URL restores the sender's exact cluster inputs and scenarios on load
@@ -121,7 +137,7 @@ Plans:
 | 9. v1.2 Charts | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
-| 12. Dark Mode Toggle | 1/2 | In Progress|  | - |
-| 13. Import Scope Filter | v1.3 | 0/? | Not started | - |
+| 12. Dark Mode Toggle | 2/2 | Complete   | 2026-03-13 | - |
+| 13. Import Scope Filter | v1.3 | 0/2 | Not started | - |
 | 14. Persistent Scope Widget | v1.3 | 0/? | Not started | - |
 | 15. Persistence | v1.3 | 0/? | Not started | - |

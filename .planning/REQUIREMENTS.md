@@ -39,7 +39,7 @@
 | BRAND-01 | Phase 11 | Complete |
 | BRAND-02 | Phase 11 | Complete |
 | TD-04 | Phase 11 | Complete |
-| THEME-01 | Phase 12 | Pending |
+| THEME-01 | Phase 12 | Complete |
 | THEME-02 | Phase 12 | Complete |
 | THEME-03 | Phase 12 | Complete |
 | SCOPE-01 | Phase 13 | Pending |

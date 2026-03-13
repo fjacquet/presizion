@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 12-dark-mode-toggle-01-PLAN.md
-last_updated: "2026-03-13T20:28:51.129Z"
+stopped_at: Completed 12-dark-mode-toggle-02-PLAN.md
+last_updated: "2026-03-13T20:35:11.082Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 3
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 4
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 11-branding-and-tech-debt P02 | 2 | 3 tasks | 3 files |
 | Phase 11-branding-and-tech-debt P01 | 5 | 2 tasks | 3 files |
 | Phase 12-dark-mode-toggle P01 | 3 | 2 tasks | 3 files |
+| Phase 12-dark-mode-toggle P02 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ Recent decisions affecting current work:
 - [Phase 12-dark-mode-toggle]: Tests stub localStorage globally before store import to capture module-load-time readStored() call
 - [Phase 12-dark-mode-toggle]: Anti-flash script uses var (not const/let) for pre-parse context compatibility
 - [Phase 12-dark-mode-toggle]: STORAGE_KEY 'presizion-theme' is single source of truth across useThemeStore and anti-flash script
+- [Phase 12-dark-mode-toggle]: ThemeToggle uses relative+absolute Tailwind pattern in WizardShell header to keep centered layout intact
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-13T20:28:51.127Z
-Stopped at: Completed 12-dark-mode-toggle-01-PLAN.md
+Last session: 2026-03-13T20:35:11.079Z
+Stopped at: Completed 12-dark-mode-toggle-02-PLAN.md
 Resume file: None
