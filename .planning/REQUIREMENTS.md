@@ -61,14 +61,14 @@
 - [x] **PERF-01**: User can select a global sizing mode: vCPU-based (default) or SPECint-based (mutually exclusive toggle)
 - [ ] **PERF-02**: In SPECint mode, Step 1 shows an additional field: SPECint benchmark score for the existing server model
 - [ ] **PERF-03**: In SPECint mode, each scenario shows an additional field: SPECint benchmark score for the target server model
-- [ ] **PERF-04**: In SPECint mode the CPU constraint uses `ceil(existingServers × oldSPECint × headroom / targetSPECint)`; RAM and disk formulas are unchanged
-- [ ] **PERF-05**: The limiting resource label shows "SPECint" when SPECint mode is active and that constraint drives the final server count
+- [x] **PERF-04**: In SPECint mode the CPU constraint uses `ceil(existingServers × oldSPECint × headroom / targetSPECint)`; RAM and disk formulas are unchanged
+- [x] **PERF-05**: The limiting resource label shows "SPECint" when SPECint mode is active and that constraint drives the final server count
 
 ### Utilization (Right-Sizing)
 
 - [x] **UTIL-01**: User can enter observed current CPU utilization % (0–100) for the existing cluster in Step 1
 - [x] **UTIL-02**: User can enter observed current RAM utilization % (0–100) for the existing cluster in Step 1
-- [ ] **UTIL-03**: When utilization % values are provided, the CPU and RAM sizing formulas multiply the effective demand by utilization% — sizing to actual consumption rather than installed capacity
+- [x] **UTIL-03**: When utilization % values are provided, the CPU and RAM sizing formulas multiply the effective demand by utilization% — sizing to actual consumption rather than installed capacity
 
 ### Enhanced Export
 
@@ -151,11 +151,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-01 | Phase 5 | Complete |
 | PERF-02 | Phase 6 | Pending |
 | PERF-03 | Phase 6 | Pending |
-| PERF-04 | Phase 5 | Pending |
-| PERF-05 | Phase 5 | Pending |
+| PERF-04 | Phase 5 | Complete |
+| PERF-05 | Phase 5 | Complete |
 | UTIL-01 | Phase 5 | Complete |
 | UTIL-02 | Phase 5 | Complete |
-| UTIL-03 | Phase 5 | Pending |
+| UTIL-03 | Phase 5 | Complete |
 | EXPO-03 | Phase 7 | Pending |
 | EXPO-04 | Phase 7 | Pending |
 
