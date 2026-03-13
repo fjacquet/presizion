@@ -68,7 +68,10 @@ Plans:
   2. Clicking the toggle switches the entire app between light and dark mode immediately
   3. Refreshing or reopening the page restores the last manually-chosen theme
   4. On first visit (no stored preference), the app respects the user's OS dark/light mode setting
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 12-01-PLAN.md — useThemeStore (Zustand) with localStorage persistence + updated index.html anti-flash script
+- [ ] 12-02-PLAN.md — ThemeToggle Sun/Moon component + WizardShell header integration
 
 ### Phase 13: Import Scope Filter
 **Goal**: Users importing multi-cluster files can choose which cluster(s) to include before Step 1 is populated
@@ -118,7 +121,7 @@ Plans:
 | 9. v1.2 Charts | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
-| 12. Dark Mode Toggle | v1.3 | 0/? | Not started | - |
+| 12. Dark Mode Toggle | v1.3 | 0/2 | Not started | - |
 | 13. Import Scope Filter | v1.3 | 0/? | Not started | - |
 | 14. Persistent Scope Widget | v1.3 | 0/? | Not started | - |
 | 15. Persistence | v1.3 | 0/? | Not started | - |
