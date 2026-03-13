@@ -1,6 +1,6 @@
 /**
- * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03
- * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03
+ * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4
+ * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
@@ -8,10 +8,12 @@ import { CurrentClusterForm } from '../CurrentClusterForm'
 import { DerivedMetricsPanel } from '../DerivedMetricsPanel'
 import { Step1CurrentCluster } from '../Step1CurrentCluster'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useWizardStore } from '@/store/useWizardStore'
 
 // Reset Zustand store before each test to prevent cross-test contamination
 beforeEach(() => {
   useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } })
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
 })
 
 describe('CurrentClusterForm', () => {
@@ -171,6 +173,103 @@ describe('CurrentClusterForm', () => {
       await waitFor(() => {
         expect(screen.queryByText(/vcpu reservations/i)).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('PERF-02: SPECint mode conditional fields', () => {
+    it('specintPerServer field is visible when sizingMode is specint', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-specintPerServer')).toBeInTheDocument()
+    })
+
+    it('existingServerCount field is visible when sizingMode is specint', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
+    })
+
+    it('specintPerServer field is NOT in DOM when sizingMode is vcpu', () => {
+      // sizingMode is 'vcpu' by default (set in beforeEach)
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.queryByTestId('input-specintPerServer')).not.toBeInTheDocument()
+    })
+
+    it('Next is blocked when sizingMode is specint and specintPerServer is empty', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      const onNext = vi.fn()
+      render(<CurrentClusterForm onNext={onNext} />)
+
+      // Fill in required base fields but leave specintPerServer empty
+      act(() => {
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+      })
+
+      const nextButton = screen.getByRole('button', { name: /next/i })
+      fireEvent.click(nextButton)
+
+      await waitFor(() => {
+        expect(onNext).not.toHaveBeenCalled()
+      })
+    })
+
+    it('Next proceeds when sizingMode is specint and specintPerServer has a valid value', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      const onNext = vi.fn()
+      render(<CurrentClusterForm onNext={onNext} />)
+
+      act(() => {
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+        fireEvent.change(screen.getByTestId('input-specintPerServer'), { target: { value: '1200' } })
+      })
+
+      const nextButton = screen.getByRole('button', { name: /next/i })
+      fireEvent.click(nextButton)
+
+      await waitFor(() => {
+        expect(onNext).toHaveBeenCalledOnce()
+      })
+    })
+  })
+
+  describe('SC-4: utilization percent fields', () => {
+    it('cpuUtilizationPercent field is always visible when sizingMode is vcpu', () => {
+      // sizingMode is 'vcpu' by default
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
+    })
+
+    it('ramUtilizationPercent field is always visible when sizingMode is vcpu', () => {
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
+    })
+
+    it('cpuUtilizationPercent field is visible when sizingMode is specint', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
+    })
+
+    it('ramUtilizationPercent field is visible when sizingMode is specint', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'specint' })
+      })
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
     })
   })
 })

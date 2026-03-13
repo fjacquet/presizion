@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/tooltip'
 import { currentClusterSchema, type CurrentClusterInput } from '@/schemas/currentClusterSchema'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import type { OldCluster } from '@/types/cluster'
 
 // Tooltip text constants (UX-03)
@@ -93,6 +94,7 @@ interface CurrentClusterFormProps {
 
 export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
+  const sizingMode = useWizardStore((s) => s.sizingMode)
 
   const form = useForm<CurrentClusterInput>({
     // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
@@ -108,6 +110,10 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       socketsPerServer: undefined,
       coresPerSocket: undefined,
       ramPerServerGb: undefined,
+      specintPerServer: undefined,
+      cpuUtilizationPercent: undefined,
+      ramUtilizationPercent: undefined,
+      existingServerCount: undefined,
     },
   })
 
@@ -119,9 +125,18 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     }
   }, [watched, form.formState.isValid, setCurrentCluster])
 
-  // Navigation guard: trigger validation on required fields before advancing
+  // Navigation guard: trigger validation on required fields before advancing.
+  // In SPECint mode, also require specintPerServer to have a value.
   async function handleNext() {
-    const isValid = await form.trigger(['totalVcpus', 'totalPcores', 'totalVms'])
+    const alwaysRequired: Array<keyof CurrentClusterInput> = ['totalVcpus', 'totalPcores', 'totalVms']
+    const modeRequired: Array<keyof CurrentClusterInput> =
+      sizingMode === 'specint' ? ['specintPerServer'] : []
+    const isValid = await form.trigger([...alwaysRequired, ...modeRequired])
+    // Extra check: in specint mode, specintPerServer must have a value (schema allows undefined)
+    if (isValid && sizingMode === 'specint') {
+      const specintVal = form.getValues('specintPerServer')
+      if (!specintVal) return // Block advance without calling onNext
+    }
     if (isValid) onNext()
   }
 
@@ -152,6 +167,28 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             <NumericFormField control={form.control} name="ramPerServerGb" label="RAM/Server GB" testId="input-ramPerServerGb" optional />
           </div>
         </section>
+
+        <section>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Current Utilization (optional)
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <NumericFormField control={form.control} name="cpuUtilizationPercent" label="CPU Utilization %" testId="input-cpuUtilizationPercent" optional />
+            <NumericFormField control={form.control} name="ramUtilizationPercent" label="RAM Utilization %" testId="input-ramUtilizationPercent" optional />
+          </div>
+        </section>
+
+        {sizingMode === 'specint' && (
+          <section>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              SPECint Mode (required)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />
+              <NumericFormField control={form.control} name="specintPerServer" label="SPECint/Server (existing)" testId="input-specintPerServer" optional />
+            </div>
+          </section>
+        )}
 
         <Button type="button" onClick={handleNext} className="w-full sm:w-auto">
           Next: Define Scenarios
