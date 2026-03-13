@@ -125,7 +125,13 @@ Plans:
   3. The limiting resource label returned by `computeScenarioResult` is "SPECint" when SPECint mode is active and the SPECint constraint drives the final server count
   4. Vitest suite passes with fixture pairs covering: SPECint mode CPU-limited, vCPU mode unchanged, utilization-scaled CPU, utilization-scaled RAM, and combined SPECint + utilization scenarios
   5. TypeScript strict-mode build completes with zero errors after all schema, type, and store changes
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 05-01-PLAN.md — Type contracts, Zod schemas, useWizardStore sizingMode, Wave 0 it.todo stubs (Wave 1)
+- [ ] 05-02-PLAN.md — Formula engine: serverCountBySpecint, utilization params, computeScenarioResult branch, display strings (Wave 2, TDD)
+- [ ] 05-03-PLAN.md — useScenariosResults hook integration, store/schema test stubs filled, build verification (Wave 2, parallel)
 
 ### Phase 6: Conditional UI Wiring
 
@@ -164,6 +170,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Input Forms | 3/4 | In progress | - |
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
-| 5. SPECint and Utilization Formula Engine | 0/TBD | Not started | - |
+| 5. SPECint and Utilization Formula Engine | 0/3 | Not started | - |
 | 6. Conditional UI Wiring | 0/TBD | Not started | - |
 | 7. Enhanced Export | 0/TBD | Not started | - |
