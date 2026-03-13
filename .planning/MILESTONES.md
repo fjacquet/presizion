@@ -5,6 +5,7 @@
 **Goal:** Ship a working, deployable sizing tool that correctly calculates server counts from cluster metrics and presents results in a clean 3-step wizard.
 
 **What shipped:**
+
 - Phase 1: Sizing library (CPU/RAM/disk formulas), Zustand stores, Zod schemas, formula display strings
 - Phase 2: 3-step wizard, Step 1 current cluster form, Step 2 scenario cards with live calculation
 - Phase 3: Side-by-side comparison table, CSV download, clipboard copy, beforeunload guard

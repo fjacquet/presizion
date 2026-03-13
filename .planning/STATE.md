@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v1.1
+milestone_name: SPECint, Utilization and Enhanced Export
 status: planning
-stopped_at: Completed 04-deployment-and-polish-03-PLAN.md
-last_updated: "2026-03-12T21:26:45.580Z"
-last_activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
+stopped_at: Roadmap created for v1.1 — phases 5, 6, 7 defined
+last_updated: "2026-03-13T00:00:00.000Z"
+last_activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 progress:
-  total_phases: 4
+  total_phases: 7
   completed_phases: 4
   total_plans: 15
   completed_plans: 15
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** Phase 3: Comparison, Export & UX Polish
+**Current focus:** Phase 5: SPECint and Utilization Formula Engine
 
 ## Current Position
 
-Phase: 3 of 4 (Comparison, Export & UX Polish)
+Phase: 5 of 7 (SPECint and Utilization Formula Engine)
 Plan: 0 of TBD in current phase
 Status: Ready to plan
-Last activity: 2026-03-12 — Phase 3 plan 02 complete; 155 tests green; ComparisonTable + export utils delivered
+Last activity: 2026-03-13 — v1.1 roadmap created; 10 requirements mapped to phases 5-7
 
 Progress: [█████░░░░░] 50%
 
@@ -36,7 +36,7 @@ Progress: [█████░░░░░] 50%
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 15
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -113,6 +113,9 @@ Recent decisions affecting current work:
 - [Phase 04-deployment-and-polish]: useRef for timeout ID (not useState) — avoids extra re-render for clipboard feedback state
 - [Phase 04-deployment-and-polish]: useEffect cleanup clears setTimeout on unmount — prevents setState-after-unmount warning in UX-06 copied state
 - [Phase 04-deployment-and-polish]: display.ts co-located in src/lib/sizing/ alongside formulas.ts; formula strings show 100+headroomPercent% format; useClusterStore added to ScenarioResults for formula params
+- [v1.1 Roadmap]: SPECint mode is a global store toggle — formula engine changes (Phase 5) must precede all UI wiring (Phase 6) to maintain math-before-UI discipline
+- [v1.1 Roadmap]: UTIL-01/02 are Step 1 inputs extending OldCluster schema; UTIL-03 scales CPU/RAM effective demand before ceiling — same pattern as headroom factor
+- [v1.1 Roadmap]: EXPO-03 (JSON) extends export.ts; EXPO-04 (print CSS) is pure @media print in index.css — both are self-contained and grouped in Phase 7
 
 ### Pending Todos
 
@@ -122,9 +125,10 @@ None yet.
 
 - [Phase 1]: Reference spreadsheet fixture values needed — at least 3 known input/output pairs required for unit test fixtures; must be provided or verified by project owner before Phase 1 can be completed
 - [Phase 1]: Confirm exact vCPU:pCore default with project owner if target users have a specific workload profile (VDI-heavy, DB-heavy)
+- [Phase 5]: SPECint formula requires existingServers as an input — confirm OldCluster schema already stores this (INPUT-03 captures optional server count); plan must handle the case where existingServers is undefined
 
 ## Session Continuity
 
-Last session: 2026-03-12T21:26:45.577Z
-Stopped at: Completed 04-deployment-and-polish-03-PLAN.md
+Last session: 2026-03-13T00:00:00.000Z
+Stopped at: v1.1 roadmap created — phases 5, 6, 7 defined; ready to plan Phase 5
 Resume file: None

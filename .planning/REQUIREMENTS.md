@@ -144,21 +144,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Mapped to phases: 27
 - Unmapped: 0 ✓
 
-**v1.1 Coverage:** (traceability updated after roadmap creation)
+**v1.1 Coverage:**
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PERF-01 | TBD | Pending |
-| PERF-02 | TBD | Pending |
-| PERF-03 | TBD | Pending |
-| PERF-04 | TBD | Pending |
-| PERF-05 | TBD | Pending |
-| UTIL-01 | TBD | Pending |
-| UTIL-02 | TBD | Pending |
-| UTIL-03 | TBD | Pending |
-| EXPO-03 | TBD | Pending |
-| EXPO-04 | TBD | Pending |
+| PERF-01 | Phase 5 | Pending |
+| PERF-02 | Phase 6 | Pending |
+| PERF-03 | Phase 6 | Pending |
+| PERF-04 | Phase 5 | Pending |
+| PERF-05 | Phase 5 | Pending |
+| UTIL-01 | Phase 5 | Pending |
+| UTIL-02 | Phase 5 | Pending |
+| UTIL-03 | Phase 5 | Pending |
+| EXPO-03 | Phase 7 | Pending |
+| EXPO-04 | Phase 7 | Pending |
+
+- v1.1 requirements: 10 total
+- Mapped to phases: 10
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-13 after v1.1 milestone start — 10 new requirements added*
+*Last updated: 2026-03-13 after v1.1 roadmap creation — 10 requirements assigned to phases 5-7*

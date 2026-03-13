@@ -4,6 +4,8 @@
 
 This tool is built bottom-up: math first, state second, UI third. Phase 1 establishes the correctness foundation — pure TypeScript sizing formulas with unit tests against reference spreadsheet fixtures, alongside Zustand state slices and Zod schemas. Phase 2 constructs the two data-entry steps with live calculation feedback and full form validation. Phase 3 completes the MVP with the comparison table, all export formats, and the wizard shell tying all steps together. Phase 4 deploys the finished application to GitHub Pages and adds the UI polish that was deliberately deferred.
 
+v1.1 continues with the same bottom-up discipline: Phase 5 extends the formula engine and schemas for SPECint mode and utilization right-sizing before any UI is touched. Phase 6 wires the new conditional fields into the existing Step 1 and scenario forms. Phase 7 adds the two enhanced export formats (JSON download and print CSS).
+
 ## Phases
 
 **Phase Numbering:**
@@ -13,10 +15,18 @@ This tool is built bottom-up: math first, state second, UI third. Phase 1 establ
 
 Decimal phases appear between their surrounding integers in numeric order.
 
+### v1.0
+
 - [x] **Phase 1: Foundation** - Sizing library, data types, Zod schemas, and Zustand state slices — correctness engine before any UI (completed 2026-03-12)
 - [ ] **Phase 2: Input Forms** - Steps 1 and 2 with live calculation feedback, per-field validation, and formula display
 - [x] **Phase 3: Comparison, Export, and Wizard Shell** - Step 3 comparison table, all export formats, and full wizard navigation (completed 2026-03-12)
 - [x] **Phase 4: Deployment and Polish** - GitHub Pages deployment, formula tooltips, utilization indicators, and clipboard feedback (completed 2026-03-12)
+
+### v1.1
+
+- [ ] **Phase 5: SPECint and Utilization Formula Engine** - Schema extensions, formula rewrites, and unit test coverage for SPECint mode and utilization right-sizing — no UI changes
+- [ ] **Phase 6: Conditional UI Wiring** - Step 1 and ScenarioCard conditional fields for SPECint and utilization inputs, with updated results and comparison displays
+- [ ] **Phase 7: Enhanced Export** - JSON download of all inputs and outputs, plus print-optimized CSS for PDF via browser print
 
 ## Phase Details
 
@@ -103,10 +113,50 @@ Plans:
 - [ ] 04-03-PLAN.md — Formula display: create display.ts + wire into ScenarioResults (DEPLOY-01 / CALC-07)
 - [ ] 04-04-PLAN.md — Clipboard feedback: "Copied!" state in Step3ReviewExport (UX-06)
 
+### Phase 5: SPECint and Utilization Formula Engine
+
+**Goal**: The sizing formulas, type contracts, Zod schemas, and Zustand store correctly handle SPECint mode and utilization right-sizing — with full test coverage — before any UI change is made
+**Depends on**: Phase 4
+**Requirements**: PERF-01, PERF-04, PERF-05, UTIL-01, UTIL-02, UTIL-03
+**Success Criteria** (what must be TRUE):
+
+  1. User can set a global sizing mode (vCPU or SPECint) via the Zustand wizard store, and `computeScenarioResult` returns the correct server count using `ceil(existingServers × oldSPECint × headroom / targetSPECint)` for the CPU constraint when SPECint mode is active
+  2. When observed CPU utilization % is provided, the effective CPU demand scales by that percentage (e.g., 60% utilization on a 1000 vCPU cluster sizes to 600 effective vCPUs); when RAM utilization % is provided, the RAM demand scales equivalently
+  3. The limiting resource label returned by `computeScenarioResult` is "SPECint" when SPECint mode is active and the SPECint constraint drives the final server count
+  4. Vitest suite passes with fixture pairs covering: SPECint mode CPU-limited, vCPU mode unchanged, utilization-scaled CPU, utilization-scaled RAM, and combined SPECint + utilization scenarios
+  5. TypeScript strict-mode build completes with zero errors after all schema, type, and store changes
+**Plans**: TBD
+
+### Phase 6: Conditional UI Wiring
+
+**Goal**: Users can see and interact with the SPECint and utilization fields in the existing wizard steps, with results and the comparison table reflecting the active mode
+**Depends on**: Phase 5
+**Requirements**: PERF-02, PERF-03
+**Success Criteria** (what must be TRUE):
+
+  1. A mode toggle (vCPU / SPECint) is visible and accessible in the wizard; selecting SPECint reveals the SPECint score field in Step 1 and the target SPECint field on each scenario card, while switching back to vCPU mode hides those fields
+  2. The SPECint score fields in Step 1 and each scenario card validate as positive numbers; the user cannot advance past the relevant step while a required SPECint field is empty or invalid when SPECint mode is active
+  3. ScenarioResults and the comparison table display the "SPECint" limiting resource label — with the correct server count — when SPECint mode is active and that constraint is the bottleneck
+  4. CPU and RAM utilization % fields appear in Step 1; when values are entered, scenario server counts and formula display strings update live to reflect right-sized demand
+**Plans**: TBD
+
+### Phase 7: Enhanced Export
+
+**Goal**: Users can download a complete JSON record of the session and produce a clean print layout for PDF hardcopy
+**Depends on**: Phase 6
+**Requirements**: EXPO-03, EXPO-04
+**Success Criteria** (what must be TRUE):
+
+  1. Clicking "Download JSON" in Step 3 triggers a file download containing all current cluster inputs, all scenario configurations, and all computed outputs in valid, pretty-printed JSON
+  2. The downloaded JSON file is self-contained and human-readable: field names match the application's internal naming and all numeric values are present without truncation
+  3. Invoking browser print (Ctrl+P / Cmd+P) from Step 3 renders a clean single-column layout: no buttons, no wizard chrome, no truncated table columns, and utilization color coding preserved in print
+  4. The print layout fits standard A4/Letter paper width without horizontal scrolling or clipped content
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -114,3 +164,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 2. Input Forms | 3/4 | In progress | - |
 | 3. Comparison, Export, and Wizard Shell | 2/3 | Complete    | 2026-03-12 |
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
+| 5. SPECint and Utilization Formula Engine | 0/TBD | Not started | - |
+| 6. Conditional UI Wiring | 0/TBD | Not started | - |
+| 7. Enhanced Export | 0/TBD | Not started | - |
