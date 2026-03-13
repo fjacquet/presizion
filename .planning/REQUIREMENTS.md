@@ -54,6 +54,27 @@
 - [x] **DEPLOY-01**: App builds as pure static assets (Vite) with correct `base` path configuration for GitHub Pages deployment
 - [x] **UX-06**: App respects the user's OS dark-mode preference (`prefers-color-scheme`); all text, backgrounds, borders, and utilization color indicators render correctly in both light and dark mode
 
+## v1.1 Requirements
+
+### Performance (SPECint Sizing Mode)
+
+- [ ] **PERF-01**: User can select a global sizing mode: vCPU-based (default) or SPECint-based (mutually exclusive toggle)
+- [ ] **PERF-02**: In SPECint mode, Step 1 shows an additional field: SPECint benchmark score for the existing server model
+- [ ] **PERF-03**: In SPECint mode, each scenario shows an additional field: SPECint benchmark score for the target server model
+- [ ] **PERF-04**: In SPECint mode the CPU constraint uses `ceil(existingServers × oldSPECint × headroom / targetSPECint)`; RAM and disk formulas are unchanged
+- [ ] **PERF-05**: The limiting resource label shows "SPECint" when SPECint mode is active and that constraint drives the final server count
+
+### Utilization (Right-Sizing)
+
+- [ ] **UTIL-01**: User can enter observed current CPU utilization % (0–100) for the existing cluster in Step 1
+- [ ] **UTIL-02**: User can enter observed current RAM utilization % (0–100) for the existing cluster in Step 1
+- [ ] **UTIL-03**: When utilization % values are provided, the CPU and RAM sizing formulas multiply the effective demand by utilization% — sizing to actual consumption rather than installed capacity
+
+### Enhanced Export
+
+- [ ] **EXPO-03**: User can download a JSON file containing all inputs and outputs for all scenarios
+- [ ] **EXPO-04**: App provides a print-optimized stylesheet; browser print / Save as PDF produces a clean layout of the Step 3 results
+
 ## v2 Requirements
 
 ### Persistence
@@ -61,14 +82,14 @@
 - **PERS-01**: App saves last-used inputs to localStorage and restores them on next visit
 - **PERS-02**: User can share a URL that encodes current session state (hash-based)
 
-### Enhanced Export
-
-- **EXPO-03**: User can download a JSON file containing all inputs and outputs (for future re-import)
-- **EXPO-04**: App provides a print-optimized layout for producing a PDF hardcopy
-
 ### UI Enhancements
 
 - **UI-01**: App supports an explicit light/dark mode toggle (manual override beyond OS preference)
+
+### File Import (v1.2)
+
+- **IMPORT-01**: User can upload a LiveOptics zip file; app parses it and auto-fills Step 1 cluster inputs
+- **IMPORT-02**: User can upload an RVTools xlsx file; app parses it and auto-fills Step 1 cluster inputs
 
 ## Out of Scope
 
@@ -117,12 +138,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPLOY-01 | Phase 4 | Complete |
 | UX-06 | Phase 4 | Complete |
 
-**Coverage:**
+**v1.0 Coverage:**
 
 - v1 requirements: 27 total
 - Mapped to phases: 27
-- Unmapped: 0
+- Unmapped: 0 ✓
+
+**v1.1 Coverage:** (traceability updated after roadmap creation)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| PERF-01 | TBD | Pending |
+| PERF-02 | TBD | Pending |
+| PERF-03 | TBD | Pending |
+| PERF-04 | TBD | Pending |
+| PERF-05 | TBD | Pending |
+| UTIL-01 | TBD | Pending |
+| UTIL-02 | TBD | Pending |
+| UTIL-03 | TBD | Pending |
+| EXPO-03 | TBD | Pending |
+| EXPO-04 | TBD | Pending |
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after roadmap creation — all 27 requirements mapped*
+*Last updated: 2026-03-13 after v1.1 milestone start — 10 new requirements added*

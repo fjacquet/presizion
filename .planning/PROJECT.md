@@ -10,25 +10,36 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 
 ## Requirements
 
+## Current Milestone: v1.1 — SPECint, Utilization & Enhanced Export
+
+**Goal:** Add performance-based sizing via SPECint delta, right-sizing from observed cluster utilization, and enhanced export (JSON download + print/PDF layout).
+
+**Target features:**
+
+- SPECint-based sizing mode (alternative to vCPU mode, mutually exclusive)
+- Observed CPU % and RAM % utilization inputs for right-sizing to actual consumption
+- JSON export of all inputs and outputs
+- Print-optimized layout for PDF hardcopy via browser print
+
+---
+
 ### Validated
 
-(None yet — ship to validate)
+- ✓ User can enter current cluster metrics and define scenarios — v1.0 / Phase 2
+- ✓ App calculates server counts (CPU/RAM/disk constraints) with live updates — v1.0 / Phase 1–2
+- ✓ Side-by-side comparison table with utilization color-coding — v1.0 / Phase 3
+- ✓ Clipboard copy and CSV download — v1.0 / Phase 3
+- ✓ 3-step wizard with validation guards and beforeunload warning — v1.0 / Phase 2–3
+- ✓ GitHub Pages deployment with dark mode support — v1.0 / Phase 4
+- ✓ Inline formula display for all key outputs — v1.0 / Phase 4
 
 ### Active
 
-- [ ] User can enter current cluster metrics (VM averages, totals, existing server config) via manual form
-- [ ] App auto-calculates derived metrics (vCPU:pCore ratio, VMs/server by CPU and RAM)
-- [ ] User can define at least 2 target scenarios with custom server configs and sizing assumptions
-- [ ] App calculates required server count per constraint (CPU, RAM, disk) for each scenario
-- [ ] App identifies the limiting resource and final server count (max of constraints)
-- [ ] App computes per-server utilization and VM density for each scenario
-- [ ] App displays side-by-side scenario comparison with key metrics
-- [ ] All sizing assumptions ship with sensible industry defaults (e.g., 4:1 vCPU:pCore, 20% headroom)
-- [ ] User can copy a plain-text summary suitable for email or slides
-- [ ] User can download a JSON/CSV file of all inputs and outputs
-- [ ] All form fields have inline validation (non-negative, range checks) with clear error messages
-- [ ] Each key output shows the formula and parameters used to derive it
-- [ ] User can duplicate a scenario to quickly create a variant
+- [ ] User can switch between vCPU-based and SPECint-based sizing mode (mutually exclusive, global)
+- [ ] In SPECint mode, user enters SPECint score for existing and target servers; CPU constraint uses delta formula
+- [ ] User can enter observed current CPU % and RAM % utilization; formulas scale to actual consumption
+- [ ] User can download a JSON file of all inputs and outputs
+- [ ] App provides a print-optimized layout for PDF hardcopy via browser print
 
 ### Out of Scope
 
