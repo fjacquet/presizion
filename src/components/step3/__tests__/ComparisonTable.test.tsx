@@ -108,6 +108,11 @@ describe('ComparisonTable', () => {
     })
   })
 
+  describe('PERF-03: SPECint mode label correctness', () => {
+    it.todo('shows SPECint (not Specint) in limiting resource column when specint mode active')
+    it.todo('shows CPU-limited label when cpu is limiting resource')
+  })
+
   describe('UX-04: color-coded utilization indicators', () => {
     it('applies green class when utilization < 70%', () => {
       expect(utilizationClass(69)).toMatch(/text-green/)
