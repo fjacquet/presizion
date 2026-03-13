@@ -138,13 +138,17 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     }
   }, [currentCluster, form])
 
-  // Sync valid form values to Zustand store for live DerivedMetricsPanel updates
-  const watched = form.watch()
+  // Sync valid form values to Zustand store for live DerivedMetricsPanel updates.
+  // Uses watch(callback) subscription to fire only on actual value changes,
+  // not on every render (avoids infinite setState loop with new object refs).
   useEffect(() => {
-    if (form.formState.isValid) {
-      setCurrentCluster(form.getValues() as OldCluster)
-    }
-  }, [watched, form.formState.isValid, setCurrentCluster])
+    const { unsubscribe } = form.watch(() => {
+      if (form.formState.isValid) {
+        setCurrentCluster(form.getValues() as OldCluster)
+      }
+    })
+    return unsubscribe
+  }, [form, setCurrentCluster])
 
   // Auto-derive totalPcores from existingServerCount × socketsPerServer × coresPerSocket
   // Only fires when totalPcores is 0/falsy (does not override manually entered values)
