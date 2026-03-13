@@ -124,4 +124,17 @@ describe('computeScenarioResult', () => {
   });
 });
 
+describe('computeScenarioResult — SPECint mode (PERF-04, PERF-05)', () => {
+  it.todo('sizingMode=specint: cpuLimitedCount=ceil(10×1200×1.20/2400)=6, limitingResource=specint');
+  it.todo('sizingMode=vcpu explicit: same result as default (regression)');
+  it.todo('limitingResource=specint only when specint count exceeds ram and disk');
+  it.todo('combined: specint mode ignores cpuUtilizationPercent (utilization is vcpu-mode only)');
+});
+
+describe('computeScenarioResult — utilization scaling (UTIL-03)', () => {
+  it.todo('cpuUtilizationPercent=60: cpuLimitedCount = ceil(1000×0.60×1.20/4/40)=5');
+  it.todo('ramUtilizationPercent=80: ramLimitedCount = ceil(500×16×0.80×1.20/512)=15');
+  it.todo('utilization=100 on both: same result as no utilization fields (regression)');
+});
+
 export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };

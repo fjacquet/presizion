@@ -90,3 +90,12 @@ describe('display: formula string generators', () => {
     })
   })
 })
+
+describe('specintFormulaString (PERF-04 display)', () => {
+  it.todo('formats: ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)');
+});
+
+describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
+  it.todo('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)');
+  it.todo('omits utilization factor when cpuUtilizationPercent is absent');
+});

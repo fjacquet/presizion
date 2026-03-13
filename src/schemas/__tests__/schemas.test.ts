@@ -115,3 +115,25 @@ describe('scenarioSchema', () => {
     expect(result.socketsPerServer).toBe(2);
   });
 });
+
+describe('currentClusterSchema — utilization fields (UTIL-01, UTIL-02)', () => {
+  it.todo('accepts cpuUtilizationPercent: 70');
+  it.todo('rejects cpuUtilizationPercent: -5 (below 0)');
+  it.todo('rejects cpuUtilizationPercent: 110 (above 100)');
+  it.todo('accepts cpuUtilizationPercent absent (field is optional)');
+  it.todo('accepts ramUtilizationPercent: 80');
+  it.todo('rejects ramUtilizationPercent: 110 (above 100)');
+});
+
+describe('currentClusterSchema — SPECint fields (PERF-01)', () => {
+  it.todo('accepts existingServerCount: 10');
+  it.todo('accepts specintPerServer: 1200');
+  it.todo('rejects specintPerServer: -100 (must be positive)');
+  it.todo('accepts all SPECint fields absent (all optional)');
+});
+
+describe('scenarioSchema — targetSpecint (PERF-03)', () => {
+  it.todo('accepts targetSpecint: 2400');
+  it.todo('rejects targetSpecint: 0 (must be positive)');
+  it.todo('accepts targetSpecint absent (optional field)');
+});

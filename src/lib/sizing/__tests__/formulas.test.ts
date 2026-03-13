@@ -57,4 +57,20 @@ describe('serverCountByDisk', () => {
   });
 });
 
+describe('serverCountBySpecint (PERF-04)', () => {
+  it.todo('ceil(10 × 1200 × 1.20 / 2400) = 6 — standard specint fixture');
+  it.todo('returns 0 when targetSPECint is 0 — zero-guard');
+  it.todo('returns 0 when existingServers is 0');
+});
+
+describe('serverCountByCpu with cpuUtilPct (UTIL-03)', () => {
+  it.todo('ceil(1000 × (60/100) × 1.20 / 4 / 40) = 5 — utilization scaling');
+  it.todo('cpuUtilPct=100 produces same result as current signature — regression');
+});
+
+describe('serverCountByRam with ramUtilPct (UTIL-03)', () => {
+  it.todo('ceil(500 × 16 × (80/100) × 1.20 / 512) = 15 — utilization scaling');
+  it.todo('ramUtilPct=100 produces same result as current signature — regression');
+});
+
 export { F1, F2, F3, BOUNDARY };
