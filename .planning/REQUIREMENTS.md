@@ -93,8 +93,20 @@
 
 ### File Import (v1.2)
 
-- **IMPORT-01**: User can upload a LiveOptics zip file; app parses it and auto-fills Step 1 cluster inputs
-- **IMPORT-02**: User can upload an RVTools xlsx file; app parses it and auto-fills Step 1 cluster inputs
+- [x] **IMPORT-01**: User can upload a LiveOptics zip file; app parses it and auto-fills Step 1 cluster inputs
+- [x] **IMPORT-02**: User can upload an RVTools xlsx file; app parses it and auto-fills Step 1 cluster inputs
+
+### Charts (v1.2)
+
+- [x] **CHART-01**: Step 3 displays a bar chart comparing server counts (CPU/RAM/disk-limited) across all defined scenarios
+- [x] **CHART-02**: Chart shows per-constraint breakdown (CPU/RAM/disk or SPECint-limited) per scenario; SPECint label shown when sizingMode is specint
+- [x] **CHART-03**: User can download the chart as a PNG file for use in external reports
+
+### Tech Debt Fixes (v1.2)
+
+- [x] **TD-01**: Step 2 CPU formula display string shows utilization factor (× N%) when CPU utilization % is entered
+- [x] **TD-02**: In SPECint mode, Step 2 results panel shows only the SPECint-limited row (no duplicate CPU-limited row)
+- [x] **TD-03**: Dead code `src/lib/display/formulaStrings.ts` removed from codebase; canonical display module is `src/lib/sizing/display.ts`
 
 ## Out of Scope
 
@@ -170,6 +182,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Mapped to phases: 12
 - Unmapped: 0 ✓
 
+**v1.2 Coverage:**
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| IMPORT-01 | Phase 10 | Complete |
+| IMPORT-02 | Phase 10 | Complete |
+| CHART-01 | Phase 9 | Complete |
+| CHART-02 | Phase 9 | Complete |
+| CHART-03 | Phase 9 | Complete |
+| TD-01 | Phase 8 | Complete |
+| TD-02 | Phase 8 | Complete |
+| TD-03 | Phase 8 | Complete |
+
+- v1.2 requirements: 8 total
+- Mapped to phases: 8
+- Unmapped: 0 ✓
+
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-13 after v1.1 roadmap creation — 10 requirements assigned to phases 5-7*
+*Last updated: 2026-03-13 after v1.2 sprint — 8 requirements assigned to phases 8-10*

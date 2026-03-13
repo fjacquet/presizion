@@ -172,10 +172,30 @@ Plans:
 - [ ] 07-02-PLAN.md — REPT-02: unconditional existingServerCount + totalPcores auto-derive; REPT-01: As-Is column in ComparisonTable (Wave 2, parallel)
 - [ ] 07-03-PLAN.md — EXPO-03: buildJsonContent + downloadJson + Download JSON button; EXPO-04: @media print CSS + print:hidden wizard chrome (Wave 2, parallel)
 
+### Phase 8: v1.2 Planning Backfill
+
+**Goal**: Close all documentation tech debt identified in the v1.2 milestone audit — retroactively add ROADMAP/REQUIREMENTS/STATE artifacts for the v1.2 implementation sprint, create phase directories with VERIFICATION stubs, and remove the orphaned `parseNumericInput.ts` dead code module
+**Depends on**: Phase 7
+**Requirements**: IMPORT-01, IMPORT-02 (traceability update); CHART-01, CHART-02, CHART-03, TD-01, TD-02, TD-03 (new traceability entries)
+**Gap Closure**: Closes all 5 tech debt gaps from v1.2-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE):
+
+  1. ROADMAP.md lists Phase 8 (tech debt), Phase 9 (charts), Phase 10 (file import) as completed v1.2 entries with requirements and success criteria
+  2. REQUIREMENTS.md traceability table includes IMPORT-01, IMPORT-02 with Phase 10 assignment and `[x]` checked; v1.2 chart/tech-debt features have assigned phase entries
+  3. STATE.md reflects `status: complete` and `percent: 100` for v1.2 milestone
+  4. `.planning/phases/08-v12-tech-debt/`, `09-v12-charts/`, `10-v12-file-import/` directories exist with VERIFICATION.md stubs documenting what was implemented
+  5. `src/lib/sizing/parseNumericInput.ts` and its test file are deleted; no production or test code imports them
+  6. `rtk vitest run` passes with 0 failures after parseNumericInput deletion
+**Plans**: 1 plan
+
+Plans:
+
+- [ ] 08-01-PLAN.md — Backfill planning artifacts for v1.2 sprint + delete parseNumericInput dead code
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -186,3 +206,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
 | 6. Conditional UI Wiring | 2/2 | Complete    | 2026-03-13 |
 | 7. Enhanced Export | 3/3 | Complete    | 2026-03-13 |
+| 8. v1.2 Planning Backfill | 0/1 | Pending     | - |
