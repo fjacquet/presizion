@@ -31,7 +31,7 @@ export function aggregateScopes(
   const allWarnings: string[] = []
 
   // ESX fields — copy from first scope that has them
-  let esxFields: Partial<Pick<ClusterImportResult, 'totalPcores' | 'existingServerCount' | 'socketsPerServer' | 'coresPerSocket' | 'ramPerServerGb' | 'cpuUtilizationPercent' | 'ramUtilizationPercent'>> = {}
+  const esxFields: Partial<Pick<ClusterImportResult, 'totalPcores' | 'existingServerCount' | 'socketsPerServer' | 'coresPerSocket' | 'ramPerServerGb' | 'cpuUtilizationPercent' | 'ramUtilizationPercent'>> = {}
 
   for (const scope of selected) {
     totalVcpus += scope.totalVcpus

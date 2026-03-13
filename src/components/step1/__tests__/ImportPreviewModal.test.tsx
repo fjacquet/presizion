@@ -6,28 +6,36 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ImportPreviewModal } from '../ImportPreviewModal'
 import type { ClusterImportResult } from '@/lib/utils/import'
+import * as scopeAggregatorModule from '@/lib/utils/import/scopeAggregator'
+import * as clusterStoreModule from '@/store/useClusterStore'
 
 // Mock stores
+const mockSetCurrentCluster = vi.fn()
+const mockSeedFromCluster = vi.fn()
+const mockSetScenarios = vi.fn()
+
 vi.mock('@/store/useClusterStore', () => ({
-  useClusterStore: vi.fn((selector) => selector({ setCurrentCluster: vi.fn() })),
+  useClusterStore: vi.fn((selector) => selector({ setCurrentCluster: mockSetCurrentCluster })),
 }))
 
 vi.mock('@/store/useScenariosStore', () => ({
   useScenariosStore: vi.fn((selector) =>
-    selector({ setScenarios: vi.fn(), seedFromCluster: vi.fn() })
+    selector({ setScenarios: mockSetScenarios, seedFromCluster: mockSeedFromCluster })
   ),
 }))
 
 // Mock aggregateScopes
+const AGGREGATED_RESULT = {
+  totalVcpus: 40,
+  totalVms: 20,
+  totalDiskGb: 400,
+  avgRamPerVmGb: 10,
+  vmCount: 20,
+  warnings: [],
+}
+
 vi.mock('@/lib/utils/import/scopeAggregator', () => ({
-  aggregateScopes: vi.fn(() => ({
-    totalVcpus: 50,
-    totalVms: 25,
-    totalDiskGb: 500,
-    avgRamPerVmGb: 8,
-    vmCount: 25,
-    warnings: [],
-  })),
+  aggregateScopes: vi.fn(() => AGGREGATED_RESULT),
 }))
 
 // Build fixtures
@@ -98,6 +106,11 @@ const defaultProps = {
 describe('ImportPreviewModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Re-bind mocks after clearAllMocks
+    vi.mocked(clusterStoreModule.useClusterStore).mockImplementation((selector) =>
+      selector({ setCurrentCluster: mockSetCurrentCluster })
+    )
+    vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue(AGGREGATED_RESULT)
   })
 
   describe('Test 1: multi-scope renders checkboxes', () => {
@@ -144,9 +157,6 @@ describe('ImportPreviewModal', () => {
 
   describe('Test 4: unchecking scope calls aggregateScopes', () => {
     it('calls aggregateScopes with reduced selectedKeys when a scope is unchecked', () => {
-      const { aggregateScopes } = vi.mocked(
-        await import('@/lib/utils/import/scopeAggregator')
-      )
       render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
 
       // Uncheck the first checkbox (CL-A)
@@ -154,7 +164,7 @@ describe('ImportPreviewModal', () => {
       fireEvent.click(checkboxes[0])
 
       // Should call aggregateScopes with only the remaining scope
-      expect(aggregateScopes).toHaveBeenCalledWith(
+      expect(scopeAggregatorModule.aggregateScopes).toHaveBeenCalledWith(
         rawByScope,
         expect.arrayContaining(['DC1||CL-B'])
       )
@@ -162,16 +172,7 @@ describe('ImportPreviewModal', () => {
   })
 
   describe('Test 5: Apply with subset passes re-aggregated data to setCurrentCluster', () => {
-    it('clicking Apply passes aggregateScopes result to setCurrentCluster', async () => {
-      const { aggregateScopes } = vi.mocked(
-        await import('@/lib/utils/import/scopeAggregator')
-      )
-      const { useClusterStore } = await import('@/store/useClusterStore')
-      const mockSetCurrentCluster = vi.fn()
-      vi.mocked(useClusterStore).mockImplementation((selector) =>
-        selector({ setCurrentCluster: mockSetCurrentCluster })
-      )
-
+    it('clicking Apply passes aggregateScopes result to setCurrentCluster', () => {
       render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
 
       // Uncheck first scope
@@ -182,21 +183,14 @@ describe('ImportPreviewModal', () => {
       const applyBtn = screen.getByRole('button', { name: /apply/i })
       fireEvent.click(applyBtn)
 
-      const aggregated = aggregateScopes(rawByScope, ['DC1||CL-B'])
       expect(mockSetCurrentCluster).toHaveBeenCalledWith(
-        expect.objectContaining({ totalVcpus: aggregated.totalVcpus })
+        expect.objectContaining({ totalVcpus: AGGREGATED_RESULT.totalVcpus })
       )
     })
   })
 
   describe('Test 6: single-cluster import Apply flow unchanged', () => {
-    it('Apply without detectedScopes uses result directly', async () => {
-      const { useClusterStore } = await import('@/store/useClusterStore')
-      const mockSetCurrentCluster = vi.fn()
-      vi.mocked(useClusterStore).mockImplementation((selector) =>
-        selector({ setCurrentCluster: mockSetCurrentCluster })
-      )
-
+    it('Apply without detectedScopes uses result directly', () => {
       render(<ImportPreviewModal result={NO_SCOPE_RESULT} {...defaultProps} />)
       const applyBtn = screen.getByRole('button', { name: /apply/i })
       fireEvent.click(applyBtn)

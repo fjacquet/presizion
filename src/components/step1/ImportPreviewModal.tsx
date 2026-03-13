@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
-import type { AnyImportResult } from '@/lib/utils/import'
+import { aggregateScopes } from '@/lib/utils/import/scopeAggregator'
+import type { AnyImportResult, ScopeData } from '@/lib/utils/import'
 
 interface ImportPreviewModalProps {
   result: AnyImportResult
@@ -17,6 +20,35 @@ const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
   'presizion-json': 'Presizion JSON export',
 }
 
+interface ScopeSelectorProps {
+  detectedScopes: string[]
+  scopeLabels: Record<string, string>
+  selectedScopes: string[]
+  onToggle: (key: string, checked: boolean) => void
+}
+
+function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle }: ScopeSelectorProps) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium">Filter by cluster</p>
+      <div className="space-y-1">
+        {detectedScopes.map((key) => (
+          <div key={key} className="flex items-center gap-2">
+            <Checkbox
+              id={`scope-${key}`}
+              checked={selectedScopes.includes(key)}
+              onCheckedChange={(checked) => onToggle(key, checked)}
+            />
+            <label htmlFor={`scope-${key}`} className="text-sm cursor-pointer">
+              {scopeLabels[key] ?? key}
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
   const setScenarios = useScenariosStore((s) => s.setScenarios)
@@ -24,17 +56,42 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
   const isJson = result.sourceFormat === 'presizion-json'
 
+  const isMultiScope =
+    !isJson &&
+    result.detectedScopes != null &&
+    result.detectedScopes.length > 1
+
+  const scopesFromResult = 'detectedScopes' in result ? (result.detectedScopes ?? []) : []
+
+  // Track previous result to reset selection state when a new import arrives
+  const [prevResult, setPrevResult] = useState<AnyImportResult>(result)
+  const [selectedScopes, setSelectedScopes] = useState<string[]>(scopesFromResult)
+
+  if (prevResult !== result) {
+    setPrevResult(result)
+    setSelectedScopes(scopesFromResult)
+  }
+
+  const previewCluster: ScopeData =
+    isMultiScope && 'rawByScope' in result && result.rawByScope != null
+      ? aggregateScopes(result.rawByScope, selectedScopes)
+      : (result as ScopeData)
+
+  const handleToggle = (key: string, checked: boolean) => {
+    setSelectedScopes((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)))
+  }
+
   const handleApply = () => {
     if (isJson) {
       setCurrentCluster({ ...result.cluster })
       setScenarios(result.scenarios)
     } else {
       const cluster = {
-        totalVcpus: result.totalVcpus,
+        totalVcpus: previewCluster.totalVcpus,
         totalPcores: result.totalPcores ?? 0,
-        totalVms: result.totalVms,
-        totalDiskGb: result.totalDiskGb,
-        avgRamPerVmGb: result.avgRamPerVmGb,
+        totalVms: previewCluster.totalVms,
+        totalDiskGb: previewCluster.totalDiskGb,
+        avgRamPerVmGb: previewCluster.avgRamPerVmGb,
         ...(result.existingServerCount != null && { existingServerCount: result.existingServerCount }),
         ...(result.socketsPerServer != null && { socketsPerServer: result.socketsPerServer }),
         ...(result.coresPerSocket != null && { coresPerSocket: result.coresPerSocket }),
@@ -60,6 +117,15 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             Review the extracted data before populating the form.
           </Dialog.Description>
 
+          {isMultiScope && 'scopeLabels' in result && result.scopeLabels != null && result.detectedScopes != null && (
+            <ScopeSelector
+              detectedScopes={result.detectedScopes}
+              scopeLabels={result.scopeLabels}
+              selectedScopes={selectedScopes}
+              onToggle={handleToggle}
+            />
+          )}
+
           <div className="space-y-1 text-sm">
             <p><span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}</p>
 
@@ -75,13 +141,13 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               </>
             ) : (
               <>
-                <p><span className="font-medium">VMs found:</span> {result.vmCount}</p>
-                <p><span className="font-medium">Total vCPUs:</span> {result.totalVcpus}</p>
-                <p><span className="font-medium">Total VMs:</span> {result.totalVms}</p>
-                <p><span className="font-medium">Total Disk:</span> {result.totalDiskGb} GB</p>
+                <p><span className="font-medium">VMs found:</span> {previewCluster.vmCount}</p>
+                <p><span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}</p>
+                <p><span className="font-medium">Total VMs:</span> {previewCluster.totalVms}</p>
+                <p><span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB</p>
                 <p className="text-muted-foreground">
                   <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
-                  {result.avgRamPerVmGb} GB
+                  {previewCluster.avgRamPerVmGb} GB
                 </p>
                 {result.totalPcores != null && (
                   <p><span className="font-medium">Total pCores:</span> {result.totalPcores}</p>
