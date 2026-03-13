@@ -15,6 +15,7 @@ import {
   serverCountByCpu,
   serverCountByRam,
   serverCountByDisk,
+  serverCountBySpecint,
 } from '../sizing/formulas';
 
 // ─── Parameter interfaces ───────────────────────────────────────────────────
@@ -28,6 +29,8 @@ export interface CpuFormulaParams {
   targetVcpuToPCoreRatio: number;
   /** Physical cores per new target server */
   coresPerServer: number;
+  /** CPU utilization percentage (0–100); absent means 100% (no right-sizing) */
+  cpuUtilizationPercent?: number;
 }
 
 export interface RamFormulaParams {
@@ -52,19 +55,39 @@ export interface DiskFormulaParams {
   diskPerServerGb: number;
 }
 
+export interface SpecintFormulaParams {
+  /** Number of existing servers in the old cluster */
+  existingServers: number;
+  /** SPECint benchmark score per existing server */
+  specintPerServer: number;
+  /** Headroom percentage, e.g. 20 for 20% */
+  headroomPercent: number;
+  /** SPECint benchmark score of the new target server */
+  targetSpecint: number;
+}
+
 // ─── Display functions ──────────────────────────────────────────────────────
 
 /**
  * Returns a human-readable CPU formula string with substituted values.
+ * When cpuUtilizationPercent is provided and not 100, includes the utilization factor.
  *
- * Example:
+ * Example (no utilization):
  *   getCpuFormulaString({ totalVcpus: 3200, headroomPercent: 20, targetVcpuToPCoreRatio: 4, coresPerServer: 40 })
  *   → "ceil(3200 × 1.20 / 4 / 40) = 24 servers"
+ *
+ * Example (with utilization=60%):
+ *   getCpuFormulaString({ totalVcpus: 1000, headroomPercent: 20, targetVcpuToPCoreRatio: 4, coresPerServer: 40, cpuUtilizationPercent: 60 })
+ *   → "ceil(1000 × 60% × 1.20 / 4 / 40) = 5 servers"
  */
 export function getCpuFormulaString(params: CpuFormulaParams): string {
-  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer } = params;
+  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer, cpuUtilizationPercent } = params;
   const headroomFactor = 1 + headroomPercent / 100;
-  const result = serverCountByCpu(totalVcpus, headroomFactor, targetVcpuToPCoreRatio, coresPerServer);
+  const cpuUtilPct = cpuUtilizationPercent ?? 100;
+  const result = serverCountByCpu(totalVcpus, headroomFactor, targetVcpuToPCoreRatio, coresPerServer, cpuUtilPct);
+  if (cpuUtilPct !== 100) {
+    return `ceil(${totalVcpus} × ${cpuUtilPct}% × ${headroomFactor.toFixed(2)} / ${targetVcpuToPCoreRatio} / ${coresPerServer}) = ${result} servers`;
+  }
   return `ceil(${totalVcpus} × ${headroomFactor.toFixed(2)} / ${targetVcpuToPCoreRatio} / ${coresPerServer}) = ${result} servers`;
 }
 
@@ -94,4 +117,18 @@ export function getDiskFormulaString(params: DiskFormulaParams): string {
   const headroomFactor = 1 + headroomPercent / 100;
   const result = serverCountByDisk(totalVms, diskPerVmGb, headroomFactor, diskPerServerGb);
   return `ceil(${totalVms} × ${diskPerVmGb} × ${headroomFactor.toFixed(2)} / ${diskPerServerGb}) = ${result} servers`;
+}
+
+/**
+ * Returns a human-readable SPECint formula string with substituted values.
+ *
+ * Example:
+ *   getSpecintFormulaString({ existingServers: 10, specintPerServer: 1200, headroomPercent: 20, targetSpecint: 2400 })
+ *   → "ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint) = 6 servers"
+ */
+export function getSpecintFormulaString(params: SpecintFormulaParams): string {
+  const { existingServers, specintPerServer, headroomPercent, targetSpecint } = params;
+  const headroomFactor = 1 + headroomPercent / 100;
+  const result = serverCountBySpecint(existingServers, specintPerServer, headroomFactor, targetSpecint);
+  return `ceil(${existingServers} servers × ${specintPerServer} SPECint × ${headroomFactor.toFixed(2)} / ${targetSpecint} SPECint) = ${result} servers`;
 }

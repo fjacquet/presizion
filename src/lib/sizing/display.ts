@@ -16,6 +16,7 @@ export interface CpuFormulaParams {
   readonly headroomPercent: number
   readonly targetVcpuToPCoreRatio: number
   readonly coresPerServer: number
+  readonly cpuUtilizationPercent?: number
 }
 
 export interface RamFormulaParams {
@@ -32,15 +33,29 @@ export interface DiskFormulaParams {
   readonly diskPerServerGb: number
 }
 
+export interface SpecintFormulaParams {
+  readonly existingServers: number
+  readonly specintPerServer: number
+  readonly headroomPercent: number
+  readonly targetSpecint: number
+}
+
 /**
  * Returns a human-readable formula string for the CPU-limited server count (CALC-01).
- * Format: ceil(totalVcpus × headroom% / ratio / coresPerServer)
+ * When cpuUtilizationPercent is provided and not 100, includes utilization factor.
  *
- * Example: "ceil(2000 × 120% / 4 / 48)"
+ * Format without utilization: ceil(totalVcpus × headroom% / ratio / coresPerServer)
+ * Format with utilization:    ceil(totalVcpus × utilPct% × headroom% / ratio / coresPerServer)
+ *
+ * Example (no util): "ceil(2000 × 120% / 4 / 48)"
+ * Example (with util): "ceil(2000 × 70% × 120% / 4 / 48)"
  */
 export function cpuFormulaString(params: CpuFormulaParams): string {
-  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer } = params
+  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer, cpuUtilizationPercent } = params
   const headroomDisplay = `${100 + headroomPercent}%`
+  if (cpuUtilizationPercent !== undefined && cpuUtilizationPercent !== 100) {
+    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
+  }
   return `ceil(${totalVcpus} × ${headroomDisplay} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
 }
 
@@ -66,4 +81,16 @@ export function diskFormulaString(params: DiskFormulaParams): string {
   const { totalVms, diskPerVmGb, headroomPercent, diskPerServerGb } = params
   const headroomDisplay = `${100 + headroomPercent}%`
   return `ceil(${totalVms} × ${diskPerVmGb} GB × ${headroomDisplay} / ${diskPerServerGb} GB)`
+}
+
+/**
+ * Returns a human-readable formula string for the SPECint-limited server count.
+ * Format: ceil(existingServers servers × specintPerServer SPECint × headroomFactor / targetSpecint SPECint)
+ *
+ * Example: "ceil(10 servers × 1200 SPECint × 1.20 / 2400 SPECint)"
+ */
+export function specintFormulaString(params: SpecintFormulaParams): string {
+  const { existingServers, specintPerServer, headroomPercent, targetSpecint } = params
+  const headroomFactor = (1 + headroomPercent / 100).toFixed(2)
+  return `ceil(${existingServers} servers × ${specintPerServer} SPECint × ${headroomFactor} / ${targetSpecint} SPECint)`
 }

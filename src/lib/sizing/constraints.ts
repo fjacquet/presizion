@@ -1,22 +1,28 @@
 import type { OldCluster, Scenario } from '../../types/cluster';
 import type { ScenarioResult, LimitingResource } from '../../types/results';
-import { serverCountByCpu, serverCountByRam, serverCountByDisk } from './formulas';
+import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint } from './formulas';
+
+/** Sizing mode: 'vcpu' uses vCPU ratio formula; 'specint' uses SPECint benchmark formula */
+type SizingMode = 'vcpu' | 'specint';
 
 /**
  * Determines which resource constraint drove the final (maximum) server count.
  *
  * Tie-breaking priority when counts are equal: cpu > ram > disk.
+ * When sizingMode is 'specint', the cpu slot returns 'specint' instead of 'cpu'.
  *
- * @param cpu   CPU-limited server count (integer, post-ceil)
+ * @param cpu   CPU/SPECint-limited server count (integer, post-ceil)
  * @param ram   RAM-limited server count (integer, post-ceil)
  * @param disk  Disk-limited server count (integer, post-ceil)
+ * @param sizingMode  'vcpu' (default) or 'specint'
  */
 function determineLimitingResource(
   cpu: number,
   ram: number,
   disk: number,
+  sizingMode: SizingMode = 'vcpu',
 ): LimitingResource {
-  if (cpu >= ram && cpu >= disk) return 'cpu';
+  if (cpu >= ram && cpu >= disk) return sizingMode === 'specint' ? 'specint' : 'cpu';
   if (ram > cpu && ram >= disk) return 'ram';
   return 'disk';
 }
@@ -25,7 +31,7 @@ function determineLimitingResource(
  * Public API: computes the full ScenarioResult for a given cluster + scenario pair.
  *
  * Applies CALC-01 through CALC-06:
- *   CALC-01: CPU-limited server count
+ *   CALC-01: CPU-limited server count (or SPECint count when sizingMode='specint')
  *   CALC-02: RAM-limited server count
  *   CALC-03: Disk-limited server count
  *   CALC-04: N+1 HA reserve (adds exactly 1 if haReserveEnabled)
@@ -34,12 +40,14 @@ function determineLimitingResource(
  *
  * The returned object is frozen — it is never mutated after creation.
  *
- * @param cluster  Current environment metrics (OldCluster)
- * @param scenario Target server configuration and sizing assumptions (Scenario)
+ * @param cluster      Current environment metrics (OldCluster)
+ * @param scenario     Target server configuration and sizing assumptions (Scenario)
+ * @param sizingMode   'vcpu' (default) or 'specint' — determines CPU constraint formula
  */
 export function computeScenarioResult(
   cluster: OldCluster,
   scenario: Scenario,
+  sizingMode: SizingMode = 'vcpu',
 ): ScenarioResult {
   // headroomFactor = 1 + headroomPercent/100
   // e.g. 20% headroom → factor = 1.20
@@ -47,20 +55,32 @@ export function computeScenarioResult(
 
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
-  // CALC-01: CPU-limited count
-  const cpuLimitedCount = serverCountByCpu(
-    cluster.totalVcpus,
-    headroomFactor,
-    scenario.targetVcpuToPCoreRatio,
-    coresPerServer,
-  );
+  // CALC-01: CPU-limited count (or SPECint-limited count in specint mode)
+  let cpuLimitedCount: number;
+  if (sizingMode === 'specint') {
+    const existingServers = cluster.existingServerCount ?? 0;
+    const oldSPECint = cluster.specintPerServer ?? 0;
+    const targetSPECint = scenario.targetSpecint ?? 0;
+    cpuLimitedCount = serverCountBySpecint(existingServers, oldSPECint, headroomFactor, targetSPECint);
+  } else {
+    const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
+    cpuLimitedCount = serverCountByCpu(
+      cluster.totalVcpus,
+      headroomFactor,
+      scenario.targetVcpuToPCoreRatio,
+      coresPerServer,
+      cpuUtilPct,
+    );
+  }
 
-  // CALC-02: RAM-limited count
+  // CALC-02: RAM-limited count (with utilization scaling if provided)
+  const ramUtilPct = cluster.ramUtilizationPercent ?? 100;
   const ramLimitedCount = serverCountByRam(
     cluster.totalVms,
     scenario.ramPerVmGb,
     headroomFactor,
     scenario.ramPerServerGb,
+    ramUtilPct,
   );
 
   // CALC-03: Disk-limited count
@@ -83,6 +103,7 @@ export function computeScenarioResult(
     cpuLimitedCount,
     ramLimitedCount,
     diskLimitedCount,
+    sizingMode,
   );
 
   // CALC-06: Utilization metrics (use finalCount as denominator)
