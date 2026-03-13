@@ -106,3 +106,73 @@ export function downloadCsv(filename: string, csv: string): void {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
+
+/**
+ * Builds a pretty-printed JSON string from cluster sizing results.
+ * Undefined optional fields are replaced with null (not omitted) via replacer function.
+ *
+ * JSON schema version 1.1:
+ * - schemaVersion: "1.1"
+ * - generatedAt: ISO timestamp
+ * - currentCluster: OldCluster object (undefined fields → null)
+ * - scenarios: array of scenario + interleaved result
+ *
+ * @param cluster - The existing cluster metrics
+ * @param scenarios - The target scenarios being compared
+ * @param results - The computed ScenarioResult for each scenario (parallel array)
+ * @returns Pretty-printed JSON string
+ */
+/**
+ * Normalise an OldCluster so all optional fields are explicitly present (null if absent).
+ * This ensures JSON.stringify produces "existingServerCount": null rather than omitting the key.
+ */
+function normaliseCluster(
+  cluster: OldCluster,
+): Record<string, string | number | boolean | null> {
+  return {
+    totalVcpus: cluster.totalVcpus,
+    totalPcores: cluster.totalPcores,
+    totalVms: cluster.totalVms,
+    totalDiskGb: cluster.totalDiskGb ?? null,
+    socketsPerServer: cluster.socketsPerServer ?? null,
+    coresPerSocket: cluster.coresPerSocket ?? null,
+    ramPerServerGb: cluster.ramPerServerGb ?? null,
+    existingServerCount: cluster.existingServerCount ?? null,
+    specintPerServer: cluster.specintPerServer ?? null,
+    cpuUtilizationPercent: cluster.cpuUtilizationPercent ?? null,
+    ramUtilizationPercent: cluster.ramUtilizationPercent ?? null,
+  }
+}
+
+export function buildJsonContent(
+  cluster: OldCluster,
+  scenarios: readonly Scenario[],
+  results: readonly ScenarioResult[],
+): string {
+  const payload = {
+    schemaVersion: '1.1',
+    generatedAt: new Date().toISOString(),
+    currentCluster: normaliseCluster(cluster),
+    scenarios: scenarios.map((s, i) => ({ ...s, result: results[i] ?? null })),
+  }
+  return JSON.stringify(payload, null, 2)
+}
+
+/**
+ * Triggers a browser JSON file download.
+ * Creates a Blob, generates an object URL, simulates an anchor click, then revokes the URL.
+ *
+ * @param filename - The suggested filename for the download (e.g., 'cluster-sizing.json')
+ * @param json - The JSON string content to download
+ */
+export function downloadJson(filename: string, json: string): void {
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}

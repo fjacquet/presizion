@@ -17,7 +17,7 @@ import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
-import { buildCsvContent, downloadCsv } from '@/lib/utils/export'
+import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
 
 export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
@@ -53,6 +53,11 @@ export function Step3ReviewExport() {
     downloadCsv('cluster-sizing.csv', csv)
   }
 
+  const handleDownloadJson = (): void => {
+    const json = buildJsonContent(currentCluster, scenarios, results)
+    downloadJson('cluster-sizing.json', json)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -68,6 +73,9 @@ export function Step3ReviewExport() {
         </Button>
         <Button variant="outline" onClick={handleDownloadCsv}>
           Download CSV
+        </Button>
+        <Button variant="outline" onClick={handleDownloadJson}>
+          Download JSON
         </Button>
       </div>
 
