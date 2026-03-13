@@ -54,7 +54,10 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
   2. The browser tab shows a custom Presizion favicon instead of the Vite default
   3. When a RAM utilization % is entered in Step 2, the RAM formula display includes the utilization factor (e.g., "× 80%")
   4. RAM formula display behavior mirrors the existing CPU formula display (TD-01 parity)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — RAM formula display fix (TD-04): add ramUtilizationPercent to RamFormulaParams and ramFormulaString; wire from ScenarioResults
+- [ ] 11-02-PLAN.md — Presizion branding assets: create logo.svg and favicon.svg; integrate logo in WizardShell header
 
 ### Phase 12: Dark Mode Toggle
 **Goal**: Users can manually switch between light and dark mode; the choice persists across sessions
@@ -114,7 +117,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 | 8. v1.2 Planning Backfill | v1.2 | 1/1 | Complete | 2026-03-13 |
 | 9. v1.2 Charts | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
-| 11. Branding & Tech Debt | v1.3 | 0/? | Not started | - |
+| 11. Branding & Tech Debt | v1.3 | 0/2 | Not started | - |
 | 12. Dark Mode Toggle | v1.3 | 0/? | Not started | - |
 | 13. Import Scope Filter | v1.3 | 0/? | Not started | - |
 | 14. Persistent Scope Widget | v1.3 | 0/? | Not started | - |
