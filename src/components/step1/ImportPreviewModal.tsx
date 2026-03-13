@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useImportStore } from '@/store/useImportStore'
 import { aggregateScopes } from '@/lib/utils/import/scopeAggregator'
 import type { AnyImportResult, ScopeData } from '@/lib/utils/import'
 
@@ -53,6 +54,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
   const setScenarios = useScenariosStore((s) => s.setScenarios)
   const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
+  const setImportBuffer = useImportStore((s) => s.setImportBuffer)
 
   const isJson = result.sourceFormat === 'presizion-json'
 
@@ -101,6 +103,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       }
       setCurrentCluster(cluster)
       seedFromCluster(cluster)
+      if (result.rawByScope != null && result.detectedScopes != null && result.scopeLabels != null) {
+        setImportBuffer(result.rawByScope, result.scopeLabels, selectedScopes)
+      }
     }
     onClose()
   }

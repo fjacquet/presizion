@@ -1,11 +1,12 @@
 /**
- * ImportPreviewModal tests for SCOPE-02
- * Tests scope selector rendering and selection behavior
+ * ImportPreviewModal tests for SCOPE-02 and SCOPE-04
+ * Tests scope selector rendering, selection behavior, and import buffer wiring
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ImportPreviewModal } from '../ImportPreviewModal'
 import type { ClusterImportResult } from '@/lib/utils/import'
+import type { JsonImportResult } from '@/lib/utils/import'
 import * as scopeAggregatorModule from '@/lib/utils/import/scopeAggregator'
 import * as clusterStoreModule from '@/store/useClusterStore'
 
@@ -13,6 +14,7 @@ import * as clusterStoreModule from '@/store/useClusterStore'
 const mockSetCurrentCluster = vi.fn()
 const mockSeedFromCluster = vi.fn()
 const mockSetScenarios = vi.fn()
+const mockSetImportBuffer = vi.fn()
 
 vi.mock('@/store/useClusterStore', () => ({
   useClusterStore: vi.fn((selector) => selector({ setCurrentCluster: mockSetCurrentCluster })),
@@ -22,6 +24,10 @@ vi.mock('@/store/useScenariosStore', () => ({
   useScenariosStore: vi.fn((selector) =>
     selector({ setScenarios: mockSetScenarios, seedFromCluster: mockSeedFromCluster })
   ),
+}))
+
+vi.mock('@/store/useImportStore', () => ({
+  useImportStore: vi.fn((selector) => selector({ setImportBuffer: mockSetImportBuffer })),
 }))
 
 // Mock aggregateScopes
@@ -113,6 +119,9 @@ describe('ImportPreviewModal', () => {
     vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue(AGGREGATED_RESULT)
   })
 
+  // Note: useImportStore mock re-binding is not needed because it uses the
+  // module-level mockSetImportBuffer variable (not cleared by clearAllMocks binding)
+
   describe('Test 1: multi-scope renders checkboxes', () => {
     it('renders "Filter by cluster" heading when detectedScopes has 2 entries', () => {
       render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
@@ -198,6 +207,37 @@ describe('ImportPreviewModal', () => {
       expect(mockSetCurrentCluster).toHaveBeenCalledWith(
         expect.objectContaining({ totalVcpus: 80, totalVms: 40 })
       )
+    })
+  })
+
+  describe('Test 7 (SCOPE-04): Apply on multi-scope result calls setImportBuffer', () => {
+    it('clicking Apply with a multi-scope result calls setImportBuffer with rawByScope, scopeLabels, selectedScopes', () => {
+      render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
+      const applyBtn = screen.getByRole('button', { name: /apply/i })
+      fireEvent.click(applyBtn)
+
+      expect(mockSetImportBuffer).toHaveBeenCalledOnce()
+      expect(mockSetImportBuffer).toHaveBeenCalledWith(
+        rawByScope,
+        MULTI_SCOPE_RESULT.scopeLabels,
+        expect.arrayContaining(['DC1||CL-A', 'DC1||CL-B'])
+      )
+    })
+  })
+
+  describe('Test 8 (SCOPE-04): Apply on JSON import does NOT call setImportBuffer', () => {
+    it('clicking Apply with a JSON import result does not call setImportBuffer', () => {
+      const JSON_RESULT: JsonImportResult = {
+        sourceFormat: 'presizion-json',
+        cluster: { totalVcpus: 80, totalPcores: 40, totalVms: 30 },
+        scenarios: [],
+        warnings: [],
+      }
+      render(<ImportPreviewModal result={JSON_RESULT} {...defaultProps} />)
+      const applyBtn = screen.getByRole('button', { name: /apply/i })
+      fireEvent.click(applyBtn)
+
+      expect(mockSetImportBuffer).not.toHaveBeenCalled()
     })
   })
 })
