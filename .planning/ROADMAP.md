@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 5: SPECint and Utilization Formula Engine** - Schema extensions, formula rewrites, and unit test coverage for SPECint mode and utilization right-sizing — no UI changes (completed 2026-03-13)
 - [x] **Phase 6: Conditional UI Wiring** - Step 1 and ScenarioCard conditional fields for SPECint and utilization inputs, with updated results and comparison displays (completed 2026-03-13)
-- [ ] **Phase 7: Enhanced Export** - JSON download of all inputs and outputs, plus print-optimized CSS for PDF via browser print
+- [ ] **Phase 7: Enhanced Export and As-Is/To-Be Report** - As-Is reference column in Step 3, JSON download, print/PDF layout, and Step 1 server config cleanup
 
 ## Phase Details
 
@@ -151,17 +151,19 @@ Plans:
 - [ ] 06-01-PLAN.md — Wave 0 test stubs (SizingModeToggle, ComparisonTable) + SizingModeToggle component wired into WizardShell (Wave 1)
 - [ ] 06-02-PLAN.md — Conditional SPECint fields in CurrentClusterForm and ScenarioCard + ScenarioResults SPECint row + ComparisonTable label fix (Wave 2)
 
-### Phase 7: Enhanced Export
+### Phase 7: Enhanced Export and As-Is/To-Be Report
 
-**Goal**: Users can download a complete JSON record of the session and produce a clean print layout for PDF hardcopy
+**Goal**: Users get a complete as-is/to-be comparison report — an "As-Is" reference column in Step 3, JSON download, and print/PDF layout — plus a cleaned-up Step 1 server config section
 **Depends on**: Phase 6
-**Requirements**: EXPO-03, EXPO-04
+**Requirements**: EXPO-03, EXPO-04, REPT-01, REPT-02
 **Success Criteria** (what must be TRUE):
 
   1. Clicking "Download JSON" in Step 3 triggers a file download containing all current cluster inputs, all scenario configurations, and all computed outputs in valid, pretty-printed JSON
   2. The downloaded JSON file is self-contained and human-readable: field names match the application's internal naming and all numeric values are present without truncation
   3. Invoking browser print (Ctrl+P / Cmd+P) from Step 3 renders a clean single-column layout: no buttons, no wizard chrome, no truncated table columns, and utilization color coding preserved in print
   4. The print layout fits standard A4/Letter paper width without horizontal scrolling or clipped content
+  5. Step 3 comparison table has an "As-Is" reference column showing: existing server count, sockets × cores/server, total pCores (derived or entered), and observed vCPU:pCore ratio
+  6. Step 1 shows `existingServerCount` in "Existing Server Config" unconditionally (not SPECint-only); `totalPcores` is optional and auto-derived when count + sockets + cores/socket are all provided
 **Plans**: TBD
 
 ## Progress
