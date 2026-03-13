@@ -103,6 +103,55 @@ describe('specintFormulaString (PERF-04 display)', () => {
   });
 });
 
+describe('ramFormulaString with utilization (TD-04)', () => {
+  it('includes utilization factor when ramUtilizationPercent is not 100: contains 80%, ceil, 300, 16, 512', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+      ramUtilizationPercent: 80,
+    });
+    expect(result).toContain('80%');
+    expect(result).toContain('ceil');
+    expect(result).toContain('300');
+    expect(result).toContain('16');
+    expect(result).toContain('512');
+  });
+
+  it('exact format with ramUtilizationPercent=80: ceil(300 × 80% × 16 GB × 120% / 512 GB)', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+      ramUtilizationPercent: 80,
+    });
+    expect(result).toBe('ceil(300 × 80% × 16 GB × 120% / 512 GB)');
+  });
+
+  it('omits utilization factor when ramUtilizationPercent=100 (treated as no-op)', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+      ramUtilizationPercent: 100,
+    });
+    expect(result).toBe('ceil(300 × 16 GB × 120% / 512 GB)');
+  });
+
+  it('omits utilization factor when ramUtilizationPercent is absent (existing behavior unchanged)', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+    });
+    expect(result).toBe('ceil(300 × 16 GB × 120% / 512 GB)');
+  });
+});
+
 describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
   it('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)', () => {
     const result = cpuFormulaString({

@@ -24,6 +24,7 @@ export interface RamFormulaParams {
   readonly ramPerVmGb: number
   readonly headroomPercent: number
   readonly ramPerServerGb: number
+  readonly ramUtilizationPercent?: number
 }
 
 export interface DiskFormulaParams {
@@ -61,13 +62,20 @@ export function cpuFormulaString(params: CpuFormulaParams): string {
 
 /**
  * Returns a human-readable formula string for the RAM-limited server count (CALC-02).
- * Format: ceil(totalVms × ramPerVmGb × headroom% / ramPerServerGb)
+ * When ramUtilizationPercent is provided and not 100, includes utilization factor.
  *
- * Example: "ceil(300 × 16 GB × 120% / 512 GB)"
+ * Format without utilization: ceil(totalVms × ramPerVmGb GB × headroom% / ramPerServerGb GB)
+ * Format with utilization:    ceil(totalVms × utilPct% × ramPerVmGb GB × headroom% / ramPerServerGb GB)
+ *
+ * Example (no util): "ceil(300 × 16 GB × 120% / 512 GB)"
+ * Example (with util): "ceil(300 × 80% × 16 GB × 120% / 512 GB)"
  */
 export function ramFormulaString(params: RamFormulaParams): string {
-  const { totalVms, ramPerVmGb, headroomPercent, ramPerServerGb } = params
+  const { totalVms, ramPerVmGb, headroomPercent, ramPerServerGb, ramUtilizationPercent } = params
   const headroomDisplay = `${100 + headroomPercent}%`
+  if (ramUtilizationPercent !== undefined && ramUtilizationPercent !== 100) {
+    return `ceil(${totalVms} × ${ramUtilizationPercent}% × ${ramPerVmGb} GB × ${headroomDisplay} / ${ramPerServerGb} GB)`
+  }
   return `ceil(${totalVms} × ${ramPerVmGb} GB × ${headroomDisplay} / ${ramPerServerGb} GB)`
 }
 
