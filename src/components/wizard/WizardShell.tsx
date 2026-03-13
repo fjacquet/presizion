@@ -3,6 +3,7 @@ import { Step1CurrentCluster } from '@/components/step1/Step1CurrentCluster'
 import { Step2Scenarios } from '@/components/step2/Step2Scenarios'
 import { Step3ReviewExport } from '@/components/step3/Step3ReviewExport'
 import { StepIndicator } from './StepIndicator'
+import { SizingModeToggle } from './SizingModeToggle'
 import { Button } from '@/components/ui/button'
 import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 
@@ -21,6 +22,7 @@ export function WizardShell() {
           <p className="text-sm text-muted-foreground mt-1">
             Size your refreshed cluster based on existing metrics
           </p>
+          <SizingModeToggle />
         </header>
 
         <StepIndicator currentStep={currentStep} totalSteps={3} />
