@@ -2,32 +2,31 @@
 
 ## What This Is
 
-A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. It takes real cluster data (vCPUs, pCores, VMs, RAM, disk, server config) and produces one or more target cluster proposals — entirely in the browser, with no backend or external integrations.
+A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
+
+v1.2 ships with Recharts bar chart visualization, RVTools/LiveOptics file import, SPECint-based sizing mode, utilization right-sizing, print/PDF export, and a full As-Is/To-Be comparison report.
 
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
 
+## Current State (v1.2 — Shipped 2026-03-13)
+
+- **Codebase:** ~6,445 lines TypeScript (src/)
+- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Vitest (254 tests)
+- **Deployment:** GitHub Pages at `/presizion/`
+- **Sizing modes:** vCPU-based (default) and SPECint-based (global toggle)
+- **Export formats:** Clipboard text, CSV, JSON, PNG (chart), Print/PDF
+- **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → auto-fills Step 1
+
 ## Requirements
-
-## Current Milestone: v1.2 — Visualization, File Import & Tech Debt
-
-**Goal:** Add graphical sizing charts, client-side RVTools/LiveOptics file import, and resolve v1.1 display tech debt items.
-
-**Target features:**
-
-- Bar/comparison charts in Step 3 showing server counts and constraint breakdown across scenarios
-- RVTools (.xlsx) and LiveOptics (.zip) drag-and-drop file upload → auto-fill Step 1 cluster inputs
-- Three tech debt display fixes (formula string, SPECint duplicate row, dead code removal)
-
----
 
 ### Validated
 
 - ✓ User can enter current cluster metrics and define scenarios — v1.0 / Phase 2
 - ✓ App calculates server counts (CPU/RAM/disk constraints) with live updates — v1.0 / Phase 1–2
 - ✓ Side-by-side comparison table with utilization color-coding — v1.0 / Phase 3
-- ✓ Clipboard copy, CSV download, JSON download — v1.0–1.1 / Phase 3, 7
+- ✓ Clipboard copy and CSV download — v1.0 / Phase 3
 - ✓ 3-step wizard with validation guards and beforeunload warning — v1.0 / Phase 2–3
 - ✓ GitHub Pages deployment with dark mode support — v1.0 / Phase 4
 - ✓ Inline formula display for all key outputs — v1.0 / Phase 4
@@ -35,35 +34,35 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ CPU & RAM utilization % inputs for right-sizing — v1.1 / Phase 5–6
 - ✓ As-Is reference column in Step 3 (server count, config, pCores, ratio) — v1.1 / Phase 7
 - ✓ Print/PDF-optimized layout — v1.1 / Phase 7
+- ✓ JSON download export — v1.1 / Phase 7
+- ✓ Bar chart comparing CPU/RAM/disk-limited counts per scenario — v1.2 / Phase 9
+- ✓ Chart PNG download for use in external reports — v1.2 / Phase 9
+- ✓ RVTools .xlsx file import → auto-fill Step 1 — v1.2 / Phase 10
+- ✓ LiveOptics .zip/.xlsx/.csv file import → auto-fill Step 1 — v1.2 / Phase 10
+- ✓ Import preview/confirm modal before form population — v1.2 / Phase 10
 
-### Active
+### Active (v2 candidates)
 
-- [ ] User can view a bar/comparison chart in Step 3 comparing server counts across scenarios
-- [ ] Chart shows per-constraint breakdown (CPU/RAM/disk or SPECint) per scenario
-- [ ] User can download chart as PNG for use in external reports
-- [ ] User can upload an RVTools .xlsx file; app auto-fills Step 1 cluster inputs
-- [ ] User can upload a LiveOptics .zip file; app auto-fills Step 1 cluster inputs
-- [ ] After upload, user reviews and confirms extracted data before form population
-- [ ] Step 2 CPU formula display string shows utilization factor (× N%) when utilization % entered
-- [ ] In SPECint mode, Step 2 results panel shows only the SPECint row (not a duplicate CPU row)
+- [ ] localStorage persistence — save last-used inputs, restore on next visit (PERS-01)
+- [ ] URL hash state sharing — encode session state for sharing links (PERS-02)
+- [ ] Explicit light/dark mode toggle — manual override beyond OS preference (UI-01)
 
 ### Out of Scope
 
 - Backend, server-side storage, or authentication — client-side only by design
 - Pre-defined server SKU library — users define every server config manually
-- TCO/ROI or pricing/BOM calculations — capacity sizing only in v1
+- TCO/ROI or pricing/BOM calculations — capacity sizing only
 - Per-VM-level modeling — aggregate calculations only
 - Integration with vCenter, CloudIQ, or any external system
 - PWA / offline capability — basic static hosting is sufficient
-- Localization / i18n — English only for v1
-- localStorage persistence — nice-to-have, deferred; app starts fresh each session in v1
+- Localization / i18n — English only
 
 ## Context
 
 - **Target users**: Presales / Systems Engineers and Solution Architects at Dell (or similar), working from Excel extracts or summary slides of existing environments.
-- **Deployment**: GitHub Pages (static assets, zero infrastructure).
-- **Reference**: `docs/prd.md` — full product requirements document with functional requirements, data model, and acceptance criteria.
+- **Deployment**: GitHub Pages (static assets, zero infrastructure) at `/presizion/`.
 - **Engineering standards**: `docs/constitution.md` — KISS/DRY/YAGNI, functional React + TypeScript, strict TS, formulas centralized in `src/lib/sizing/`.
+- **File import source**: Column alias maps and format detection logic ported from store-predict Python parsers.
 
 ## Constraints
 
@@ -71,15 +70,24 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - **Deployment**: GitHub Pages — output must be pure static files
 - **Correctness**: Formula outputs must match reference spreadsheet calculations (within rounding); this is the acceptance criterion for every sizing feature
 - **Performance**: Calculations must re-render in <200ms on input change; initial load <2s
+- **SheetJS version**: xlsx@0.18.5 locked (last MIT-licensed version) — do not upgrade
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| No pre-defined server SKUs | Avoids maintaining a hardware catalog; users input their own specs | — Pending |
-| Industry defaults for ratios | 4:1 vCPU:pCore, 20% headroom are widely accepted starting points | — Pending |
-| localStorage deferred to v1.1 | Not blocking the core workflow; adds complexity for minimal benefit in v1 | — Pending |
-| GitHub Pages deployment | Zero infra, easy sharing, matches static-only constraint | — Pending |
+| No pre-defined server SKUs | Avoids maintaining a hardware catalog; users input their own specs | ✓ Good — no SKU maintenance burden |
+| Industry defaults for ratios | 4:1 vCPU:pCore, 20% headroom are widely accepted starting points | ✓ Good — users rarely change defaults |
+| localStorage deferred to v2 | Not blocking the core workflow; adds complexity for minimal benefit | ✓ Good — not missed in v1.0-v1.2 |
+| GitHub Pages deployment | Zero infra, easy sharing, matches static-only constraint | ✓ Good — works perfectly |
+| Math before UI (Phase 1 first) | Sizing library correctness established before any component depends on it | ✓ Good — zero formula regressions |
+| z.preprocess for numeric Zod fields | Empty string inputs produce ZodError, protecting form validation | ✓ Good — no NaN leaks to formulas |
+| derive-on-read (no result in Zustand) | useScenariosResults derives on demand — no stale result state | ✓ Good — no sync bugs |
+| Dynamic import() for xlsx/jszip | Vite code-splits both to lazy chunk (~900KB SheetJS deferred) | ✓ Good — no impact on initial load |
+| xlsx@0.18.5 locked | Last MIT-licensed SheetJS version — licensing constraint | ✓ Required — do not upgrade |
+| Recharts 2.15.x | React 19 compatible, widely used, low bundle overhead | ✓ Good — no compatibility issues |
+| Wave 0 it.todo stubs (Nyquist) | TDD leading indicators before implementation; forces test writing | ✓ Good — zero skipped stubs at completion |
+| Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-12 after initialization*
+*Last updated: 2026-03-13 after v1.2 milestone completion*

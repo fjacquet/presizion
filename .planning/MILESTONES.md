@@ -17,10 +17,39 @@
 
 ---
 
-## v1.1 — In Progress
+## v1.1 — Visualization, File Import & Tech Debt (completed 2026-03-13)
 
 **Goal:** Add SPECint performance-based sizing mode, right-sizing via observed utilization, and enhanced export (JSON + print/PDF).
 
-**Phases:** 5+ (continuing from phase 4)
+**What shipped:**
 
-**Started:** 2026-03-13
+- Phase 5: SPECint formula engine (serverCountBySpecint, utilization right-sizing, LimitingResource extended to 4-way union)
+- Phase 6: Conditional SPECint/utilization UI fields in Step 1 and ScenarioCard
+- Phase 7: As-Is reference column in ComparisonTable, JSON download, @media print CSS, unconditional existingServerCount
+
+**Requirements shipped:** 12/12 (PERF-01–05, UTIL-01–03, EXPO-03–04, REPT-01–02)
+
+**Last phase number:** 7
+
+---
+
+## v1.2 — Charts, File Import & Tech Debt (completed 2026-03-13)
+
+**Goal:** Add Recharts bar chart visualization, RVTools/LiveOptics file import, and close v1.1 display tech debt.
+
+**What shipped:**
+
+- Phase 8: Documentation backfill (ROADMAP/REQUIREMENTS/STATE artifacts) + parseNumericInput dead code deleted (254 tests pass)
+- Phase 9: SizingChart (Recharts BarChart), SPECint bar label, PNG download via SVG→canvas
+- Phase 10: FileImportButton + ImportPreviewModal + format detection (RVTools vInfo/LiveOptics VMs) + column alias maps ported from store-predict
+
+**Requirements shipped:** 8/8 (CHART-01–03, IMPORT-01–02, TD-01–03)
+
+**Codebase at completion:** ~6,445 lines TypeScript, 254 Vitest tests
+
+**Archive:**
+- Roadmap: `.planning/milestones/v1.2-ROADMAP.md`
+- Requirements: `.planning/milestones/v1.2-REQUIREMENTS.md`
+- Audit: `.planning/v1.2-MILESTONE-AUDIT.md`
+
+**Last phase number:** 10
