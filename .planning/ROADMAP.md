@@ -164,7 +164,13 @@ Plans:
   4. The print layout fits standard A4/Letter paper width without horizontal scrolling or clipped content
   5. Step 3 comparison table has an "As-Is" reference column showing: existing server count, sockets × cores/server, total pCores (derived or entered), and observed vCPU:pCore ratio
   6. Step 1 shows `existingServerCount` in "Existing Server Config" unconditionally (not SPECint-only); `totalPcores` is optional and auto-derived when count + sockets + cores/socket are all provided
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 07-01-PLAN.md — Nyquist Wave 0 test stubs for all 4 requirements (Wave 1)
+- [ ] 07-02-PLAN.md — REPT-02: unconditional existingServerCount + totalPcores auto-derive; REPT-01: As-Is column in ComparisonTable (Wave 2, parallel)
+- [ ] 07-03-PLAN.md — EXPO-03: buildJsonContent + downloadJson + Download JSON button; EXPO-04: @media print CSS + print:hidden wizard chrome (Wave 2, parallel)
 
 ## Progress
 
@@ -179,4 +185,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Deployment and Polish | 4/4 | Complete   | 2026-03-12 |
 | 5. SPECint and Utilization Formula Engine | 3/3 | Complete    | 2026-03-13 |
 | 6. Conditional UI Wiring | 2/2 | Complete    | 2026-03-13 |
-| 7. Enhanced Export | 0/TBD | Not started | - |
+| 7. Enhanced Export | 0/3 | Not started | - |
