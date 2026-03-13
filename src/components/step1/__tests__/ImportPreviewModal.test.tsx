@@ -114,7 +114,7 @@ describe('ImportPreviewModal', () => {
     vi.clearAllMocks()
     // Re-bind mocks after clearAllMocks
     vi.mocked(clusterStoreModule.useClusterStore).mockImplementation((selector) =>
-      selector({ setCurrentCluster: mockSetCurrentCluster })
+      selector({ setCurrentCluster: mockSetCurrentCluster, currentCluster: {} as never, resetCluster: vi.fn() })
     )
     vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue(AGGREGATED_RESULT)
   })
@@ -170,7 +170,7 @@ describe('ImportPreviewModal', () => {
 
       // Uncheck the first checkbox (CL-A)
       const checkboxes = screen.getAllByRole('checkbox')
-      fireEvent.click(checkboxes[0])
+      fireEvent.click(checkboxes[0]!)
 
       // Should call aggregateScopes with only the remaining scope
       expect(scopeAggregatorModule.aggregateScopes).toHaveBeenCalledWith(
@@ -186,7 +186,7 @@ describe('ImportPreviewModal', () => {
 
       // Uncheck first scope
       const checkboxes = screen.getAllByRole('checkbox')
-      fireEvent.click(checkboxes[0])
+      fireEvent.click(checkboxes[0]!)
 
       // Click Apply
       const applyBtn = screen.getByRole('button', { name: /apply/i })
