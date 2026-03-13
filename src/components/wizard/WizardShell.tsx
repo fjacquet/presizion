@@ -4,6 +4,7 @@ import { Step2Scenarios } from '@/components/step2/Step2Scenarios'
 import { Step3ReviewExport } from '@/components/step3/Step3ReviewExport'
 import { StepIndicator } from './StepIndicator'
 import { SizingModeToggle } from './SizingModeToggle'
+import { ThemeToggle } from './ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 
@@ -17,7 +18,10 @@ export function WizardShell() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <header className="mb-6 text-center print:hidden">
+        <header className="relative mb-6 text-center print:hidden">
+          <div className="absolute right-0 top-0">
+            <ThemeToggle />
+          </div>
           <img
             src="/presizion/logo.svg"
             alt="Presizion"
