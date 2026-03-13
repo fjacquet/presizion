@@ -169,4 +169,12 @@ describe('ComparisonTable', () => {
       expect(limitingCell.className).toMatch(/font-bold/)
     })
   })
+
+  describe('REPT-01: As-Is column in comparison table', () => {
+    it.todo('renders an "As-Is" column header')
+    it.todo('As-Is column shows existingServerCount from useClusterStore')
+    it.todo('As-Is column shows "—" when existingServerCount is undefined')
+    it.todo('As-Is column shows sockets x cores server config string')
+    it.todo('As-Is column shows observed vCPU:pCore ratio')
+  })
 })

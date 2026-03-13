@@ -283,3 +283,10 @@ describe('Step1CurrentCluster', () => {
     expect(screen.getByText(/vcpu:pcore ratio/i)).toBeInTheDocument()
   })
 })
+
+describe('REPT-02: unconditional existingServerCount and totalPcores auto-derive', () => {
+  it.todo('renders existingServerCount field when sizingMode is vcpu (unconditional)')
+  it.todo('renders existingServerCount field when sizingMode is specint')
+  it.todo('auto-derives totalPcores when existingServerCount, socketsPerServer, and coresPerSocket are all provided')
+  it.todo('does not override a manually entered totalPcores value')
+})
