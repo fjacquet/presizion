@@ -101,9 +101,9 @@ export function ComparisonTable() {
             <TableCell className="text-center bg-muted/30">
               {currentCluster.totalPcores}
             </TableCell>
-            {scenarios.map((scenario) => (
-              <TableCell key={scenario.id} className="text-center">
-                {scenario.socketsPerServer * scenario.coresPerSocket}
+            {results.map((result, i) => (
+              <TableCell key={scenarios[i]?.id ?? i} className="text-center">
+                {result.finalCount * (scenarios[i]?.socketsPerServer ?? 0) * (scenarios[i]?.coresPerSocket ?? 0)}
               </TableCell>
             ))}
           </TableRow>
@@ -163,28 +163,34 @@ export function ComparisonTable() {
           <TableRow>
             <TableCell className="font-medium">CPU Util %</TableCell>
             <TableCell className="text-center bg-muted/30">—</TableCell>
-            {results.map((result, i) => (
-              <TableCell
-                key={scenarios[i]?.id ?? i}
-                className={`text-center ${utilizationClass(result.cpuUtilizationPercent)}`}
-              >
-                {result.cpuUtilizationPercent.toFixed(1)}%
-              </TableCell>
-            ))}
+            {results.map((result, i) => {
+              const pct = result.cpuUtilizationPercent
+              return (
+                <TableCell
+                  key={scenarios[i]?.id ?? i}
+                  className={`text-center ${utilizationClass(pct)}`}
+                >
+                  {pct > 100 ? `⚠ ${pct.toFixed(1)}%` : `${pct.toFixed(1)}%`}
+                </TableCell>
+              )
+            })}
           </TableRow>
 
           {/* Row 9: RAM Util % */}
           <TableRow>
             <TableCell className="font-medium">RAM Util %</TableCell>
             <TableCell className="text-center bg-muted/30">—</TableCell>
-            {results.map((result, i) => (
-              <TableCell
-                key={scenarios[i]?.id ?? i}
-                className={`text-center ${utilizationClass(result.ramUtilizationPercent)}`}
-              >
-                {result.ramUtilizationPercent.toFixed(1)}%
-              </TableCell>
-            ))}
+            {results.map((result, i) => {
+              const pct = result.ramUtilizationPercent
+              return (
+                <TableCell
+                  key={scenarios[i]?.id ?? i}
+                  className={`text-center ${utilizationClass(pct)}`}
+                >
+                  {pct > 100 ? `⚠ ${pct.toFixed(1)}%` : `${pct.toFixed(1)}%`}
+                </TableCell>
+              )
+            })}
           </TableRow>
 
           {/* Row 10: Disk Util % */}

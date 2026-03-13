@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { detectFormat } from '../formatDetector'
 import { ImportError } from '../fileValidation'
 
-vi.mock('xlsx', () => ({
+vi.mock('@e965/xlsx', () => ({
   read: vi.fn(),
   utils: { sheet_to_json: vi.fn() },
 }))
@@ -13,7 +13,7 @@ vi.mock('jszip', () => ({
   },
 }))
 
-import * as XLSX from 'xlsx'
+import * as XLSX from '@e965/xlsx'
 import JSZip from 'jszip'
 
 function rvtoolsWorkbook() {

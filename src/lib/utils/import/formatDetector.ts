@@ -9,7 +9,7 @@ export interface DetectionResult {
 }
 
 async function detectXlsx(buffer: ArrayBuffer): Promise<DetectionResult> {
-  const XLSX = await import('xlsx')
+  const XLSX = await import('@e965/xlsx')
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' })
   if (wb.SheetNames.includes('vInfo')) return { format: 'rvtools', resolvedBuffer: buffer }
   if (wb.SheetNames.includes('VMs')) return { format: 'liveoptics-xlsx', resolvedBuffer: buffer }
@@ -20,7 +20,7 @@ async function detectXlsx(buffer: ArrayBuffer): Promise<DetectionResult> {
 
 async function detectZip(buffer: ArrayBuffer): Promise<DetectionResult> {
   const JSZip = (await import('jszip')).default
-  const XLSX = await import('xlsx')
+  const XLSX = await import('@e965/xlsx')
   const zip = await JSZip.loadAsync(buffer)
 
   const xlsxEntries = Object.values(zip.files).filter(

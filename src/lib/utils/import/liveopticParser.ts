@@ -26,7 +26,7 @@ function isTruthy(row: VmRow, col: string | undefined): boolean {
 }
 
 async function parseXlsx(buffer: ArrayBuffer): Promise<Omit<ClusterImportResult, 'sourceFormat'>> {
-  const XLSX = await import('xlsx')
+  const XLSX = await import('@e965/xlsx')
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' })
   const sheet = wb.Sheets['VMs']
   if (!sheet) throw new ImportError('VMs sheet not found in LiveOptics xlsx.')

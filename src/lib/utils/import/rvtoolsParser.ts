@@ -22,7 +22,7 @@ function isTruthy(row: VInfoRow, col: string | undefined): boolean {
 export async function parseRvtools(
   buffer: ArrayBuffer,
 ): Promise<Omit<ClusterImportResult, 'sourceFormat'>> {
-  const XLSX = await import('xlsx')
+  const XLSX = await import('@e965/xlsx')
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' })
   const sheet = wb.Sheets['vInfo']
   if (!sheet) throw new Error('vInfo sheet not found')

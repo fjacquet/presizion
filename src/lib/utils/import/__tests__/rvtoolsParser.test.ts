@@ -7,14 +7,14 @@ const MOCK_ROWS = [
   { VM: 'template-vm', CPUs: 2, Memory: 4096, 'Provisioned MB': 10240, Template: true },
 ]
 
-vi.mock('xlsx', () => ({
+vi.mock('@e965/xlsx', () => ({
   read: vi.fn(),
   utils: {
     sheet_to_json: vi.fn(),
   },
 }))
 
-import * as XLSX from 'xlsx'
+import * as XLSX from '@e965/xlsx'
 
 const MOCK_SHEET = {}
 const MOCK_WORKBOOK = { Sheets: { vInfo: MOCK_SHEET }, SheetNames: ['vInfo'] }
