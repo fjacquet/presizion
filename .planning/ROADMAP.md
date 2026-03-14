@@ -47,7 +47,7 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 **Requirements:** FIX-SCOPE-01..06, FIX-VM-01..02, FIX-ASIS-01..04 (12 requirements)
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 16-01-PLAN.md — Import scope fixes: per-cluster ESX host config, performance scoping, aggregation fix
@@ -121,5 +121,5 @@ Plans:
 | 13. Import Scope Filter | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
-| 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 0/2 | Planned | — |
+| 16. Bug Fixes — Import Scoping, VM Override & As-Is | 1/2 | In Progress|  | — |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 0/3 | Pending | — |

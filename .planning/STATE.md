@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
-status: planning
-stopped_at: —
+status: executing
+stopped_at: Completed 16-02-PLAN.md
 last_updated: "2026-03-14"
-last_activity: 2026-03-14 — Milestone v1.4 started
+last_activity: 2026-03-14 — Completed 16-02 (VM Override Tests & As-Is Column)
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -21,30 +21,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.4 — roadmap defined, ready to plan Phase 16
+**Current focus:** v1.4 — Phase 16 executing
 
 ## Current Position
 
-Phase: Not started (roadmap defined, planning next)
-Plan: —
-Status: Ready to plan Phase 16
-Last activity: 2026-03-14 — Requirements (27) and roadmap (2 phases, 5 plans) defined
+Phase: 16-bug-fixes-import-scoping-vm-override-asis
+Plan: 02 of 2 complete
+Status: Plan 16-02 complete; Plan 16-01 pending
+Last activity: 2026-03-14 — Completed 16-02 (VM Override Tests & As-Is Column)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [=====░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: — min
-- Total execution time: 0.0 hours
+- Total plans completed: 1
+- Average duration: 4 min
+- Total execution time: 0.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 16 | 1/2 | 4min | 4min |
 
 *Updated after each plan completion*
 
@@ -82,10 +82,13 @@ Recent decisions affecting current work:
 - [Phase 15-persistence]: Boot restore is synchronous before createRoot — no flicker, no empty-state render
 - [Phase 15-persistence]: Zod v4 UUID validation is stricter than v3 — test fixtures must use valid RFC 4122 UUIDs
 - [Phase 15-persistence]: URL hash takes priority over localStorage on boot; history.replaceState clears hash after restore; Share button copies base64url session URL
+- [Phase 16-02]: VM override tests confirm existing code correctness -- no bug fix needed, tests are the deliverable
+- [Phase 16-02]: As-Is cells use em-dash for unavailable data and literal N/A for not-applicable concepts
+- [Phase 16-02]: Disk As-Is cell shows totalDiskGb only in disaggregated mode; HCI mode shows em-dash
 
 ### Pending Todos
 
-- Plan Phase 16 (Bug Fixes — Import Scoping, VM Override & As-Is Column)
+- Execute Phase 16 Plan 01 (Import Scoping Bugs)
 
 ### Blockers/Concerns
 
@@ -94,5 +97,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: —
+Stopped at: Completed 16-02-PLAN.md
 Resume file: None
