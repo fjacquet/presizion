@@ -52,4 +52,9 @@ export interface Scenario {
   readonly vsanCpuOverheadPercent?: number;            // VSAN-06 — default 10%
   readonly vsanMemoryPerHostGb?: number;               // VSAN-07 — default 6 GB
   readonly vsanVmSwapEnabled?: boolean;                // VSAN-04 — default false (sparse swap)
+
+  // --- Growth projections (Phase 19; all optional — default 0%, GROW-03) ---
+  readonly cpuGrowthPercent?: number;        // GROW-01 — scales CPU demand by (1 + pct/100)
+  readonly memoryGrowthPercent?: number;     // GROW-01 — scales memory demand by (1 + pct/100)
+  readonly storageGrowthPercent?: number;    // GROW-01 — scales storage demand by (1 + pct/100)
 }
