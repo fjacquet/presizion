@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
-status: executing
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-03-14"
+status: completed
+stopped_at: Completed 16-01-PLAN.md (Phase 16 fully complete)
+last_updated: "2026-03-14T14:25:31.092Z"
 last_activity: 2026-03-14 — Completed 16-01 (Import Scoping ESX Per-Cluster Fix)
 progress:
   total_phases: 2

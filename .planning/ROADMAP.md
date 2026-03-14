@@ -121,5 +121,5 @@ Plans:
 | 13. Import Scope Filter | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
-| 16. Bug Fixes — Import Scoping, VM Override & As-Is | 2/2 | Complete   | 2026-03-14 | — |
+| 16. Bug Fixes — Import Scoping, VM Override & As-Is | 2/2 | Complete    | 2026-03-14 | — |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 0/3 | Pending | — |
