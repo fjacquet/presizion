@@ -113,14 +113,20 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
         const clusterCol = cols['cluster_name']
         let usedFallback = false
 
+        // Build datacenter column resolver for ESX Hosts to match dc||cluster scope keys
+        const esxDcCols = resolveColumns(Object.keys(firstRow), DATACENTER_ALIASES, new Set())
+
         for (const host of hosts) {
           const hostName = str(host, cols['host_name'])
           let scopeKey: string | undefined
 
-          // Priority 1: Direct Cluster column on ESX Hosts
+          // Priority 1: Direct Cluster column on ESX Hosts (use dc||cluster format to match VM scope keys)
           if (clusterCol) {
             const cluster = str(host, clusterCol)
-            if (cluster) scopeKey = cluster
+            if (cluster) {
+              const dc = str(host, esxDcCols['datacenter_name'])
+              scopeKey = dc ? `${dc}||${cluster}` : cluster
+            }
           }
 
           // Priority 2: hostToCluster map from VMs
@@ -182,6 +188,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
             const hostRows2 = XLSX.utils.sheet_to_json<VmRow>(hostsSheetRef, { defval: '' })
             if (hostRows2[0]) {
               const hostCols = resolveColumns(Object.keys(hostRows2[0]), LIVEOPTICS_ESX_HOSTS_ALIASES, new Set())
+              const perfDcCols = resolveColumns(Object.keys(hostRows2[0]), DATACENTER_ALIASES, new Set())
               const clusterCol = hostCols['cluster_name']
               for (const hr of hostRows2) {
                 const hn = str(hr, hostCols['host_name'])
@@ -189,7 +196,8 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
                 if (clusterCol) {
                   const cl = str(hr, clusterCol)
                   if (cl) {
-                    hostScopeMap.set(hn, cl)
+                    const dc = str(hr, perfDcCols['datacenter_name'])
+                    hostScopeMap.set(hn, dc ? `${dc}||${cl}` : cl)
                     continue
                   }
                 }

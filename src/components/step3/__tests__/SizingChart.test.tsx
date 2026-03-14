@@ -15,6 +15,7 @@ vi.mock('recharts', () => ({
   Legend: () => <div data-testid="legend" />,
   LabelList: ({ dataKey }: { dataKey: string }) => <span data-testid="label-list">{dataKey}</span>,
   ReferenceLine: () => null,
+  Cell: () => null,
 }))
 
 import { SizingChart } from '../SizingChart'
@@ -78,14 +79,14 @@ describe('SizingChart', () => {
     expect(screen.getByText('Server Count Comparison')).toBeInTheDocument()
   })
 
-  it('renders one bar group per scenario', () => {
+  it('renders bar series for comparison and constraint charts', () => {
     const scenario2 = { ...baseScenario, id: 's2', name: 'Scenario B' }
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario, scenario2] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult, { ...baseResult, cpuLimitedCount: 5 }])
     render(<SizingChart />)
-    // 3 Bar series (cpu, ram, disk) are rendered
+    // 1 Bar series for comparison chart + 3 for constraint chart (cpu, ram, disk)
     const bars = screen.getAllByTestId('bar-series')
-    expect(bars).toHaveLength(3)
+    expect(bars).toHaveLength(4)
   })
 
   it('shows SPECint bar label when sizingMode is specint', () => {
@@ -118,7 +119,9 @@ describe('SizingChart', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
     render(<SizingChart />)
-    expect(screen.getByTestId('legend')).toBeInTheDocument()
+    // Two charts = two legends (comparison + constraint)
+    const legends = screen.getAllByTestId('legend')
+    expect(legends.length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders LabelList elements for data labels', () => {

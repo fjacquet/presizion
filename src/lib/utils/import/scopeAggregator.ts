@@ -118,7 +118,7 @@ export function aggregateScopes(
 
   // RAM per server: representative with heterogeneity warning
   if (ramPerServerValues.length > 0) {
-    esxFields.ramPerServerGb = ramPerServerValues[0]
+    esxFields.ramPerServerGb = ramPerServerValues[0]!
     const uniqueRam = new Set(ramPerServerValues)
     if (uniqueRam.size > 1) {
       allWarnings.push('Heterogeneous RAM/server detected across clusters -- using first cluster as representative.')

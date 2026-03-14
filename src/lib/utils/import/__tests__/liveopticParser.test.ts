@@ -223,7 +223,6 @@ describe('liveopticParser', () => {
       // No cluster column, no vm host column
       setupMultiClusterWithHosts({ hostsHaveCluster: false, vmHostCol: false })
       const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
-      const allScope = result.rawByScope?.get('__all__')
       // Since we have cluster columns on VMs, scopes are CL-A, CL-B not __all__
       // ESX data should be on each scope as global fallback, OR on __all__
       // The plan says: "ESX data attached to '__all__' scope with warning"

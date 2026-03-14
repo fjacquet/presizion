@@ -249,7 +249,7 @@ describe('WizardShell', () => {
       // Click the destructive Reset button in the dialog (not the header one)
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(resetClusterSpy).toHaveBeenCalled()
     })
 
@@ -259,7 +259,7 @@ describe('WizardShell', () => {
       await userEvent.click(screen.getByRole('button', { name: /reset/i }))
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(setScenariosSpy).toHaveBeenCalled()
     })
 
@@ -269,7 +269,7 @@ describe('WizardShell', () => {
       await userEvent.click(screen.getByRole('button', { name: /reset/i }))
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(clearImportSpy).toHaveBeenCalled()
     })
 
@@ -279,7 +279,7 @@ describe('WizardShell', () => {
       await userEvent.click(screen.getByRole('button', { name: /reset/i }))
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('presizion-session')
       expect(localStorageStore['presizion-session']).toBeUndefined()
     })
@@ -290,7 +290,7 @@ describe('WizardShell', () => {
       await userEvent.click(screen.getByRole('button', { name: /reset/i }))
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(localStorageStore['presizion-theme']).toBe('dark')
     })
 
@@ -300,7 +300,7 @@ describe('WizardShell', () => {
       await userEvent.click(screen.getByRole('button', { name: /reset/i }))
       const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
       const confirmBtn = dialogButtons[dialogButtons.length - 1]
-      await userEvent.click(confirmBtn)
+      await userEvent.click(confirmBtn!)
       expect(useWizardStore.getState().currentStep).toBe(1)
     })
   })
