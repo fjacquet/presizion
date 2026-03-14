@@ -81,7 +81,7 @@
 | VSAN-09 | Phase 18 | Complete |
 | VSAN-10 | Phase 18 | Complete |
 | VSAN-11 | Phase 18 | Complete |
-| VSAN-12 | Phase 18 | Pending |
+| VSAN-12 | Phase 18 | Complete |
 | CAP-01 | Phase 19 | Pending |
 | CAP-02 | Phase 19 | Pending |
 | CAP-03 | Phase 19 | Pending |

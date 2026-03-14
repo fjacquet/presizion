@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
-status: executing
-stopped_at: Completed 18-01-PLAN.md
-last_updated: "2026-03-14T21:38:31.907Z"
-last_activity: 2026-03-14 — Phase 18 Plan 01 complete (vSAN formula engine, 19 tests, 4 functions)
+status: completed
+stopped_at: Completed 18-02-PLAN.md
+last_updated: "2026-03-14T21:45:35.877Z"
+last_activity: 2026-03-14 — Phase 18 Plan 02 complete (vSAN constraints wiring, 8 integration tests, 3 files modified)
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -26,19 +26,19 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 18 of 22 (vSAN Formula Engine)
-Plan: 1 of 2 complete
-Status: Executing
-Last activity: 2026-03-14 — Phase 18 Plan 01 complete (vSAN formula engine, 19 tests, 4 functions)
+Plan: 2 of 2 complete
+Status: Phase Complete
+Last activity: 2026-03-14 — Phase 18 Plan 02 complete (vSAN constraints wiring, 8 integration tests, 3 files modified)
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 5 min
-- Total execution time: 0.5 hours
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
@@ -46,9 +46,10 @@ Progress: [█████░░░░░] 50%
 |-------|-------|-------|----------|
 | 16 | 2/2 | 11min | 6min |
 | 17 | 3/3 | 14min | 5min |
-| 18 | 1/2 | 3min | 3min |
+| 18 | 2/2 | 6min | 3min |
 
 *Updated after each plan completion*
+| Phase 18 P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,9 @@ Recent decisions affecting current work:
 - [Phase 18-01]: raid5 multiplier = 1+1/3 (exact), not 1.33 (truncated)
 - [Phase 18-01]: Compression applied BEFORE FTT in storage pipeline (VSAN-09)
 - [Phase 18-01]: All vSAN Scenario fields optional -- absent = legacy sizing path (VSAN-12)
+- [Phase 18-02]: vSAN CPU overhead only applied in GHz sizing mode (not vcpu/specint/aggressive)
+- [Phase 18-02]: Disaggregated layout overrides vSAN for CALC-03 (diskLimitedCount=0 always)
+- [Phase 18-02]: vSAN default constants re-exported from defaults.ts for Phase 20 form use
 
 ### Pending Todos
 
@@ -75,6 +79,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-14T21:38:31.905Z
-Stopped at: Completed 18-01-PLAN.md
+Last session: 2026-03-14T21:45:35.875Z
+Stopped at: Completed 18-02-PLAN.md
 Resume file: None

@@ -54,7 +54,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF report export.
 
-- [ ] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI)
+- [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
 - [ ] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline
 - [ ] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard
 - [ ] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download
@@ -73,7 +73,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
   4. vSAN CPU overhead (default 10%) reduces available GHz per node before server count is calculated
   5. vSAN memory overhead per host (default 6 GB) reduces available RAM per node before memory-limited count is calculated
   6. FTT policy enforces the correct minimum node floor (Mirror FTT=1: 3, FTT=2: 5, FTT=3: 7, RAID-5: 4, RAID-6: 6)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 18-01-PLAN.md — vSAN constants, types, formula functions with TDD tests, Scenario interface extension
@@ -146,7 +146,7 @@ Plans:
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
-| 18. vSAN Formula Engine | 1/2 | In Progress|  | - |
+| 18. vSAN Formula Engine | 2/2 | Complete   | 2026-03-14 | - |
 | 19. Capacity Breakdown & Growth Wiring | v2.0 | 0/TBD | Not started | - |
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/TBD | Not started | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
