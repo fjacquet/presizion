@@ -41,7 +41,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 - [x] **Phase 12: Dark Mode Toggle** — Header theme toggle with localStorage persistence and OS fallback (completed 2026-03-13)
 - [x] **Phase 13: Import Scope Filter** — Parser detects clusters/datacenters; modal lets user select scope before populating Step 1 (completed 2026-03-13)
 - [x] **Phase 14: Persistent Scope Widget** — Step 1 scope badge shows active clusters; re-aggregates data on scope change (completed 2026-03-13)
-- [ ] **Phase 15: Persistence** — localStorage auto-restore and shareable URL hash encoding full session state
+- [x] **Phase 15: Persistence** — localStorage auto-restore and shareable URL hash encoding full session state (completed 2026-03-14)
 
 ## Phase Details
 
@@ -186,4 +186,4 @@ Plans:
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
 | 13. Import Scope Filter | 2/2 | Complete    | 2026-03-13 | - |
 | 14. Persistent Scope Widget | 2/2 | Complete   | 2026-03-13 | - |
-| 15. Persistence | 1/2 | In Progress|  | - |
+| 15. Persistence | 2/2 | Complete   | 2026-03-14 | - |
