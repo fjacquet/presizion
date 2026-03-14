@@ -79,17 +79,87 @@ describe('aggregateScopes', () => {
     expect(result.warnings).toEqual([])
   })
 
-  it('copies ESX fields from first scope that has them defined', () => {
+  it('sums totalPcores across two scopes (additive)', () => {
     const map = new Map<string, ScopeEntry>([
       ['CL-A', makeScope({ vmCount: 2, totalPcores: 64, existingServerCount: 4, socketsPerServer: 2, coresPerSocket: 8, ramPerServerGb: 256 })],
-      ['CL-B', makeScope({ vmCount: 3 })],
+      ['CL-B', makeScope({ vmCount: 3, totalPcores: 96, existingServerCount: 6, socketsPerServer: 2, coresPerSocket: 8, ramPerServerGb: 256 })],
     ])
     const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.totalPcores).toBe(160) // 64 + 96
+  })
+
+  it('sums existingServerCount across two scopes (additive)', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, totalPcores: 64, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, totalPcores: 96, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.existingServerCount).toBe(10) // 4 + 6
+  })
+
+  it('same ramPerServerGb across scopes -> no warning', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 256, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, ramPerServerGb: 256, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.ramPerServerGb).toBe(256)
+    expect(result.warnings).not.toContain(expect.stringContaining('Heterogeneous RAM'))
+  })
+
+  it('different ramPerServerGb across scopes -> warning with "Heterogeneous RAM"', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 256, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, ramPerServerGb: 512, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.ramPerServerGb).toBe(256) // first scope value
+    expect(result.warnings).toContain(expect.stringContaining('Heterogeneous RAM'))
+  })
+
+  it('weighted average cpuUtilizationPercent by existingServerCount', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, cpuUtilizationPercent: 40, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, cpuUtilizationPercent: 60, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    // (40*4 + 60*6)/(4+6) = (160 + 360)/10 = 52
+    expect(result.cpuUtilizationPercent).toBe(52)
+  })
+
+  it('weighted average ramUtilizationPercent by existingServerCount', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramUtilizationPercent: 50, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, ramUtilizationPercent: 70, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    // (50*4 + 70*6)/(4+6) = (200 + 420)/10 = 62
+    expect(result.ramUtilizationPercent).toBe(62)
+  })
+
+  it('single scope selected -> all ESX fields copied unchanged', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, totalPcores: 64, existingServerCount: 4, socketsPerServer: 2, coresPerSocket: 8, ramPerServerGb: 256, cpuUtilizationPercent: 40, ramUtilizationPercent: 50 })],
+      ['CL-B', makeScope({ vmCount: 3, totalPcores: 96, existingServerCount: 6, socketsPerServer: 4, coresPerSocket: 12, ramPerServerGb: 512 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A'])
     expect(result.totalPcores).toBe(64)
     expect(result.existingServerCount).toBe(4)
     expect(result.socketsPerServer).toBe(2)
     expect(result.coresPerSocket).toBe(8)
     expect(result.ramPerServerGb).toBe(256)
+    expect(result.cpuUtilizationPercent).toBe(40)
+    expect(result.ramUtilizationPercent).toBe(50)
+  })
+
+  it('socketsPerServer and coresPerSocket use representative from first scope', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, socketsPerServer: 2, coresPerSocket: 8, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, socketsPerServer: 4, coresPerSocket: 12, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.socketsPerServer).toBe(2) // first scope
+    expect(result.coresPerSocket).toBe(8) // first scope
   })
 
   it('flattens warnings from all selected scopes', () => {
