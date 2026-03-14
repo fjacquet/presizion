@@ -576,4 +576,145 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
   });
 });
 
+// =====================================================================
+// Growth Factor Wiring (Phase 19, Plan 01)
+// =====================================================================
+
+describe('Growth factor wiring (Phase 19)', () => {
+  it('cpuGrowthPercent=20 increases cpuLimitedCount from 7 to 8', () => {
+    // totalVcpus=1000, headroom=0%, ratio=4, coresPerServer=40
+    // Without growth: ceil(1000/4/40) = ceil(6.25) = 7
+    // With 20% growth: ceil(1200/4/40) = ceil(7.5) = 8
+    const cluster = { totalVcpus: 1000, totalVms: 10, totalPcores: 250 };
+    const scenario = {
+      id: '00000000-0000-0000-0000-000000000g01',
+      name: 'CPU-Growth',
+      socketsPerServer: 2, coresPerSocket: 20,
+      ramPerServerGb: 10000, diskPerServerGb: 100000,
+      targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
+      headroomPercent: 0, haReserveCount: 0 as const,
+      cpuGrowthPercent: 20,
+    };
+    const result = computeScenarioResult(cluster, scenario);
+    expect(result.cpuLimitedCount).toBe(8);
+
+    // Without growth: should be 7
+    const noGrowth = { ...scenario, cpuGrowthPercent: undefined };
+    const noGrowthResult = computeScenarioResult(cluster, noGrowth);
+    expect(noGrowthResult.cpuLimitedCount).toBe(7);
+  });
+
+  it('memoryGrowthPercent=50 increases ramLimitedCount from 1 to 2', () => {
+    // totalVms=100, ramPerVmGb=4, ramPerServerGb=512, headroom=0%
+    // Without growth: ceil(100*4/512) = ceil(0.78125) = 1
+    // With 50% growth: ramPerVm effectively 6 → ceil(100*6/512) = ceil(1.171875) = 2
+    const cluster = { totalVcpus: 10, totalVms: 100, totalPcores: 5 };
+    const scenario = {
+      id: '00000000-0000-0000-0000-000000000g02',
+      name: 'RAM-Growth',
+      socketsPerServer: 2, coresPerSocket: 20,
+      ramPerServerGb: 512, diskPerServerGb: 100000,
+      targetVcpuToPCoreRatio: 4, ramPerVmGb: 4, diskPerVmGb: 10,
+      headroomPercent: 0, haReserveCount: 0 as const,
+      memoryGrowthPercent: 50,
+    };
+    const result = computeScenarioResult(cluster, scenario);
+    expect(result.ramLimitedCount).toBe(2);
+
+    // Without growth: should be 1
+    const noGrowth = { ...scenario, memoryGrowthPercent: undefined };
+    const noGrowthResult = computeScenarioResult(cluster, noGrowth);
+    expect(noGrowthResult.ramLimitedCount).toBe(1);
+  });
+
+  it('storageGrowthPercent=100 doubles diskLimitedCount in legacy path', () => {
+    // totalVms=100, diskPerVmGb=50, diskPerServerGb=5000, headroom=0%
+    // Without growth: ceil(100*50/5000) = ceil(1) = 1
+    // With 100% growth: diskPerVm effectively 100 → ceil(100*100/5000) = ceil(2) = 2
+    const cluster = { totalVcpus: 10, totalVms: 100, totalPcores: 5 };
+    const scenario = {
+      id: '00000000-0000-0000-0000-000000000g03',
+      name: 'Disk-Growth',
+      socketsPerServer: 2, coresPerSocket: 20,
+      ramPerServerGb: 10000, diskPerServerGb: 5000,
+      targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 50,
+      headroomPercent: 0, haReserveCount: 0 as const,
+      storageGrowthPercent: 100,
+    };
+    const result = computeScenarioResult(cluster, scenario);
+    expect(result.diskLimitedCount).toBe(2);
+
+    // Without growth: should be 1
+    const noGrowth = { ...scenario, storageGrowthPercent: undefined };
+    const noGrowthResult = computeScenarioResult(cluster, noGrowth);
+    expect(noGrowthResult.diskLimitedCount).toBe(1);
+  });
+
+  it('storageGrowthPercent=100 in vSAN path doubles usableGib demand', () => {
+    // Using mirror-1, no compression (factor 1.0), no swap, 25% slack, 200 VMs, 50 GiB/VM
+    // Without growth: usableGib = 200*50 = 10000
+    //   raw = 10000*2.0 = 20000; meta = 10000*0.02 = 200; raw = 20200; withSlack = 20200/0.75 = 26933.33
+    //   ceil(26933.33/10000) = 3; max(3, 3) = 3
+    // With 100% growth: usableGib = 200*100 = 20000 (diskPerVmGb*2.0)
+    //   raw = 20000*2.0 = 40000; meta = 20000*0.02 = 400; raw = 40400; withSlack = 40400/0.75 = 53866.67
+    //   ceil(53866.67/10000) = 6; max(6, 3) = 6
+    const cluster = { totalVcpus: 800, totalVms: 200, totalPcores: 200 };
+    const scenario = {
+      id: '00000000-0000-0000-0000-000000000g04',
+      name: 'vSAN-Growth',
+      socketsPerServer: 2, coresPerSocket: 20,
+      ramPerServerGb: 10000, diskPerServerGb: 10000,
+      targetVcpuToPCoreRatio: 4, ramPerVmGb: 8, diskPerVmGb: 50,
+      headroomPercent: 0, haReserveCount: 0 as const,
+      vsanFttPolicy: 'mirror-1' as const,
+      vsanCompressionFactor: 1.0 as const,
+      vsanSlackPercent: 25,
+      vsanVmSwapEnabled: false,
+      storageGrowthPercent: 100,
+    };
+    const result = computeScenarioResult(cluster, scenario);
+    expect(result.diskLimitedCount).toBe(6);
+
+    // Without growth: should be 3
+    const noGrowth = { ...scenario, storageGrowthPercent: undefined };
+    const noGrowthResult = computeScenarioResult(cluster, noGrowth);
+    expect(noGrowthResult.diskLimitedCount).toBe(3);
+  });
+
+  it('absent growth fields produce same result as explicitly setting all to 0', () => {
+    const cluster = { totalVcpus: 1000, totalVms: 100, totalPcores: 250 };
+    const baseScenario = {
+      id: '00000000-0000-0000-0000-000000000g05',
+      name: 'No-Growth',
+      socketsPerServer: 2, coresPerSocket: 20,
+      ramPerServerGb: 512, diskPerServerGb: 10000,
+      targetVcpuToPCoreRatio: 4, ramPerVmGb: 8, diskPerVmGb: 50,
+      headroomPercent: 20, haReserveCount: 0 as const,
+    };
+    const zeroGrowth = {
+      ...baseScenario,
+      cpuGrowthPercent: 0,
+      memoryGrowthPercent: 0,
+      storageGrowthPercent: 0,
+    };
+    const absentResult = computeScenarioResult(cluster, baseScenario);
+    const zeroResult = computeScenarioResult(cluster, zeroGrowth);
+    expect(absentResult.cpuLimitedCount).toBe(zeroResult.cpuLimitedCount);
+    expect(absentResult.ramLimitedCount).toBe(zeroResult.ramLimitedCount);
+    expect(absentResult.diskLimitedCount).toBe(zeroResult.diskLimitedCount);
+    expect(absentResult.finalCount).toBe(zeroResult.finalCount);
+    expect(absentResult.limitingResource).toBe(zeroResult.limitingResource);
+  });
+
+  it('existing CPU-limited fixture produces unchanged results (regression guard)', () => {
+    // This is the same CPU_LIMITED test from CALC-05 — must still pass
+    const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+    expect(result.cpuLimitedCount).toBe(24);
+    expect(result.ramLimitedCount).toBe(1);
+    expect(result.diskLimitedCount).toBe(1);
+    expect(result.finalCount).toBe(24);
+    expect(result.limitingResource).toBe('cpu');
+  });
+});
+
 export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };
