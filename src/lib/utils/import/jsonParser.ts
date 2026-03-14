@@ -65,7 +65,7 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
       ramPerVmGb: num(sc.ramPerVmGb, `scenarios[${i}].ramPerVmGb`),
       diskPerVmGb: num(sc.diskPerVmGb, `scenarios[${i}].diskPerVmGb`),
       headroomPercent: num(sc.headroomPercent, `scenarios[${i}].headroomPercent`),
-      haReserveEnabled: typeof sc.haReserveEnabled === 'boolean' ? sc.haReserveEnabled : false,
+      haReserveCount: (sc.haReserveCount === 1 || sc.haReserveCount === 2 ? sc.haReserveCount : 0) as 0 | 1 | 2,
       ...(sc.targetSpecint != null && { targetSpecint: num(sc.targetSpecint, `scenarios[${i}].targetSpecint`) }),
     }
   })

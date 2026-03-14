@@ -65,8 +65,8 @@ describe('useImportStore', () => {
     // Set up fresh mockSetCurrentCluster per test
     mockSetCurrentCluster = vi.fn()
     vi.mocked(clusterStoreModule.useClusterStore.getState).mockReturnValue({
-      setCurrentCluster: mockSetCurrentCluster,
-    })
+      setCurrentCluster: mockSetCurrentCluster as (cluster: import('@/types/cluster').OldCluster) => void,
+    } as ReturnType<typeof clusterStoreModule.useClusterStore.getState>)
     vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue(AGGREGATE_RESULT)
     // Reset store to initial state between tests
     useImportStore.setState({

@@ -24,7 +24,7 @@ const scenario: Scenario = {
   ramPerVmGb: 16,
   diskPerVmGb: 100,
   headroomPercent: 20,
-  haReserveEnabled: false,
+  haReserveCount: 0 as const,
 }
 
 const result: ScenarioResult = {
@@ -32,8 +32,10 @@ const result: ScenarioResult = {
   ramLimitedCount: 19,
   diskLimitedCount: 12,
   rawCount: 24,
+  requiredCount: 24,
   finalCount: 24,
   limitingResource: 'cpu',
+  haReserveCount: 0,
   haReserveApplied: false,
   achievedVcpuToPCoreRatio: 4.0,
   vmsPerServer: 12.5,

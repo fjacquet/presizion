@@ -3,7 +3,7 @@
  * Tests rendering, dialog behavior, and scope re-selection
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ScopeBadge } from '../ScopeBadge'
 import * as importStoreModule from '@/store/useImportStore'

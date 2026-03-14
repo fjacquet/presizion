@@ -11,6 +11,7 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   ram: 'RAM-limited',
   disk: 'Disk-limited',
   specint: 'SPECrate-limited',
+  ghz: 'GHz-limited',
 }
 
 interface ScenarioResultsProps {

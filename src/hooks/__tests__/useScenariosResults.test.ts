@@ -24,7 +24,7 @@ const CPU_LIMITED_SCENARIO = {
   ramPerVmGb: 2,
   diskPerVmGb: 10,
   headroomPercent: 20,
-  haReserveEnabled: false,
+  haReserveCount: 0 as const,
 };
 
 // Stub crypto.randomUUID so createDefaultScenario generates predictable IDs in tests

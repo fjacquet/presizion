@@ -70,7 +70,7 @@ export function SizingModeToggle() {
 
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger>
               <span>
                 <ModeBtn
                   label="Aggressive"
@@ -93,7 +93,7 @@ export function SizingModeToggle() {
 
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger>
               <span>
                 <ModeBtn
                   label="GHz"

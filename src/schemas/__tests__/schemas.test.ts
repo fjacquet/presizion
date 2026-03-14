@@ -109,7 +109,7 @@ describe('scenarioSchema', () => {
       name: 'Valid Scenario',
       targetVcpuToPCoreRatio: 4,
       headroomPercent: 20,
-      haReserveEnabled: false,
+      haReserveCount: 0 as const,
     });
     expect(result.name).toBe('Valid Scenario');
     expect(result.socketsPerServer).toBe(2);
