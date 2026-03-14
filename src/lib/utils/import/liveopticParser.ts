@@ -78,8 +78,10 @@ function computeEsxFields(hosts: VmRow[], cols: Record<string, string | undefine
   if (ramGb) fields.ramPerServerGb = ramGb
   const model = str(firstHost, cols['cpu_model'])
   if (model) fields.cpuModel = model
+  const speedGhz = num(firstHost, cols['cpu_speed_ghz'])
   const speedMhz = num(firstHost, cols['cpu_speed_mhz'])
-  if (speedMhz > 0) fields.cpuFrequencyGhz = Math.round(speedMhz / 100) / 10
+  if (speedGhz > 0) fields.cpuFrequencyGhz = Math.round(speedGhz * 10) / 10
+  else if (speedMhz > 0) fields.cpuFrequencyGhz = Math.round(speedMhz / 100) / 10
   return fields
 }
 

@@ -32,8 +32,9 @@ export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {
   cpu_sockets:  ['CPU Sockets', 'Sockets'],
   cpu_cores:    ['CPU Cores', 'Cores'],
   memory_kib:   ['Memory (KiB)', 'Memory KiB', 'Memory'],
-  cpu_model:    ['CPU Model', 'Processor Model', 'Processor'],
+  cpu_model:    ['CPU Model', 'Processor Model', 'Processor', 'CPU Description'],
   cpu_speed_mhz: ['CPU Speed (MHz)', 'CPU Speed', 'CPU MHz'],
+  cpu_speed_ghz: ['CPU Clock Speed (GHz)', 'Net Clock Speed (GHz)'],
   cluster_name: ['Cluster', 'cluster', 'Cluster Name'],
 }
 
