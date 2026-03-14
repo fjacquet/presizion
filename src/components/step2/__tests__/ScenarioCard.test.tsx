@@ -235,6 +235,118 @@ describe('Step2Scenarios / ScenarioCard', () => {
   })
 })
 
+describe('SPEC-06..09: auto-derive and read-only fields', () => {
+  function getSocketsInput() {
+    // Sockets/Server input: find the label text, then get the adjacent spinbutton
+    const labels = screen.getAllByText(/sockets\/server/i)
+    // The label is inside a FormItem; the input is the next spinbutton sibling
+    const formItem = labels[0]!.closest('[class*="FormItem"], .space-y-2, [data-slot="form-item"]')!
+    return formItem.querySelector('input[type="number"]') as HTMLInputElement
+  }
+
+  function getCoresInput() {
+    const labels = screen.getAllByText(/cores\/socket/i)
+    const formItem = labels[0]!.closest('[class*="FormItem"], .space-y-2, [data-slot="form-item"]')!
+    return formItem.querySelector('input[type="number"]') as HTMLInputElement
+  }
+
+  it('in specint mode with cluster metadata, sockets/server input is disabled', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getSocketsInput()).toBeDisabled()
+  })
+
+  it('in specint mode with cluster metadata, cores/socket input is disabled', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getCoresInput()).toBeDisabled()
+  })
+
+  it('in vcpu mode, sockets/server and cores/socket inputs are NOT disabled', () => {
+    // sizingMode is 'vcpu' by default
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getSocketsInput()).not.toBeDisabled()
+    expect(getCoresInput()).not.toBeDisabled()
+  })
+
+  it('switching from specint to vcpu re-enables the inputs', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    const { rerender } = render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getSocketsInput()).toBeDisabled()
+
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'vcpu' })
+    })
+    rerender(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getSocketsInput()).not.toBeDisabled()
+    expect(getCoresInput()).not.toBeDisabled()
+  })
+
+  it('in specint mode WITHOUT cluster metadata, inputs are NOT disabled', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      // No socketsPerServer or coresPerSocket
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(getSocketsInput()).not.toBeDisabled()
+    expect(getCoresInput()).not.toBeDisabled()
+  })
+
+  it('in specint mode WITHOUT cluster metadata, a warning message is visible', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(screen.getByText(/no socket\/core data from import/i)).toBeInTheDocument()
+  })
+
+  it('warning message is NOT shown when metadata is present in specint mode', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
+      })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(screen.queryByText(/no socket\/core data from import/i)).not.toBeInTheDocument()
+  })
+
+  it('warning message is NOT shown in vcpu mode', () => {
+    // sizingMode is 'vcpu' by default, no metadata
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(screen.queryByText(/no socket\/core data from import/i)).not.toBeInTheDocument()
+  })
+})
+
 describe('ScenarioResults', () => {
   it('renders CPU-limited, RAM-limited, disk-limited, and final server count labels', () => {
     // Set up cluster data so results can be computed

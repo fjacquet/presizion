@@ -126,6 +126,11 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     form,
   ])
 
+  // SPEC-06..08: In specint mode, auto-derive socket/core from cluster metadata (read-only)
+  const hasMetadata = sizingMode === 'specint' &&
+    currentCluster.socketsPerServer != null &&
+    currentCluster.coresPerSocket != null
+
   const socketsVal = Number(form.watch('socketsPerServer')) || 0
   const coresVal = Number(form.watch('coresPerSocket')) || 0
   const totalCores = socketsVal > 0 && coresVal > 0 ? socketsVal * coresVal : null
@@ -202,14 +207,14 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 <FormField control={form.control} name="socketsPerServer" render={({ field }) => (
                   <FormItem>
                     <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
-                    <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
+                    <FormControl><Input type="number" min={1} disabled={hasMetadata} {...numericField(field)} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="coresPerSocket" render={({ field }) => (
                   <FormItem>
                     <FieldLabel name="coresPerSocket">Cores/Socket</FieldLabel>
-                    <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
+                    <FormControl><Input type="number" min={1} disabled={hasMetadata} {...numericField(field)} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -233,6 +238,12 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               {totalCores !== null && (
                 <p className="text-sm text-muted-foreground mt-2">
                   Total cores/server: <span className="font-semibold tabular-nums">{totalCores}</span>
+                </p>
+              )}
+              {sizingMode === 'specint' &&
+                (currentCluster.socketsPerServer == null || currentCluster.coresPerSocket == null) && (
+                <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
+                  No socket/core data from import — enter manually.
                 </p>
               )}
             </section>
