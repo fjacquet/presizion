@@ -166,4 +166,95 @@ describe('rvtoolsParser', () => {
       expect(result.detectedScopes).toContain('DC1||CL-A')
     })
   })
+
+  describe('per-scope vHost config', () => {
+    const VHOST_SHEET_2 = {}
+
+    function setupMultiClusterVHost() {
+      const vInfoRows = [
+        { VM: 'web-01', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Cluster: 'CL-A', Host: 'esxi-01' },
+        { VM: 'db-01', CPUs: 8, Memory: 16384, 'Provisioned MB': 204800, Template: false, Cluster: 'CL-A', Host: 'esxi-02' },
+        { VM: 'app-01', CPUs: 2, Memory: 4096, 'Provisioned MB': 51200, Template: false, Cluster: 'CL-B', Host: 'esxi-03' },
+      ]
+      // vHost rows with # CPU (sockets), # Cores, Memory Size (MB)
+      const vHostRows = [
+        { Host: 'esxi-01', '# CPU': 2, '# Cores': 48, 'CPU Model': 'Xeon Gold A', 'Speed MHz': 2400, 'Memory Size': 262144, Cluster: 'CL-A' },
+        { Host: 'esxi-02', '# CPU': 2, '# Cores': 48, 'CPU Model': 'Xeon Gold A', 'Speed MHz': 2400, 'Memory Size': 262144, Cluster: 'CL-A' },
+        { Host: 'esxi-03', '# CPU': 4, '# Cores': 96, 'CPU Model': 'Xeon Plat B', 'Speed MHz': 3200, 'Memory Size': 524288, Cluster: 'CL-B' },
+      ]
+
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { vInfo: MOCK_SHEET, vHost: VHOST_SHEET_2 },
+        SheetNames: ['vInfo', 'vHost'],
+      } as unknown as ReturnType<typeof XLSX.read>)
+
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === VHOST_SHEET_2) return vHostRows
+        return vInfoRows
+      })
+    }
+
+    it('vHost sheet with sockets/cores/memory -> rawByScope CL-A gets host config', async () => {
+      setupMultiClusterVHost()
+      const result = await parseRvtools(new ArrayBuffer(0))
+      const scopeA = result.rawByScope?.get('CL-A')
+      expect(scopeA?.existingServerCount).toBe(2)
+      expect(scopeA?.totalPcores).toBe(96) // 48 + 48
+      expect(scopeA?.socketsPerServer).toBe(2)
+      expect(scopeA?.coresPerSocket).toBe(24) // 48 / 2
+      // 262144 MB = 256 GB
+      expect(scopeA?.ramPerServerGb).toBe(256)
+    })
+
+    it('vHost with multi-cluster -> each scope has its own host config', async () => {
+      setupMultiClusterVHost()
+      const result = await parseRvtools(new ArrayBuffer(0))
+      const scopeB = result.rawByScope?.get('CL-B')
+      expect(scopeB?.existingServerCount).toBe(1)
+      expect(scopeB?.totalPcores).toBe(96)
+      expect(scopeB?.socketsPerServer).toBe(4)
+      expect(scopeB?.coresPerSocket).toBe(24) // 96 / 4
+      // 524288 MB = 512 GB
+      expect(scopeB?.ramPerServerGb).toBe(512)
+    })
+
+    it('vHost absent -> no host config on any scope', async () => {
+      // Default MOCK_WORKBOOK has no vHost sheet
+      vi.mocked(XLSX.read).mockReturnValue(MOCK_WORKBOOK as unknown as ReturnType<typeof XLSX.read>)
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { VM: 'web-01', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Cluster: 'CL-A' },
+      ])
+      const result = await parseRvtools(new ArrayBuffer(0))
+      const scopeA = result.rawByScope?.get('CL-A')
+      expect(scopeA?.existingServerCount).toBeUndefined()
+      expect(scopeA?.totalPcores).toBeUndefined()
+    })
+
+    it('vHost host-to-cluster mapping from vInfo Host column when vHost has no Cluster column', async () => {
+      const vInfoRows = [
+        { VM: 'web-01', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Cluster: 'CL-A', Host: 'esxi-01' },
+        { VM: 'app-01', CPUs: 2, Memory: 4096, 'Provisioned MB': 51200, Template: false, Cluster: 'CL-B', Host: 'esxi-02' },
+      ]
+      const vHostRows = [
+        { Host: 'esxi-01', '# CPU': 2, '# Cores': 48, 'CPU Model': 'Xeon Gold', 'Speed MHz': 2400, 'Memory Size': 262144 },
+        { Host: 'esxi-02', '# CPU': 4, '# Cores': 96, 'CPU Model': 'Xeon Plat', 'Speed MHz': 3200, 'Memory Size': 524288 },
+      ]
+
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { vInfo: MOCK_SHEET, vHost: VHOST_SHEET_2 },
+        SheetNames: ['vInfo', 'vHost'],
+      } as unknown as ReturnType<typeof XLSX.read>)
+
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === VHOST_SHEET_2) return vHostRows
+        return vInfoRows
+      })
+
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.rawByScope?.get('CL-A')?.existingServerCount).toBe(1)
+      expect(result.rawByScope?.get('CL-A')?.totalPcores).toBe(48)
+      expect(result.rawByScope?.get('CL-B')?.existingServerCount).toBe(1)
+      expect(result.rawByScope?.get('CL-B')?.totalPcores).toBe(96)
+    })
+  })
 })

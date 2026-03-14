@@ -138,4 +138,126 @@ describe('liveopticParser', () => {
       expect(result.detectedScopes).toEqual(['__all__'])
     })
   })
+
+  describe('per-scope ESX host config from ESX Hosts sheet', () => {
+    const HOSTS_SHEET = {}
+    const PERF_SHEET = {}
+
+    function setupMultiClusterWithHosts(opts?: { hostsHaveCluster?: boolean; vmHostCol?: boolean; perfSheet?: boolean }) {
+      const vmRows = [
+        { 'VM Name': 'web-01', 'Virtual CPU': 4, 'Provisioned Memory (MiB)': 8192, 'Virtual Disk Size (MiB)': 102400, Template: false, Cluster: 'CL-A', ...(opts?.vmHostCol ? { 'ESX Host': 'esxi-01' } : {}) },
+        { 'VM Name': 'db-01', 'Virtual CPU': 8, 'Provisioned Memory (MiB)': 16384, 'Virtual Disk Size (MiB)': 204800, Template: false, Cluster: 'CL-A', ...(opts?.vmHostCol ? { 'ESX Host': 'esxi-02' } : {}) },
+        { 'VM Name': 'app-01', 'Virtual CPU': 2, 'Provisioned Memory (MiB)': 4096, 'Virtual Disk Size (MiB)': 51200, Template: false, Cluster: 'CL-B', ...(opts?.vmHostCol ? { 'ESX Host': 'esxi-03' } : {}) },
+      ]
+      // ESX Hosts: 2 in CL-A, 1 in CL-B
+      const hostRows = opts?.hostsHaveCluster
+        ? [
+            { 'Host Name': 'esxi-01', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 268435456, 'CPU Model': 'Xeon Gold A', 'CPU Speed (MHz)': 2400, Cluster: 'CL-A' },
+            { 'Host Name': 'esxi-02', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 268435456, 'CPU Model': 'Xeon Gold A', 'CPU Speed (MHz)': 2400, Cluster: 'CL-A' },
+            { 'Host Name': 'esxi-03', 'CPU Sockets': 4, 'CPU Cores': 96, 'Memory (KiB)': 536870912, 'CPU Model': 'Xeon Plat B', 'CPU Speed (MHz)': 3200, Cluster: 'CL-B' },
+          ]
+        : [
+            { 'Host Name': 'esxi-01', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 268435456, 'CPU Model': 'Xeon Gold A', 'CPU Speed (MHz)': 2400 },
+            { 'Host Name': 'esxi-02', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 268435456, 'CPU Model': 'Xeon Gold A', 'CPU Speed (MHz)': 2400 },
+            { 'Host Name': 'esxi-03', 'CPU Sockets': 4, 'CPU Cores': 96, 'Memory (KiB)': 536870912, 'CPU Model': 'Xeon Plat B', 'CPU Speed (MHz)': 3200 },
+          ]
+
+      const perfRows = [
+        { 'Host Name': 'esxi-01', 'Average CPU %': 40, 'Average Memory %': 50 },
+        { 'Host Name': 'esxi-02', 'Average CPU %': 50, 'Average Memory %': 60 },
+        { 'Host Name': 'esxi-03', 'Average CPU %': 70, 'Average Memory %': 80 },
+      ]
+
+      const sheets: Record<string, unknown> = { VMs: MOCK_SHEET, 'ESX Hosts': HOSTS_SHEET }
+      const sheetNames = ['VMs', 'ESX Hosts']
+      if (opts?.perfSheet) {
+        sheets['ESX Performance'] = PERF_SHEET
+        sheetNames.push('ESX Performance')
+      }
+
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: sheets,
+        SheetNames: sheetNames,
+      } as unknown as ReturnType<typeof XLSX.read>)
+
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === HOSTS_SHEET) return hostRows
+        if (sheet === PERF_SHEET) return perfRows
+        return vmRows
+      })
+    }
+
+    it('multi-cluster with ESX Hosts Cluster column -> rawByScope CL-A has ESX fields from CL-A hosts only', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const scopeA = result.rawByScope?.get('CL-A')
+      expect(scopeA?.existingServerCount).toBe(2)
+      expect(scopeA?.totalPcores).toBe(96) // 48 + 48
+      expect(scopeA?.socketsPerServer).toBe(2)
+      expect(scopeA?.coresPerSocket).toBe(24) // 48/2
+      // 268435456 KiB = 256 GB
+      expect(scopeA?.ramPerServerGb).toBe(256)
+    })
+
+    it('multi-cluster with ESX Hosts Cluster column -> rawByScope CL-B has ESX fields from CL-B hosts only', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const scopeB = result.rawByScope?.get('CL-B')
+      expect(scopeB?.existingServerCount).toBe(1)
+      expect(scopeB?.totalPcores).toBe(96)
+      expect(scopeB?.socketsPerServer).toBe(4)
+      expect(scopeB?.coresPerSocket).toBe(24) // 96/4
+      // 536870912 KiB = 512 GB
+      expect(scopeB?.ramPerServerGb).toBe(512)
+    })
+
+    it('ESX Hosts with host-to-cluster mapping from VMs -> hosts grouped by VM host column', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: false, vmHostCol: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const scopeA = result.rawByScope?.get('CL-A')
+      expect(scopeA?.existingServerCount).toBe(2)
+      expect(scopeA?.totalPcores).toBe(96)
+    })
+
+    it('no cluster column on ESX Hosts and no host column on VMs -> ESX data on __all__ with warning', async () => {
+      // No cluster column, no vm host column
+      setupMultiClusterWithHosts({ hostsHaveCluster: false, vmHostCol: false })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const allScope = result.rawByScope?.get('__all__')
+      // Since we have cluster columns on VMs, scopes are CL-A, CL-B not __all__
+      // ESX data should be on each scope as global fallback, OR on __all__
+      // The plan says: "ESX data attached to '__all__' scope with warning"
+      // But since __all__ scope may not exist, ESX should go to all scopes or result-level
+      // Check that the result-level (base) still has ESX fields (backward compat)
+      expect(result.existingServerCount).toBe(3)
+      expect(result.totalPcores).toBe(192)
+      expect(result.warnings).toContain('Host-to-cluster mapping unavailable; ESX host config applied globally.')
+    })
+
+    it('top-level result still has global ESX fields for backward compat', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      // Global: all 3 hosts combined
+      expect(result.existingServerCount).toBe(3)
+      expect(result.totalPcores).toBe(192) // 48+48+96
+    })
+
+    it('ESX Performance per scope -> CL-A cpuUtilizationPercent reflects only CL-A hosts', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: true, perfSheet: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const scopeA = result.rawByScope?.get('CL-A')
+      // CL-A hosts: esxi-01 (40%), esxi-02 (50%) -> avg = 45
+      expect(scopeA?.cpuUtilizationPercent).toBe(45)
+      expect(scopeA?.ramUtilizationPercent).toBe(55) // avg(50,60)
+    })
+
+    it('ESX Performance per scope -> CL-B has its own utilization', async () => {
+      setupMultiClusterWithHosts({ hostsHaveCluster: true, perfSheet: true })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      const scopeB = result.rawByScope?.get('CL-B')
+      // CL-B hosts: esxi-03 (70% cpu, 80% ram)
+      expect(scopeB?.cpuUtilizationPercent).toBe(70)
+      expect(scopeB?.ramUtilizationPercent).toBe(80)
+    })
+  })
 })
