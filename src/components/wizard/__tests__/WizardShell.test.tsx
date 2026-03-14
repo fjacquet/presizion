@@ -1,10 +1,14 @@
 /**
  * WizardShell — Integration tests
- * Requirements: UX-01, UX-02, UX-05
+ * Requirements: UX-01, UX-02, UX-05, RESET-01, RESET-02, RESET-03, RESET-04
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { useWizardStore } from '@/store/useWizardStore'
+import { useClusterStore } from '@/store/useClusterStore'
+import { useScenariosStore } from '@/store/useScenariosStore'
+import { useImportStore } from '@/store/useImportStore'
 
 // Mock step components to isolate WizardShell routing logic
 vi.mock('@/components/step1/Step1CurrentCluster', () => ({
@@ -22,6 +26,18 @@ vi.mock('@/components/step3/Step3ReviewExport', () => ({
 vi.mock('@/hooks/useBeforeUnload', () => ({
   useBeforeUnload: vi.fn(),
 }))
+
+// localStorage mock — jsdom's localStorage may not survive module-level store initialization
+const localStorageStore: Record<string, string> = {}
+const localStorageMock = {
+  getItem: vi.fn((key: string) => localStorageStore[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => { localStorageStore[key] = value }),
+  removeItem: vi.fn((key: string) => { delete localStorageStore[key] }),
+  clear: vi.fn(() => { Object.keys(localStorageStore).forEach(k => delete localStorageStore[k]) }),
+  get length() { return Object.keys(localStorageStore).length },
+  key: vi.fn((index: number) => Object.keys(localStorageStore)[index] ?? null),
+}
+vi.stubGlobal('localStorage', localStorageMock)
 
 // Import after mocks
 import { WizardShell } from '../WizardShell'
@@ -163,6 +179,129 @@ describe('WizardShell', () => {
       useWizardStore.setState({ currentStep: 3 })
       render(<WizardShell />)
       expect(useBeforeUnload).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('RESET-01..04: Reset button and confirmation', () => {
+    const resetClusterSpy = vi.fn()
+    const setScenariosSpy = vi.fn()
+    const clearImportSpy = vi.fn()
+
+    beforeEach(() => {
+      // Set up store spies
+      useClusterStore.setState({ resetCluster: resetClusterSpy })
+      useScenariosStore.setState({ setScenarios: setScenariosSpy })
+      useImportStore.setState({ clearImport: clearImportSpy })
+
+      // Set up localStorage test data
+      localStorageStore['presizion-theme'] = 'dark'
+      localStorageStore['presizion-session'] = '{"test":"data"}'
+
+      // Reset spies
+      resetClusterSpy.mockClear()
+      setScenariosSpy.mockClear()
+      clearImportSpy.mockClear()
+      localStorageMock.removeItem.mockClear()
+    })
+
+    it('Reset button is visible on Step 1', () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      expect(screen.getByRole('button', { name: /reset/i })).toBeInTheDocument()
+    })
+
+    it('Reset button is visible on Step 2', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      expect(screen.getByRole('button', { name: /reset/i })).toBeInTheDocument()
+    })
+
+    it('Reset button is visible on Step 3', () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      expect(screen.getByRole('button', { name: /reset/i })).toBeInTheDocument()
+    })
+
+    it('clicking Reset opens a confirmation dialog', async () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      expect(screen.getByText(/All cluster data and scenarios will be cleared/)).toBeInTheDocument()
+    })
+
+    it('clicking Cancel closes the dialog without clearing stores', async () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      expect(screen.getByText(/All cluster data and scenarios will be cleared/)).toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('button', { name: /cancel/i }))
+      expect(screen.queryByText(/All cluster data and scenarios will be cleared/)).not.toBeInTheDocument()
+      expect(resetClusterSpy).not.toHaveBeenCalled()
+      expect(setScenariosSpy).not.toHaveBeenCalled()
+      expect(clearImportSpy).not.toHaveBeenCalled()
+    })
+
+    it('confirming clears cluster store (resetCluster called)', async () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      // Click the destructive Reset button in the dialog (not the header one)
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(resetClusterSpy).toHaveBeenCalled()
+    })
+
+    it('confirming resets scenarios store', async () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(setScenariosSpy).toHaveBeenCalled()
+    })
+
+    it('confirming clears import store', async () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(clearImportSpy).toHaveBeenCalled()
+    })
+
+    it('confirming removes presizion-session from localStorage', async () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('presizion-session')
+      expect(localStorageStore['presizion-session']).toBeUndefined()
+    })
+
+    it('confirming does NOT remove presizion-theme from localStorage', async () => {
+      useWizardStore.setState({ currentStep: 1 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(localStorageStore['presizion-theme']).toBe('dark')
+    })
+
+    it('after confirm, wizard navigates to Step 1', async () => {
+      useWizardStore.setState({ currentStep: 3 })
+      render(<WizardShell />)
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }))
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i })
+      const confirmBtn = dialogButtons[dialogButtons.length - 1]
+      await userEvent.click(confirmBtn)
+      expect(useWizardStore.getState().currentStep).toBe(1)
     })
   })
 })
