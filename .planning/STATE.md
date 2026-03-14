@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
 status: executing
-stopped_at: Completed 16-02-PLAN.md
+stopped_at: Completed 16-01-PLAN.md
 last_updated: "2026-03-14"
-last_activity: 2026-03-14 — Completed 16-02 (VM Override Tests & As-Is Column)
+last_activity: 2026-03-14 — Completed 16-01 (Import Scoping ESX Per-Cluster Fix)
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -26,25 +26,25 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 16-bug-fixes-import-scoping-vm-override-asis
-Plan: 02 of 2 complete
-Status: Plan 16-02 complete; Plan 16-01 pending
-Last activity: 2026-03-14 — Completed 16-02 (VM Override Tests & As-Is Column)
+Plan: 2 of 2 complete
+Status: Phase 16 complete (all plans done)
+Last activity: 2026-03-14 — Completed 16-01 (Import Scoping ESX Per-Cluster Fix)
 
-Progress: [=====░░░░░] 50%
+Progress: [==========] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 4 min
-- Total execution time: 0.1 hours
+- Total plans completed: 2
+- Average duration: 6 min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 16 | 1/2 | 4min | 4min |
+| 16 | 2/2 | 11min | 6min |
 
 *Updated after each plan completion*
 
@@ -85,10 +85,14 @@ Recent decisions affecting current work:
 - [Phase 16-02]: VM override tests confirm existing code correctness -- no bug fix needed, tests are the deliverable
 - [Phase 16-02]: As-Is cells use em-dash for unavailable data and literal N/A for not-applicable concepts
 - [Phase 16-02]: Disk As-Is cell shows totalDiskGb only in disaggregated mode; HCI mode shows em-dash
+- [Phase 16-01]: Host-to-cluster mapping priority: direct Cluster column on ESX sheet > host column on VMs/vInfo > __all__ fallback with warning
+- [Phase 16-01]: Additive ESX fields (totalPcores, existingServerCount) are summed; representative fields (sockets, cores/socket) use first scope
+- [Phase 16-01]: Heterogeneous RAM/server triggers warning string but still uses first cluster value as representative
+- [Phase 16-01]: CPU/RAM utilization weighted by existingServerCount per scope, not simple average
 
 ### Pending Todos
 
-- Execute Phase 16 Plan 01 (Import Scoping Bugs)
+- None (Phase 16 complete)
 
 ### Blockers/Concerns
 
@@ -97,5 +101,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 16-02-PLAN.md
+Stopped at: Completed 16-01-PLAN.md (Phase 16 fully complete)
 Resume file: None

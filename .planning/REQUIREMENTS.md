@@ -54,12 +54,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-SCOPE-01 | Phase 16 | Pending |
-| FIX-SCOPE-02 | Phase 16 | Pending |
-| FIX-SCOPE-03 | Phase 16 | Pending |
-| FIX-SCOPE-04 | Phase 16 | Pending |
-| FIX-SCOPE-05 | Phase 16 | Pending |
-| FIX-SCOPE-06 | Phase 16 | Pending |
+| FIX-SCOPE-01 | Phase 16 | Complete |
+| FIX-SCOPE-02 | Phase 16 | Complete |
+| FIX-SCOPE-03 | Phase 16 | Complete |
+| FIX-SCOPE-04 | Phase 16 | Complete |
+| FIX-SCOPE-05 | Phase 16 | Complete |
+| FIX-SCOPE-06 | Phase 16 | Complete |
 | FIX-VM-01 | Phase 16 | Complete |
 | FIX-VM-02 | Phase 16 | Complete |
 | FIX-ASIS-01 | Phase 16 | Complete |
