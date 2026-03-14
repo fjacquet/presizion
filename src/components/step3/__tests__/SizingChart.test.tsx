@@ -99,20 +99,21 @@ describe('SizingChart', () => {
     expect(screen.getByText('SPECint-limited')).toBeInTheDocument()
   })
 
-  it('download PNG button present', () => {
+  it('both charts have download PNG buttons', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
     render(<SizingChart />)
-    expect(screen.getByRole('button', { name: /download.*png/i })).toBeInTheDocument()
+    const buttons = screen.getAllByRole('button', { name: /download.*png/i })
+    expect(buttons).toHaveLength(2)
   })
 
   it('download PNG button triggers download attempt', async () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
     render(<SizingChart />)
-    const btn = screen.getByRole('button', { name: /download.*png/i })
+    const buttons = screen.getAllByRole('button', { name: /download.*png/i })
     // Clicking should not throw (SVG not rendered in jsdom, so it's a no-op)
-    await userEvent.click(btn)
+    await userEvent.click(buttons[0]!)
   })
 
   it('always renders Legend even with single scenario', () => {

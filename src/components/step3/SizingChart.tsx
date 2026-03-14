@@ -27,7 +27,8 @@ export function SizingChart() {
   const sizingMode = useWizardStore((s) => s.sizingMode)
   const layoutMode = useWizardStore((s) => s.layoutMode)
   const currentCluster = useClusterStore((s) => s.currentCluster)
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const comparisonRef = useRef<HTMLDivElement | null>(null)
+  const constraintRef = useRef<HTMLDivElement | null>(null)
 
   if (scenarios.length === 0) return null
 
@@ -59,32 +60,26 @@ export function SizingChart() {
 
   return (
     <div className="space-y-6">
-      {/* Final server count comparison */}
+      {/* Final server count comparison — x-axis labels identify bars, no legend needed */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-muted-foreground">Server Count Comparison</h3>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadChartPng(containerRef, 'cluster-sizing-chart.png')}
+            onClick={() => downloadChartPng(comparisonRef, 'cluster-sizing-chart.png')}
             aria-label="Download chart as PNG"
           >
             Download PNG
           </Button>
         </div>
-        <div ref={containerRef}>
+        <div ref={comparisonRef}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={comparisonData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
               <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Legend
-                payload={[
-                  ...(hasAsIs ? [{ value: 'As-Is', type: 'square' as const, color: AS_IS_COLOR }] : []),
-                  ...scenarios.map((s, i) => ({ value: s.name, type: 'square' as const, color: CHART_COLORS[i % CHART_COLORS.length]! })),
-                ]}
-              />
               <Bar dataKey="servers" name="Servers Required">
                 <LabelList dataKey="servers" position="top" style={{ fontSize: 12, fontWeight: 600 }} />
                 {comparisonData.map((entry, idx) => (
@@ -101,27 +96,39 @@ export function SizingChart() {
 
       {/* Per-constraint breakdown */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">Constraint Breakdown per Scenario</h3>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-            <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="cpu" name={cpuBarName} fill={CHART_COLORS[0]}>
-              <LabelList dataKey="cpu" position="top" style={{ fontSize: 11 }} />
-            </Bar>
-            <Bar dataKey="ram" name="RAM-limited" fill={CHART_COLORS[1]}>
-              <LabelList dataKey="ram" position="top" style={{ fontSize: 11 }} />
-            </Bar>
-            {showDisk && (
-              <Bar dataKey="disk" name="Disk-limited" fill={CHART_COLORS[2]}>
-                <LabelList dataKey="disk" position="top" style={{ fontSize: 11 }} />
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-muted-foreground">Constraint Breakdown per Scenario</h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadChartPng(constraintRef, 'constraint-breakdown-chart.png')}
+            aria-label="Download constraint chart as PNG"
+          >
+            Download PNG
+          </Button>
+        </div>
+        <div ref={constraintRef}>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
+              <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="cpu" name={cpuBarName} fill={CHART_COLORS[0]}>
+                <LabelList dataKey="cpu" position="top" style={{ fontSize: 11 }} />
               </Bar>
-            )}
-          </BarChart>
-        </ResponsiveContainer>
+              <Bar dataKey="ram" name="RAM-limited" fill={CHART_COLORS[1]}>
+                <LabelList dataKey="ram" position="top" style={{ fontSize: 11 }} />
+              </Bar>
+              {showDisk && (
+                <Bar dataKey="disk" name="Disk-limited" fill={CHART_COLORS[2]}>
+                  <LabelList dataKey="disk" position="top" style={{ fontSize: 11 }} />
+                </Bar>
+              )}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   )
