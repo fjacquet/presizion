@@ -174,7 +174,7 @@ Plans:
 | 5. SPECint and Utilization Formula Engine | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 6. Conditional UI Wiring | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 7. Enhanced Export and As-Is/To-Be Report | v1.1 | 3/3 | Complete | 2026-03-13 |
-| 8. v1.2 Planning Backfill | v1.2 | 1/1 | Complete | 2026-03-13 |
+| 8. v1.2 Planning Backfill | 1/1 | Complete   | 2026-03-14 | 2026-03-13 |
 | 9. v1.2 Charts | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 10. v1.2 File Import | v1.2 | 3/3 | Complete | 2026-03-13 |
 | 11. Branding & Tech Debt | 2/2 | Complete    | 2026-03-13 | - |
