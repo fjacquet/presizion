@@ -55,6 +55,50 @@ describe('liveopticParser', () => {
     expect(result.avgRamPerVmGb).toBe(12)
   })
 
+  describe('ESX Hosts sheet — cpuModel and cpuFrequencyGhz extraction', () => {
+    it('extracts cpuModel from CPU Model column of first ESX host', async () => {
+      const HOSTS_SHEET = {}
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { VMs: MOCK_SHEET, 'ESX Hosts': HOSTS_SHEET },
+        SheetNames: ['VMs', 'ESX Hosts'],
+      } as unknown as ReturnType<typeof XLSX.read>)
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === HOSTS_SHEET) return [
+          { 'Host Name': 'esxi-01', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 536870912,
+            'CPU Model': 'Intel Xeon Gold 6526Y', 'CPU Speed (MHz)': 2400 },
+        ]
+        return MOCK_ROWS
+      })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.cpuModel).toBe('Intel Xeon Gold 6526Y')
+    })
+
+    it('extracts cpuFrequencyGhz from CPU Speed (MHz) column (MHz → GHz, 1 decimal)', async () => {
+      const HOSTS_SHEET = {}
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { VMs: MOCK_SHEET, 'ESX Hosts': HOSTS_SHEET },
+        SheetNames: ['VMs', 'ESX Hosts'],
+      } as unknown as ReturnType<typeof XLSX.read>)
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === HOSTS_SHEET) return [
+          { 'Host Name': 'esxi-01', 'CPU Sockets': 2, 'CPU Cores': 48, 'Memory (KiB)': 536870912,
+            'CPU Model': 'Xeon', 'CPU Speed (MHz)': 3600 },
+        ]
+        return MOCK_ROWS
+      })
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      // 3600 MHz → 3.6 GHz
+      expect(result.cpuFrequencyGhz).toBe(3.6)
+    })
+
+    it('returns undefined cpuModel and cpuFrequencyGhz when ESX Hosts sheet is absent', async () => {
+      // Default MOCK_WORKBOOK has no ESX Hosts sheet
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx')
+      expect(result.cpuModel).toBeUndefined()
+      expect(result.cpuFrequencyGhz).toBeUndefined()
+    })
+  })
+
   describe('scope detection (xlsx path)', () => {
     it('single-cluster rows produce detectedScopes with one entry', async () => {
       vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([

@@ -68,6 +68,7 @@ export const currentClusterSchema = z.object({
   specintPerServer: optionalPositiveNumber,
   cpuUtilizationPercent: optionalPercent,
   ramUtilizationPercent: optionalPercent,
+  cpuFrequencyGhz: optionalPositiveNumber,
 });
 
 export type CurrentClusterInput = z.infer<typeof currentClusterSchema>;

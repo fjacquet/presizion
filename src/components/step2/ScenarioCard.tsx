@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2, Copy, Info } from 'lucide-react'
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -25,19 +25,24 @@ import {
 import { scenarioSchema, type ScenarioInput } from '@/schemas/scenarioSchema'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
+import { useClusterStore } from '@/store/useClusterStore'
 import type { Scenario } from '@/types/cluster'
 
 const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
-  socketsPerServer:        'Physical CPU sockets per target server. Check the vendor spec sheet.',
-  coresPerSocket:          'Physical cores per socket — NOT hyperthreaded logical CPUs.',
-  ramPerServerGb:          'Total RAM installed per target server (GB).',
-  diskPerServerGb:         'Total usable storage per target server (GB).',
-  targetVcpuToPCoreRatio:  'CPU oversubscription ratio. VMware recommends 4:1 for mixed workloads; use 2:1 for databases or CPU-intensive workloads.',
-  ramPerVmGb:              'Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.',
-  diskPerVmGb:             'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
-  headroomPercent:         '20% means the sized cluster runs at 80% utilization, leaving buffer for spikes and growth.',
-  haReserveEnabled:        'Adds one extra server to absorb a single host failure without breaching capacity. Recommended for production vSphere HA clusters.',
-  targetSpecint:           'SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).',
+  socketsPerServer:               'Physical CPU sockets per target server. Check the vendor spec sheet.',
+  coresPerSocket:                 'Physical cores per socket — NOT hyperthreaded logical CPUs.',
+  ramPerServerGb:                 'Total RAM installed per target server (GB).',
+  diskPerServerGb:                'Total usable storage per target server (GB).',
+  targetVcpuToPCoreRatio:         'Hard assignment-density cap: no more than N vCPUs per physical core. VMware recommends 4:1 for mixed workloads; use 2:1 for databases.',
+  ramPerVmGb:                     'Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.',
+  diskPerVmGb:                    'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
+  headroomPercent:                '20% means the sized cluster runs at 80% utilization, leaving buffer for spikes and growth.',
+  targetSpecint:                  'SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).',
+  targetCpuUtilizationPercent:    'Display reference only: the CPU utilization % you are designing for. Does not affect server count (the vCPU:pCore ratio is the hard cap).',
+  targetRamUtilizationPercent:    'Design target: size the cluster so RAM runs at this utilization. E.g. 80% means current RAM demand fills 80% of new capacity (with headroom on top).',
+  targetVmCount:                  'Growth override: size the cluster for this future VM count. vCPUs are scaled proportionally from the current cluster.',
+  targetCpuFrequencyGhz:          'Target server CPU clock frequency in GHz. Used with current frequency to compute GHz demand ratio.',
+  minServerCount:                 'Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing.',
 }
 
 function FieldLabel({ name, children }: { name: keyof ScenarioInput; children: React.ReactNode }) {
@@ -69,25 +74,24 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const removeScenario = useScenariosStore((s) => s.removeScenario)
   const duplicateScenario = useScenariosStore((s) => s.duplicateScenario)
   const sizingMode = useWizardStore((s) => s.sizingMode)
+  const layoutMode = useWizardStore((s) => s.layoutMode)
+  const currentCluster = useClusterStore((s) => s.currentCluster)
+
+  const [pinEnabled, setPinEnabled] = useState(() => !!scenario?.minServerCount)
 
   const form = useForm<ScenarioInput>({
-    // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
-    // input type uses `unknown` while useForm expects the output type. Cast to resolve.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(scenarioSchema) as any,
     mode: 'onBlur',
     defaultValues: scenario as ScenarioInput,
   })
 
-  // Sync valid form values to store on every change.
-  // Use a ref to hold stable references so the subscription callback doesn't re-register.
   const scenarioIdRef = useRef(scenarioId)
   scenarioIdRef.current = scenarioId
   const updateScenarioRef = useRef(updateScenario)
   updateScenarioRef.current = updateScenario
 
   useEffect(() => {
-    // Subscribe to form value changes; returns an unsubscribe function
     // eslint-disable-next-line react-hooks/incompatible-library
     const subscription = form.watch((values) => {
       const result = scenarioSchema.safeParse(values)
@@ -98,12 +102,34 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     return () => subscription.unsubscribe()
   }, [form])
 
-  // Derived metric: total cores per server
+  // Sync seeded fields from Zustand store → RHF form when they change externally (e.g. Step 1 → Next).
+  // Use primitive deps so React only re-runs when VALUES change, preventing infinite loops:
+  //   form.setValue → watch fires → updateScenario → same value in store → dep unchanged → no re-run ✓
+  useEffect(() => {
+    if (!scenario) return
+    const seededFields = [
+      'socketsPerServer', 'coresPerSocket', 'ramPerServerGb', 'ramPerVmGb', 'diskPerVmGb',
+    ] as const
+    seededFields.forEach((field) => {
+      const storeVal = scenario[field]
+      if (storeVal === undefined) return
+      if (Number(form.getValues(field)) !== storeVal) {
+        form.setValue(field, storeVal as never, { shouldDirty: false, shouldValidate: false })
+      }
+    })
+  }, [
+    scenario?.socketsPerServer,
+    scenario?.coresPerSocket,
+    scenario?.ramPerServerGb,
+    scenario?.ramPerVmGb,
+    scenario?.diskPerVmGb,
+    form,
+  ])
+
   const socketsVal = Number(form.watch('socketsPerServer')) || 0
   const coresVal = Number(form.watch('coresPerSocket')) || 0
   const totalCores = socketsVal > 0 && coresVal > 0 ? socketsVal * coresVal : null
 
-  // Helper: pass raw string to field.onChange (preserves z.preprocess behavior)
   function numericField(field: {
     onChange: (v: string) => void
     [k: string]: unknown
@@ -115,6 +141,11 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   }
 
   if (!scenario) return null
+
+  const cpuUtilLabel = sizingMode === 'ghz' ? 'Target CPU Load %' : 'Target CPU Util %'
+  const cpuUtilTip = sizingMode === 'ghz'
+    ? 'Design target: new servers will run at this CPU load at steady state.'
+    : TOOLTIPS.targetCpuUtilizationPercent
 
   return (
     <Card className="w-full">
@@ -162,157 +193,190 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Server Configuration (SCEN-02) */}
+            {/* Server Configuration */}
             <section>
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Target Server Config
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <FormField
-                  control={form.control}
-                  name="socketsPerServer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={1} {...numericField(field)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="coresPerSocket"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FieldLabel name="coresPerSocket">Cores/Socket</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={1} {...numericField(field)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ramPerServerGb"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FieldLabel name="ramPerServerGb">RAM/Server GB</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={1} {...numericField(field)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="diskPerServerGb"
-                  render={({ field }) => (
+                <FormField control={form.control} name="socketsPerServer" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
+                    <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="coresPerSocket" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="coresPerSocket">Cores/Socket</FieldLabel>
+                    <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="ramPerServerGb" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="ramPerServerGb">RAM/Server GB</FieldLabel>
+                    <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                {layoutMode !== 'disaggregated' && (
+                  <FormField control={form.control} name="diskPerServerGb" render={({ field }) => (
                     <FormItem>
                       <FieldLabel name="diskPerServerGb">Disk/Server GB</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={1} {...numericField(field)} />
-                      </FormControl>
+                      <FormControl><Input type="number" min={1} {...numericField(field)} /></FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
+                  )} />
+                )}
               </div>
               {totalCores !== null && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Total cores/server:{' '}
-                  <span className="font-semibold tabular-nums">{totalCores}</span>
+                  Total cores/server: <span className="font-semibold tabular-nums">{totalCores}</span>
                 </p>
               )}
             </section>
 
             <Separator />
 
-            {/* Sizing Assumptions (SCEN-03) */}
+            {/* Sizing Assumptions */}
             <section>
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Sizing Assumptions
               </h4>
+
+              {/* Aggressive mode info banner */}
+              {sizingMode === 'aggressive' && (
+                <div className="flex items-center gap-2 p-3 mb-4 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
+                  <Info className="h-4 w-4 shrink-0" />
+                  Server count driven by CPU Util % from Step 1 — vCPU:pCore ratio cap bypassed
+                </div>
+              )}
+
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <FormField
-                  control={form.control}
-                  name="targetVcpuToPCoreRatio"
-                  render={({ field }) => (
+                {sizingMode === 'vcpu' && (
+                  <FormField control={form.control} name="targetVcpuToPCoreRatio" render={({ field }) => (
                     <FormItem>
                       <FieldLabel name="targetVcpuToPCoreRatio">vCPU:pCore Ratio</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={0.1} step={0.5} {...numericField(field)} />
-                      </FormControl>
+                      <FormControl><Input type="number" min={0.1} step={0.5} {...numericField(field)} /></FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ramPerVmGb"
-                  render={({ field }) => (
+                  )} />
+                )}
+                <FormField control={form.control} name="ramPerVmGb" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="ramPerVmGb">RAM/VM GB</FieldLabel>
+                    <FormControl><Input type="number" min={0.1} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="diskPerVmGb" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="diskPerVmGb">Disk/VM GB</FieldLabel>
+                    <FormControl><Input type="number" min={0.1} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="headroomPercent" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="headroomPercent">Headroom %</FieldLabel>
+                    <FormControl><Input type="number" min={0} max={100} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                {sizingMode !== 'specint' && (
+                  <FormField control={form.control} name="targetCpuUtilizationPercent" render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="ramPerVmGb">RAM/VM GB</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={0.1} {...numericField(field)} />
-                      </FormControl>
+                      <FormLabel className="flex items-center gap-1">
+                        {cpuUtilLabel}
+                        {cpuUtilTip && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent><p className="max-w-xs text-sm">{cpuUtilTip}</p></TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </FormLabel>
+                      <FormControl><Input type="number" min={1} max={100} {...numericField(field)} /></FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="diskPerVmGb"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FieldLabel name="diskPerVmGb">Disk/VM GB</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={0.1} {...numericField(field)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="headroomPercent"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FieldLabel name="headroomPercent">Headroom %</FieldLabel>
-                      <FormControl>
-                        <Input type="number" min={0} max={100} {...numericField(field)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  )} />
+                )}
+                <FormField control={form.control} name="targetRamUtilizationPercent" render={({ field }) => (
+                  <FormItem>
+                    <FieldLabel name="targetRamUtilizationPercent">Target RAM Util %</FieldLabel>
+                    <FormControl><Input type="number" min={1} max={100} {...numericField(field)} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
               </div>
+
+              {/* HA Reserve — 3-way toggle */}
               <div className="mt-4">
-                <FormField
+                <Controller
                   control={form.control}
-                  name="haReserveEnabled"
+                  name="haReserveCount"
                   render={({ field }) => (
-                    <FormItem className="flex items-center gap-3">
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          aria-label="N+1 HA Reserve"
-                        />
-                      </FormControl>
-                      <FieldLabel name="haReserveEnabled">N+1 HA Reserve</FieldLabel>
-                      <FormMessage />
+                    <FormItem>
+                      <FormLabel>HA Reserve</FormLabel>
+                      <div className="flex gap-0.5 border rounded-md p-0.5 bg-muted/40 w-fit">
+                        {([0, 1, 2] as const).map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            aria-pressed={field.value === n}
+                            onClick={() => field.onChange(n)}
+                            className={[
+                              'px-3 py-1 text-sm rounded-sm transition-colors',
+                              field.value === n
+                                ? 'bg-primary text-primary-foreground font-semibold'
+                                : 'bg-transparent hover:bg-muted',
+                            ].join(' ')}
+                          >
+                            {n === 0 ? 'N (None)' : `N+${n}`}
+                          </button>
+                        ))}
+                      </div>
                     </FormItem>
                   )}
                 />
               </div>
             </section>
 
+            {/* GHz mode — target CPU frequency */}
+            {sizingMode === 'ghz' && (
+              <div className="border-t pt-4">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  GHz Mode (required)
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="targetCpuFrequencyGhz" render={({ field }) => (
+                    <FormItem>
+                      <FieldLabel name="targetCpuFrequencyGhz">Target CPU Frequency (GHz)</FieldLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0.1}
+                          step={0.1}
+                          data-testid={`input-targetCpuFrequencyGhz-${scenarioId}`}
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+            )}
+
+            {/* SPECrate2017 mode */}
             {sizingMode === 'specint' && (
-              <div className="mt-4 border-t pt-4">
+              <div className="border-t pt-4">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                   SPECrate2017 Target (required in SPECrate mode)
                 </p>
@@ -339,6 +403,83 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 />
               </div>
             )}
+
+            {/* Optional advanced fields */}
+            <div className="border-t pt-4 space-y-4">
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                Advanced (optional)
+              </p>
+
+              {/* VM Count growth override */}
+              <FormField control={form.control} name="targetVmCount" render={({ field }) => (
+                <FormItem>
+                  <FieldLabel name="targetVmCount">Target VM Count</FieldLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      step={1}
+                      data-testid={`input-targetVmCount-${scenarioId}`}
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  {currentCluster.totalVms > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Current: {currentCluster.totalVms.toLocaleString()} VMs → vCPUs scaled proportionally
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              {/* Minimum server floor (pin) */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id={`${scenarioId}-pin-enabled`}
+                    checked={pinEnabled}
+                    onCheckedChange={(checked) => {
+                      setPinEnabled(checked)
+                      if (!checked) form.setValue('minServerCount', undefined)
+                    }}
+                  />
+                  <Label htmlFor={`${scenarioId}-pin-enabled`} className="flex items-center gap-1 cursor-pointer text-sm">
+                    Pin minimum servers
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-sm">{TOOLTIPS.minServerCount}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </Label>
+                </div>
+                {pinEnabled && (
+                  <FormField control={form.control} name="minServerCount" render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          step={1}
+                          placeholder="Minimum server count"
+                          data-testid={`input-minServerCount-${scenarioId}`}
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
+              </div>
+            </div>
           </CardContent>
         </form>
       </Form>

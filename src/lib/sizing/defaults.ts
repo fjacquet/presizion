@@ -16,10 +16,22 @@ export const DEFAULT_HEADROOM_PERCENT = 20;
 
 /**
  * Headroom percentage already provides a sufficient capacity buffer.
- * Users may opt in to an explicit +1 server (N+1 HA) for additional resilience.
+ * Users may opt in to N+1 or N+2 HA reserve for additional resilience.
+ * 0 = no reserve, 1 = N+1 (one extra server), 2 = N+2 (two extra servers).
  * CALC-04.
  */
-export const DEFAULT_HA_RESERVE_ENABLED = false;
+export const DEFAULT_HA_RESERVE_COUNT: 0 | 1 | 2 = 0;
+
+/**
+ * Default target CPU utilization for the new cluster (100 = fill to capacity).
+ * Set lower (e.g. 80) to leave steady-state headroom above the headroom growth buffer.
+ */
+export const DEFAULT_TARGET_CPU_UTILIZATION_PERCENT = 100;
+
+/**
+ * Default target RAM utilization for the new cluster (100 = fill to capacity).
+ */
+export const DEFAULT_TARGET_RAM_UTILIZATION_PERCENT = 100;
 
 /**
  * SPECrate2017_int_base score for a Dell PowerEdge R660 with 2× Intel Xeon Gold 6526Y
@@ -45,7 +57,7 @@ export function createDefaultScenario(): Scenario {
     ramPerVmGb: 4,
     diskPerVmGb: 50,
     headroomPercent: DEFAULT_HEADROOM_PERCENT,
-    haReserveEnabled: DEFAULT_HA_RESERVE_ENABLED,
+    haReserveCount: DEFAULT_HA_RESERVE_COUNT,
     targetSpecint: DEFAULT_TARGET_SPECINT,
   };
 }

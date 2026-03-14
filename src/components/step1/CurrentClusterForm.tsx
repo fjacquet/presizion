@@ -1,6 +1,6 @@
 import { useForm, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Info } from 'lucide-react'
 import {
   Form,
@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +22,7 @@ import {
 } from '@/components/ui/tooltip'
 import { currentClusterSchema, type CurrentClusterInput } from '@/schemas/currentClusterSchema'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
 import type { OldCluster } from '@/types/cluster'
 
@@ -36,11 +39,10 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
   specintPerServer: 'SPECrate2017_int_base score per existing server. Find at spec.org/cpu2017/results/ → filter by server model. Default is Dell R660 with 2× Xeon Gold 6526Y (~337). Both existing and target must use the same metric.',
   cpuUtilizationPercent: 'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
   ramUtilizationPercent: 'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
+  cpuFrequencyGhz: 'Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.',
 }
 
 interface NumericFieldProps {
-  // Control<TFieldValues, TContext, TTransformedValues> — TTransformedValues matches
-  // the output of zodResolver with z.preprocess schemas (resolved output type)
   control: Control<CurrentClusterInput, any, CurrentClusterInput> // eslint-disable-line @typescript-eslint/no-explicit-any
   name: keyof CurrentClusterInput
   label: string
@@ -88,6 +90,60 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
   )
 }
 
+/** Numeric field with an activation checkbox — when unchecked, value is cleared to undefined. */
+function CheckboxNumericField({
+  control,
+  name,
+  label,
+  testId,
+  enabled,
+  onToggle,
+}: NumericFieldProps & { enabled: boolean; onToggle: (checked: boolean) => void }) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`${name}-enabled`}
+              checked={enabled}
+              onCheckedChange={onToggle}
+            />
+            <FormLabel className="flex items-center gap-1 cursor-pointer" htmlFor={`${name}-enabled`}>
+              {label}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" aria-label={`Info: ${label}`} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-sm">{TOOLTIPS[name]}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </FormLabel>
+          </div>
+          <FormControl>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              data-testid={testId}
+              disabled={!enabled}
+              {...field}
+              value={enabled ? (field.value ?? '') : ''}
+              onChange={(e) => field.onChange(e.target.value)}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}
+
 interface CurrentClusterFormProps {
   onNext: () => void
 }
@@ -95,11 +151,13 @@ interface CurrentClusterFormProps {
 export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
   const currentCluster = useClusterStore((s) => s.currentCluster)
+  const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
   const sizingMode = useWizardStore((s) => s.sizingMode)
 
+  const [cpuUtilEnabled, setCpuUtilEnabled] = useState(() => currentCluster.cpuUtilizationPercent !== undefined)
+  const [ramUtilEnabled, setRamUtilEnabled] = useState(() => currentCluster.ramUtilizationPercent !== undefined)
+
   const form = useForm<CurrentClusterInput>({
-    // zodResolver with z.preprocess schemas has a known type mismatch: the schema's
-    // input type uses `unknown` while useForm expects the output type. Cast to resolve.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(currentClusterSchema) as any,
     mode: 'onBlur',
@@ -115,11 +173,11 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       cpuUtilizationPercent: undefined,
       ramUtilizationPercent: undefined,
       existingServerCount: undefined,
+      cpuFrequencyGhz: undefined,
     },
   })
 
   // Sync Zustand store → form when cluster data is updated externally (e.g. file import).
-  // Guard with value-equality to prevent infinite re-render loop.
   useEffect(() => {
     const formVals = form.getValues()
     const changed =
@@ -133,7 +191,8 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.ramPerServerGb !== currentCluster.ramPerServerGb ||
       formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
       formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent ||
-      formVals.specintPerServer !== currentCluster.specintPerServer
+      formVals.specintPerServer !== currentCluster.specintPerServer ||
+      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz
     if (changed) {
       form.reset({
         ...formVals,
@@ -148,13 +207,15 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
         ramUtilizationPercent: currentCluster.ramUtilizationPercent,
         specintPerServer: currentCluster.specintPerServer,
+        cpuFrequencyGhz: currentCluster.cpuFrequencyGhz,
       })
+      // Sync checkbox enabled state when cluster is imported
+      if (currentCluster.cpuUtilizationPercent !== undefined) setCpuUtilEnabled(true)
+      if (currentCluster.ramUtilizationPercent !== undefined) setRamUtilEnabled(true)
     }
   }, [currentCluster, form])
 
   // Sync valid form values to Zustand store for live DerivedMetricsPanel updates.
-  // Uses watch(callback) subscription to fire only on actual value changes,
-  // not on every render (avoids infinite setState loop with new object refs).
   useEffect(() => {
     // eslint-disable-next-line react-hooks/incompatible-library
     const { unsubscribe } = form.watch(() => {
@@ -166,7 +227,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   }, [form, setCurrentCluster])
 
   // Auto-derive totalPcores from existingServerCount × socketsPerServer × coresPerSocket
-  // Only fires when totalPcores is 0/falsy (does not override manually entered values)
   useEffect(() => {
     const subscription = form.watch((data, { name }) => {
       if (name && ['existingServerCount', 'socketsPerServer', 'coresPerSocket'].includes(name)) {
@@ -182,19 +242,28 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     return () => subscription.unsubscribe()
   }, [form])
 
-  // Navigation guard: trigger validation on required fields before advancing.
-  // In SPECint mode, also require specintPerServer to have a value.
   async function handleNext() {
     const alwaysRequired: Array<keyof CurrentClusterInput> = ['totalVcpus', 'totalPcores', 'totalVms']
     const modeRequired: Array<keyof CurrentClusterInput> =
-      sizingMode === 'specint' ? ['specintPerServer'] : []
+      sizingMode === 'specint' ? ['specintPerServer'] :
+      sizingMode === 'ghz' ? ['cpuFrequencyGhz'] : []
     const isValid = await form.trigger([...alwaysRequired, ...modeRequired])
-    // Extra check: in specint mode, specintPerServer must have a value (schema allows undefined)
     if (isValid && sizingMode === 'specint') {
-      const specintVal = form.getValues('specintPerServer')
-      if (!specintVal) return // Block advance without calling onNext
+      if (!form.getValues('specintPerServer')) return
     }
-    if (isValid) onNext()
+    if (isValid && sizingMode === 'ghz') {
+      if (!form.getValues('cpuFrequencyGhz')) return
+    }
+    if (isValid) {
+      // Parse through Zod schema to get properly typed numbers (form.getValues returns raw HTML strings)
+      const parseResult = currentClusterSchema.safeParse(form.getValues())
+      const typedValues = parseResult.success ? parseResult.data : form.getValues()
+      // Merge over existing cluster to preserve fields not in the form (avgRamPerVmGb, cpuModel)
+      const merged: OldCluster = { ...currentCluster, ...(typedValues as Partial<OldCluster>) }
+      setCurrentCluster(merged)
+      seedFromCluster(merged)
+      onNext()
+    }
   }
 
   return (
@@ -218,6 +287,12 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
             Existing Server Config (optional)
           </h3>
+          {currentCluster.cpuModel && (
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm text-muted-foreground">Detected CPU:</span>
+              <Badge variant="secondary">{currentCluster.cpuModel}</Badge>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />
             <NumericFormField control={form.control} name="socketsPerServer" label="Sockets/Server" testId="input-socketsPerServer" optional />
@@ -231,8 +306,30 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             Current Utilization (optional)
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <NumericFormField control={form.control} name="cpuUtilizationPercent" label="CPU Utilization %" testId="input-cpuUtilizationPercent" optional />
-            <NumericFormField control={form.control} name="ramUtilizationPercent" label="RAM Utilization %" testId="input-ramUtilizationPercent" optional />
+            {sizingMode !== 'specint' && (
+              <CheckboxNumericField
+                control={form.control}
+                name="cpuUtilizationPercent"
+                label="CPU Utilization %"
+                testId="input-cpuUtilizationPercent"
+                enabled={cpuUtilEnabled}
+                onToggle={(checked) => {
+                  setCpuUtilEnabled(checked)
+                  if (!checked) form.setValue('cpuUtilizationPercent', undefined, { shouldValidate: true })
+                }}
+              />
+            )}
+            <CheckboxNumericField
+              control={form.control}
+              name="ramUtilizationPercent"
+              label="RAM Utilization %"
+              testId="input-ramUtilizationPercent"
+              enabled={ramUtilEnabled}
+              onToggle={(checked) => {
+                setRamUtilEnabled(checked)
+                if (!checked) form.setValue('ramUtilizationPercent', undefined, { shouldValidate: true })
+              }}
+            />
           </div>
         </section>
 
@@ -243,6 +340,17 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <NumericFormField control={form.control} name="specintPerServer" label="SPECrate2017_int_base / Server (existing)" testId="input-specintPerServer" optional />
+            </div>
+          </section>
+        )}
+
+        {sizingMode === 'ghz' && (
+          <section>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              GHz Mode (required)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField control={form.control} name="cpuFrequencyGhz" label="CPU Frequency (GHz)" testId="input-cpuFrequencyGhz" optional />
             </div>
           </section>
         )}

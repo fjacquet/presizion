@@ -118,24 +118,26 @@ describe('Step2Scenarios / ScenarioCard', () => {
       expect(screen.getByText(/headroom %/i)).toBeInTheDocument()
     })
 
-    it('renders N+1 HA reserve Switch toggle', () => {
+    it('renders HA reserve N/N+1/N+2 toggle buttons', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      expect(screen.getByRole('switch', { name: /n\+1 ha reserve/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'N (None)' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'N+1' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'N+2' })).toBeInTheDocument()
     })
 
-    it('Switch toggle changes haReserveEnabled in store when toggled', async () => {
+    it('clicking N+1 sets haReserveCount to 1 in store', async () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      const switchEl = screen.getByRole('switch', { name: /n\+1 ha reserve/i })
+      const n1btn = screen.getByRole('button', { name: 'N+1' })
 
       act(() => {
-        fireEvent.click(switchEl)
+        fireEvent.click(n1btn)
       })
 
       await waitFor(() => {
         const updated = useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)
-        expect(updated?.haReserveEnabled).toBe(true)
+        expect(updated?.haReserveCount).toBe(1)
       })
     })
   })
@@ -159,12 +161,12 @@ describe('Step2Scenarios / ScenarioCard', () => {
       expect(headroomInput).toBeDefined()
     })
 
-    it('new ScenarioCard pre-fills haReserveEnabled with false', () => {
+    it('new ScenarioCard pre-fills haReserveCount with 0 (N/None selected)', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      const switchEl = screen.getByRole('switch', { name: /n\+1 ha reserve/i })
-      // aria-checked="false" when switch is off
-      expect(switchEl).toHaveAttribute('aria-checked', 'false')
+      // N (None) button should be aria-pressed=true by default
+      const noneBtn = screen.getByRole('button', { name: 'N (None)' })
+      expect(noneBtn).toHaveAttribute('aria-pressed', 'true')
     })
   })
 

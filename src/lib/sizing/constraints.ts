@@ -1,20 +1,37 @@
 import type { OldCluster, Scenario } from '../../types/cluster';
 import type { ScenarioResult, LimitingResource } from '../../types/results';
-import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint } from './formulas';
+import {
+  serverCountByCpu,
+  serverCountByCpuAggressive,
+  serverCountByGhz,
+  serverCountByRam,
+  serverCountByDisk,
+  serverCountBySpecint,
+} from './formulas';
 
-/** Sizing mode: 'vcpu' uses vCPU ratio formula; 'specint' uses SPECint benchmark formula */
-type SizingMode = 'vcpu' | 'specint';
+/**
+ * Sizing mode — determines which CPU/performance formula drives CALC-01.
+ *
+ * - 'vcpu':       vCPU:pCore ratio hard cap (default).
+ * - 'specint':    SPECrate2017 benchmark score comparison.
+ * - 'aggressive': Observed CPU utilization drives density; ratio cap bypassed.
+ * - 'ghz':        Clock-frequency × utilization drives demand and capacity.
+ */
+export type SizingMode = 'vcpu' | 'specint' | 'aggressive' | 'ghz';
+
+/**
+ * Layout mode — determines whether disk is a server-level constraint.
+ *
+ * - 'hci':           Hyperconverged: disk lives inside the compute nodes (disk counted).
+ * - 'disaggregated': External storage (SAN/NAS): disk constraint excluded from sizing.
+ */
+export type LayoutMode = 'hci' | 'disaggregated';
 
 /**
  * Determines which resource constraint drove the final (maximum) server count.
  *
- * Tie-breaking priority when counts are equal: cpu > ram > disk.
- * When sizingMode is 'specint', the cpu slot returns 'specint' instead of 'cpu'.
- *
- * @param cpu   CPU/SPECint-limited server count (integer, post-ceil)
- * @param ram   RAM-limited server count (integer, post-ceil)
- * @param disk  Disk-limited server count (integer, post-ceil)
- * @param sizingMode  'vcpu' (default) or 'specint'
+ * Tie-breaking priority when counts are equal: cpu/specint/ghz > ram > disk.
+ * The cpu slot returns 'specint' or 'ghz' when the respective mode is active.
  */
 function determineLimitingResource(
   cpu: number,
@@ -22,7 +39,11 @@ function determineLimitingResource(
   disk: number,
   sizingMode: SizingMode = 'vcpu',
 ): LimitingResource {
-  if (cpu >= ram && cpu >= disk) return sizingMode === 'specint' ? 'specint' : 'cpu';
+  if (cpu >= ram && cpu >= disk) {
+    if (sizingMode === 'specint') return 'specint';
+    if (sizingMode === 'ghz') return 'ghz';
+    return 'cpu';
+  }
   if (ram > cpu && ram >= disk) return 'ram';
   return 'disk';
 }
@@ -31,72 +52,101 @@ function determineLimitingResource(
  * Public API: computes the full ScenarioResult for a given cluster + scenario pair.
  *
  * Applies CALC-01 through CALC-06:
- *   CALC-01: CPU-limited server count (or SPECint count when sizingMode='specint')
- *   CALC-02: RAM-limited server count
- *   CALC-03: Disk-limited server count
- *   CALC-04: N+1 HA reserve (adds exactly 1 if haReserveEnabled)
+ *   CALC-01: CPU-limited count (formula depends on sizingMode)
+ *   CALC-02: RAM-limited count
+ *   CALC-03: Disk-limited count (0 in disaggregated layout mode)
+ *   CALC-04: HA reserve (adds haReserveCount servers after the max)
  *   CALC-05: Max constraint selection + limiting resource identification
- *   CALC-06: Utilization metrics (achievedVcpuToPCoreRatio, vmsPerServer, utilization %)
+ *   CALC-06: Utilization metrics
+ *
+ * When scenario.targetVmCount is set, RAM/disk formulas use the target count and
+ * vCPUs are scaled proportionally (effectiveVcpus = totalVcpus × targetVmCount / totalVms).
  *
  * The returned object is frozen — it is never mutated after creation.
  *
  * @param cluster      Current environment metrics (OldCluster)
  * @param scenario     Target server configuration and sizing assumptions (Scenario)
- * @param sizingMode   'vcpu' (default) or 'specint' — determines CPU constraint formula
+ * @param sizingMode   CPU formula selection (default 'vcpu')
+ * @param layoutMode   Disk constraint inclusion (default 'hci')
  */
 export function computeScenarioResult(
   cluster: OldCluster,
   scenario: Scenario,
   sizingMode: SizingMode = 'vcpu',
+  layoutMode: LayoutMode = 'hci',
 ): ScenarioResult {
-  // headroomFactor = 1 + headroomPercent/100
-  // e.g. 20% headroom → factor = 1.20
   const headroomFactor = 1 + scenario.headroomPercent / 100;
-
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
-  // CALC-01: CPU-limited count (or SPECint-limited count in specint mode)
+  // Effective VM and vCPU counts — scaled when targetVmCount overrides cluster.totalVms
+  const effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms;
+  const effectiveVcpus =
+    scenario.targetVmCount && cluster.totalVms > 0
+      ? Math.round(cluster.totalVcpus * (scenario.targetVmCount / cluster.totalVms))
+      : cluster.totalVcpus;
+
+  const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
+  const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
+
+  // CALC-01: CPU/performance-limited count (formula depends on sizingMode)
   let cpuLimitedCount: number;
   if (sizingMode === 'specint') {
-    const existingServers = cluster.existingServerCount ?? 0;
-    const oldSPECint = cluster.specintPerServer ?? 0;
-    const targetSPECint = scenario.targetSpecint ?? 0;
-    cpuLimitedCount = serverCountBySpecint(existingServers, oldSPECint, headroomFactor, targetSPECint);
+    cpuLimitedCount = serverCountBySpecint(
+      cluster.existingServerCount ?? 0,
+      cluster.specintPerServer ?? 0,
+      headroomFactor,
+      scenario.targetSpecint ?? 0,
+    );
+  } else if (sizingMode === 'aggressive') {
+    // Ratio cap bypassed: observed utilization drives density
+    cpuLimitedCount = serverCountByCpuAggressive(
+      effectiveVcpus,
+      cpuUtilPct,
+      headroomFactor,
+      coresPerServer,
+    );
+  } else if (sizingMode === 'ghz') {
+    cpuLimitedCount = serverCountByGhz(
+      cluster.totalPcores,
+      cluster.cpuFrequencyGhz ?? 1,
+      cpuUtilPct,
+      headroomFactor,
+      scenario.targetCpuFrequencyGhz ?? 1,
+      coresPerServer,
+      targetCpuUtilPct,
+    );
   } else {
-    const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
+    // 'vcpu': ratio is a hard assignment-density cap; cpuUtilPct not used here
     cpuLimitedCount = serverCountByCpu(
-      cluster.totalVcpus,
+      effectiveVcpus,
       headroomFactor,
       scenario.targetVcpuToPCoreRatio,
       coresPerServer,
-      cpuUtilPct,
     );
   }
 
-  // CALC-02: RAM-limited count (with utilization scaling if provided)
+  // CALC-02: RAM-limited count
   const ramUtilPct = cluster.ramUtilizationPercent ?? 100;
+  const targetRamUtilPct = scenario.targetRamUtilizationPercent ?? 100;
   const ramLimitedCount = serverCountByRam(
-    cluster.totalVms,
+    effectiveVmCount,
     scenario.ramPerVmGb,
     headroomFactor,
     scenario.ramPerServerGb,
     ramUtilPct,
+    targetRamUtilPct,
   );
 
-  // CALC-03: Disk-limited count
-  const diskLimitedCount = serverCountByDisk(
-    cluster.totalVms,
-    scenario.diskPerVmGb,
-    headroomFactor,
-    scenario.diskPerServerGb,
-  );
-
-  // CALC-05: Final count is the maximum of the three constraints
-  const rawCount = Math.max(cpuLimitedCount, ramLimitedCount, diskLimitedCount);
-
-  // CALC-04: N+1 HA — adds exactly 1 server after the max(), not before
-  const haReserveApplied = scenario.haReserveEnabled;
-  const finalCount = haReserveApplied ? rawCount + 1 : rawCount;
+  // CALC-03: Disk-limited count (0 in disaggregated mode — external storage)
+  const diskLimitedCount =
+    layoutMode === 'disaggregated'
+      ? 0
+      : serverCountByDisk(
+          effectiveVmCount,
+          scenario.diskPerVmGb,
+          headroomFactor,
+          scenario.diskPerServerGb,
+        );
 
   // CALC-05: Limiting resource — determined from the raw counts (before HA)
   const limitingResource = determineLimitingResource(
@@ -106,35 +156,58 @@ export function computeScenarioResult(
     sizingMode,
   );
 
+  // CALC-05: Raw count is the maximum of all active constraints
+  const rawCount = Math.max(cpuLimitedCount, ramLimitedCount, diskLimitedCount);
+
+  // CALC-04: HA reserve — add 0, 1, or 2 servers after the constraint max
+  const haReserveCount = scenario.haReserveCount ?? 0;
+  const withHA = rawCount + haReserveCount;
+
+  // Pin floor: finalCount is never less than minServerCount when set
+  const finalCount =
+    scenario.minServerCount != null ? Math.max(withHA, scenario.minServerCount) : withHA;
+
+  const requiredCount = rawCount;
+  const haReserveApplied = haReserveCount > 0;
+
   // CALC-06: Utilization metrics (use finalCount as denominator)
   const achievedVcpuToPCoreRatio =
-    cluster.totalVcpus / (finalCount * coresPerServer);
+    finalCount > 0 ? effectiveVcpus / (finalCount * coresPerServer) : 0;
 
-  const vmsPerServer = cluster.totalVms / finalCount;
+  const vmsPerServer = finalCount > 0 ? effectiveVmCount / finalCount : 0;
 
+  // CPU util % applies the same factor used in CALC-01 display
   const cpuUtilizationPercent =
-    (cluster.totalVcpus /
-      scenario.targetVcpuToPCoreRatio /
-      (finalCount * coresPerServer)) *
-    100;
+    finalCount > 0
+      ? (effectiveVcpus * (cpuUtilPct / 100) /
+          scenario.targetVcpuToPCoreRatio /
+          (finalCount * coresPerServer)) *
+        100
+      : 0;
 
   const ramUtilizationPercent =
-    (cluster.totalVms * scenario.ramPerVmGb) /
-    (finalCount * scenario.ramPerServerGb) *
-    100;
+    finalCount > 0
+      ? ((effectiveVmCount * scenario.ramPerVmGb * (ramUtilPct / 100)) /
+          (finalCount * scenario.ramPerServerGb)) *
+        100
+      : 0;
 
   const diskUtilizationPercent =
-    (cluster.totalVms * scenario.diskPerVmGb) /
-    (finalCount * scenario.diskPerServerGb) *
-    100;
+    finalCount > 0
+      ? ((effectiveVmCount * scenario.diskPerVmGb) /
+          (finalCount * scenario.diskPerServerGb)) *
+        100
+      : 0;
 
   return Object.freeze({
     cpuLimitedCount,
     ramLimitedCount,
     diskLimitedCount,
     rawCount,
+    requiredCount,
     finalCount,
     limitingResource,
+    haReserveCount,
     haReserveApplied,
     achievedVcpuToPCoreRatio,
     vmsPerServer,

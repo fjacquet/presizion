@@ -8,10 +8,12 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useWizardStore } from '@/store/useWizardStore'
+import { useClusterStore } from '@/store/useClusterStore'
 import { Button } from '@/components/ui/button'
 
 function downloadChartPng(ref: React.RefObject<HTMLDivElement | null>): void {
@@ -46,15 +48,25 @@ export function SizingChart() {
   const scenarios = useScenariosStore((s) => s.scenarios)
   const results = useScenariosResults()
   const sizingMode = useWizardStore((s) => s.sizingMode)
+  const layoutMode = useWizardStore((s) => s.layoutMode)
+  const currentCluster = useClusterStore((s) => s.currentCluster)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   if (scenarios.length === 0) return null
+
+  const showLegend = scenarios.length > 1
+  const showDisk = layoutMode !== 'disaggregated'
+
+  const cpuBarName =
+    sizingMode === 'specint' ? 'SPECint-limited' :
+    sizingMode === 'ghz' ? 'GHz-limited' :
+    'CPU-limited'
 
   const chartData = scenarios.map((s, i) => ({
     name: s.name,
     cpu: results[i]?.cpuLimitedCount ?? 0,
     ram: results[i]?.ramLimitedCount ?? 0,
-    disk: results[i]?.diskLimitedCount ?? 0,
+    ...(showDisk ? { disk: results[i]?.diskLimitedCount ?? 0 } : {}),
   }))
 
   return (
@@ -77,14 +89,18 @@ export function SizingChart() {
             <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
             <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
             <Tooltip />
-            <Legend />
-            <Bar
-              dataKey="cpu"
-              name={sizingMode === 'specint' ? 'SPECint-limited' : 'CPU-limited'}
-              fill="#6366f1"
-            />
+            {showLegend && <Legend />}
+            {currentCluster.existingServerCount !== undefined && (
+              <ReferenceLine
+                y={currentCluster.existingServerCount}
+                label="As-Is"
+                stroke="#94a3b8"
+                strokeDasharray="4 2"
+              />
+            )}
+            <Bar dataKey="cpu" name={cpuBarName} fill="#6366f1" />
             <Bar dataKey="ram" name="RAM-limited" fill="#22c55e" />
-            <Bar dataKey="disk" name="Disk-limited" fill="#f59e0b" />
+            {showDisk && <Bar dataKey="disk" name="Disk-limited" fill="#f59e0b" />}
           </BarChart>
         </ResponsiveContainer>
       </div>

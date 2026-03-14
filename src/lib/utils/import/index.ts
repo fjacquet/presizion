@@ -16,6 +16,8 @@ export interface ClusterImportResult {
   ramPerServerGb?: number
   cpuUtilizationPercent?: number
   ramUtilizationPercent?: number
+  cpuFrequencyGhz?: number   // avg CPU clock frequency in GHz (from vHost / ESX Hosts)
+  cpuModel?: string           // display-only CPU model string from first host
   // Scope detection fields — populated by parsers
   detectedScopes?: string[]
   scopeLabels?: Record<string, string>

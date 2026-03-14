@@ -1,7 +1,7 @@
 // VALIDATION.md: CALC-01 (CPU-limited), CALC-02 (RAM-limited), CALC-03 (disk-limited)
 // Imported functions will come from src/lib/sizing/formulas.ts (Plan 02)
 import { describe, it, expect } from 'vitest';
-import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint } from '../formulas';
+import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint, serverCountByCpuAggressive, serverCountByGhz } from '../formulas';
 
 // === Fixture constants (manually verified against formula spec) ===
 
@@ -70,15 +70,13 @@ describe('serverCountBySpecint (PERF-04)', () => {
   });
 });
 
-describe('serverCountByCpu with cpuUtilPct (UTIL-03)', () => {
-  it('ceil(1000 × (60/100) × 1.20 / 4 / 40) = 5 — utilization scaling', () => {
-    // ceil(1000 * (60/100) * 1.20 / 4 / 40) = ceil(600 * 1.20 / 4 / 40) = ceil(720 / 160) = ceil(4.5) = 5
-    expect(serverCountByCpu(1000, 1.20, 4, 40, 60)).toBe(5);
+describe('serverCountByCpu — ratio is a hard cap (CALC-01)', () => {
+  it('cpuUtilPct has no effect on server count — ratio is enforced on assigned vCPUs', () => {
+    // The ratio cap: ceil(1000 × 1.20 / 4 / 40) = ceil(7.5) = 8
+    // cpuUtil=60% must NOT reduce this to 5 (that would violate 4:1 assignment density)
+    expect(serverCountByCpu(1000, 1.20, 4, 40)).toBe(8);
   });
-  it('cpuUtilPct=100 produces same result as current signature — regression', () => {
-    // With utlPct=100: ceil(3200 * 1.0 * 1.20 / 4 / 40) = ceil(24) = 24
-    expect(serverCountByCpu(3200, 1.20, 4, 40, 100)).toBe(24);
-    // Default (no 5th arg) should also give 24
+  it('ratio hard cap: ceil(3200 × 1.20 / 4 / 40) = 24 — unchanged from original', () => {
     expect(serverCountByCpu(3200, 1.20, 4, 40)).toBe(24);
   });
 });
@@ -93,6 +91,38 @@ describe('serverCountByRam with ramUtilPct (UTIL-03)', () => {
     expect(serverCountByRam(500, 16, 1.20, 512, 100)).toBe(19);
     // Default (no 5th arg) should also give 19
     expect(serverCountByRam(500, 16, 1.20, 512)).toBe(19);
+  });
+});
+
+describe('serverCountByCpuAggressive (CALC-01-AGG)', () => {
+  it('1000 vCPUs, 60% util, 20% headroom, 40 cores/server = ceil(1000×0.6×1.2/40) = 18', () => {
+    expect(serverCountByCpuAggressive(1000, 60, 1.20, 40)).toBe(18);
+  });
+  it('100% util = same as raw vCPU ceiling without ratio: ceil(1000×1.0×1.2/40) = 30', () => {
+    expect(serverCountByCpuAggressive(1000, 100, 1.20, 40)).toBe(30);
+  });
+  it('50% util: ceil(1000×0.5×1.2/40) = ceil(15) = 15', () => {
+    expect(serverCountByCpuAggressive(1000, 50, 1.20, 40)).toBe(15);
+  });
+});
+
+describe('serverCountByGhz (CALC-01-GHZ)', () => {
+  // demand = 200 × 2.4 × 0.70 = 336 GHz; capacity = 40 × 3.0 × 0.80 = 96 GHz/server
+  // servers = ceil(336 × 1.2 / 96) = ceil(403.2 / 96) = ceil(4.2) = 5
+  it('200 pCores × 2.4GHz × 70% util × 1.2 headroom / (40c × 3.0GHz × 80% target) = 5', () => {
+    expect(serverCountByGhz(200, 2.4, 70, 1.20, 3.0, 40, 80)).toBe(5);
+  });
+  it('targetCpuUtilPct default (100%): ceil(200×2.4×0.70×1.2 / (40×3.0×1.0)) = ceil(403.2/120) = 4', () => {
+    expect(serverCountByGhz(200, 2.4, 70, 1.20, 3.0, 40)).toBe(4);
+  });
+  it('returns 0 when existingFreqGhz = 0 (zero-guard)', () => {
+    expect(serverCountByGhz(200, 0, 70, 1.20, 3.0, 40)).toBe(0);
+  });
+  it('returns 0 when targetCpuFrequencyGhz = 0 (zero-guard)', () => {
+    expect(serverCountByGhz(200, 2.4, 70, 1.20, 0, 40)).toBe(0);
+  });
+  it('same freq old/new with 100% util = ceil(pCores × headroom / coresPerServer): ceil(200×1.2/40)=6', () => {
+    expect(serverCountByGhz(200, 2.4, 100, 1.20, 2.4, 40)).toBe(6);
   });
 });
 
