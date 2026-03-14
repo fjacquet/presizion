@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
-status: in-progress
-stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-03-14T14:49:25Z"
-last_activity: 2026-03-14 — Completed 17-02 (SPECrate UX - Read-only fields, Lookup link)
+status: completed
+stopped_at: Completed 17-03-PLAN.md (Phase 17 fully complete)
+last_updated: "2026-03-14T14:49:44Z"
+last_activity: 2026-03-14 — Completed 17-03 (Reset button with confirmation dialog)
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -21,31 +21,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.4 — Phase 17 executing
+**Current focus:** v1.4 — Phase 17 complete
 
 ## Current Position
 
 Phase: 17-chart-polish-specrate-ux-reset
-Plan: 2 of 3 complete
-Status: Phase 17 in progress
-Last activity: 2026-03-14 — Completed 17-02 (SPECrate UX - Read-only fields, Lookup link)
+Plan: 3 of 3 complete
+Status: Phase 17 complete (all plans done)
+Last activity: 2026-03-14 — Completed 17-03 (Reset button with confirmation dialog)
 
-Progress: [========  ] 80%
+Progress: [==========] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 5 min
-- Total execution time: 0.32 hours
+- Total execution time: 0.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 16 | 2/2 | 11min | 6min |
-| 17 | 2/3 | 9min | 5min |
+| 17 | 3/3 | 14min | 5min |
 
 *Updated after each plan completion*
 
@@ -97,10 +97,13 @@ Recent decisions affecting current work:
 - [Phase 17-02]: hasMetadata derived at render time from sizingMode + currentCluster, not stored in local state
 - [Phase 17-02]: SPECrate lookup uses button element (not anchor) to run async clipboard before navigation
 - [Phase 17-02]: Sonner installed and Toaster added to App.tsx for project-wide toast support
+- [Phase 17-03]: Reset uses store.getState() pattern for one-shot operations avoiding hook subscription overhead
+- [Phase 17-03]: localStorage.removeItem targets only presizion-session; presizion-theme preserved by design
+- [Phase 17-03]: Confirmation dialog pattern: useState for open, controlled Dialog, Cancel + destructive buttons in DialogFooter
 
 ### Pending Todos
 
-- None
+- None (Phase 17 complete)
 
 ### Blockers/Concerns
 
@@ -109,5 +112,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 17-02-PLAN.md
+Stopped at: Completed 17-03-PLAN.md (Phase 17 fully complete)
 Resume file: None

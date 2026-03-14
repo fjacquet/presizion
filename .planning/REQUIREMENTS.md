@@ -77,7 +77,7 @@
 | SPEC-LINK-01 | Phase 17 | Complete |
 | SPEC-LINK-02 | Phase 17 | Complete |
 | SPEC-LINK-03 | Phase 17 | Complete |
-| RESET-01 | Phase 17 | Pending |
-| RESET-02 | Phase 17 | Pending |
-| RESET-03 | Phase 17 | Pending |
-| RESET-04 | Phase 17 | Pending |
+| RESET-01 | Phase 17 | Complete |
+| RESET-02 | Phase 17 | Complete |
+| RESET-03 | Phase 17 | Complete |
+| RESET-04 | Phase 17 | Complete |
