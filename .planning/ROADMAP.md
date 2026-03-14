@@ -50,8 +50,8 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 16-01-PLAN.md — Import scope fixes: per-cluster ESX host config, performance scoping, aggregation fix
-- [ ] 16-02-PLAN.md — VM override test coverage and As-Is column rendering
+- [x] 16-01-PLAN.md — Import scope fixes: per-cluster ESX host config, performance scoping, aggregation fix
+- [x] 16-02-PLAN.md — VM override test coverage and As-Is column rendering
 
 **Plan 01 — Import Scope Fixes (FIX-SCOPE-01..06)**
 - Refactor LiveOptics parser: scope ESX host config per cluster (join hosts to clusters via Cluster column or Host-to-Cluster mapping from VMs sheet)
@@ -74,7 +74,14 @@ Plans:
 
 **Goal:** Polish charts for presentation quality, improve SPECrate workflow, add reset capability.
 
-**Requirements:** CHART-04..07, SPEC-06..09, SPEC-LINK-01..03, RESET-01..04 (13 requirements)
+**Requirements:** CHART-04..07, SPEC-06..09, SPEC-LINK-01..03, RESET-01..04 (14 requirements)
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 17-01-PLAN.md — Chart polish: legends, data labels, professional colors, CoreCountChart PNG download
+- [ ] 17-02-PLAN.md — SPECrate UX: read-only socket/core fields in specint mode, lookup link
+- [ ] 17-03-PLAN.md — Reset button with confirmation dialog
 
 **Plan 01 — Chart Polish (CHART-04..07)**
 - Add legends to SizingChart and CoreCountChart (scenario name + color)
@@ -98,8 +105,6 @@ Plans:
 - After reset: navigate to Step 1 with blank form
 - Tests: button visibility, confirmation dialog, store clearing, navigation
 
-**Estimated plans:** 3
-
 ---
 
 ## Progress
@@ -121,5 +126,5 @@ Plans:
 | 13. Import Scope Filter | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
-| 16. Bug Fixes — Import Scoping, VM Override & As-Is | 2/2 | Complete    | 2026-03-14 | — |
+| 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 0/3 | Pending | — |
