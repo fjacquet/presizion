@@ -134,7 +134,7 @@ describe('deserializeSession', () => {
     });
     const result = deserializeSession(withExtra);
     expect(result).not.toBeNull();
-    expect((result!.cluster as Record<string, unknown>)['unknownField']).toBeUndefined();
+    expect((result!.cluster as unknown as Record<string, unknown>)['unknownField']).toBeUndefined();
   });
 
   it('defaults sizingMode to "vcpu" when absent', () => {
@@ -178,7 +178,7 @@ describe('saveToLocalStorage', () => {
     saveToLocalStorage(validSession);
     const stored = localStorageStore[STORAGE_KEY];
     expect(stored).toBeDefined();
-    const restored = deserializeSession(stored);
+    const restored = deserializeSession(stored!);
     expect(restored).not.toBeNull();
     expect(restored!.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
   });

@@ -33,7 +33,7 @@ beforeEach(() => {
         ramPerVmGb: 16,
         diskPerVmGb: 100,
         headroomPercent: 20,
-        haReserveEnabled: false,
+        haReserveCount: 0 as const,
       },
     ],
   })

@@ -231,7 +231,6 @@ describe('ImportPreviewModal', () => {
         sourceFormat: 'presizion-json',
         cluster: { totalVcpus: 80, totalPcores: 40, totalVms: 30 },
         scenarios: [],
-        warnings: [],
       }
       render(<ImportPreviewModal result={JSON_RESULT} {...defaultProps} />)
       const applyBtn = screen.getByRole('button', { name: /apply/i })

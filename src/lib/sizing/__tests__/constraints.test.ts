@@ -16,7 +16,7 @@ const CPU_LIMITED_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 1024, diskPerServerGb: 50000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
 };
 
 // RAM-limited scenario fixture
@@ -32,7 +32,7 @@ const RAM_LIMITED_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 512, diskPerServerGb: 50000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 10,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
 };
 
 // Disk-limited scenario fixture
@@ -48,7 +48,7 @@ const DISK_LIMITED_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 1024, diskPerServerGb: 10000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 500,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
 };
 
 describe('computeScenarioResult', () => {
@@ -156,7 +156,7 @@ const SPECINT_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 512, diskPerServerGb: 50000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
   targetSpecint: 2400,
 };
 
@@ -174,7 +174,7 @@ const UTIL_CPU_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 2048, diskPerServerGb: 100000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
 };
 
 // RAM cluster: totalVms=500, ramUtilizationPercent=80
@@ -189,7 +189,7 @@ const UTIL_RAM_SCENARIO = {
   socketsPerServer: 2, coresPerSocket: 20,
   ramPerServerGb: 512, diskPerServerGb: 100000,
   targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 10,
-  headroomPercent: 20, haReserveCount: 0,
+  headroomPercent: 20, haReserveCount: 0 as const,
 };
 
 describe('computeScenarioResult — SPECint mode (PERF-04, PERF-05)', () => {

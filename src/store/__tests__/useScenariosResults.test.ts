@@ -21,7 +21,7 @@ const SPECINT_SCENARIO = {
   ramPerVmGb: 2,
   diskPerVmGb: 10,
   headroomPercent: 20,
-  haReserveEnabled: false,
+  haReserveCount: 0 as const,
   targetSpecint: 2400,
 };
 
@@ -49,7 +49,7 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
       ramPerVmGb: 2,
       diskPerVmGb: 10,
       headroomPercent: 20,
-      haReserveEnabled: false,
+      haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, 'vcpu');
     expect(result.finalCount).toBe(24);
