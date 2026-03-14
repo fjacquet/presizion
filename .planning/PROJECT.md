@@ -4,35 +4,41 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v1.2 ships with Recharts bar chart visualization, RVTools/LiveOptics file import, SPECint-based sizing mode, utilization right-sizing, print/PDF export, and a full As-Is/To-Be comparison report.
+v1.3 ships with Presizion branding, dark mode toggle, multi-cluster import scope filtering, persistent scope widget, localStorage session auto-restore, and shareable URL hash encoding.
 
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
 
-## Current Milestone: v1.3 — Scope, Persistence & Branding
+## Current State (v1.3 — Shipped 2026-03-14)
 
-**Goal:** Add cluster-scoped import filtering, localStorage/URL-share persistence, manual dark-mode toggle, and Presizion brand assets.
-
-**Target features:**
-
-- BRAND-01/02: Presizion logo + custom favicon (modern abstract, blue/slate via Nano-Banana)
-- THEME-01/02/03: Manual light/dark toggle (Sun/Moon button, localStorage, OS fallback)
-- SCOPE-01–04: Cluster/datacenter scope filter in import flow + persistent badge in Step 1
-- PERS-01/02/03: localStorage session restore + shareable URL hash encoding
-
-## Current State (v1.2 — Shipped 2026-03-13)
-
-- **Codebase:** ~6,445 lines TypeScript (src/)
-- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Vitest (254 tests)
+- **Codebase:** ~10,118 lines TypeScript (src/)
+- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Vitest (378 tests)
 - **Deployment:** GitHub Pages at `/presizion/`
 - **Sizing modes:** vCPU-based (default) and SPECint-based (global toggle)
-- **Export formats:** Clipboard text, CSV, JSON, PNG (chart), Print/PDF
-- **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → auto-fills Step 1
+- **Export formats:** Clipboard text, CSV, JSON, PNG (chart), Print/PDF, Shareable URL
+- **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → scope filter → auto-fills Step 1
+- **Branding:** Presizion SVG wordmark + custom favicon
+- **Theming:** Light/dark/system toggle with localStorage persistence
+- **Persistence:** localStorage auto-restore + base64url shareable URL hash
 
 ## Requirements
 
 ### Validated
+
+- ✓ User can enter current cluster metrics and define scenarios — v1.0 / Phase 2
+- ✓ App calculates server counts (CPU/RAM/disk constraints) with live updates — v1.0 / Phase 1–2
+- ✓ Side-by-side comparison table with utilization color-coding — v1.0 / Phase 3
+- ✓ Clipboard copy and CSV download — v1.0 / Phase 3
+- ✓ 3-step wizard with validation guards and beforeunload warning — v1.0 / Phase 2–3
+- ✓ GitHub Pages deployment with dark mode support — v1.0 / Phase 4
+- ✓ Inline formula display for all key outputs — v1.0 / Phase 4
+- ✓ SPECint-based sizing mode (global toggle, delta formula) — v1.1 / Phase 5–6
+- ✓ CPU & RAM utilization % inputs for right-sizing — v1.1 / Phase 5–6
+- ✓ As-Is reference column in Step 3 (server count, config, pCores, ratio) — v1.1 / Phase 7
+- ✓ Print/PDF-optimized layout — v1.1 / Phase 7
+- ✓ JSON download export — v1.1 / Phase 7
+### Validated (full history in milestones archive)
 
 - ✓ User can enter current cluster metrics and define scenarios — v1.0 / Phase 2
 - ✓ App calculates server counts (CPU/RAM/disk constraints) with live updates — v1.0 / Phase 1–2
@@ -51,12 +57,15 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ RVTools .xlsx file import → auto-fill Step 1 — v1.2 / Phase 10
 - ✓ LiveOptics .zip/.xlsx/.csv file import → auto-fill Step 1 — v1.2 / Phase 10
 - ✓ Import preview/confirm modal before form population — v1.2 / Phase 10
+- ✓ Presizion logo + custom favicon — v1.3 / Phase 11
+- ✓ RAM formula display shows utilization factor (× N%) — v1.3 / Phase 11
+- ✓ Manual light/dark/system theme toggle with localStorage persistence — v1.3 / Phase 12
+- ✓ Multi-cluster import scope filter (detect clusters, select subset) — v1.3 / Phase 13
+- ✓ Persistent scope badge in Step 1 with live re-aggregation — v1.3 / Phase 14
+- ✓ localStorage session auto-restore on page load — v1.3 / Phase 15
+- ✓ Shareable URL hash encoding full session state — v1.3 / Phase 15
 
-### Active (v2 candidates)
-
-- [ ] localStorage persistence — save last-used inputs, restore on next visit (PERS-01)
-- [ ] URL hash state sharing — encode session state for sharing links (PERS-02)
-- [ ] Explicit light/dark mode toggle — manual override beyond OS preference (UI-01)
+### Active (v1.4 candidates)
 
 ### Out of Scope
 
@@ -89,7 +98,10 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 |----------|-----------|---------|
 | No pre-defined server SKUs | Avoids maintaining a hardware catalog; users input their own specs | ✓ Good — no SKU maintenance burden |
 | Industry defaults for ratios | 4:1 vCPU:pCore, 20% headroom are widely accepted starting points | ✓ Good — users rarely change defaults |
-| localStorage deferred to v2 | Not blocking the core workflow; adds complexity for minimal benefit | ✓ Good — not missed in v1.0-v1.2 |
+| localStorage delivered in v1.3 | Shipped as PERS-01/02/03 — Zustand subscribe + Zod validation + base64url URL hash | ✓ Good — clean implementation, 22 tests |
+| Zod v4 UUID strictness | v4 uses stricter RFC 4122 regex — test fixtures must use valid UUIDs | ✓ Required — fixed during v1.3 |
+| history.replaceState after hash restore | Clears hash from address bar so refresh falls back to localStorage | ✓ Good — expected UX behavior |
+| useImportStore for scope state | Separates import buffer from wizard state — enables re-aggregation without re-import | ✓ Good — clean separation |
 | GitHub Pages deployment | Zero infra, easy sharing, matches static-only constraint | ✓ Good — works perfectly |
 | Math before UI (Phase 1 first) | Sizing library correctness established before any component depends on it | ✓ Good — zero formula regressions |
 | z.preprocess for numeric Zod fields | Empty string inputs produce ZodError, protecting form validation | ✓ Good — no NaN leaks to formulas |
@@ -101,4 +113,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-13 after v1.2 milestone completion*
+*Last updated: 2026-03-14 after v1.3 milestone completion*

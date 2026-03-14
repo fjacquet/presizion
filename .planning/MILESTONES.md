@@ -1,5 +1,14 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v1.3 Scope, Persistence & Branding (Shipped: 2026-03-14)
+
+**Phases completed:** 7 phases, 10 plans, 0 tasks
+
+**Key accomplishments:**
+- (none recorded)
+
+---
+
 ## v1.0 — MVP (completed 2026-03-12)
 
 **Goal:** Ship a working, deployable sizing tool that correctly calculates server counts from cluster metrics and presents results in a clean 3-step wizard.

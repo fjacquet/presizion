@@ -56,14 +56,64 @@
 
 ---
 
+## Milestone: v1.3 — Scope, Persistence & Branding
+
+**Shipped:** 2026-03-14
+**Phases:** 5 (11-15) | **Plans:** 10
+**Timeline:** 1 day (2026-03-13 → 2026-03-14)
+
+### What Was Built
+
+1. **Presizion branding** — SVG wordmark (geometric P mark + wordmark, #3B82F6/#475569), custom favicon replacing Vite default, wired into WizardShell header
+2. **RAM formula display parity** — `ramUtilizationPercent` added to `RamFormulaParams`, conditional `× N%` factor in `ramFormulaString`, matches CPU pattern (TD-04 resolved)
+3. **Dark mode toggle** — `useThemeStore` (Zustand + localStorage), Sun/Moon `ThemeToggle` in header, OS fallback on first visit, anti-flash script in index.html
+4. **Multi-cluster import scope filter** — parser scope detection in RVTools + LiveOptics, `scopeAggregator.ts`, ImportPreviewModal scope selector with live re-aggregation preview
+5. **Persistent scope badge** — `useImportStore` for import buffer, `ScopeBadge` in Step 1 with edit dialog that re-aggregates on scope change
+6. **Session persistence + Share** — `persistence.ts` (serialize/deserialize/localStorage/base64url hash), boot restore (hash priority > localStorage), Share button with "Link Copied!" feedback
+
+### What Worked
+
+- **GSD framework for all 5 phases** — full framework compliance throughout; no documentation backfill needed (contrast with v1.2 Phases 8-10 informal sprint)
+- **Separation of import state** — `useImportStore` holding the raw import buffer independently of wizard state made scope re-aggregation clean with no refactoring of existing stores
+- **Zod validation in persistence** — deserializing from localStorage/URL through Zod schemas prevented corrupted or stale state from reaching the UI; silent null returns on bad data were the right pattern
+- **history.replaceState after hash restore** — clears the hash from the address bar immediately after loading, so subsequent refreshes use localStorage naturally
+- **Wave structure (persist utility → URL hash)** — splitting plan 15-01 (utility layer) from 15-02 (URL + Share) meant the executor could build on a stable foundation in wave 2 with no circular dependencies
+
+### What Was Inefficient
+
+- **Phase 09/10 confusion on plan-phase** — initial `/gsd:plan-phase 09` call required workflow clarification; `roadmap get-phase` returning `found: false` despite ROADMAP.md having the phase caused confusion. Phase directory creation needed manual intervention.
+- **Zod v4 UUID regex strictness** — test fixtures using `00000000-0000-0000-0000-000000000001` (invalid variant bits) silently failed Zod v4 validation. Required fixing to RFC 4122 compliant UUIDs (`a0eebc99-...`). Should be in standard fixture conventions.
+- **REQUIREMENTS.md missing THEME-01/02/03** — dark mode requirements were referenced in ROADMAP.md but absent from REQUIREMENTS.md traceability table. Minor documentation gap.
+
+### Patterns Established
+
+- **`history.replaceState(null, '', location.pathname + location.search)` after hash restore** — clean URL hash clearing without page reload; reusable pattern for any hash-based feature
+- **Synchronous boot restore before `createRoot`** — call store `getState().set*` imperatively before React mounts; initial render has restored state, zero flash
+- **Zustand `store.subscribe` for auto-save** — no middleware required, plain subscribe fires on every state change, filter via `saveToLocalStorage` with try/catch for SecurityError
+- **Scope aggregation via import buffer** — store raw parsed data in `useImportStore.importBuffer`; re-aggregation is a pure function over (buffer, selectedClusters); no re-parse needed
+
+### Key Lessons
+
+1. **Zod v4 UUID validation** — test fixtures must use RFC 4122 compliant UUIDs (check variant bits); add to project fixture conventions
+2. **`roadmap get-phase` tool gap** — gsd-tools CLI doesn't reliably find phases by number when the phase is in progress (not yet in directory); document workaround (manual mkdir)
+3. **GSD framework discipline pays off** — all 5 phases completed cleanly with no backfill; contrast with v1.2 informal sprint that required Phase 8 backfill
+
+### Cost Observations
+
+- **Sessions:** 1 day, multiple context resets handled by GSD state
+- **Model:** claude-sonnet-4-6 throughout (planner, executor, verifier agents)
+- **Notable:** Wave-based parallel execution worked cleanly for all phases; verifier scored 7/7 on phase 15 with 378 tests passing
+
+---
+
 ## Cross-Milestone Trends
 
-| Metric | v1.2 |
-|--------|------|
-| Phases | 10 (cumulative) |
-| Plans | 29 |
-| Tests at completion | 254 |
-| LOC (src/) | ~6,445 |
-| Formula regressions | 0 |
-| Phase duration avg | < 1 day |
-| GSD framework compliance | Phases 1-7: full; Phases 8-10: informal |
+| Metric | v1.2 | v1.3 |
+|--------|------|------|
+| Phases | 10 (cumulative) | 5 (incremental) |
+| Plans | 29 | 10 |
+| Tests at completion | 254 | 378 |
+| LOC (src/) | ~6,445 | ~10,118 |
+| Formula regressions | 0 | 0 |
+| Phase duration avg | < 1 day | < 1 day |
+| GSD framework compliance | Phases 1-7: full; 8-10: informal | Phases 11-15: full |
