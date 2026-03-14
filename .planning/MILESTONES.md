@@ -1,12 +1,26 @@
 # Milestones: Cluster Refresh Sizing Tool
 
-## v1.4 — Bug Fixes, Chart Polish & UX (In Progress)
+## v1.4 — Bug Fixes, Chart Polish & UX (Shipped: 2026-03-14)
 
-**Goal:** Fix data-integrity bugs (import scoping, VM override, As-Is column), polish charts, improve SPECrate UX, add reset button.
+**Goal:** Fix data-integrity bugs, polish charts for presentation quality, improve SPECrate workflow, add reset capability.
 
-**Phases:** 16-17 (2 phases, 5 plans, 27 requirements)
+**What shipped:**
 
-**Branch:** `v1.4`
+- Phase 16: Per-cluster ESX host config scoping in LiveOptics/RVTools parsers, VM override test coverage, As-Is column populated with real values
+- Phase 17: Chart legends + data labels + professional palette + PNG download, SPECrate read-only fields + lookup link with clipboard copy, Reset button with confirmation dialog
+- 6 post-phase hotfixes: scope key priority, ImportPreviewModal ESX fields, cpuModel propagation, CPU Description alias, formula display VM count, chart redesign
+
+**Requirements shipped:** 27/27 (FIX-SCOPE-01..06, FIX-VM-01..02, FIX-ASIS-01..04, CHART-04..07, SPEC-06..09, SPEC-LINK-01..03, RESET-01..04)
+
+**Codebase at completion:** ~6,131 lines TypeScript (src/), 441 Vitest tests
+
+**Archive:**
+
+- Roadmap: `.planning/milestones/v1.4-ROADMAP.md`
+- Requirements: `.planning/milestones/v1.4-REQUIREMENTS.md`
+- Audit: `.planning/milestones/v1.4-MILESTONE-AUDIT.md`
+
+**Last phase number:** 17
 
 ---
 

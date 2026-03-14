@@ -4,7 +4,7 @@ milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
 status: completed
 stopped_at: Completed 17-03-PLAN.md (Phase 17 fully complete)
-last_updated: "2026-03-14T14:55:33.980Z"
+last_updated: "2026-03-14T20:25:20.558Z"
 last_activity: 2026-03-14 — Completed 17-03 (Reset button with confirmation dialog)
 progress:
   total_phases: 2

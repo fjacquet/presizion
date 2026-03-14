@@ -4,7 +4,7 @@
 
 - ✅ **v1.2 — Visualization, File Import & Tech Debt** — Phases 1-10 (shipped 2026-03-13)
 - ✅ **v1.3 — Scope, Persistence & Branding** — Phases 11-15 (shipped 2026-03-14)
-- 🔧 **v1.4 — Bug Fixes, Chart Polish & UX** — Phases 16-17 (in progress)
+- ✅ **v1.4 — Bug Fixes, Chart Polish & UX** — Phases 16-17 (shipped 2026-03-14)
 
 ## Phases
 
@@ -39,73 +39,15 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 </details>
 
-### v1.4 — Bug Fixes, Chart Polish & UX (Phases 16-17)
+<details>
+<summary>✅ v1.4 — Bug Fixes, Chart Polish & UX (Phases 16-17) — SHIPPED 2026-03-14</summary>
 
-#### Phase 16: Bug Fixes — Import Scoping, VM Override & As-Is Column
+Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
-**Goal:** Fix all data-integrity bugs that produce incorrect sizing results.
+- [x] Phase 16: Bug Fixes — Import Scoping, VM Override & As-Is (2/2 plans) — completed 2026-03-14
+- [x] Phase 17: Chart Polish, SPECrate UX & Reset (3/3 plans) — completed 2026-03-14
 
-**Requirements:** FIX-SCOPE-01..06, FIX-VM-01..02, FIX-ASIS-01..04 (12 requirements)
-
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 16-01-PLAN.md — Import scope fixes: per-cluster ESX host config, performance scoping, aggregation fix
-- [x] 16-02-PLAN.md — VM override test coverage and As-Is column rendering
-
-**Plan 01 — Import Scope Fixes (FIX-SCOPE-01..06)**
-- Refactor LiveOptics parser: scope ESX host config per cluster (join hosts to clusters via Cluster column or Host-to-Cluster mapping from VMs sheet)
-- Per-scope ScopeData includes host config fields (ramPerServerGb, socketsPerServer, coresPerSocket, totalPcores, existingServerCount, cpuUtilizationPercent, ramUtilizationPercent)
-- "All" scope aggregation: sum pCores, total hosts, representative RAM/server with heterogeneity warning
-- ESX Performance data (CPU/RAM util) scoped per cluster
-- Fallback when no cluster column: global behavior + warning
-- Audit + fix RVTools vHost parser for same scoping gap
-- Tests: per-scope host config, "All" aggregation, heterogeneous RAM warning, fallback
-
-**Plan 02 — VM Override & As-Is Column (FIX-VM-01..02, FIX-ASIS-01..04)**
-- Fix constraints.ts: when targetVmCount overrides VM count, pass overridden count to RAM-limited and Disk-limited formulas (not just CPU)
-- Complete As-Is column in ComparisonTable: VMs/Server, CPU Util %, RAM Util %, Total Disk Required
-- Metrics not applicable to As-Is show "N/A" instead of "---"
-- Tests: VM override propagation to all 3 formulas, As-Is column rendering
-
----
-
-#### Phase 17: Chart Polish, SPECrate UX & Reset Button
-
-**Goal:** Polish charts for presentation quality, improve SPECrate workflow, add reset capability.
-
-**Requirements:** CHART-04..07, SPEC-06..09, SPEC-LINK-01..03, RESET-01..04 (14 requirements)
-
-**Plans:** 3/3 plans complete
-
-Plans:
-- [ ] 17-01-PLAN.md — Chart polish: legends, data labels, professional colors, CoreCountChart PNG download
-- [ ] 17-02-PLAN.md — SPECrate UX: read-only socket/core fields in specint mode, lookup link
-- [ ] 17-03-PLAN.md — Reset button with confirmation dialog
-
-**Plan 01 — Chart Polish (CHART-04..07)**
-- Add legends to SizingChart and CoreCountChart (scenario name + color)
-- Display data values on top of each bar
-- Fix CoreCountChart PNG download (same SVG-to-canvas approach as SizingChart)
-- Professional color palette replacing default Recharts colors
-- Tests: legend rendered, data labels present, download trigger
-
-**Plan 02 — SPECrate UX & Lookup Link (SPEC-06..09, SPEC-LINK-01..03)**
-- In SPECrate mode: auto-derive sockets/server and cores/socket from benchmark metadata
-- Make socket/core fields read-only when benchmark provides them; re-enable on mode switch back
-- Fallback to manual entry with warning when benchmark metadata incomplete
-- Display detected CPU model in Step 1; add "Look up SPECrate" link to SPEC results page (new tab)
-- Hide lookup link when no CPU model detected
-- Tests: auto-derive behavior, read-only toggle, link rendering, fallback
-
-**Plan 03 — Reset Button (RESET-01..04)**
-- Add Reset button to WizardShell header (visible from all steps)
-- Confirmation dialog ("Are you sure? All data will be lost.")
-- Reset clears all stores (cluster, scenarios, wizard, import, theme preference preserved) and localStorage session
-- After reset: navigate to Step 1 with blank form
-- Tests: button visibility, confirmation dialog, store clearing, navigation
-
----
+</details>
 
 ## Progress
 
@@ -127,4 +69,4 @@ Plans:
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
-| 17. Chart Polish, SPECrate UX & Reset | 3/3 | Complete    | 2026-03-14 | — |
+| 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
