@@ -55,7 +55,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 **Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF report export.
 
 - [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
-- [ ] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline
+- [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
 - [ ] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard
 - [ ] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download
 - [ ] **Phase 22: PDF Report Export** - Client-side PDF generation with jsPDF + capacity tables + embedded chart images
@@ -89,7 +89,7 @@ Plans:
   3. HA Reserve for CPU/Memory equals one host worth of capacity; for storage equals 1/N of cluster raw capacity
   4. Setting CPU Growth to 20% causes the effective CPU demand to increase by 20% before any overhead is applied, and the formula display string shows the growth factor
   5. Growth fields default to 0% and absent vSAN fields fall through to the legacy non-vSAN sizing path without error
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 19-01-PLAN.md — Growth fields on Scenario + growth pre-multiply in constraints.ts
@@ -152,7 +152,7 @@ Plans:
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
-| 19. Capacity Breakdown & Growth Wiring | 2/3 | In Progress|  | - |
+| 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete   | 2026-03-14 | - |
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/TBD | Not started | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
