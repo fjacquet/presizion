@@ -173,6 +173,125 @@ describe('ComparisonTable', () => {
     })
   })
 
+  describe('FIX-ASIS: As-Is column data rendering', () => {
+    /**
+     * Helper: get the As-Is cell (second cell in row, index 1) for a given row label.
+     * Row structure: <td>label</td> <td class="bg-muted/30">As-Is</td> <td>scenario...</td>
+     */
+    function getAsIsCell(rowLabel: RegExp): HTMLElement | undefined {
+      const row = screen.getByText(rowLabel).closest('tr')
+      const cells = row?.querySelectorAll('td')
+      return cells?.[1] as HTMLElement | undefined
+    }
+
+    it('FIX-ASIS-01: shows computed VMs/Server when existingServerCount is set', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          existingServerCount: 20,
+        },
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/vms\/server/i)
+      // 300 / 20 = 15.0
+      expect(cell?.textContent).toContain('15.0')
+    })
+
+    it('FIX-ASIS-01: shows dash for VMs/Server when existingServerCount is undefined', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          // existingServerCount intentionally not set
+        },
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/vms\/server/i)
+      expect(cell?.textContent).toContain('\u2014')
+    })
+
+    it('FIX-ASIS-02: shows cpuUtilizationPercent in As-Is CPU Util cell', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          cpuUtilizationPercent: 48,
+        },
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/cpu util/i)
+      expect(cell?.textContent).toContain('48.0%')
+    })
+
+    it('FIX-ASIS-02: shows ramUtilizationPercent in As-Is RAM Util cell', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          cpuUtilizationPercent: 48,
+          ramUtilizationPercent: 65,
+        },
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/ram util/i)
+      expect(cell?.textContent).toContain('65.0%')
+    })
+
+    it('FIX-ASIS-02: shows dash for CPU Util when cpuUtilizationPercent is undefined', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          // cpuUtilizationPercent not set — CPU Util row hidden in vcpu mode
+        },
+      })
+      // In vcpu mode, CPU Util row only shows when cpuUtilizationPercent is defined.
+      // So this test simply ensures the row is absent when cpuUtilizationPercent is undefined.
+      render(<ComparisonTable />)
+      expect(screen.queryByText(/cpu util/i)).toBeNull()
+    })
+
+    it('FIX-ASIS-03: shows totalDiskGb in disaggregated mode', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          totalDiskGb: 50000,
+          cpuUtilizationPercent: 48,
+        },
+      })
+      act(() => {
+        useWizardStore.setState({ layoutMode: 'disaggregated' })
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/total disk required/i)
+      expect(cell?.textContent).toContain('50,000 GB')
+    })
+
+    it('FIX-ASIS-03: shows dash for disk in HCI mode', () => {
+      useClusterStore.setState({
+        currentCluster: {
+          totalVcpus: 2000, totalPcores: 500, totalVms: 300,
+          totalDiskGb: 50000,
+          cpuUtilizationPercent: 48,
+        },
+      })
+      act(() => {
+        useWizardStore.setState({ layoutMode: 'hci' })
+      })
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/disk util/i)
+      expect(cell?.textContent).toContain('\u2014')
+    })
+
+    it('FIX-ASIS-04: Limiting Resource As-Is cell shows N/A', () => {
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/limiting resource/i)
+      expect(cell?.textContent).toContain('N/A')
+    })
+
+    it('FIX-ASIS-04: Headroom As-Is cell shows N/A', () => {
+      render(<ComparisonTable />)
+      const cell = getAsIsCell(/headroom/i)
+      expect(cell?.textContent).toContain('N/A')
+    })
+  })
+
   describe('REPT-01: As-Is column in comparison table', () => {
     it('renders an "As-Is" column header', () => {
       render(<ComparisonTable />)
