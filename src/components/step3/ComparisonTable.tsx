@@ -127,7 +127,7 @@ export function ComparisonTable() {
             {/* Row 4: Limiting Resource */}
             <TableRow>
               <TableCell className="font-medium">Limiting Resource</TableCell>
-              <TableCell className="text-center bg-muted/30">—</TableCell>
+              <TableCell className="text-center bg-muted/30">N/A</TableCell>
               {results.map((result, i) => (
                 <TableCell key={scenarios[i]?.id ?? i} className="text-center font-bold">
                   {RESOURCE_LABELS[result.limitingResource]}
@@ -171,7 +171,11 @@ export function ComparisonTable() {
             {/* Row 6: VMs/Server */}
             <TableRow>
               <TableCell className="font-medium">VMs/Server</TableCell>
-              <TableCell className="text-center bg-muted/30">—</TableCell>
+              <TableCell className="text-center bg-muted/30">
+                {currentCluster.existingServerCount && currentCluster.existingServerCount > 0
+                  ? (currentCluster.totalVms / currentCluster.existingServerCount).toFixed(1)
+                  : '\u2014'}
+              </TableCell>
               {results.map((result, i) => (
                 <TableCell key={scenarios[i]?.id ?? i} className="text-center">
                   {result.vmsPerServer.toFixed(1)}
@@ -182,7 +186,7 @@ export function ComparisonTable() {
             {/* Row 7: Headroom % */}
             <TableRow>
               <TableCell className="font-medium">Headroom</TableCell>
-              <TableCell className="text-center bg-muted/30">—</TableCell>
+              <TableCell className="text-center bg-muted/30">N/A</TableCell>
               {scenarios.map((scenario) => (
                 <TableCell key={scenario.id} className="text-center">
                   {scenario.headroomPercent}%
@@ -201,7 +205,11 @@ export function ComparisonTable() {
                   )}
                   CPU Util %
                 </TableCell>
-                <TableCell className="text-center bg-muted/30">—</TableCell>
+                <TableCell className="text-center bg-muted/30">
+                  {currentCluster.cpuUtilizationPercent !== undefined
+                    ? `${currentCluster.cpuUtilizationPercent.toFixed(1)}%`
+                    : '\u2014'}
+                </TableCell>
                 {results.map((result, i) => {
                   const pct = result.cpuUtilizationPercent
                   const target = scenarios[i]?.targetCpuUtilizationPercent ?? 100
@@ -223,7 +231,11 @@ export function ComparisonTable() {
             {/* Row 9: RAM Util % */}
             <TableRow>
               <TableCell className="font-medium">RAM Util %</TableCell>
-              <TableCell className="text-center bg-muted/30">—</TableCell>
+              <TableCell className="text-center bg-muted/30">
+                {currentCluster.ramUtilizationPercent !== undefined
+                  ? `${currentCluster.ramUtilizationPercent.toFixed(1)}%`
+                  : '\u2014'}
+              </TableCell>
               {results.map((result, i) => {
                 const pct = result.ramUtilizationPercent
                 const target = scenarios[i]?.targetRamUtilizationPercent ?? 100
@@ -246,7 +258,11 @@ export function ComparisonTable() {
               <TableCell className="font-medium">
                 {layoutMode === 'disaggregated' ? 'Total Disk Required' : 'Disk Util %'}
               </TableCell>
-              <TableCell className="text-center bg-muted/30">—</TableCell>
+              <TableCell className="text-center bg-muted/30">
+                {layoutMode === 'disaggregated' && currentCluster.totalDiskGb
+                  ? `${Math.round(currentCluster.totalDiskGb).toLocaleString()} GB`
+                  : '\u2014'}
+              </TableCell>
               {layoutMode === 'disaggregated'
                 ? scenarios.map((scenario, i) => {
                     const effectiveVmCount = scenario.targetVmCount ?? currentCluster.totalVms
