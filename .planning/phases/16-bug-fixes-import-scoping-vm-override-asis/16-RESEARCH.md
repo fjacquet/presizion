@@ -50,6 +50,7 @@ VM-override fix may be primarily test-writing; the As-Is column fix is purely pr
 ---
 
 <phase_requirements>
+
 ## Phase Requirements
 
 | ID | Description | Research Support |
@@ -73,6 +74,7 @@ VM-override fix may be primarily test-writing; the As-Is column fix is purely pr
 ## Standard Stack
 
 ### Core (already in project — no new installations)
+
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
 | `@e965/xlsx` | existing | XLSX/CSV parsing | Already used in both parsers |
@@ -84,6 +86,7 @@ No new dependencies are required for Phase 16.
 ## Architecture Patterns
 
 ### Relevant Project Structure
+
 ```
 src/
   lib/
@@ -109,6 +112,7 @@ the VMs sheet by building a host→cluster mapping (hostname → cluster key), t
 ESX Hosts rows by that map.
 
 **Key insight from LiveOptics structure:**
+
 - VMs sheet has a `Cluster` column per VM and (optionally) a host assignment column or the
   host→cluster relationship can be inferred if the ESX Hosts sheet has a matching host name.
 - The LiveOptics VMs sheet may include a column like "Host" or "ESX Host" that maps each VM
@@ -122,6 +126,7 @@ computed scoped VM data. The ESX fields are then attached only to the top-level 
 never to any `rawByScope` entry.
 
 **Fix shape:**
+
 ```typescript
 // In parseXlsx():
 // 1. During aggregate(), if a 'host' column exists on VMs, collect:
@@ -139,6 +144,7 @@ never to any `rawByScope` entry.
 ```
 
 **"All" aggregation fix for scopeAggregator.ts:**
+
 ```typescript
 // Current: copies ESX fields from first scope that has them
 // Needed:
@@ -163,11 +169,13 @@ stores them globally. The RVTOOLS_VHOST_ALIASES in `columnResolver.ts` only defi
 `memory_mb` (or equivalent).
 
 **RVTools vHost column names (typical):**
+
 - `# CPU` or `CPUs` or `Num CPU` — physical CPU sockets
 - `CPU` or `# Cores` — total cores (not cores/socket — needs derivation)
 - `Memory Size` or `Memory` — host RAM in MB or GB
 
 **RVTOOLS_VHOST_ALIASES needs extension:**
+
 ```typescript
 export const RVTOOLS_VHOST_ALIASES: ColumnAliasMap = {
   host_name:      ['Host', 'Name', 'Host Name'],
@@ -185,6 +193,7 @@ export const RVTOOLS_VHOST_ALIASES: ColumnAliasMap = {
 **What:** `constraints.ts` computes `effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms`
 and passes it to both `serverCountByRam` and `serverCountByDisk`. The code appears correct.
 The required fix is adding explicit tests that:
+
 1. Confirm RAM-limited count uses `targetVmCount` (not `cluster.totalVms`) when override is set
 2. Confirm Disk-limited count uses `targetVmCount` when override is set
 3. Confirm both counts scale correctly (e.g., 2× VM count → proportionally more servers)
@@ -195,6 +204,7 @@ will be a new file).
 ### Pattern 4: As-Is Column Rendering
 
 **Current state of As-Is cells:**
+
 - Row 6 (VMs/Server): `<TableCell className="text-center bg-muted/30">—</TableCell>`
 - Row 7 (Headroom): `<TableCell className="text-center bg-muted/30">—</TableCell>` — should be `N/A`
 - Row 8 (CPU Util %): `<TableCell className="text-center bg-muted/30">—</TableCell>` — should be real value
@@ -203,6 +213,7 @@ will be a new file).
 - Row 4 (Limiting Resource): `<TableCell className="text-center bg-muted/30">—</TableCell>` — should be `N/A`
 
 **Fix shapes:**
+
 ```tsx
 // Row 6 (VMs/Server)
 const asisVmsPerServer =
@@ -277,6 +288,7 @@ ESX Hosts sheet. Using only the host→VM→cluster join misses this simpler pat
 to scope hosts. Only fall back to the host→cluster join from VMs if absent.
 
 **Add alias:** `LIVEOPTICS_ESX_HOSTS_ALIASES` should include:
+
 ```typescript
 cluster_name: ['Cluster', 'cluster', 'Cluster Name'],
 ```
@@ -321,6 +333,7 @@ so it is already protected. No special handling needed.
 disaggregated mode. The As-Is cell content for this row differs by layout mode.
 
 **How to avoid:**
+
 - HCI mode: As-Is disk util % is not computable without per-server disk capacity data in
   `OldCluster`. Show `—` (not `N/A` — data simply not available from import).
 - Disaggregated mode: As-Is total disk = `currentCluster.totalDiskGb` — show if available.
@@ -515,6 +528,7 @@ const asisVmsPerServer =
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - Direct code inspection of `/src/lib/utils/import/liveopticParser.ts` — current ESX Hosts
   parsing behavior verified (global read, not per-scope)
 - Direct code inspection of `/src/lib/utils/import/rvtoolsParser.ts` — vHost parsing
@@ -529,6 +543,7 @@ const asisVmsPerServer =
   already include all optional ESX fields
 
 ### Secondary (MEDIUM confidence)
+
 - LiveOptics XLSX format knowledge from existing aliases and test fixtures — column names
   (e.g., `Cluster`, `Host Name`, `CPU Sockets`) inferred from `LIVEOPTICS_ESX_HOSTS_ALIASES`
 - RVTools vHost format knowledge from `RVTOOLS_VHOST_ALIASES` and `RVTOOLS_ALIASES` patterns
@@ -536,6 +551,7 @@ const asisVmsPerServer =
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard Stack: HIGH — no new dependencies; existing project stack
 - Architecture: HIGH — all affected files identified, patterns extracted from existing code
 - VM Override fix: HIGH (code); MEDIUM (whether it's a code bug or test gap — needs test execution)
