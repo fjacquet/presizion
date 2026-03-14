@@ -382,4 +382,198 @@ describe('computeScenarioResult — minServerCount pin floor', () => {
   });
 });
 
+// =====================================================================
+// vSAN Integration Tests (Phase 18, Plan 02)
+// =====================================================================
+
+// Fixture cluster for vSAN integration tests
+const VSAN_CLUSTER = {
+  totalVcpus: 800,
+  totalPcores: 200,
+  totalVms: 200,
+  cpuFrequencyGhz: 2.4,
+  cpuUtilizationPercent: 70,
+};
+
+// Fixture scenario with vSAN enabled (mirror-1, 1.5x compression, 25% slack)
+const VSAN_SCENARIO = {
+  id: '00000000-0000-0000-0000-0000000000a1',
+  name: 'vSAN Test',
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 10000, // 10 TiB raw per node
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 8,
+  diskPerVmGb: 50, // 50 GiB usable per VM
+  headroomPercent: 20,
+  haReserveCount: 0 as const,
+  vsanFttPolicy: 'mirror-1' as const,
+  vsanCompressionFactor: 1.5 as const,
+  vsanSlackPercent: 25,
+  vsanCpuOverheadPercent: 10,
+  vsanMemoryPerHostGb: 6,
+  vsanVmSwapEnabled: false,
+};
+
+describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
+  it('vSAN storage path: mirror-1 with 200 VMs, 50 GiB/VM, 1.5x compression → diskLimitedCount=3 (min-node floor)', () => {
+    // 200 VMs × 50 GiB = 10000 GiB usable
+    // Step 1: effectiveUsable = 10000 / 1.5 = 6666.667
+    // Step 2: no swap
+    // Step 3: raw = 6666.667 × 2.0 = 13333.333
+    // Step 4: metadata = 10000 × 0.02 = 200 → raw = 13533.333
+    // Step 5: rawWithSlack = 13533.333 / 0.75 = 18044.444
+    // serverCount = ceil(18044.444 / 10000) = 2
+    // mirror-1 minNodes = 3 → max(2, 3) = 3
+    const result = computeScenarioResult(VSAN_CLUSTER, VSAN_SCENARIO);
+    expect(result.diskLimitedCount).toBe(3);
+  });
+
+  it('legacy regression: WITHOUT vsanFttPolicy produces identical results to legacy behavior (VSAN-12)', () => {
+    // Same fixture but without any vSAN fields → legacy path
+    const legacyScenario = {
+      id: '00000000-0000-0000-0000-0000000000a2',
+      name: 'Legacy Test',
+      socketsPerServer: 2,
+      coresPerSocket: 20,
+      ramPerServerGb: 512,
+      diskPerServerGb: 10000,
+      targetVcpuToPCoreRatio: 4,
+      ramPerVmGb: 8,
+      diskPerVmGb: 50,
+      headroomPercent: 20,
+      haReserveCount: 0 as const,
+    };
+    const result = computeScenarioResult(VSAN_CLUSTER, legacyScenario);
+    // Legacy: ceil(200 × 50 × 1.20 / 10000) = ceil(12000/10000) = ceil(1.2) = 2
+    expect(result.diskLimitedCount).toBe(2);
+    // CPU count: ceil(800 × 1.20 / 4 / 40) = ceil(6) = 6
+    expect(result.cpuLimitedCount).toBe(6);
+    // RAM count: ceil(200 × 8 × 1.20 / 512) = ceil(3.75) = 4
+    expect(result.ramLimitedCount).toBe(4);
+    expect(result.finalCount).toBe(6);
+    expect(result.limitingResource).toBe('cpu');
+  });
+
+  it('mirror-2 on tiny cluster (3 VMs): diskLimitedCount >= 5 (min-node floor for mirror-2)', () => {
+    const tinyScenario = {
+      ...VSAN_SCENARIO,
+      id: '00000000-0000-0000-0000-0000000000a3',
+      vsanFttPolicy: 'mirror-2' as const,
+    };
+    const tinyCluster = { ...VSAN_CLUSTER, totalVms: 3, totalVcpus: 12, totalPcores: 6 };
+    const result = computeScenarioResult(tinyCluster, tinyScenario);
+    // 3 VMs × 50 GiB = 150 GiB usable
+    // Step 1: 150/1.5 = 100; Step 3: 100×3.0=300; Step 4: 300+3=303; Step 5: 303/0.75=404
+    // ceil(404/10000) = 1; minNodes for mirror-2 = 5 → max(1, 5) = 5
+    expect(result.diskLimitedCount).toBeGreaterThanOrEqual(5);
+    expect(result.diskLimitedCount).toBe(5);
+  });
+
+  it('vsanMemoryPerHostGb=6: effective RAM per server is 506 GB (deducted from 512)', () => {
+    const result = computeScenarioResult(VSAN_CLUSTER, VSAN_SCENARIO);
+    // RAM demand: 200 × 8 × 1.20 = 1920 GiB
+    // Effective RAM per server: 512 - 6 = 506
+    // ramLimitedCount = ceil(1920 / 506) = ceil(3.794) = 4
+    expect(result.ramLimitedCount).toBe(4);
+
+    // Verify it differs from a non-vSAN scenario with ramPerServerGb=506 to confirm the deduction path is used
+    // (The count is 4 either way for this fixture, but the formula goes through the vSAN branch)
+    // We verify by checking a scenario where 6 GB matters: large VM RAM
+    const highRamScenario = {
+      ...VSAN_SCENARIO,
+      id: '00000000-0000-0000-0000-0000000000a4',
+      ramPerVmGb: 64, // 200 × 64 × 1.2 = 15360 demand
+    };
+    const vsanResult = computeScenarioResult(VSAN_CLUSTER, highRamScenario);
+    // vSAN: ceil(15360 / 506) = ceil(30.355) = 31
+    expect(vsanResult.ramLimitedCount).toBe(31);
+
+    const legacyHighRamScenario = {
+      ...highRamScenario,
+      vsanFttPolicy: undefined,
+      vsanMemoryPerHostGb: undefined,
+      vsanCompressionFactor: undefined,
+      vsanSlackPercent: undefined,
+      vsanCpuOverheadPercent: undefined,
+      vsanVmSwapEnabled: undefined,
+    };
+    const legacyResult = computeScenarioResult(VSAN_CLUSTER, legacyHighRamScenario);
+    // Legacy: ceil(15360 / 512) = ceil(30.0) = 30
+    expect(legacyResult.ramLimitedCount).toBe(30);
+    // vSAN RAM deduction produces 1 more server
+    expect(vsanResult.ramLimitedCount).toBeGreaterThan(legacyResult.ramLimitedCount);
+  });
+
+  it('vsanCpuOverheadPercent=10 in GHz mode: CPU-limited count higher than without vSAN overhead', () => {
+    // Use smaller coresPerSocket=10 (20 cores/server) to make the difference visible
+    const ghzVsanScenario = {
+      ...VSAN_SCENARIO,
+      id: '00000000-0000-0000-0000-0000000000a5',
+      coresPerSocket: 10,
+      targetCpuFrequencyGhz: 3.0,
+    };
+    // Demand: 200 × 2.4 × 0.70 × 1.2 = 403.2 GHz
+    // vSAN: effectiveFreq = 3.0 × 0.90 = 2.7; capacity = 20 × 2.7 = 54 per node
+    // ceil(403.2 / 54) = ceil(7.467) = 8
+    const vsanResult = computeScenarioResult(VSAN_CLUSTER, ghzVsanScenario, 'ghz');
+    expect(vsanResult.cpuLimitedCount).toBe(8);
+
+    const noVsanGhzScenario = {
+      ...ghzVsanScenario,
+      vsanFttPolicy: undefined,
+      vsanCpuOverheadPercent: undefined,
+      vsanMemoryPerHostGb: undefined,
+      vsanCompressionFactor: undefined,
+      vsanSlackPercent: undefined,
+      vsanVmSwapEnabled: undefined,
+    };
+    // No vSAN: capacity = 20 × 3.0 = 60 per node
+    // ceil(403.2 / 60) = ceil(6.72) = 7
+    const noVsanResult = computeScenarioResult(VSAN_CLUSTER, noVsanGhzScenario, 'ghz');
+    expect(noVsanResult.cpuLimitedCount).toBe(7);
+
+    expect(vsanResult.cpuLimitedCount).toBeGreaterThan(noVsanResult.cpuLimitedCount);
+  });
+
+  it('disaggregated layout with vsanFttPolicy set: diskLimitedCount = 0 (disaggregated overrides vSAN)', () => {
+    const result = computeScenarioResult(VSAN_CLUSTER, VSAN_SCENARIO, 'vcpu', 'disaggregated');
+    expect(result.diskLimitedCount).toBe(0);
+  });
+
+  it('vsanVmSwapEnabled=true increases storage-limited count', () => {
+    const swapScenario = {
+      ...VSAN_SCENARIO,
+      id: '00000000-0000-0000-0000-0000000000a6',
+      vsanVmSwapEnabled: true,
+    };
+    const noSwapResult = computeScenarioResult(VSAN_CLUSTER, VSAN_SCENARIO);
+    const swapResult = computeScenarioResult(VSAN_CLUSTER, swapScenario);
+    // With swap: effectiveUsable += totalVmRamGib = 200 × 8 = 1600 extra GiB
+    // Step 1: 10000/1.5 = 6666.667
+    // Step 2: 6666.667 + 1600 = 8266.667
+    // Step 3: 8266.667 × 2.0 = 16533.333
+    // Step 4: 16533.333 + 200 = 16733.333
+    // Step 5: 16733.333 / 0.75 = 22311.111
+    // ceil(22311.111 / 10000) = 3
+    // min-node floor = 3 → max(3, 3) = 3
+    expect(swapResult.diskLimitedCount).toBe(3);
+    // Without swap was 3 (from min-node floor). With swap, math gives 3 as well (ceil=3 >= minNodes=3)
+    // But the raw storage IS higher — verify with larger values to see the difference
+    expect(swapResult.diskLimitedCount).toBeGreaterThanOrEqual(noSwapResult.diskLimitedCount);
+
+    // Use a scenario with more VMs where the swap actually pushes over a boundary
+    const largeCluster = { ...VSAN_CLUSTER, totalVms: 800, totalVcpus: 3200, totalPcores: 800 };
+    const largeSwapScenario = { ...swapScenario, ramPerVmGb: 16 };
+    const largeNoSwapScenario = { ...VSAN_SCENARIO, id: swapScenario.id, ramPerVmGb: 16 };
+    const largeSwap = computeScenarioResult(largeCluster, largeSwapScenario);
+    const largeNoSwap = computeScenarioResult(largeCluster, largeNoSwapScenario);
+    // 800 VMs × 50 GiB = 40000 usable; ramGib = 800×16 = 12800
+    // No swap: 40000/1.5 = 26666.67; 26666.67*2=53333.33; +800=54133.33; /0.75=72177.78; ceil/10000=8; max(8,3)=8
+    // With swap: 26666.67+12800 = 39466.67; 39466.67*2=78933.33; +800=79733.33; /0.75=106311.11; ceil/10000=11; max(11,3)=11
+    expect(largeSwap.diskLimitedCount).toBeGreaterThan(largeNoSwap.diskLimitedCount);
+  });
+});
+
 export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };
