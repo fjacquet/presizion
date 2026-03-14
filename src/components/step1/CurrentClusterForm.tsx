@@ -1,7 +1,7 @@
 import { useForm, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
-import { Info } from 'lucide-react'
+import { Info, ExternalLink } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -24,6 +24,7 @@ import { currentClusterSchema, type CurrentClusterInput } from '@/schemas/curren
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
+import { toast } from 'sonner'
 import type { OldCluster } from '@/types/cluster'
 
 // Tooltip text constants (UX-03)
@@ -242,6 +243,18 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     return () => subscription.unsubscribe()
   }, [form])
 
+  async function handleSpecLookup() {
+    if (currentCluster.cpuModel) {
+      try {
+        await navigator.clipboard.writeText(currentCluster.cpuModel)
+        toast('CPU model copied to clipboard')
+      } catch {
+        // Clipboard API may fail in non-secure contexts; proceed anyway
+      }
+    }
+    window.open('https://www.spec.org/cgi-bin/osgresults?conf=rint2017', '_blank', 'noopener,noreferrer')
+  }
+
   async function handleNext() {
     const alwaysRequired: Array<keyof CurrentClusterInput> = ['totalVcpus', 'totalPcores', 'totalVms']
     const modeRequired: Array<keyof CurrentClusterInput> =
@@ -292,6 +305,15 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               <span className="text-sm text-muted-foreground">Detected CPU:</span>
               <Badge variant="secondary">{currentCluster.cpuModel}</Badge>
             </div>
+          )}
+          {sizingMode === 'specint' && currentCluster.cpuModel && (
+            <button
+              type="button"
+              onClick={handleSpecLookup}
+              className="inline-flex items-center gap-1 text-sm text-primary underline-offset-3 hover:underline mb-3"
+            >
+              Look up SPECrate <ExternalLink className="h-3 w-3" />
+            </button>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />

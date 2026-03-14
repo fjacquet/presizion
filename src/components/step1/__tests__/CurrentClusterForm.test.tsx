@@ -1,6 +1,6 @@
 /**
- * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4
- * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4
+ * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK
+ * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK-01, SPEC-LINK-02, SPEC-LINK-03
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
@@ -335,5 +335,89 @@ describe('REPT-02: unconditional existingServerCount and totalPcores auto-derive
       const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement
       expect(totalPcoresInput.value).toBe('200')
     })
+  })
+})
+
+describe('SPEC-LINK: SPECrate lookup link', () => {
+  beforeEach(() => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn(() => Promise.resolve()) },
+    })
+  })
+
+  it('in specint mode with cpuModel, "Look up SPECrate" button is rendered', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument()
+  })
+
+  it('clicking the button copies cpuModel to clipboard', async () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+
+    const btn = screen.getByRole('button', { name: /look up specrate/i })
+    fireEvent.click(btn)
+
+    await waitFor(() => {
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Intel Xeon Gold 6526Y')
+    })
+  })
+
+  it('clicking the button opens spec.org results page in new tab', async () => {
+    const openSpy = vi.fn()
+    vi.stubGlobal('open', openSpy)
+
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+
+    const btn = screen.getByRole('button', { name: /look up specrate/i })
+    fireEvent.click(btn)
+
+    await waitFor(() => {
+      expect(openSpy).toHaveBeenCalledWith(
+        expect.stringContaining('spec.org/cgi-bin/osgresults'),
+        '_blank',
+        'noopener,noreferrer',
+      )
+    })
+
+    vi.unstubAllGlobals()
+  })
+
+  it('in vcpu mode with cpuModel, the button is NOT rendered', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'vcpu' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument()
+  })
+
+  it('in specint mode without cpuModel, the button is NOT rendered', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument()
   })
 })
