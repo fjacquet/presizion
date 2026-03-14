@@ -82,3 +82,37 @@ export function loadFromLocalStorage(): SessionData | null {
     return null;
   }
 }
+
+/**
+ * Encode a session to a URL-safe base64 string (no padding) for use as a URL hash.
+ * Uses base64url encoding: '+' → '-', '/' → '_', '=' stripped.
+ */
+export function encodeSessionToHash(data: SessionData): string {
+  const json = serializeSession(data);
+  return btoa(json)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+/**
+ * Decode a URL hash string back to SessionData.
+ * - Accepts hash with or without a leading '#'.
+ * - Returns null for empty string, '#', malformed base64, or invalid schema.
+ */
+export function decodeSessionFromHash(hash: string): SessionData | null {
+  try {
+    const stripped = hash.startsWith('#') ? hash.slice(1) : hash;
+    if (!stripped) return null;
+    // Restore standard base64 from URL-safe base64
+    const base64 = stripped
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    // Add padding if needed
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+    const json = atob(padded);
+    return deserializeSession(json);
+  } catch {
+    return null;
+  }
+}

@@ -28,6 +28,8 @@ import {
   deserializeSession,
   saveToLocalStorage,
   loadFromLocalStorage,
+  encodeSessionToHash,
+  decodeSessionFromHash,
 } from '../persistence';
 import type { SessionData } from '../persistence';
 
@@ -212,5 +214,49 @@ describe('loadFromLocalStorage', () => {
       throw new DOMException('SecurityError', 'SecurityError');
     });
     expect(loadFromLocalStorage()).toBeNull();
+  });
+});
+
+describe('encodeSessionToHash / decodeSessionFromHash', () => {
+  it('round-trips: encode then decode returns data equal to original', () => {
+    const encoded = encodeSessionToHash(validSession);
+    const decoded = decodeSessionFromHash('#' + encoded);
+    expect(decoded).not.toBeNull();
+    expect(decoded!.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
+    expect(decoded!.cluster.totalPcores).toBe(validSession.cluster.totalPcores);
+    expect(decoded!.cluster.totalVms).toBe(validSession.cluster.totalVms);
+    expect(decoded!.sizingMode).toBe(validSession.sizingMode);
+    expect(decoded!.layoutMode).toBe(validSession.layoutMode);
+    expect(decoded!.scenarios).toHaveLength(validSession.scenarios.length);
+  });
+
+  it('decodeSessionFromHash strips leading # before decoding', () => {
+    const encoded = encodeSessionToHash(validSession);
+    const withHash = decodeSessionFromHash('#' + encoded);
+    const withoutHash = decodeSessionFromHash(encoded);
+    expect(withHash).not.toBeNull();
+    expect(withoutHash).not.toBeNull();
+    expect(withHash!.cluster.totalVcpus).toBe(withoutHash!.cluster.totalVcpus);
+  });
+
+  it('decodeSessionFromHash returns null for empty string', () => {
+    expect(decodeSessionFromHash('')).toBeNull();
+  });
+
+  it('decodeSessionFromHash returns null for "#" alone', () => {
+    expect(decodeSessionFromHash('#')).toBeNull();
+  });
+
+  it('decodeSessionFromHash returns null for malformed base64', () => {
+    expect(decodeSessionFromHash('not-valid-base64!!!@@@')).toBeNull();
+  });
+
+  it('decodeSessionFromHash returns null when decoded JSON fails schema validation', () => {
+    // Encode a JSON string that doesn't match SessionData schema
+    const invalidJson = btoa(JSON.stringify({ foo: 'bar' }))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+    expect(decodeSessionFromHash('#' + invalidJson)).toBeNull();
   });
 });
