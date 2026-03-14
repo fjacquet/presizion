@@ -94,9 +94,19 @@ export function computeScenarioResult(
   const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
   const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
 
+  // Growth factor pre-multiply (GROW-02): applied BEFORE headroom and overhead
+  const cpuGrowthFactor     = 1 + (scenario.cpuGrowthPercent     ?? 0) / 100;
+  const memGrowthFactor     = 1 + (scenario.memoryGrowthPercent  ?? 0) / 100;
+  const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100;
+
+  const grownVcpus       = effectiveVcpus * cpuGrowthFactor;
+  const grownRamPerVmGb  = scenario.ramPerVmGb * memGrowthFactor;
+  const grownDiskPerVmGb = scenario.diskPerVmGb * storageGrowthFactor;
+
   // CALC-01: CPU/performance-limited count (formula depends on sizingMode)
   let cpuLimitedCount: number;
   if (sizingMode === 'specint') {
+    // SPECint is a benchmark comparison, not demand-driven — growth does not apply
     cpuLimitedCount = serverCountBySpecint(
       cluster.existingServerCount ?? 0,
       cluster.specintPerServer ?? 0,
@@ -106,19 +116,20 @@ export function computeScenarioResult(
   } else if (sizingMode === 'aggressive') {
     // Ratio cap bypassed: observed utilization drives density
     cpuLimitedCount = serverCountByCpuAggressive(
-      effectiveVcpus,
+      grownVcpus,
       cpuUtilPct,
       headroomFactor,
       coresPerServer,
     );
   } else if (sizingMode === 'ghz') {
-    // CALC-01-GHZ: When vSAN is active, deduct CPU overhead from target per-core GHz
+    // CALC-01-GHZ: GHz mode uses pCores, not vCPUs — apply growth to pCores
+    const grownPcores = cluster.totalPcores * cpuGrowthFactor;
     const rawTargetFreqGhz = scenario.targetCpuFrequencyGhz ?? 1;
     const effectiveTargetFreqGhz = scenario.vsanFttPolicy
       ? computeVsanEffectiveGhzPerNode(rawTargetFreqGhz, scenario.vsanCpuOverheadPercent)
       : rawTargetFreqGhz;
     cpuLimitedCount = serverCountByGhz(
-      cluster.totalPcores,
+      grownPcores,
       cluster.cpuFrequencyGhz ?? 1,
       cpuUtilPct,
       headroomFactor,
@@ -129,7 +140,7 @@ export function computeScenarioResult(
   } else {
     // 'vcpu': ratio is a hard assignment-density cap; cpuUtilPct not used here
     cpuLimitedCount = serverCountByCpu(
-      effectiveVcpus,
+      grownVcpus,
       headroomFactor,
       scenario.targetVcpuToPCoreRatio,
       coresPerServer,
@@ -144,7 +155,7 @@ export function computeScenarioResult(
     : scenario.ramPerServerGb;
   const ramLimitedCount = serverCountByRam(
     effectiveVmCount,
-    scenario.ramPerVmGb,
+    grownRamPerVmGb,
     headroomFactor,
     effectiveRamPerServerGb,
     ramUtilPct,
@@ -156,8 +167,8 @@ export function computeScenarioResult(
   if (layoutMode === 'disaggregated') {
     diskLimitedCount = 0;
   } else if (scenario.vsanFttPolicy) {
-    // vSAN-aware path (VSAN-02, VSAN-11)
-    const usableGib = effectiveVmCount * scenario.diskPerVmGb;
+    // vSAN-aware path (VSAN-02, VSAN-11) — use grown demand values
+    const usableGib = effectiveVmCount * grownDiskPerVmGb;
     diskLimitedCount = serverCountByVsanStorage(
       usableGib,
       scenario.diskPerServerGb,
@@ -165,15 +176,15 @@ export function computeScenarioResult(
       {
         compressionFactor: scenario.vsanCompressionFactor ?? 1.0,
         vmSwapEnabled: scenario.vsanVmSwapEnabled ?? false,
-        totalVmRamGib: effectiveVmCount * scenario.ramPerVmGb,
+        totalVmRamGib: effectiveVmCount * grownRamPerVmGb,
         slackPercent: scenario.vsanSlackPercent ?? VSAN_DEFAULT_SLACK_PERCENT,
       },
     );
   } else {
-    // Legacy path — unchanged (VSAN-12)
+    // Legacy path — unchanged pattern (VSAN-12), now with grown demand
     diskLimitedCount = serverCountByDisk(
       effectiveVmCount,
-      scenario.diskPerVmGb,
+      grownDiskPerVmGb,
       headroomFactor,
       scenario.diskPerServerGb,
     );
@@ -201,16 +212,16 @@ export function computeScenarioResult(
   const requiredCount = rawCount;
   const haReserveApplied = haReserveCount > 0;
 
-  // CALC-06: Utilization metrics (use finalCount as denominator)
+  // CALC-06: Utilization metrics (use finalCount as denominator, grown demand values)
   const achievedVcpuToPCoreRatio =
-    finalCount > 0 ? effectiveVcpus / (finalCount * coresPerServer) : 0;
+    finalCount > 0 ? grownVcpus / (finalCount * coresPerServer) : 0;
 
   const vmsPerServer = finalCount > 0 ? effectiveVmCount / finalCount : 0;
 
   // CPU util % applies the same factor used in CALC-01 display
   const cpuUtilizationPercent =
     finalCount > 0
-      ? (effectiveVcpus * (cpuUtilPct / 100) /
+      ? (grownVcpus * (cpuUtilPct / 100) /
           scenario.targetVcpuToPCoreRatio /
           (finalCount * coresPerServer)) *
         100
@@ -218,14 +229,14 @@ export function computeScenarioResult(
 
   const ramUtilizationPercent =
     finalCount > 0
-      ? ((effectiveVmCount * scenario.ramPerVmGb * (ramUtilPct / 100)) /
+      ? ((effectiveVmCount * grownRamPerVmGb * (ramUtilPct / 100)) /
           (finalCount * scenario.ramPerServerGb)) *
         100
       : 0;
 
   const diskUtilizationPercent =
     finalCount > 0
-      ? ((effectiveVmCount * scenario.diskPerVmGb) /
+      ? ((effectiveVmCount * grownDiskPerVmGb) /
           (finalCount * scenario.diskPerServerGb)) *
         100
       : 0;
