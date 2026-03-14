@@ -70,46 +70,47 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VSAN-01 | TBD | Pending |
-| VSAN-02 | TBD | Pending |
-| VSAN-03 | TBD | Pending |
-| VSAN-04 | TBD | Pending |
-| VSAN-05 | TBD | Pending |
-| VSAN-06 | TBD | Pending |
-| VSAN-07 | TBD | Pending |
-| VSAN-08 | TBD | Pending |
-| VSAN-09 | TBD | Pending |
-| VSAN-10 | TBD | Pending |
-| VSAN-11 | TBD | Pending |
-| VSAN-12 | TBD | Pending |
-| CAP-01 | TBD | Pending |
-| CAP-02 | TBD | Pending |
-| CAP-03 | TBD | Pending |
-| CAP-04 | TBD | Pending |
-| CAP-05 | TBD | Pending |
-| CAP-06 | TBD | Pending |
-| VIZ-01 | TBD | Pending |
-| VIZ-02 | TBD | Pending |
-| VIZ-03 | TBD | Pending |
-| VIZ-04 | TBD | Pending |
-| GROW-01 | TBD | Pending |
-| GROW-02 | TBD | Pending |
-| GROW-03 | TBD | Pending |
-| GROW-04 | TBD | Pending |
-| FORM-01 | TBD | Pending |
-| FORM-02 | TBD | Pending |
-| FORM-03 | TBD | Pending |
-| FORM-04 | TBD | Pending |
-| PDF-01 | TBD | Pending |
-| PDF-02 | TBD | Pending |
-| PDF-03 | TBD | Pending |
-| PDF-04 | TBD | Pending |
-| PDF-05 | TBD | Pending |
+| VSAN-01 | Phase 18 | Pending |
+| VSAN-02 | Phase 18 | Pending |
+| VSAN-03 | Phase 18 | Pending |
+| VSAN-04 | Phase 18 | Pending |
+| VSAN-05 | Phase 18 | Pending |
+| VSAN-06 | Phase 18 | Pending |
+| VSAN-07 | Phase 18 | Pending |
+| VSAN-08 | Phase 18 | Pending |
+| VSAN-09 | Phase 18 | Pending |
+| VSAN-10 | Phase 18 | Pending |
+| VSAN-11 | Phase 18 | Pending |
+| VSAN-12 | Phase 18 | Pending |
+| CAP-01 | Phase 19 | Pending |
+| CAP-02 | Phase 19 | Pending |
+| CAP-03 | Phase 19 | Pending |
+| CAP-04 | Phase 19 | Pending |
+| CAP-05 | Phase 19 | Pending |
+| CAP-06 | Phase 19 | Pending |
+| GROW-01 | Phase 19 | Pending |
+| GROW-02 | Phase 19 | Pending |
+| GROW-03 | Phase 19 | Pending |
+| GROW-04 | Phase 19 | Pending |
+| FORM-01 | Phase 20 | Pending |
+| FORM-02 | Phase 20 | Pending |
+| FORM-03 | Phase 20 | Pending |
+| FORM-04 | Phase 20 | Pending |
+| VIZ-01 | Phase 21 | Pending |
+| VIZ-02 | Phase 21 | Pending |
+| VIZ-03 | Phase 21 | Pending |
+| VIZ-04 | Phase 21 | Pending |
+| PDF-01 | Phase 22 | Pending |
+| PDF-02 | Phase 22 | Pending |
+| PDF-03 | Phase 22 | Pending |
+| PDF-04 | Phase 22 | Pending |
+| PDF-05 | Phase 22 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 35 total
-- Mapped to phases: 0
-- Unmapped: 35
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-14*
+*Traceability updated: 2026-03-14*
