@@ -1,11 +1,16 @@
-import type { ClusterImportResult, ScopeData } from './index'
+import type { ScopeData } from './index'
 
 type RawByScopeMap = Map<string, ScopeData>
 
 /**
  * Re-aggregates a subset of per-scope data into a single combined result.
- * Sums numeric fields, computes weighted average RAM, flattens warnings,
- * and copies ESX fields from the first selected scope that has them.
+ * Sums numeric fields, computes weighted average RAM per VM, flattens warnings.
+ *
+ * ESX field aggregation:
+ * - Additive: totalPcores, existingServerCount (summed across scopes)
+ * - Representative: socketsPerServer, coresPerSocket, cpuModel, cpuFrequencyGhz (first scope)
+ * - Representative with warning: ramPerServerGb (first scope; warns if heterogeneous)
+ * - Weighted average by server count: cpuUtilizationPercent, ramUtilizationPercent
  */
 export function aggregateScopes(
   rawByScope: RawByScopeMap,
@@ -30,8 +35,26 @@ export function aggregateScopes(
   let weightedRamSum = 0
   const allWarnings: string[] = []
 
-  // ESX fields — copy from first scope that has them
-  const esxFields: Partial<Pick<ClusterImportResult, 'totalPcores' | 'existingServerCount' | 'socketsPerServer' | 'coresPerSocket' | 'ramPerServerGb' | 'cpuUtilizationPercent' | 'ramUtilizationPercent'>> = {}
+  // Additive ESX fields
+  let sumTotalPcores = 0
+  let hasTotalPcores = false
+  let sumExistingServerCount = 0
+  let hasExistingServerCount = false
+
+  // Representative ESX fields (from first scope that has them)
+  let repSocketsPerServer: number | undefined
+  let repCoresPerSocket: number | undefined
+  let repCpuModel: string | undefined
+  let repCpuFrequencyGhz: number | undefined
+
+  // RAM per server: representative with heterogeneity warning
+  const ramPerServerValues: number[] = []
+
+  // Weighted average utilization
+  let weightedCpuUtilSum = 0
+  let weightedRamUtilSum = 0
+  let cpuUtilServerCount = 0
+  let ramUtilServerCount = 0
 
   for (const scope of selected) {
     totalVcpus += scope.totalVcpus
@@ -41,28 +64,74 @@ export function aggregateScopes(
     weightedRamSum += scope.avgRamPerVmGb * scope.vmCount
     allWarnings.push(...scope.warnings)
 
-    // Pick up ESX fields from first scope that has them
-    if (
-      Object.keys(esxFields).length === 0 &&
-      (scope.totalPcores !== undefined ||
-        scope.existingServerCount !== undefined ||
-        scope.socketsPerServer !== undefined ||
-        scope.coresPerSocket !== undefined ||
-        scope.ramPerServerGb !== undefined ||
-        scope.cpuUtilizationPercent !== undefined ||
-        scope.ramUtilizationPercent !== undefined)
-    ) {
-      if (scope.totalPcores !== undefined) esxFields.totalPcores = scope.totalPcores
-      if (scope.existingServerCount !== undefined) esxFields.existingServerCount = scope.existingServerCount
-      if (scope.socketsPerServer !== undefined) esxFields.socketsPerServer = scope.socketsPerServer
-      if (scope.coresPerSocket !== undefined) esxFields.coresPerSocket = scope.coresPerSocket
-      if (scope.ramPerServerGb !== undefined) esxFields.ramPerServerGb = scope.ramPerServerGb
-      if (scope.cpuUtilizationPercent !== undefined) esxFields.cpuUtilizationPercent = scope.cpuUtilizationPercent
-      if (scope.ramUtilizationPercent !== undefined) esxFields.ramUtilizationPercent = scope.ramUtilizationPercent
+    // Additive fields
+    if (scope.totalPcores !== undefined) {
+      sumTotalPcores += scope.totalPcores
+      hasTotalPcores = true
+    }
+    if (scope.existingServerCount !== undefined) {
+      sumExistingServerCount += scope.existingServerCount
+      hasExistingServerCount = true
+    }
+
+    // Representative fields (first scope that has them)
+    if (repSocketsPerServer === undefined && scope.socketsPerServer !== undefined) {
+      repSocketsPerServer = scope.socketsPerServer
+    }
+    if (repCoresPerSocket === undefined && scope.coresPerSocket !== undefined) {
+      repCoresPerSocket = scope.coresPerSocket
+    }
+    if (repCpuModel === undefined && scope.cpuModel !== undefined) {
+      repCpuModel = scope.cpuModel
+    }
+    if (repCpuFrequencyGhz === undefined && scope.cpuFrequencyGhz !== undefined) {
+      repCpuFrequencyGhz = scope.cpuFrequencyGhz
+    }
+
+    // RAM per server values
+    if (scope.ramPerServerGb !== undefined) {
+      ramPerServerValues.push(scope.ramPerServerGb)
+    }
+
+    // Weighted utilization (by existingServerCount)
+    if (scope.cpuUtilizationPercent !== undefined && scope.existingServerCount !== undefined) {
+      weightedCpuUtilSum += scope.cpuUtilizationPercent * scope.existingServerCount
+      cpuUtilServerCount += scope.existingServerCount
+    }
+    if (scope.ramUtilizationPercent !== undefined && scope.existingServerCount !== undefined) {
+      weightedRamUtilSum += scope.ramUtilizationPercent * scope.existingServerCount
+      ramUtilServerCount += scope.existingServerCount
     }
   }
 
   const avgRamPerVmGb = totalVmCount > 0 ? weightedRamSum / totalVmCount : 0
+
+  // Build ESX fields
+  const esxFields: Partial<ScopeData> = {}
+
+  if (hasTotalPcores) esxFields.totalPcores = sumTotalPcores
+  if (hasExistingServerCount) esxFields.existingServerCount = sumExistingServerCount
+  if (repSocketsPerServer !== undefined) esxFields.socketsPerServer = repSocketsPerServer
+  if (repCoresPerSocket !== undefined) esxFields.coresPerSocket = repCoresPerSocket
+  if (repCpuModel !== undefined) esxFields.cpuModel = repCpuModel
+  if (repCpuFrequencyGhz !== undefined) esxFields.cpuFrequencyGhz = repCpuFrequencyGhz
+
+  // RAM per server: representative with heterogeneity warning
+  if (ramPerServerValues.length > 0) {
+    esxFields.ramPerServerGb = ramPerServerValues[0]
+    const uniqueRam = new Set(ramPerServerValues)
+    if (uniqueRam.size > 1) {
+      allWarnings.push('Heterogeneous RAM/server detected across clusters -- using first cluster as representative.')
+    }
+  }
+
+  // Weighted average utilization
+  if (cpuUtilServerCount > 0) {
+    esxFields.cpuUtilizationPercent = Math.round(weightedCpuUtilSum / cpuUtilServerCount)
+  }
+  if (ramUtilServerCount > 0) {
+    esxFields.ramUtilizationPercent = Math.round(weightedRamUtilSum / ramUtilServerCount)
+  }
 
   return {
     totalVcpus,

@@ -104,7 +104,7 @@ describe('aggregateScopes', () => {
     ])
     const result = aggregateScopes(map, ['CL-A', 'CL-B'])
     expect(result.ramPerServerGb).toBe(256)
-    expect(result.warnings).not.toContain(expect.stringContaining('Heterogeneous RAM'))
+    expect(result.warnings.some((w) => w.includes('Heterogeneous RAM'))).toBe(false)
   })
 
   it('different ramPerServerGb across scopes -> warning with "Heterogeneous RAM"', () => {
@@ -114,7 +114,7 @@ describe('aggregateScopes', () => {
     ])
     const result = aggregateScopes(map, ['CL-A', 'CL-B'])
     expect(result.ramPerServerGb).toBe(256) // first scope value
-    expect(result.warnings).toContain(expect.stringContaining('Heterogeneous RAM'))
+    expect(result.warnings.some((w) => w.includes('Heterogeneous RAM'))).toBe(true)
   })
 
   it('weighted average cpuUtilizationPercent by existingServerCount', () => {
