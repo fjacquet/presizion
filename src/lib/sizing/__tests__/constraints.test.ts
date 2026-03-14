@@ -330,6 +330,45 @@ describe('computeScenarioResult — targetVmCount growth override', () => {
   });
 });
 
+// FIX-VM-01/02 fixtures: VM override propagation to RAM and Disk
+const VM_OVERRIDE_CLUSTER = { totalVcpus: 1000, totalVms: 100, totalPcores: 200 };
+const VM_OVERRIDE_SCENARIO_BASE = {
+  id: '00000000-0000-0000-0000-000000000020',
+  name: 'VM-Override',
+  socketsPerServer: 2, coresPerSocket: 20,
+  ramPerServerGb: 512, diskPerServerGb: 5000,
+  targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 100,
+  headroomPercent: 0, haReserveCount: 0 as const,
+};
+
+describe('FIX-VM-01/02: targetVmCount override propagates to RAM and Disk', () => {
+  it('FIX-VM-01: RAM-limited uses targetVmCount=200 → ramLimitedCount=7', () => {
+    // ceil(200 * 16 / 512) = ceil(6.25) = 7
+    const scenario = { ...VM_OVERRIDE_SCENARIO_BASE, targetVmCount: 200 };
+    const result = computeScenarioResult(VM_OVERRIDE_CLUSTER, scenario);
+    expect(result.ramLimitedCount).toBe(7);
+  });
+
+  it('FIX-VM-01: RAM-limited without override uses totalVms=100 → ramLimitedCount=4', () => {
+    // ceil(100 * 16 / 512) = ceil(3.125) = 4
+    const result = computeScenarioResult(VM_OVERRIDE_CLUSTER, VM_OVERRIDE_SCENARIO_BASE);
+    expect(result.ramLimitedCount).toBe(4);
+  });
+
+  it('FIX-VM-02: Disk-limited uses targetVmCount=200 → diskLimitedCount=4', () => {
+    // ceil(200 * 100 / 5000) = ceil(4) = 4
+    const scenario = { ...VM_OVERRIDE_SCENARIO_BASE, targetVmCount: 200 };
+    const result = computeScenarioResult(VM_OVERRIDE_CLUSTER, scenario);
+    expect(result.diskLimitedCount).toBe(4);
+  });
+
+  it('FIX-VM-02: Disk-limited without override uses totalVms=100 → diskLimitedCount=2', () => {
+    // ceil(100 * 100 / 5000) = ceil(2) = 2
+    const result = computeScenarioResult(VM_OVERRIDE_CLUSTER, VM_OVERRIDE_SCENARIO_BASE);
+    expect(result.diskLimitedCount).toBe(2);
+  });
+});
+
 describe('computeScenarioResult — minServerCount pin floor', () => {
   it('minServerCount > computed: finalCount = minServerCount', () => {
     const pinnedScenario = { ...CPU_LIMITED_SCENARIO, minServerCount: 100 };
