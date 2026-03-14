@@ -17,7 +17,17 @@ vi.mock('@e965/xlsx', () => ({
 import * as XLSX from '@e965/xlsx'
 
 const MOCK_SHEET = {}
+const MOCK_VHOST_SHEET = {}
 const MOCK_WORKBOOK = { Sheets: { vInfo: MOCK_SHEET }, SheetNames: ['vInfo'] }
+const MOCK_WORKBOOK_WITH_VHOST = {
+  Sheets: { vInfo: MOCK_SHEET, vHost: MOCK_VHOST_SHEET },
+  SheetNames: ['vInfo', 'vHost'],
+}
+
+const MOCK_VHOST_ROWS = [
+  { Host: 'esxi-01', 'CPU Model': 'Intel Xeon Gold 6526Y', 'Speed MHz': 2400 },
+  { Host: 'esxi-02', 'CPU Model': 'Intel Xeon Gold 6526Y', 'Speed MHz': 2400 },
+]
 
 beforeEach(() => {
   vi.mocked(XLSX.read).mockReturnValue(MOCK_WORKBOOK as unknown as ReturnType<typeof XLSX.read>)
@@ -62,6 +72,48 @@ describe('rvtoolsParser', () => {
     ])
     const result = await parseRvtools(new ArrayBuffer(0))
     expect(result.totalVcpus).toBe(6)
+  })
+
+  describe('vHost sheet — cpuModel and cpuFrequencyGhz extraction', () => {
+    beforeEach(() => {
+      vi.mocked(XLSX.read).mockReturnValue(MOCK_WORKBOOK_WITH_VHOST as unknown as ReturnType<typeof XLSX.read>)
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === MOCK_VHOST_SHEET) return MOCK_VHOST_ROWS
+        return MOCK_ROWS
+      })
+    })
+
+    it('extracts cpuModel from first vHost row CPU Model column', async () => {
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.cpuModel).toBe('Intel Xeon Gold 6526Y')
+    })
+
+    it('extracts cpuFrequencyGhz as average Speed MHz / 1000 (1 decimal)', async () => {
+      const result = await parseRvtools(new ArrayBuffer(0))
+      // 2400 MHz → 2.4 GHz
+      expect(result.cpuFrequencyGhz).toBe(2.4)
+    })
+
+    it('returns undefined cpuModel and cpuFrequencyGhz when vHost sheet is absent', async () => {
+      vi.mocked(XLSX.read).mockReturnValue(MOCK_WORKBOOK as unknown as ReturnType<typeof XLSX.read>)
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue(MOCK_ROWS)
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.cpuModel).toBeUndefined()
+      expect(result.cpuFrequencyGhz).toBeUndefined()
+    })
+
+    it('averages Speed MHz across all hosts when values differ', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === MOCK_VHOST_SHEET) return [
+          { Host: 'esxi-01', 'CPU Model': 'Xeon Silver', 'Speed MHz': 2000 },
+          { Host: 'esxi-02', 'CPU Model': 'Xeon Silver', 'Speed MHz': 3000 },
+        ]
+        return MOCK_ROWS
+      })
+      const result = await parseRvtools(new ArrayBuffer(0))
+      // avg(2000, 3000) = 2500 MHz → 2.5 GHz
+      expect(result.cpuFrequencyGhz).toBe(2.5)
+    })
   })
 
   describe('scope detection', () => {

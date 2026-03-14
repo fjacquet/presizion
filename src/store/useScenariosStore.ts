@@ -66,12 +66,27 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
         cluster.totalDiskGb && cluster.totalVms
           ? Math.round((cluster.totalDiskGb / cluster.totalVms) * 10) / 10
           : undefined
-      if (ramPerVmGb == null && diskPerVmGb == null) return state
+      // Seed target server hardware config from existing cluster when available
+      const socketsPerServer = cluster.socketsPerServer ?? undefined
+      const coresPerSocket = cluster.coresPerSocket ?? undefined
+      const ramPerServerGb = cluster.ramPerServerGb ?? undefined
+
+      const hasUpdates =
+        ramPerVmGb != null ||
+        diskPerVmGb != null ||
+        socketsPerServer != null ||
+        coresPerSocket != null ||
+        ramPerServerGb != null
+      if (!hasUpdates) return state
+
       return {
         scenarios: state.scenarios.map((s) => ({
           ...s,
           ...(ramPerVmGb != null && { ramPerVmGb }),
           ...(diskPerVmGb != null && { diskPerVmGb }),
+          ...(socketsPerServer != null && { socketsPerServer }),
+          ...(coresPerSocket != null && { coresPerSocket }),
+          ...(ramPerServerGb != null && { ramPerServerGb }),
         })),
       }
     }),

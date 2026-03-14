@@ -69,7 +69,7 @@ export function buildCsvContent(
       scenario.ramPerVmGb,
       scenario.diskPerVmGb,
       scenario.headroomPercent,
-      scenario.haReserveEnabled,
+      scenario.haReserveCount === 0 ? 'None' : `N+${scenario.haReserveCount}`,
       result.cpuLimitedCount,
       result.ramLimitedCount,
       result.diskLimitedCount,

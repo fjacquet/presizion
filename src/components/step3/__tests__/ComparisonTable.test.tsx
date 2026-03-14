@@ -35,9 +35,11 @@ const baseResult = {
   ramLimitedCount: 12,
   diskLimitedCount: 2,
   rawCount: 13,
+  requiredCount: 13,
   finalCount: 13,
   limitingResource: 'cpu' as const,
   haReserveApplied: false,
+  haReserveCount: 0,
   achievedVcpuToPCoreRatio: 3.2,
   vmsPerServer: 7.7,
   cpuUtilizationPercent: 48.0,
@@ -47,12 +49,12 @@ const baseResult = {
 
 beforeEach(() => {
   useClusterStore.setState({
-    currentCluster: { totalVcpus: 2000, totalPcores: 500, totalVms: 300 },
+    currentCluster: { totalVcpus: 2000, totalPcores: 500, totalVms: 300, cpuUtilizationPercent: 48 },
   })
   useScenariosStore.setState({
     scenarios: [baseScenario],
   })
-  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu', layoutMode: 'hci' })
   vi.mocked(useScenariosResults).mockReturnValue([baseResult])
 })
 
@@ -133,11 +135,11 @@ describe('ComparisonTable', () => {
         { ...baseResult, limitingResource: 'specint' as const },
       ])
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'specint', layoutMode: 'hci' })
       })
       render(<ComparisonTable />)
-      // Should show 'SPECrate2017' not 'SPECint'
-      expect(screen.getByText('SPECrate2017')).toBeTruthy()
+      // Should show 'SPECrate2017' — may appear in both mode badge and limiting resource column
+      expect(screen.getAllByText('SPECrate2017').length).toBeGreaterThanOrEqual(1)
       expect(screen.queryByText('Specint')).toBeNull()
     })
 

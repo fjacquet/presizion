@@ -1,5 +1,5 @@
 import type { ClusterImportResult, ScopeData } from './index'
-import { RVTOOLS_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
+import { RVTOOLS_ALIASES, RVTOOLS_VHOST_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
@@ -109,7 +109,7 @@ export async function parseRvtools(
     })
   }
 
-  return {
+  const result: Omit<ClusterImportResult, 'sourceFormat'> = {
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
@@ -120,4 +120,24 @@ export async function parseRvtools(
     scopeLabels,
     rawByScope,
   }
+
+  // vHost sheet — best-effort: extract CPU model and clock frequency from first host row
+  const vHostSheet = wb.Sheets['vHost']
+  if (vHostSheet) {
+    const hostRows = XLSX.utils.sheet_to_json<VInfoRow>(vHostSheet, { defval: '' })
+    const firstRow = hostRows[0]
+    if (firstRow) {
+      const cols = resolveColumns(Object.keys(firstRow), RVTOOLS_VHOST_ALIASES, new Set())
+      const firstHost = hostRows.find((r) => str(r, cols['host_name']) !== '') ?? firstRow
+      const model = str(firstHost, cols['cpu_model'])
+      if (model) result.cpuModel = model
+      const validSpeeds = hostRows.filter((r) => num(r, cols['cpu_speed_mhz']) > 0)
+      if (validSpeeds.length > 0) {
+        const avgMhz = validSpeeds.reduce((s, r) => s + num(r, cols['cpu_speed_mhz']), 0) / validSpeeds.length
+        result.cpuFrequencyGhz = Math.round(avgMhz / 100) / 10
+      }
+    }
+  }
+
+  return result
 }

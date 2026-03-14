@@ -256,12 +256,12 @@ describe('CurrentClusterForm', () => {
       expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
     })
 
-    it('cpuUtilizationPercent field is visible when sizingMode is specint', () => {
+    it('cpuUtilizationPercent field is NOT in DOM when sizingMode is specint', () => {
       act(() => {
         useWizardStore.setState({ sizingMode: 'specint' })
       })
       render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
+      expect(screen.queryByTestId('input-cpuUtilizationPercent')).not.toBeInTheDocument()
     })
 
     it('ramUtilizationPercent field is visible when sizingMode is specint', () => {

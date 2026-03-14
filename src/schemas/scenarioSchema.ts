@@ -2,7 +2,9 @@ import { z } from 'zod';
 import {
   DEFAULT_VCPU_TO_PCORE_RATIO,
   DEFAULT_HEADROOM_PERCENT,
-  DEFAULT_HA_RESERVE_ENABLED,
+  DEFAULT_HA_RESERVE_COUNT,
+  DEFAULT_TARGET_CPU_UTILIZATION_PERCENT,
+  DEFAULT_TARGET_RAM_UTILIZATION_PERCENT,
 } from '../lib/sizing/defaults';
 
 /**
@@ -58,8 +60,19 @@ export const scenarioSchema = z.object({
   headroomPercent: z
     .preprocess(numericPreprocess, z.number().min(0).max(100).optional())
     .default(DEFAULT_HEADROOM_PERCENT),
-  haReserveEnabled: z.boolean().default(DEFAULT_HA_RESERVE_ENABLED),
+  haReserveCount: z
+    .union([z.literal(0), z.literal(1), z.literal(2)])
+    .default(DEFAULT_HA_RESERVE_COUNT),
   targetSpecint: optionalPositiveNumber,
+  targetCpuUtilizationPercent: z
+    .preprocess(numericPreprocess, z.number().min(1).max(100).optional())
+    .default(DEFAULT_TARGET_CPU_UTILIZATION_PERCENT),
+  targetRamUtilizationPercent: z
+    .preprocess(numericPreprocess, z.number().min(1).max(100).optional())
+    .default(DEFAULT_TARGET_RAM_UTILIZATION_PERCENT),
+  targetVmCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
+  minServerCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
+  targetCpuFrequencyGhz: optionalPositiveNumber,
 });
 
 export type ScenarioInput = z.infer<typeof scenarioSchema>;

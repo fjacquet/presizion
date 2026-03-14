@@ -18,11 +18,19 @@ export const LIVEOPTICS_ALIASES: ColumnAliasMap = {
   is_template: ['Template'],
 }
 
+export const RVTOOLS_VHOST_ALIASES: ColumnAliasMap = {
+  host_name:    ['Host', 'Name', 'Host Name'],
+  cpu_model:    ['CPU Model'],
+  cpu_speed_mhz: ['Speed MHz', 'CPU Speed MHz', 'CPU Speed'],
+}
+
 export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {
-  host_name:   ['Host Name', 'ESX Host', 'Host'],
-  cpu_sockets: ['CPU Sockets', 'Sockets'],
-  cpu_cores:   ['CPU Cores', 'Cores'],
-  memory_kib:  ['Memory (KiB)', 'Memory KiB', 'Memory'],
+  host_name:    ['Host Name', 'ESX Host', 'Host'],
+  cpu_sockets:  ['CPU Sockets', 'Sockets'],
+  cpu_cores:    ['CPU Cores', 'Cores'],
+  memory_kib:   ['Memory (KiB)', 'Memory KiB', 'Memory'],
+  cpu_model:    ['CPU Model', 'Processor Model', 'Processor'],
+  cpu_speed_mhz: ['CPU Speed (MHz)', 'CPU Speed', 'CPU MHz'],
 }
 
 export const LIVEOPTICS_ESX_PERF_ALIASES: ColumnAliasMap = {

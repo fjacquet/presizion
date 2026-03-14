@@ -7,9 +7,26 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build output
 node_modules
 dist
 dist-ssr
+
+# Test coverage
+coverage
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Vite dev cache
+.vite
+
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Local config overrides
 *.local
 
 # Editor directories and files
@@ -17,8 +34,12 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code local state (worktrees, local settings)
+.claude/

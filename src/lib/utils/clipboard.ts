@@ -35,7 +35,7 @@ export function buildSummaryText(
       '',
       `Scenario: ${scenario.name}`,
       `  Sockets/Server: ${scenario.socketsPerServer} | Cores/Socket: ${scenario.coresPerSocket} | RAM/Server: ${scenario.ramPerServerGb} GB | Disk/Server: ${scenario.diskPerServerGb} GB`,
-      `  vCPU:pCore Ratio: ${scenario.targetVcpuToPCoreRatio} | Headroom: ${scenario.headroomPercent}% | N+1 HA: ${scenario.haReserveEnabled ? 'On' : 'Off'}`,
+      `  vCPU:pCore Ratio: ${scenario.targetVcpuToPCoreRatio} | Headroom: ${scenario.headroomPercent}% | HA Reserve: ${scenario.haReserveCount === 0 ? 'None' : `N+${scenario.haReserveCount}`}`,
       '',
       '  Results:',
       `    CPU-limited:  ${result.cpuLimitedCount} servers`,

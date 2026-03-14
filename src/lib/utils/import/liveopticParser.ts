@@ -81,6 +81,10 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
         if (derivedCores) base.coresPerSocket = derivedCores
         const ramGb = Math.round(num(firstHost, cols['memory_kib']) / 1024 / 1024)
         if (ramGb) base.ramPerServerGb = ramGb
+        const model = str(firstHost, cols['cpu_model'])
+        if (model) base.cpuModel = model
+        const speedMhz = num(firstHost, cols['cpu_speed_mhz'])
+        if (speedMhz > 0) base.cpuFrequencyGhz = Math.round(speedMhz / 100) / 10
       }
     }
   }

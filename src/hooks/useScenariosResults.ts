@@ -21,8 +21,9 @@ export function useScenariosResults(): readonly ScenarioResult[] {
   const currentCluster = useClusterStore((state) => state.currentCluster);
   const scenarios = useScenariosStore((state) => state.scenarios);
   const sizingMode = useWizardStore((state) => state.sizingMode);
+  const layoutMode = useWizardStore((state) => state.layoutMode);
 
   return scenarios.map((scenario) =>
-    computeScenarioResult(currentCluster, scenario, sizingMode),
+    computeScenarioResult(currentCluster, scenario, sizingMode, layoutMode),
   );
 }
