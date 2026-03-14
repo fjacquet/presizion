@@ -1,83 +1,115 @@
-# Requirements — v1.4 Bug Fixes, Chart Polish & UX
+# Requirements — v2.0 vSAN-Aware Sizing Engine
 
 *Defined: 2026-03-14*
 
-## Bug Fixes — Import Scoping (FIX-SCOPE)
+## vSAN Storage Engine (VSAN)
 
-- **FIX-SCOPE-01**: LiveOptics ESX host config (RAM/server, sockets, cores/socket, pCores, server count, CPU/RAM util) must be scoped per cluster, not read from first host row globally (GH #4)
-- **FIX-SCOPE-02**: Per-scope ScopeData must include host config fields — switching cluster filter updates both VM aggregates AND host config (GH #4)
-- **FIX-SCOPE-03**: "All" scope aggregates host config across all clusters (total pCores = sum, server count = total hosts, RAM/server = representative value with warning if heterogeneous) (GH #4)
-- **FIX-SCOPE-04**: ESX Performance data (CPU/RAM utilization) must also be scoped per cluster (GH #4)
-- **FIX-SCOPE-05**: Fallback when no cluster column on ESX Hosts — use global behavior with warning about potential inaccuracy (GH #4)
-- **FIX-SCOPE-06**: Audit RVTools parser (vHost sheet) for the same scoping gap and fix if present (GH #4)
+- **VSAN-01**: User can select a Fault Tolerance policy per scenario: Mirror FTT=1 (2x), Mirror FTT=2 (3x), Mirror FTT=3 (4x), RAID-5 3+1 (1.33x), RAID-6 4+2 (1.5x), or None
+- **VSAN-02**: Storage sizing computes Raw from Usable using the selected FTT multiplier: `raw = usable * fttMultiplier`
+- **VSAN-03**: Storage pipeline includes vSAN metadata overhead (~2% of usable)
+- **VSAN-04**: User can toggle VM swap overhead (default OFF/sparse swap; ON adds 100% of VM RAM to storage)
+- **VSAN-05**: User can set vSAN slack space percentage (default 25%) for operations reserve (resyncs, policy changes)
+- **VSAN-06**: vSAN CPU overhead (default 10%) is deducted from available CPU capacity per node
+- **VSAN-07**: User can set vSAN memory overhead per host in GB (default 6 GB for ESA, configurable)
+- **VSAN-08**: Compression/dedup factor is selectable per scenario: None (1.0), Pessimistic (1.3:1), Conservative (1.5:1), Moderate (2:1), Optimistic (3:1)
+- **VSAN-09**: Compression is applied to usable demand BEFORE FTT multiplication (not after)
+- **VSAN-10**: All storage computations use GiB internally; display converts to TiB for values > 1024 GiB
+- **VSAN-11**: FTT policy enforces minimum node count (Mirror FTT=1: 3, FTT=2: 5, FTT=3: 7, RAID-5: 4, RAID-6: 6)
+- **VSAN-12**: vSAN settings are per-scenario optional fields (no new store); absent fields use legacy sizing path
 
-## Bug Fixes — VM Override (FIX-VM)
+## Capacity Breakdown (CAP)
 
-- **FIX-VM-01**: When targetVmCount overrides the VM count, RAM-limited formula must use the overridden count, not the original totalVms (GH #7)
-- **FIX-VM-02**: When targetVmCount overrides the VM count, Disk-limited formula must use the overridden count, not the original totalVms (GH #7)
+- **CAP-01**: CPU capacity breakdown table shows: VMs Required, vSAN Consumption, Total Required, Reserved (Max Util), HA Reserve, Spare, Excess, Total Configured — in GHz
+- **CAP-02**: Memory capacity breakdown table shows: VMs Required, vSAN Consumption, Total Required, Reserved (Max Util), HA Reserve, Spare, Excess, Total Configured — in GiB
+- **CAP-03**: Storage capacity breakdown table shows: VMs Usable, Swap, Metadata, FTT Overhead, Total Raw Required, Slack Space, HA Reserve, Spare, Excess, Total Configured — in TiB (Usable + Raw columns)
+- **CAP-04**: HA Reserve for CPU/Memory = one host worth of capacity; for storage = 1/N of cluster raw capacity
+- **CAP-05**: Max Utilization Reserve = Required / maxUtilPercent * (1 - maxUtilPercent), based on Required demand not Total
+- **CAP-06**: Excess = Total Configured - Required - Spare (invariant: Required + Spare + Excess = Total)
 
-## Bug Fixes — As-Is Column (FIX-ASIS)
+## Charts (VIZ)
 
-- **FIX-ASIS-01**: As-Is column in Step 3 shows VMs/Server computed as totalVms / existingServerCount (GH #9)
-- **FIX-ASIS-02**: As-Is column shows CPU Util % and RAM Util % from imported ESX Performance data (GH #9)
-- **FIX-ASIS-03**: As-Is column shows Total Disk Required from imported totalDiskGb (GH #9)
-- **FIX-ASIS-04**: Metrics that don't apply to As-Is show "N/A" rather than "—" (GH #9)
+- **VIZ-01**: Stacked horizontal capacity bar chart shows Required / Spare / Excess with percentage labels for each resource (CPU GHz, Memory GiB, Raw Storage TiB, Usable Storage TiB)
+- **VIZ-02**: Min Nodes per Constraint horizontal bar chart shows minimum node count for: CPU, Memory, Storage, FT&HA, VMs — identifying which constraint drives the configuration
+- **VIZ-03**: Both new charts are downloadable as PNG
+- **VIZ-04**: Charts use the existing CHART_COLORS professional palette
 
-## Chart Polish (CHART)
+## Growth Projections (GROW)
 
-- **CHART-04**: All charts include a legend mapping scenario names to bar colors (GH #8)
-- **CHART-05**: Data values displayed on top of each bar (server count, core count) (GH #8)
-- **CHART-06**: CoreCountChart (Total Physical Cores) is downloadable as PNG (GH #8)
-- **CHART-07**: Professional color palette replacing default Recharts colors (GH #8)
+- **GROW-01**: User can set per-resource growth percentages per scenario: CPU Growth %, Memory Growth %, Storage Growth %
+- **GROW-02**: Growth is applied as compound factor to demand inputs BEFORE overhead calculation: `effectiveDemand = baseDemand * (1 + growthPercent / 100)`
+- **GROW-03**: Growth fields default to 0% (no growth) and are optional
+- **GROW-04**: Growth factors are visible in formula display strings when non-zero
 
-## SPECrate UX (SPEC)
+## Scenario Form (FORM)
 
-- **SPEC-06**: In SPECrate mode, sockets/server and cores/socket are auto-derived from benchmark metadata when available (GH #6)
-- **SPEC-07**: Auto-derived socket/core fields are read-only in SPECrate mode (GH #6)
-- **SPEC-08**: Switching back to vCPU mode re-enables manual entry for socket/core fields (GH #6)
-- **SPEC-09**: If benchmark metadata lacks socket/core info, fall back to manual entry with a warning (GH #6)
+- **FORM-01**: ScenarioCard includes a collapsible "vSAN & Growth" section (collapsed by default)
+- **FORM-02**: vSAN section contains: FTT policy dropdown, Compression factor dropdown, Slack space %, vSAN CPU overhead %, vSAN memory per host GB, VM swap toggle
+- **FORM-03**: Growth section contains: CPU Growth %, Memory Growth %, Storage Growth %
+- **FORM-04**: vSAN section only visible when layoutMode === 'hci' (hidden in disaggregated mode)
 
-## SPECrate Lookup (SPEC-LINK)
+## PDF Report (PDF)
 
-- **SPEC-LINK-01**: Detected CPU model from import is displayed in Step 1 form (GH #5)
-- **SPEC-LINK-02**: A "Look up SPECrate" link opens the SPEC results search page in a new tab; the detected CPU model is copied to clipboard for easy pasting (SPEC CGI does not support URL pre-fill) (GH #5)
-- **SPEC-LINK-03**: If no CPU model detected, the lookup link is hidden (GH #5)
+- **PDF-01**: User can export a professional PDF report from Step 3
+- **PDF-02**: PDF includes: title page with project info, executive summary table, capacity breakdown tables (CPU/Memory/Storage), stacked capacity chart images, comparison table
+- **PDF-03**: PDF is generated client-side using jsPDF + jspdf-autotable (lazy-loaded)
+- **PDF-04**: Charts are embedded as PNG images (SVG -> canvas -> data URL)
+- **PDF-05**: PDF export button appears alongside existing export buttons in Step 3
 
-## Reset (RESET)
+## Out of Scope
 
-- **RESET-01**: A Reset button is visible from any wizard step (GH #10)
-- **RESET-02**: Clicking Reset shows a confirmation dialog before clearing data (GH #10)
-- **RESET-03**: Reset clears all stores (cluster, scenarios, wizard, import) and localStorage session data (GH #10)
-- **RESET-04**: After reset, user lands on Step 1 with a blank form (GH #10)
+| Feature | Reason |
+|---------|--------|
+| IOPS performance modeling | Requires vendor-specific performance data curves we don't have |
+| Hardware SKU catalog | Maintenance burden; users define server config manually |
+| Disk group / cache tier configuration | Too VxRail-specific; Presizion is vendor-neutral |
+| Per-VM workload definitions | Aggregate sizing only; per-VM detail is a different tool category |
+| Pricing / BOM | Capacity sizing only |
+| vSAN ESA vs OSA distinction | Both use 10% CPU overhead for planning; memory is configurable |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-SCOPE-01 | Phase 16 | Complete |
-| FIX-SCOPE-02 | Phase 16 | Complete |
-| FIX-SCOPE-03 | Phase 16 | Complete |
-| FIX-SCOPE-04 | Phase 16 | Complete |
-| FIX-SCOPE-05 | Phase 16 | Complete |
-| FIX-SCOPE-06 | Phase 16 | Complete |
-| FIX-VM-01 | Phase 16 | Complete |
-| FIX-VM-02 | Phase 16 | Complete |
-| FIX-ASIS-01 | Phase 16 | Complete |
-| FIX-ASIS-02 | Phase 16 | Complete |
-| FIX-ASIS-03 | Phase 16 | Complete |
-| FIX-ASIS-04 | Phase 16 | Complete |
-| CHART-04 | Phase 17 | Complete |
-| CHART-05 | Phase 17 | Complete |
-| CHART-06 | Phase 17 | Complete |
-| CHART-07 | Phase 17 | Complete |
-| SPEC-06 | Phase 17 | Complete |
-| SPEC-07 | Phase 17 | Complete |
-| SPEC-08 | Phase 17 | Complete |
-| SPEC-09 | Phase 17 | Complete |
-| SPEC-LINK-01 | Phase 17 | Complete |
-| SPEC-LINK-02 | Phase 17 | Complete |
-| SPEC-LINK-03 | Phase 17 | Complete |
-| RESET-01 | Phase 17 | Complete |
-| RESET-02 | Phase 17 | Complete |
-| RESET-03 | Phase 17 | Complete |
-| RESET-04 | Phase 17 | Complete |
+| VSAN-01 | TBD | Pending |
+| VSAN-02 | TBD | Pending |
+| VSAN-03 | TBD | Pending |
+| VSAN-04 | TBD | Pending |
+| VSAN-05 | TBD | Pending |
+| VSAN-06 | TBD | Pending |
+| VSAN-07 | TBD | Pending |
+| VSAN-08 | TBD | Pending |
+| VSAN-09 | TBD | Pending |
+| VSAN-10 | TBD | Pending |
+| VSAN-11 | TBD | Pending |
+| VSAN-12 | TBD | Pending |
+| CAP-01 | TBD | Pending |
+| CAP-02 | TBD | Pending |
+| CAP-03 | TBD | Pending |
+| CAP-04 | TBD | Pending |
+| CAP-05 | TBD | Pending |
+| CAP-06 | TBD | Pending |
+| VIZ-01 | TBD | Pending |
+| VIZ-02 | TBD | Pending |
+| VIZ-03 | TBD | Pending |
+| VIZ-04 | TBD | Pending |
+| GROW-01 | TBD | Pending |
+| GROW-02 | TBD | Pending |
+| GROW-03 | TBD | Pending |
+| GROW-04 | TBD | Pending |
+| FORM-01 | TBD | Pending |
+| FORM-02 | TBD | Pending |
+| FORM-03 | TBD | Pending |
+| FORM-04 | TBD | Pending |
+| PDF-01 | TBD | Pending |
+| PDF-02 | TBD | Pending |
+| PDF-03 | TBD | Pending |
+| PDF-04 | TBD | Pending |
+| PDF-05 | TBD | Pending |
+
+**Coverage:**
+- v2.0 requirements: 35 total
+- Mapped to phases: 0
+- Unmapped: 35
+
+---
+*Requirements defined: 2026-03-14*
