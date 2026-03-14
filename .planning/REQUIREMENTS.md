@@ -40,7 +40,7 @@
 ## SPECrate Lookup (SPEC-LINK)
 
 - **SPEC-LINK-01**: Detected CPU model from import is displayed in Step 1 form (GH #5)
-- **SPEC-LINK-02**: A "Look up SPECrate" link opens the SPEC results search page in a new tab, pre-populated with the detected CPU model (GH #5)
+- **SPEC-LINK-02**: A "Look up SPECrate" link opens the SPEC results search page in a new tab; the detected CPU model is copied to clipboard for easy pasting (SPEC CGI does not support URL pre-fill) (GH #5)
 - **SPEC-LINK-03**: If no CPU model detected, the lookup link is hidden (GH #5)
 
 ## Reset (RESET)
