@@ -4,7 +4,22 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v1.4 shipped with per-cluster ESX scoping fixes, As-Is column data, chart redesign (comparison + constraint breakdown with download), SPECrate read-only fields + lookup link, and Reset button.
+v1.4 shipped with per-cluster ESX scoping fixes, As-Is column data, chart redesign, SPECrate UX improvements, and Reset button.
+
+## Current Milestone: v2.0 vSAN-Aware Sizing Engine
+
+**Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing (FTT, raw vs usable, overhead deductions), capacity breakdown tables (Required/Spare/HA/Excess), stacked capacity charts, growth projections, compression/dedup factors, and professional PDF report export.
+
+**Target features:**
+- vSAN overhead deduction (ESA CPU ~10%, vSAN memory consumption, storage overhead)
+- Storage sizing: Raw vs Usable with FTT policies (Mirror FTT=1/2/3, RAID-5 3+1, RAID-6 4+2)
+- Capacity breakdown tables per resource (Required / Reserved at Max Util / HA / Spare / Excess / Total)
+- Stacked horizontal capacity bar charts (Required/Spare/Excess with %)
+- Min nodes per constraint horizontal bar chart (CPU, Memory, Storage, FT&HA, VMs)
+- Compression/dedup factor (None, Pessimistic 1.3:1, Conservative 1.5:1, Moderate 2:1, Optimistic 3:1)
+- Slack space for vSAN operations (25% default, configurable)
+- Growth projections per resource (CPU %, Memory %, Storage %, separate from VM count override)
+- Professional PDF report export matching VxRail Sizing Summary quality
 
 ## Core Value
 
@@ -73,8 +88,17 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ SPECrate lookup link with clipboard copy of CPU model number — v1.4 / Phase 17
 - ✓ Reset button with confirmation dialog — v1.4 / Phase 17
 
-### Active (v1.5 candidates)
+### Active (v2.0)
 
+- [ ] vSAN overhead deduction: ESA CPU %, vSAN memory, storage overhead
+- [ ] Storage sizing: Raw vs Usable with FTT policies (Mirror, RAID-5, RAID-6)
+- [ ] Capacity breakdown tables (Required/Reserved/HA/Spare/Excess/Total) per CPU, Memory, Storage
+- [ ] Stacked horizontal capacity bar charts with percentages
+- [ ] Min nodes per constraint horizontal bar chart
+- [ ] Compression/dedup factor (None/Pessimistic/Conservative/Moderate/Optimistic)
+- [ ] vSAN slack space for operations (25% default, configurable)
+- [ ] Growth projections per resource (CPU %, Memory %, Storage %)
+- [ ] Professional PDF report export
 
 ### Out of Scope
 
@@ -122,4 +146,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-14 after v1.4 milestone completion*
+*Last updated: 2026-03-14 after v2.0 milestone start*

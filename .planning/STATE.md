@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: — Bug Fixes, Chart Polish & UX
-status: completed
-stopped_at: Completed 17-03-PLAN.md (Phase 17 fully complete)
-last_updated: "2026-03-14T20:25:20.558Z"
-last_activity: 2026-03-14 — Completed 17-03 (Reset button with confirmation dialog)
+milestone: v2.0
+milestone_name: — vSAN-Aware Sizing Engine
+status: planning
+stopped_at: —
+last_updated: "2026-03-14"
+last_activity: 2026-03-14 — Milestone v2.0 started
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.4 — Phase 17 complete
+**Current focus:** v2.0 — defining requirements for vSAN-aware sizing engine
 
 ## Current Position
 
-Phase: 17-chart-polish-specrate-ux-reset
-Plan: 3 of 3 complete
-Status: Phase 17 complete (all plans done)
-Last activity: 2026-03-14 — Completed 17-03 (Reset button with confirmation dialog)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-14 — Milestone v2.0 started
 
-Progress: [==========] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
