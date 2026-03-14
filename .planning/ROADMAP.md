@@ -50,7 +50,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### 🚧 v2.0 — vSAN-Aware Sizing Engine (In Progress)
+### v2.0 — vSAN-Aware Sizing Engine (In Progress)
 
 **Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF report export.
 
@@ -76,8 +76,8 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 18-01-PLAN.md — vSAN constants, types, formula functions with TDD tests, Scenario interface extension
-- [ ] 18-02-PLAN.md — Wire vSAN formulas into constraints.ts + integration tests
+- [x] 18-01-PLAN.md — vSAN constants, types, formula functions with TDD tests, Scenario interface extension
+- [x] 18-02-PLAN.md — Wire vSAN formulas into constraints.ts + integration tests
 
 ### Phase 19: Capacity Breakdown & Growth Wiring
 **Goal**: Users who have defined a scenario receive a complete capacity breakdown for CPU, Memory, and Storage — showing Required, Reserved, HA Reserve, Spare, Excess, and Total Configured — with growth factors applied to all demand inputs before overhead calculation.
@@ -89,7 +89,12 @@ Plans:
   3. HA Reserve for CPU/Memory equals one host worth of capacity; for storage equals 1/N of cluster raw capacity
   4. Setting CPU Growth to 20% causes the effective CPU demand to increase by 20% before any overhead is applied, and the formula display string shows the growth factor
   5. Growth fields default to 0% and absent vSAN fields fall through to the legacy non-vSAN sizing path without error
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Growth fields on Scenario + growth pre-multiply in constraints.ts
+- [ ] 19-02-PLAN.md — Breakdown types + computeVsanBreakdown pure function (TDD)
+- [ ] 19-03-PLAN.md — Formula display growth annotations + useVsanBreakdowns hook
 
 ### Phase 20: Scenario Form — vSAN & Growth UI
 **Goal**: Users can configure vSAN storage policy, compression, overhead percentages, and per-resource growth rates directly in the ScenarioCard form without leaving Step 2, and these settings immediately affect the live server count displayed.
@@ -146,8 +151,8 @@ Plans:
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
-| 18. vSAN Formula Engine | 2/2 | Complete    | 2026-03-14 | - |
-| 19. Capacity Breakdown & Growth Wiring | v2.0 | 0/TBD | Not started | - |
+| 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
+| 19. Capacity Breakdown & Growth Wiring | v2.0 | 0/3 | Not started | - |
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/TBD | Not started | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
