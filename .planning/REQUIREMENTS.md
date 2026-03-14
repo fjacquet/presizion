@@ -46,6 +46,6 @@
 | SCOPE-02 | Phase 13 | Complete |
 | SCOPE-03 | Phase 14 | Complete |
 | SCOPE-04 | Phase 14 | Complete |
-| PERS-01 | Phase 15 | Pending |
+| PERS-01 | Phase 15 | Complete |
 | PERS-02 | Phase 15 | Pending |
 | PERS-03 | Phase 15 | Pending |

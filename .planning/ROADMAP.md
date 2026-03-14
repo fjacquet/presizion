@@ -186,4 +186,4 @@ Plans:
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
 | 13. Import Scope Filter | 2/2 | Complete    | 2026-03-13 | - |
 | 14. Persistent Scope Widget | 2/2 | Complete   | 2026-03-13 | - |
-| 15. Persistence | v1.3 | 0/2 | Not started | - |
+| 15. Persistence | 1/2 | In Progress|  | - |

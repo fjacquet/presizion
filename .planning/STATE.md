@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Scope, Persistence & Branding
 status: planning
-stopped_at: Completed 08-v12-planning-backfill-01-PLAN.md
-last_updated: "2026-03-14T06:35:27.988Z"
+stopped_at: Completed 15-persistence-01-PLAN.md
+last_updated: "2026-03-14T08:15:36.419Z"
 last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
   percent: 0
 ---
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 14-persistent-scope-widget P01 | 6 | 2 tasks | 4 files |
 | Phase 14-persistent-scope-widget P02 | 15 | 2 tasks | 5 files |
 | Phase 08-v12-planning-backfill P01 | 5 | 3 tasks | 1 files |
+| Phase 15-persistence P01 | 7 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 14-persistent-scope-widget]: ScopeBadge self-hides via return null when scopeOptions.length <= 1 — no conditional wrapper needed in Step1CurrentCluster
 - [Phase 14-persistent-scope-widget]: Dialog pending state initialized from activeScope on open — prevents live mutations while user is selecting; shadcn dialog.tsx added via npx shadcn@latest add dialog using base-ui/react/dialog primitives
 - [Phase 08-v12-planning-backfill]: STATE.md Task 2 skipped: resetting to v1.2 complete values would destroy v1.3 context; STATE.md correctly reflects ongoing v1.3 work
+- [Phase 15-persistence]: STORAGE_KEY 'presizion-session' is the single source of truth for localStorage persistence
+- [Phase 15-persistence]: Boot restore is synchronous before createRoot — no flicker, no empty-state render
+- [Phase 15-persistence]: Zod v4 UUID validation is stricter than v3 — test fixtures must use valid RFC 4122 UUIDs
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-14T06:35:27.986Z
-Stopped at: Completed 08-v12-planning-backfill-01-PLAN.md
+Last session: 2026-03-14T08:15:36.417Z
+Stopped at: Completed 15-persistence-01-PLAN.md
 Resume file: None
