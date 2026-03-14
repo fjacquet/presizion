@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
 status: in-progress
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-14T14:48:28Z"
-last_activity: 2026-03-14 — Completed 17-01 (Chart Polish - Legend, LabelList, Colors, Download)
+stopped_at: Completed 17-02-PLAN.md
+last_updated: "2026-03-14T14:49:25Z"
+last_activity: 2026-03-14 — Completed 17-02 (SPECrate UX - Read-only fields, Lookup link)
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,26 +26,26 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 17-chart-polish-specrate-ux-reset
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: Phase 17 in progress
-Last activity: 2026-03-14 — Completed 17-01 (Chart Polish - Legend, LabelList, Colors, Download)
+Last activity: 2026-03-14 — Completed 17-02 (SPECrate UX - Read-only fields, Lookup link)
 
-Progress: [======    ] 60%
+Progress: [========  ] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 5 min
-- Total execution time: 0.25 hours
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 16 | 2/2 | 11min | 6min |
-| 17 | 1/3 | 4min | 4min |
+| 17 | 2/3 | 9min | 5min |
 
 *Updated after each plan completion*
 
@@ -94,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase 17-01]: downloadChartPng extracted to shared utility with (ref, filename) signature for reuse
 - [Phase 17-01]: Legend always shown regardless of scenario count (CHART-04)
 - [Phase 17-01]: LabelList uses fontSize: 11 to avoid overlapping on narrow charts
+- [Phase 17-02]: hasMetadata derived at render time from sizingMode + currentCluster, not stored in local state
+- [Phase 17-02]: SPECrate lookup uses button element (not anchor) to run async clipboard before navigation
+- [Phase 17-02]: Sonner installed and Toaster added to App.tsx for project-wide toast support
 
 ### Pending Todos
 
@@ -106,5 +109,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 17-01-PLAN.md
+Stopped at: Completed 17-02-PLAN.md
 Resume file: None

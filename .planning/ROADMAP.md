@@ -76,7 +76,7 @@ Plans:
 
 **Requirements:** CHART-04..07, SPEC-06..09, SPEC-LINK-01..03, RESET-01..04 (14 requirements)
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 17-01-PLAN.md — Chart polish: legends, data labels, professional colors, CoreCountChart PNG download
@@ -127,4 +127,4 @@ Plans:
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
-| 17. Chart Polish, SPECrate UX & Reset | 2/3 | In Progress|  | — |
+| 17. Chart Polish, SPECrate UX & Reset | 3/3 | Complete   | 2026-03-14 | — |
