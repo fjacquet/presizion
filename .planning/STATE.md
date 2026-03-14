@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: — Bug Fixes, Chart Polish & UX
-status: completed
-stopped_at: Completed 16-01-PLAN.md (Phase 16 fully complete)
-last_updated: "2026-03-14T14:25:31.092Z"
-last_activity: 2026-03-14 — Completed 16-01 (Import Scoping ESX Per-Cluster Fix)
+status: in-progress
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-14T14:48:28Z"
+last_activity: 2026-03-14 — Completed 17-01 (Chart Polish - Legend, LabelList, Colors, Download)
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 5
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -21,30 +21,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.4 — Phase 16 executing
+**Current focus:** v1.4 — Phase 17 executing
 
 ## Current Position
 
-Phase: 16-bug-fixes-import-scoping-vm-override-asis
-Plan: 2 of 2 complete
-Status: Phase 16 complete (all plans done)
-Last activity: 2026-03-14 — Completed 16-01 (Import Scoping ESX Per-Cluster Fix)
+Phase: 17-chart-polish-specrate-ux-reset
+Plan: 1 of 3 complete
+Status: Phase 17 in progress
+Last activity: 2026-03-14 — Completed 17-01 (Chart Polish - Legend, LabelList, Colors, Download)
 
-Progress: [==========] 100%
+Progress: [======    ] 60%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
-- Average duration: 6 min
-- Total execution time: 0.2 hours
+- Total plans completed: 3
+- Average duration: 5 min
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 16 | 2/2 | 11min | 6min |
+| 17 | 1/3 | 4min | 4min |
 
 *Updated after each plan completion*
 
@@ -89,10 +90,14 @@ Recent decisions affecting current work:
 - [Phase 16-01]: Additive ESX fields (totalPcores, existingServerCount) are summed; representative fields (sockets, cores/socket) use first scope
 - [Phase 16-01]: Heterogeneous RAM/server triggers warning string but still uses first cluster value as representative
 - [Phase 16-01]: CPU/RAM utilization weighted by existingServerCount per scope, not simple average
+- [Phase 17-01]: CHART_COLORS uses Tailwind 500-level hex colors for WCAG AA accessibility on white backgrounds
+- [Phase 17-01]: downloadChartPng extracted to shared utility with (ref, filename) signature for reuse
+- [Phase 17-01]: Legend always shown regardless of scenario count (CHART-04)
+- [Phase 17-01]: LabelList uses fontSize: 11 to avoid overlapping on narrow charts
 
 ### Pending Todos
 
-- None (Phase 16 complete)
+- None
 
 ### Blockers/Concerns
 
@@ -101,5 +106,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 16-01-PLAN.md (Phase 16 fully complete)
+Stopped at: Completed 17-01-PLAN.md
 Resume file: None

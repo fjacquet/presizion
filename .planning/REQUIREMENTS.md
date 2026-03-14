@@ -66,10 +66,10 @@
 | FIX-ASIS-02 | Phase 16 | Complete |
 | FIX-ASIS-03 | Phase 16 | Complete |
 | FIX-ASIS-04 | Phase 16 | Complete |
-| CHART-04 | Phase 17 | Pending |
-| CHART-05 | Phase 17 | Pending |
-| CHART-06 | Phase 17 | Pending |
-| CHART-07 | Phase 17 | Pending |
+| CHART-04 | Phase 17 | Complete |
+| CHART-05 | Phase 17 | Complete |
+| CHART-06 | Phase 17 | Complete |
+| CHART-07 | Phase 17 | Complete |
 | SPEC-06 | Phase 17 | Pending |
 | SPEC-07 | Phase 17 | Pending |
 | SPEC-08 | Phase 17 | Pending |
