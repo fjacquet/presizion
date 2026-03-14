@@ -1,5 +1,15 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v1.4 — Bug Fixes, Chart Polish & UX (In Progress)
+
+**Goal:** Fix data-integrity bugs (import scoping, VM override, As-Is column), polish charts, improve SPECrate UX, add reset button.
+
+**Phases:** 16-17 (2 phases, 5 plans, 27 requirements)
+
+**Branch:** `v1.4`
+
+---
+
 ## v1.3 Scope, Persistence & Branding (Shipped: 2026-03-14)
 
 **Phases completed:** 7 phases, 10 plans, 0 tasks

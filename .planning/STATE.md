@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.4 — defining requirements from 7 GitHub issues
+**Current focus:** v1.4 — roadmap defined, ready to plan Phase 16
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap defined, planning next)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-14 — Milestone v1.4 started
+Status: Ready to plan Phase 16
+Last activity: 2026-03-14 — Requirements (27) and roadmap (2 phases, 5 plans) defined
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -85,8 +85,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Define v1.4 requirements from GitHub issues #4–#10
-- Create roadmap (phases start at 16)
+- Plan Phase 16 (Bug Fixes — Import Scoping, VM Override & As-Is Column)
 
 ### Blockers/Concerns
 
