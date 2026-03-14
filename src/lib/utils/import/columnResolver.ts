@@ -22,6 +22,9 @@ export const RVTOOLS_VHOST_ALIASES: ColumnAliasMap = {
   host_name:    ['Host', 'Name', 'Host Name'],
   cpu_model:    ['CPU Model'],
   cpu_speed_mhz: ['Speed MHz', 'CPU Speed MHz', 'CPU Speed'],
+  cpu_sockets:  ['# CPU', 'CPUs', 'Num CPU', 'Sockets'],
+  cpu_cores_total: ['# Cores', 'CPU Cores', 'Cores'],
+  memory_mb:    ['Memory Size', 'Memory MB', 'Memory'],
 }
 
 export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {
@@ -31,6 +34,7 @@ export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {
   memory_kib:   ['Memory (KiB)', 'Memory KiB', 'Memory'],
   cpu_model:    ['CPU Model', 'Processor Model', 'Processor'],
   cpu_speed_mhz: ['CPU Speed (MHz)', 'CPU Speed', 'CPU MHz'],
+  cluster_name: ['Cluster', 'cluster', 'Cluster Name'],
 }
 
 export const LIVEOPTICS_ESX_PERF_ALIASES: ColumnAliasMap = {
