@@ -90,16 +90,18 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
     } else {
       const cluster = {
         totalVcpus: previewCluster.totalVcpus,
-        totalPcores: result.totalPcores ?? 0,
+        totalPcores: previewCluster.totalPcores ?? 0,
         totalVms: previewCluster.totalVms,
         totalDiskGb: previewCluster.totalDiskGb,
         avgRamPerVmGb: previewCluster.avgRamPerVmGb,
-        ...(result.existingServerCount != null && { existingServerCount: result.existingServerCount }),
-        ...(result.socketsPerServer != null && { socketsPerServer: result.socketsPerServer }),
-        ...(result.coresPerSocket != null && { coresPerSocket: result.coresPerSocket }),
-        ...(result.ramPerServerGb != null && { ramPerServerGb: result.ramPerServerGb }),
-        ...(result.cpuUtilizationPercent != null && { cpuUtilizationPercent: result.cpuUtilizationPercent }),
-        ...(result.ramUtilizationPercent != null && { ramUtilizationPercent: result.ramUtilizationPercent }),
+        ...(previewCluster.existingServerCount != null && { existingServerCount: previewCluster.existingServerCount }),
+        ...(previewCluster.socketsPerServer != null && { socketsPerServer: previewCluster.socketsPerServer }),
+        ...(previewCluster.coresPerSocket != null && { coresPerSocket: previewCluster.coresPerSocket }),
+        ...(previewCluster.ramPerServerGb != null && { ramPerServerGb: previewCluster.ramPerServerGb }),
+        ...(previewCluster.cpuUtilizationPercent != null && { cpuUtilizationPercent: previewCluster.cpuUtilizationPercent }),
+        ...(previewCluster.ramUtilizationPercent != null && { ramUtilizationPercent: previewCluster.ramUtilizationPercent }),
+        ...(previewCluster.cpuModel != null && { cpuModel: previewCluster.cpuModel }),
+        ...(previewCluster.cpuFrequencyGhz != null && { cpuFrequencyGhz: previewCluster.cpuFrequencyGhz }),
       }
       setCurrentCluster(cluster)
       seedFromCluster(cluster)

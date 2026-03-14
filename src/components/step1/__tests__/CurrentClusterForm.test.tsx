@@ -345,9 +345,9 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     })
   })
 
-  it('in specint mode with cpuModel, "Look up SPECrate" button is rendered', () => {
+  it('with cpuModel, "Look up SPECrate" button is rendered in any sizing mode', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'vcpu' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
       })
@@ -369,7 +369,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     fireEvent.click(btn)
 
     await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Intel Xeon Gold 6526Y')
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('6526Y')
     })
   })
 
@@ -399,7 +399,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     vi.unstubAllGlobals()
   })
 
-  it('in vcpu mode with cpuModel, the button is NOT rendered', () => {
+  it('in vcpu mode with cpuModel, the button IS rendered', () => {
     act(() => {
       useWizardStore.setState({ sizingMode: 'vcpu' })
       useClusterStore.setState({
@@ -407,7 +407,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
       })
     })
     render(<CurrentClusterForm onNext={vi.fn()} />)
-    expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument()
   })
 
   it('in specint mode without cpuModel, the button is NOT rendered', () => {

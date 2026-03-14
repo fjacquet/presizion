@@ -245,14 +245,17 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
   async function handleSpecLookup() {
     if (currentCluster.cpuModel) {
+      // Extract short model number (e.g., "6526Y" from "Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz")
+      const match = currentCluster.cpuModel.match(/(\d{4}\w*)\s*(?:CPU|$)/i)
+      const modelNumber = match ? match[1]! : currentCluster.cpuModel
       try {
-        await navigator.clipboard.writeText(currentCluster.cpuModel)
-        toast('CPU model copied to clipboard')
+        await navigator.clipboard.writeText(modelNumber)
+        toast(`"${modelNumber}" copied — paste into Processor field`)
       } catch {
         // Clipboard API may fail in non-secure contexts; proceed anyway
       }
     }
-    window.open('https://www.spec.org/cgi-bin/osgresults?conf=rint2017', '_blank', 'noopener,noreferrer')
+    window.open('https://www.spec.org/cgi-bin/osgresults?conf=rint2017;op=form', '_blank', 'noopener,noreferrer')
   }
 
   async function handleNext() {
@@ -306,7 +309,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               <Badge variant="secondary">{currentCluster.cpuModel}</Badge>
             </div>
           )}
-          {sizingMode === 'specint' && currentCluster.cpuModel && (
+          {currentCluster.cpuModel && (
             <button
               type="button"
               onClick={handleSpecLookup}
