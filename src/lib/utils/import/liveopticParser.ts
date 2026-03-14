@@ -120,18 +120,18 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
           const hostName = str(host, cols['host_name'])
           let scopeKey: string | undefined
 
-          // Priority 1: Direct Cluster column on ESX Hosts (use dc||cluster format to match VM scope keys)
-          if (clusterCol) {
+          // Priority 1: hostToCluster map from VMs (always has correct dc||cluster format)
+          if (hostName && hostToCluster.has(hostName)) {
+            scopeKey = hostToCluster.get(hostName)!
+          }
+
+          // Priority 2: Direct Cluster column on ESX Hosts (may lack DC prefix)
+          if (!scopeKey && clusterCol) {
             const cluster = str(host, clusterCol)
             if (cluster) {
               const dc = str(host, esxDcCols['datacenter_name'])
               scopeKey = dc ? `${dc}||${cluster}` : cluster
             }
-          }
-
-          // Priority 2: hostToCluster map from VMs
-          if (!scopeKey && hostName && hostToCluster.has(hostName)) {
-            scopeKey = hostToCluster.get(hostName)!
           }
 
           // Priority 3: fallback to __all__
@@ -180,29 +180,26 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
 
         // Group perf rows by scope key using hostToCluster or Cluster column from ESX Hosts
         if (base.rawByScope) {
-          // Build host->scope mapping: try ESX Hosts Cluster column first, then hostToCluster from VMs
+          // Build host->scope mapping: prefer hostToCluster from VMs (correct dc||cluster format)
           const hostsSheetRef = wb.Sheets['ESX Hosts']
-          let hostScopeMap = new Map<string, string>()
+          let hostScopeMap = new Map<string, string>(hostToCluster)
 
           if (hostsSheetRef) {
             const hostRows2 = XLSX.utils.sheet_to_json<VmRow>(hostsSheetRef, { defval: '' })
             if (hostRows2[0]) {
               const hostCols = resolveColumns(Object.keys(hostRows2[0]), LIVEOPTICS_ESX_HOSTS_ALIASES, new Set())
               const perfDcCols = resolveColumns(Object.keys(hostRows2[0]), DATACENTER_ALIASES, new Set())
-              const clusterCol = hostCols['cluster_name']
+              const clusterCol2 = hostCols['cluster_name']
               for (const hr of hostRows2) {
                 const hn = str(hr, hostCols['host_name'])
-                if (!hn) continue
-                if (clusterCol) {
-                  const cl = str(hr, clusterCol)
+                if (!hn || hostScopeMap.has(hn)) continue
+                // Only use ESX Hosts cluster as fallback when hostToCluster doesn't have this host
+                if (clusterCol2) {
+                  const cl = str(hr, clusterCol2)
                   if (cl) {
                     const dc = str(hr, perfDcCols['datacenter_name'])
                     hostScopeMap.set(hn, dc ? `${dc}||${cl}` : cl)
-                    continue
                   }
-                }
-                if (hostToCluster.has(hn)) {
-                  hostScopeMap.set(hn, hostToCluster.get(hn)!)
                 }
               }
             }
