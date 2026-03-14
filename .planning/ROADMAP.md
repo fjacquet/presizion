@@ -67,13 +67,17 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 **Depends on**: Phase 17 (existing constraints.ts / formulas.ts)
 **Requirements**: VSAN-01, VSAN-02, VSAN-03, VSAN-04, VSAN-05, VSAN-06, VSAN-07, VSAN-08, VSAN-09, VSAN-10, VSAN-11, VSAN-12
 **Success Criteria** (what must be TRUE):
-  1. Given a usable storage demand and an FTT policy, the engine returns correct raw storage (usable × fttMultiplier) for all six policy options
+  1. Given a usable storage demand and an FTT policy, the engine returns correct raw storage (usable x fttMultiplier) for all six policy options
   2. Compression/dedup factor reduces the effective storage demand before FTT multiplication, matching the formula: effectiveUsable = demand / dedupFactor
   3. vSAN metadata overhead (2% of usable) and configurable slack space (default 25%) are added to the raw storage total
   4. vSAN CPU overhead (default 10%) reduces available GHz per node before server count is calculated
   5. vSAN memory overhead per host (default 6 GB) reduces available RAM per node before memory-limited count is calculated
   6. FTT policy enforces the correct minimum node floor (Mirror FTT=1: 3, FTT=2: 5, FTT=3: 7, RAID-5: 4, RAID-6: 6)
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 18-01-PLAN.md — vSAN constants, types, formula functions with TDD tests, Scenario interface extension
+- [ ] 18-02-PLAN.md — Wire vSAN formulas into constraints.ts + integration tests
 
 ### Phase 19: Capacity Breakdown & Growth Wiring
 **Goal**: Users who have defined a scenario receive a complete capacity breakdown for CPU, Memory, and Storage — showing Required, Reserved, HA Reserve, Spare, Excess, and Total Configured — with growth factors applied to all demand inputs before overhead calculation.
@@ -142,7 +146,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
-| 18. vSAN Formula Engine | v2.0 | 0/TBD | Not started | - |
+| 18. vSAN Formula Engine | v2.0 | 0/2 | Not started | - |
 | 19. Capacity Breakdown & Growth Wiring | v2.0 | 0/TBD | Not started | - |
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/TBD | Not started | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
