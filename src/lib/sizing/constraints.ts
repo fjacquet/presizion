@@ -8,6 +8,12 @@ import {
   serverCountByDisk,
   serverCountBySpecint,
 } from './formulas';
+import {
+  serverCountByVsanStorage,
+  computeVsanEffectiveGhzPerNode,
+  computeVsanEffectiveRamPerNode,
+} from './vsanFormulas';
+import { VSAN_DEFAULT_SLACK_PERCENT } from './vsanConstants';
 
 /**
  * Sizing mode — determines which CPU/performance formula drives CALC-01.
@@ -106,12 +112,17 @@ export function computeScenarioResult(
       coresPerServer,
     );
   } else if (sizingMode === 'ghz') {
+    // CALC-01-GHZ: When vSAN is active, deduct CPU overhead from target per-core GHz
+    const rawTargetFreqGhz = scenario.targetCpuFrequencyGhz ?? 1;
+    const effectiveTargetFreqGhz = scenario.vsanFttPolicy
+      ? computeVsanEffectiveGhzPerNode(rawTargetFreqGhz, scenario.vsanCpuOverheadPercent)
+      : rawTargetFreqGhz;
     cpuLimitedCount = serverCountByGhz(
       cluster.totalPcores,
       cluster.cpuFrequencyGhz ?? 1,
       cpuUtilPct,
       headroomFactor,
-      scenario.targetCpuFrequencyGhz ?? 1,
+      effectiveTargetFreqGhz,
       coresPerServer,
       targetCpuUtilPct,
     );
@@ -128,25 +139,45 @@ export function computeScenarioResult(
   // CALC-02: RAM-limited count
   const ramUtilPct = cluster.ramUtilizationPercent ?? 100;
   const targetRamUtilPct = scenario.targetRamUtilizationPercent ?? 100;
+  const effectiveRamPerServerGb = scenario.vsanFttPolicy
+    ? computeVsanEffectiveRamPerNode(scenario.ramPerServerGb, scenario.vsanMemoryPerHostGb)
+    : scenario.ramPerServerGb;
   const ramLimitedCount = serverCountByRam(
     effectiveVmCount,
     scenario.ramPerVmGb,
     headroomFactor,
-    scenario.ramPerServerGb,
+    effectiveRamPerServerGb,
     ramUtilPct,
     targetRamUtilPct,
   );
 
-  // CALC-03: Disk-limited count (0 in disaggregated mode — external storage)
-  const diskLimitedCount =
-    layoutMode === 'disaggregated'
-      ? 0
-      : serverCountByDisk(
-          effectiveVmCount,
-          scenario.diskPerVmGb,
-          headroomFactor,
-          scenario.diskPerServerGb,
-        );
+  // CALC-03: Disk/Storage-limited count
+  let diskLimitedCount: number;
+  if (layoutMode === 'disaggregated') {
+    diskLimitedCount = 0;
+  } else if (scenario.vsanFttPolicy) {
+    // vSAN-aware path (VSAN-02, VSAN-11)
+    const usableGib = effectiveVmCount * scenario.diskPerVmGb;
+    diskLimitedCount = serverCountByVsanStorage(
+      usableGib,
+      scenario.diskPerServerGb,
+      scenario.vsanFttPolicy,
+      {
+        compressionFactor: scenario.vsanCompressionFactor ?? 1.0,
+        vmSwapEnabled: scenario.vsanVmSwapEnabled ?? false,
+        totalVmRamGib: effectiveVmCount * scenario.ramPerVmGb,
+        slackPercent: scenario.vsanSlackPercent ?? VSAN_DEFAULT_SLACK_PERCENT,
+      },
+    );
+  } else {
+    // Legacy path — unchanged (VSAN-12)
+    diskLimitedCount = serverCountByDisk(
+      effectiveVmCount,
+      scenario.diskPerVmGb,
+      headroomFactor,
+      scenario.diskPerServerGb,
+    );
+  }
 
   // CALC-05: Limiting resource — determined from the raw counts (before HA)
   const limitingResource = determineLimitingResource(

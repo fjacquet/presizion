@@ -1,4 +1,12 @@
 import type { Scenario } from '../../types/cluster';
+import {
+  VSAN_DEFAULT_SLACK_PERCENT,
+  VSAN_DEFAULT_CPU_OVERHEAD_PCT,
+  VSAN_DEFAULT_MEMORY_PER_HOST_GB,
+} from './vsanConstants';
+
+// Re-export vSAN defaults for form component consumption (Phase 20)
+export { VSAN_DEFAULT_SLACK_PERCENT, VSAN_DEFAULT_CPU_OVERHEAD_PCT, VSAN_DEFAULT_MEMORY_PER_HOST_GB };
 
 /**
  * VMware general-purpose recommendation for mixed workloads.
