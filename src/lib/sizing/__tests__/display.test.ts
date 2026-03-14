@@ -152,6 +152,84 @@ describe('ramFormulaString with utilization (TD-04)', () => {
   });
 });
 
+describe('Growth annotations (GROW-04)', () => {
+  it('cpuFormulaString with cpuGrowthPercent=20: output contains growth annotation', () => {
+    const result = cpuFormulaString({
+      totalVcpus: 2000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 48,
+      cpuGrowthPercent: 20,
+    });
+    expect(result).toBe('ceil(2000 × 120% × +20% growth / 4 / 48)');
+  });
+
+  it('cpuFormulaString with cpuGrowthPercent=0: output unchanged (no growth annotation)', () => {
+    const result = cpuFormulaString({
+      totalVcpus: 2000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 48,
+      cpuGrowthPercent: 0,
+    });
+    expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
+  });
+
+  it('cpuFormulaString without cpuGrowthPercent: output unchanged (no growth annotation)', () => {
+    const result = cpuFormulaString({
+      totalVcpus: 2000,
+      headroomPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      coresPerServer: 48,
+    });
+    expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
+  });
+
+  it('ramFormulaString with memoryGrowthPercent=30: output contains growth annotation', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+      memoryGrowthPercent: 30,
+    });
+    expect(result).toBe('ceil(300 × 16 GB × 120% × +30% growth / 512 GB)');
+  });
+
+  it('ramFormulaString with memoryGrowthPercent=0: output unchanged', () => {
+    const result = ramFormulaString({
+      totalVms: 300,
+      ramPerVmGb: 16,
+      headroomPercent: 20,
+      ramPerServerGb: 512,
+      memoryGrowthPercent: 0,
+    });
+    expect(result).toBe('ceil(300 × 16 GB × 120% / 512 GB)');
+  });
+
+  it('diskFormulaString with storageGrowthPercent=50: output contains growth annotation', () => {
+    const result = diskFormulaString({
+      totalVms: 300,
+      diskPerVmGb: 100,
+      headroomPercent: 20,
+      diskPerServerGb: 20000,
+      storageGrowthPercent: 50,
+    });
+    expect(result).toBe('ceil(300 × 100 GB × 120% × +50% growth / 20000 GB)');
+  });
+
+  it('diskFormulaString with storageGrowthPercent=0: output unchanged', () => {
+    const result = diskFormulaString({
+      totalVms: 300,
+      diskPerVmGb: 100,
+      headroomPercent: 20,
+      diskPerServerGb: 20000,
+      storageGrowthPercent: 0,
+    });
+    expect(result).toBe('ceil(300 × 100 GB × 120% / 20000 GB)');
+  });
+});
+
 describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
   it('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)', () => {
     const result = cpuFormulaString({
