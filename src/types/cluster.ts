@@ -1,3 +1,5 @@
+import type { VsanFttPolicy, VsanCompressionFactor } from '../lib/sizing/vsanConstants';
+
 /**
  * Represents the existing cluster being replaced.
  * All fields reflect metrics gathered from the current environment.
@@ -42,4 +44,12 @@ export interface Scenario {
   readonly targetVmCount?: number;                // growth override: size for this VM count (scales vCPUs proportionally)
   readonly minServerCount?: number;               // pin floor: finalCount is never less than this value
   readonly targetCpuFrequencyGhz?: number;        // target server CPU clock frequency in GHz (GHz mode)
+
+  // --- vSAN settings (Phase 18; all optional — absent = legacy sizing path, VSAN-12) ---
+  readonly vsanFttPolicy?: VsanFttPolicy;              // VSAN-01 — triggers vSAN storage path when present
+  readonly vsanCompressionFactor?: VsanCompressionFactor; // VSAN-08 — default 1.0 (no compression)
+  readonly vsanSlackPercent?: number;                  // VSAN-05 — default 25%
+  readonly vsanCpuOverheadPercent?: number;            // VSAN-06 — default 10%
+  readonly vsanMemoryPerHostGb?: number;               // VSAN-07 — default 6 GB
+  readonly vsanVmSwapEnabled?: boolean;                // VSAN-04 — default false (sparse swap)
 }
