@@ -17,9 +17,8 @@ vi.mock('recharts', () => ({
   ReferenceLine: () => null,
 }))
 
-import { SizingChart } from '../SizingChart'
+import { CoreCountChart } from '../CoreCountChart'
 import { useScenariosStore } from '@/store/useScenariosStore'
-import { useWizardStore } from '@/store/useWizardStore'
 
 vi.mock('@/hooks/useScenariosResults', () => ({
   useScenariosResults: vi.fn(),
@@ -60,73 +59,49 @@ const baseResult = {
 beforeEach(() => {
   act(() => {
     useScenariosStore.setState({ scenarios: [] })
-    useWizardStore.setState({ sizingMode: 'vcpu' })
   })
   vi.mocked(useScenariosResults).mockReturnValue([])
 })
 
-describe('SizingChart', () => {
+describe('CoreCountChart', () => {
   it('renders without crashing with empty store', () => {
-    const { container } = render(<SizingChart />)
+    const { container } = render(<CoreCountChart />)
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders bar chart container when results exist', () => {
+  it('renders chart when results exist', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
-    expect(screen.getByText('Server Count Comparison')).toBeInTheDocument()
+    render(<CoreCountChart />)
+    expect(screen.getByText('Total Physical Cores per Scenario')).toBeInTheDocument()
   })
 
-  it('renders one bar group per scenario', () => {
-    const scenario2 = { ...baseScenario, id: 's2', name: 'Scenario B' }
-    act(() => { useScenariosStore.setState({ scenarios: [baseScenario, scenario2] }) })
-    vi.mocked(useScenariosResults).mockReturnValue([baseResult, { ...baseResult, cpuLimitedCount: 5 }])
-    render(<SizingChart />)
-    // 3 Bar series (cpu, ram, disk) are rendered
-    const bars = screen.getAllByTestId('bar-series')
-    expect(bars).toHaveLength(3)
-  })
-
-  it('shows SPECint bar label when sizingMode is specint', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] })
-      useWizardStore.setState({ sizingMode: 'specint' })
-    })
-    vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
-    expect(screen.getByText('SPECint-limited')).toBeInTheDocument()
-  })
-
-  it('download PNG button present', () => {
+  it('Download PNG button is present', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
-    expect(screen.getByRole('button', { name: /download.*png/i })).toBeInTheDocument()
+    render(<CoreCountChart />)
+    expect(screen.getByRole('button', { name: /download.*chart.*png/i })).toBeInTheDocument()
   })
 
-  it('download PNG button triggers download attempt', async () => {
+  it('Download PNG button clickable without error', async () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
-    const btn = screen.getByRole('button', { name: /download.*png/i })
-    // Clicking should not throw (SVG not rendered in jsdom, so it's a no-op)
+    render(<CoreCountChart />)
+    const btn = screen.getByRole('button', { name: /download.*chart.*png/i })
     await userEvent.click(btn)
   })
 
   it('always renders Legend even with single scenario', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
+    render(<CoreCountChart />)
     expect(screen.getByTestId('legend')).toBeInTheDocument()
   })
 
-  it('renders LabelList elements for data labels', () => {
+  it('renders LabelList for data labels', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
-    render(<SizingChart />)
-    const labels = screen.getAllByTestId('label-list')
-    // At minimum cpu + ram; disk also in HCI mode (default)
-    expect(labels.length).toBeGreaterThanOrEqual(2)
+    render(<CoreCountChart />)
+    expect(screen.getByTestId('label-list')).toBeInTheDocument()
   })
 })
