@@ -105,7 +105,10 @@ Plans:
   2. The vSAN sub-section (FTT policy, compression factor, slack %, CPU overhead %, memory per host GB, VM swap toggle) is only visible when layoutMode is HCI
   3. The Growth sub-section (CPU %, Memory %, Storage %) is visible in both HCI and disaggregated layout modes
   4. Changing any vSAN or growth field causes the live server count in the same ScenarioCard to update without a page reload
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 20-01-PLAN.md — Extend scenarioSchema + VsanGrowthSection component + ScenarioCard integration + FORM-01..04 tests
 
 ### Phase 21: Capacity Charts
 **Goal**: Users can see stacked horizontal bar charts showing Required / Spare / Excess capacity with percentage labels for each resource, and a min-nodes-per-constraint bar chart identifying the binding constraint — and can download both as PNG for use in presentations.
@@ -153,6 +156,6 @@ Plans:
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete   | 2026-03-14 | - |
-| 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/TBD | Not started | - |
+| 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/1 | Not started | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
