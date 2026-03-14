@@ -45,7 +45,13 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 **Goal:** Fix all data-integrity bugs that produce incorrect sizing results.
 
-**Requirements:** FIX-SCOPE-01..06, FIX-VM-01..02, FIX-ASIS-01..04 (14 requirements)
+**Requirements:** FIX-SCOPE-01..06, FIX-VM-01..02, FIX-ASIS-01..04 (12 requirements)
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Import scope fixes: per-cluster ESX host config, performance scoping, aggregation fix
+- [ ] 16-02-PLAN.md — VM override test coverage and As-Is column rendering
 
 **Plan 01 — Import Scope Fixes (FIX-SCOPE-01..06)**
 - Refactor LiveOptics parser: scope ESX host config per cluster (join hosts to clusters via Cluster column or Host-to-Cluster mapping from VMs sheet)
@@ -59,10 +65,8 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 **Plan 02 — VM Override & As-Is Column (FIX-VM-01..02, FIX-ASIS-01..04)**
 - Fix constraints.ts: when targetVmCount overrides VM count, pass overridden count to RAM-limited and Disk-limited formulas (not just CPU)
 - Complete As-Is column in ComparisonTable: VMs/Server, CPU Util %, RAM Util %, Total Disk Required
-- Metrics not applicable to As-Is show "N/A" instead of "—"
+- Metrics not applicable to As-Is show "N/A" instead of "---"
 - Tests: VM override propagation to all 3 formulas, As-Is column rendering
-
-**Estimated plans:** 2
 
 ---
 
@@ -117,5 +121,5 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 | 13. Import Scope Filter | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 14. Persistent Scope Widget | v1.3 | 2/2 | Complete | 2026-03-13 |
 | 15. Persistence | v1.3 | 2/2 | Complete | 2026-03-14 |
-| 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 0/2 | Pending | — |
+| 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 0/2 | Planned | — |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 0/3 | Pending | — |
