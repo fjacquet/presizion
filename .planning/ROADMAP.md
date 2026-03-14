@@ -161,7 +161,12 @@ Plans:
   2. A Share button in Step 3 copies a URL containing the full session state encoded as a base64 hash
   3. Opening a shared URL restores the sender's exact cluster inputs and scenarios on load
   4. A URL hash takes priority over localStorage when both are present
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+
+- [ ] 15-01-PLAN.md — Persistence utility (serialize/deserialize/localStorage) + auto-save store subscribers + boot restore (Wave 1)
+- [ ] 15-02-PLAN.md — URL hash encode/decode + boot priority logic + Share button in Step 3 (Wave 2)
 
 ## Progress
 
@@ -181,4 +186,4 @@ Plans:
 | 12. Dark Mode Toggle | 2/2 | Complete    | 2026-03-13 | - |
 | 13. Import Scope Filter | 2/2 | Complete    | 2026-03-13 | - |
 | 14. Persistent Scope Widget | 2/2 | Complete   | 2026-03-13 | - |
-| 15. Persistence | v1.3 | 0/? | Not started | - |
+| 15. Persistence | v1.3 | 0/2 | Not started | - |
