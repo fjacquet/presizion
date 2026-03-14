@@ -70,17 +70,17 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VSAN-01 | Phase 18 | Pending |
-| VSAN-02 | Phase 18 | Pending |
-| VSAN-03 | Phase 18 | Pending |
-| VSAN-04 | Phase 18 | Pending |
-| VSAN-05 | Phase 18 | Pending |
-| VSAN-06 | Phase 18 | Pending |
-| VSAN-07 | Phase 18 | Pending |
-| VSAN-08 | Phase 18 | Pending |
-| VSAN-09 | Phase 18 | Pending |
-| VSAN-10 | Phase 18 | Pending |
-| VSAN-11 | Phase 18 | Pending |
+| VSAN-01 | Phase 18 | Complete |
+| VSAN-02 | Phase 18 | Complete |
+| VSAN-03 | Phase 18 | Complete |
+| VSAN-04 | Phase 18 | Complete |
+| VSAN-05 | Phase 18 | Complete |
+| VSAN-06 | Phase 18 | Complete |
+| VSAN-07 | Phase 18 | Complete |
+| VSAN-08 | Phase 18 | Complete |
+| VSAN-09 | Phase 18 | Complete |
+| VSAN-10 | Phase 18 | Complete |
+| VSAN-11 | Phase 18 | Complete |
 | VSAN-12 | Phase 18 | Pending |
 | CAP-01 | Phase 19 | Pending |
 | CAP-02 | Phase 19 | Pending |
