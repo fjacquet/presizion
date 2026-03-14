@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
-status: completed
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-03-14T21:49:24.160Z"
-last_activity: 2026-03-14 — Phase 18 Plan 02 complete (vSAN constraints wiring, 8 integration tests, 3 files modified)
+status: in-progress
+stopped_at: Completed 19-02-PLAN.md
+last_updated: "2026-03-14T22:07:42Z"
+last_activity: 2026-03-14 — Phase 19 Plan 02 complete (capacity breakdown types + computeVsanBreakdown function, 14 TDD tests, 3 files created)
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 2
-  completed_plans: 2
-  percent: 100
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.0 Phase 18 — vSAN Formula Engine
+**Current focus:** v2.0 Phase 19 — Capacity Breakdown & Growth Wiring
 
 ## Current Position
 
-Phase: 18 of 22 (vSAN Formula Engine)
-Plan: 2 of 2 complete
-Status: Phase Complete
-Last activity: 2026-03-14 — Phase 18 Plan 02 complete (vSAN constraints wiring, 8 integration tests, 3 files modified)
+Phase: 19 of 22 (Capacity Breakdown & Growth Wiring)
+Plan: 1 of 2 complete
+Status: In Progress
+Last activity: 2026-03-14 — Phase 19 Plan 02 complete (capacity breakdown types + computeVsanBreakdown function, 14 TDD tests, 3 files created)
 
-Progress: [██████████] 100%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 5 min
-- Total execution time: 0.6 hours
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
@@ -48,8 +48,10 @@ Progress: [██████████] 100%
 | 17 | 3/3 | 14min | 5min |
 | 18 | 2/2 | 6min | 3min |
 
+| 19 | 1/2 | 4min | 4min |
+
 *Updated after each plan completion*
-| Phase 18 P02 | 3min | 2 tasks | 3 files |
+| Phase 19 P02 | 4min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +70,13 @@ Recent decisions affecting current work:
 - [Phase 18-02]: vSAN CPU overhead only applied in GHz sizing mode (not vcpu/specint/aggressive)
 - [Phase 18-02]: Disaggregated layout overrides vSAN for CALC-03 (diskLimitedCount=0 always)
 - [Phase 18-02]: vSAN default constants re-exported from defaults.ts for Phase 20 form use
+- [Phase 19-01]: Growth multiplies DEMAND not server count -- pipeline is demand x growthFactor x headroomFactor
+- [Phase 19-01]: SPECint mode exempt from growth (benchmark comparison, not demand-driven)
+- [Phase 19-01]: GHz mode applies cpuGrowthFactor to pCores (not vCPUs)
+- [Phase 19-01]: Absent growth fields default to 0% via null-coalescing (same pattern as vSAN fields)
+- [Phase 19-02]: Storage invariant: required = rawBeforeSlack (FTT + metadata, no slack); spare = slackSpace + haReserve
+- [Phase 19-02]: CPU breakdown reports demand in GHz (vCPU * freq) for consistent unit reporting
+- [Phase 19-02]: Storage HA reserve = 1/N of total cluster raw (distinct from CPU/Memory one-node reserve)
 
 ### Pending Todos
 
@@ -79,6 +88,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-14T21:45:35.875Z
-Stopped at: Completed 18-02-PLAN.md
+Last session: 2026-03-14T22:07:42Z
+Stopped at: Completed 19-02-PLAN.md
 Resume file: None
