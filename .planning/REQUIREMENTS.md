@@ -88,9 +88,9 @@
 | CAP-04 | Phase 19 | Complete |
 | CAP-05 | Phase 19 | Complete |
 | CAP-06 | Phase 19 | Complete |
-| GROW-01 | Phase 19 | Pending |
-| GROW-02 | Phase 19 | Pending |
-| GROW-03 | Phase 19 | Pending |
+| GROW-01 | Phase 19 | Complete |
+| GROW-02 | Phase 19 | Complete |
+| GROW-03 | Phase 19 | Complete |
 | GROW-04 | Phase 19 | Pending |
 | FORM-01 | Phase 20 | Pending |
 | FORM-02 | Phase 20 | Pending |
