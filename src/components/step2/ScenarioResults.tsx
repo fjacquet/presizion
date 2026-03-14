@@ -48,8 +48,10 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     }),
   })
 
+  const effectiveVmCount = scenario.targetVmCount ?? currentCluster.totalVms
+
   const ramFormula = ramFormulaString({
-    totalVms: currentCluster.totalVms,
+    totalVms: effectiveVmCount,
     ramPerVmGb: scenario.ramPerVmGb,
     headroomPercent: scenario.headroomPercent,
     ramPerServerGb: scenario.ramPerServerGb,
@@ -59,7 +61,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
   })
 
   const diskFormula = diskFormulaString({
-    totalVms: currentCluster.totalVms,
+    totalVms: effectiveVmCount,
     diskPerVmGb: scenario.diskPerVmGb,
     headroomPercent: scenario.headroomPercent,
     diskPerServerGb: scenario.diskPerServerGb,
