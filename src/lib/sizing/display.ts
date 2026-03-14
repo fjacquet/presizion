@@ -17,6 +17,7 @@ export interface CpuFormulaParams {
   readonly targetVcpuToPCoreRatio: number
   readonly coresPerServer: number
   readonly cpuUtilizationPercent?: number
+  readonly cpuGrowthPercent?: number
 }
 
 export interface RamFormulaParams {
@@ -25,6 +26,7 @@ export interface RamFormulaParams {
   readonly headroomPercent: number
   readonly ramPerServerGb: number
   readonly ramUtilizationPercent?: number
+  readonly memoryGrowthPercent?: number
 }
 
 export interface DiskFormulaParams {
@@ -32,6 +34,7 @@ export interface DiskFormulaParams {
   readonly diskPerVmGb: number
   readonly headroomPercent: number
   readonly diskPerServerGb: number
+  readonly storageGrowthPercent?: number
 }
 
 export interface SpecintFormulaParams {
@@ -52,12 +55,13 @@ export interface SpecintFormulaParams {
  * Example (with util): "ceil(2000 × 70% × 120% / 4 / 48)"
  */
 export function cpuFormulaString(params: CpuFormulaParams): string {
-  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer, cpuUtilizationPercent } = params
+  const { totalVcpus, headroomPercent, targetVcpuToPCoreRatio, coresPerServer, cpuUtilizationPercent, cpuGrowthPercent } = params
   const headroomDisplay = `${100 + headroomPercent}%`
+  const growthSuffix = (cpuGrowthPercent ?? 0) !== 0 ? ` × +${cpuGrowthPercent}% growth` : ''
   if (cpuUtilizationPercent !== undefined && cpuUtilizationPercent !== 100) {
-    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
+    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
   }
-  return `ceil(${totalVcpus} × ${headroomDisplay} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
+  return `ceil(${totalVcpus} × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
 }
 
 /**
@@ -71,12 +75,13 @@ export function cpuFormulaString(params: CpuFormulaParams): string {
  * Example (with util): "ceil(300 × 80% × 16 GB × 120% / 512 GB)"
  */
 export function ramFormulaString(params: RamFormulaParams): string {
-  const { totalVms, ramPerVmGb, headroomPercent, ramPerServerGb, ramUtilizationPercent } = params
+  const { totalVms, ramPerVmGb, headroomPercent, ramPerServerGb, ramUtilizationPercent, memoryGrowthPercent } = params
   const headroomDisplay = `${100 + headroomPercent}%`
+  const growthSuffix = (memoryGrowthPercent ?? 0) !== 0 ? ` × +${memoryGrowthPercent}% growth` : ''
   if (ramUtilizationPercent !== undefined && ramUtilizationPercent !== 100) {
-    return `ceil(${totalVms} × ${ramUtilizationPercent}% × ${ramPerVmGb} GB × ${headroomDisplay} / ${ramPerServerGb} GB)`
+    return `ceil(${totalVms} × ${ramUtilizationPercent}% × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`
   }
-  return `ceil(${totalVms} × ${ramPerVmGb} GB × ${headroomDisplay} / ${ramPerServerGb} GB)`
+  return `ceil(${totalVms} × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`
 }
 
 /**
@@ -86,9 +91,10 @@ export function ramFormulaString(params: RamFormulaParams): string {
  * Example: "ceil(300 × 100 GB × 120% / 20000 GB)"
  */
 export function diskFormulaString(params: DiskFormulaParams): string {
-  const { totalVms, diskPerVmGb, headroomPercent, diskPerServerGb } = params
+  const { totalVms, diskPerVmGb, headroomPercent, diskPerServerGb, storageGrowthPercent } = params
   const headroomDisplay = `${100 + headroomPercent}%`
-  return `ceil(${totalVms} × ${diskPerVmGb} GB × ${headroomDisplay} / ${diskPerServerGb} GB)`
+  const growthSuffix = (storageGrowthPercent ?? 0) !== 0 ? ` × +${storageGrowthPercent}% growth` : ''
+  return `ceil(${totalVms} × ${diskPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${diskPerServerGb} GB)`
 }
 
 /**
