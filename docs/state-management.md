@@ -108,7 +108,7 @@ useWizardStore (sizingMode, layoutMode)  |
 
 ### Key relationships
 
-- **Import to Cluster:** `useImportStore.setActiveScope()` aggregates imported per-scope data and calls `useClusterStore.getState().setCurrentCluster()` directly. This is the only cross-store write in the codebase.
+- **Import to Cluster:** `useImportStore.setActiveScope()` aggregates imported per-scope data and calls `useClusterStore.getState().setCurrentCluster()` directly. This is the only cross-store write in the codebase. As of v1.4, the aggregated cluster object includes `cpuModel` and `cpuFrequencyGhz` fields (when available from the import source), enabling the GHz sizing mode and SPECrate lookup immediately after import.
 
 - **Cluster to Scenarios (seeding):** `useScenariosStore.seedFromCluster(cluster)` propagates imported cluster-level values (avgRamPerVmGb, diskPerVmGb, server hardware config) into all existing scenarios. This is called by the UI after import, not automatically by a store subscriber.
 

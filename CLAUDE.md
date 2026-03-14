@@ -6,32 +6,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Cluster Refresh Sizing Web Application** — a client-side-only static web app for presales engineers to size a refreshed cluster based on existing cluster metrics. No backend, no API; all calculations run in the browser.
 
-## Planned Tech Stack
+## Tech Stack
 
-- **Framework**: React + TypeScript (Vite for build)
-- **Deployment**: Static files (GitHub Pages or internal web server)
-- **State**: In-memory React state + optional localStorage persistence
-- **No external dependencies** for calculations — pure client-side logic
+- **Framework**: React 19 + TypeScript strict (Vite 8 for build)
+- **UI**: Tailwind v4 + shadcn/ui (base-ui primitives) + Recharts 2.15 + Sonner (toast)
+- **State**: Zustand v5 (5 stores) + localStorage persistence + URL hash sharing
+- **Import**: xlsx@0.18.5 (locked MIT — do not upgrade) + jszip
+- **Deployment**: GitHub Pages at `/presizion/` — pure static files, no backend
+- **Testing**: Vitest + React Testing Library (441 tests)
 
-## Project Structure (target)
+## Project Structure
 
 ```text
 src/
-  components/       # UI components, co-located with tests and CSS
-  hooks/            # Custom hooks (useScenario, useLocalStorage, etc.)
+  components/
+    step1/          # CurrentClusterForm, FileImportButton, ImportPreviewModal, ScopeBadge
+    step2/          # ScenarioCard, ScenarioResults
+    step3/          # ComparisonTable, SizingChart, CoreCountChart, Step3ReviewExport
+    wizard/         # WizardShell, SizingModeToggle, ThemeToggle
+    ui/             # shadcn/ui components (button, dialog, tooltip, badge, etc.)
+  hooks/            # useScenariosResults (derive-on-read)
   lib/
-    sizing/         # Core sizing formulas — all calculations centralized here
-    utils/          # Download, CSV/JSON export helpers
-  pages/
-    Home/           # Main 3-step wizard
+    sizing/         # formulas.ts, constraints.ts, defaults.ts, display.ts, chartColors.ts
+    utils/          # export.ts, clipboard.ts, persistence.ts, downloadChartPng.ts
+      import/       # index.ts, liveopticParser.ts, rvtoolsParser.ts, jsonParser.ts,
+                    # columnResolver.ts, scopeAggregator.ts, fileValidation.ts
+  store/            # useClusterStore, useScenariosStore, useWizardStore, useThemeStore, useImportStore
+  schemas/          # Zod schemas (currentCluster, scenario, session)
+  types/            # cluster.ts, results.ts
 ```
 
-## Common Commands (once scaffolded)
+## Common Commands
 
 ```bash
 npm run dev         # Start dev server
-npm run build       # Production build
-npm run test        # Run tests
+npm run build       # Production build (tsc -b && vite build)
+npm run test        # Run Vitest tests
 npm run lint        # ESLint check
 ```
 
@@ -47,17 +57,20 @@ All sizing formulas must live in `src/lib/sizing/` — never inline in component
 
 ## 3-Step Wizard Flow
 
-1. **Enter Current Cluster** — form inputs + derived metric preview
-2. **Define Target Scenarios** — at least 2 scenarios (tabbed/cards), each with server config + assumptions
-3. **Review & Export** — side-by-side comparison table + copy/download
+1. **Enter Current Cluster** — file import (RVTools/LiveOptics) or manual input, scope filtering, derived metrics, SPECrate lookup link
+2. **Define Target Scenarios** — scenario cards with server config + sizing assumptions + HA reserve + advanced options (VM override, min servers)
+3. **Review & Export** — As-Is vs scenario comparison table, server count chart, constraint breakdown chart, core count chart, CSV/JSON/PNG/URL/Print export
 
-## Key Sizing Logic
+## Key Sizing Logic (4 modes)
 
-- **CPU-limited servers** = `ceil((totalVcpus × headroom) / targetVcpuToPCoreRatio / coresPerServer)`
-- **RAM-limited servers** = `ceil((totalVms × ramPerVmGb × headroom) / ramPerServerGb)`
-- **Disk-limited servers** = `ceil((totalVms × diskPerVmGb × headroom) / diskPerServerGb)`
-- **Final server count** = `max(cpuLimited, ramLimited, diskLimited)`
-- **Limiting resource** = whichever constraint drove the final count
+- **vCPU mode**: `ceil(totalVcpus × headroom / ratio / coresPerServer)`
+- **SPECint mode**: `ceil(existingServers × existingSpecint × headroom / targetSpecint)`
+- **Aggressive mode**: `ceil(totalVcpus × cpuUtil% × headroom / coresPerServer)`
+- **GHz mode**: `ceil(totalPcores × oldGhz × cpuUtil% × headroom / (coresPerServer × newGhz × targetUtil%))`
+- **RAM-limited**: `ceil(effectiveVms × ramUtil% × ramPerVm × headroom / ramPerServer)`
+- **Disk-limited**: `ceil(effectiveVms × diskPerVm × headroom / diskPerServer)` (0 in disaggregated mode)
+- **Final server count** = `max(cpuLimited, ramLimited, diskLimited) + haReserveCount`
+- **Limiting resource** = whichever constraint drove the max (cpu/specint/ghz/ram/disk)
 
 ## Engineering Principles (from constitution)
 

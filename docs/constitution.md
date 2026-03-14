@@ -1,8 +1,8 @@
 
 # Engineering Constitution
 
-**Project:** `fjacquet/icons`
-**Scope:** React + TypeScript + GitHub Pages + MCP server (future)
+**Project:** Presizion (`fjacquet/cluster-sizer`)
+**Scope:** React 19 + TypeScript strict + Vite 8 + Tailwind v4 + shadcn/ui + Zustand v5 + Recharts + GitHub Pages (client-side only, no backend)
 
 This document is the **constitution** for this project: it defines how we write code, how we keep it simple, and which practices are non‑negotiable.
 
@@ -211,34 +211,28 @@ Proposed structure:
 ```text
 src/
   components/
-    IconPreview/
-      IconPreview.tsx
-      IconPreview.test.tsx
-      IconPreview.css
-    IconGrid/
-    ...
+    step1/              # CurrentClusterForm, FileImportButton, ImportPreviewModal, ScopeBadge
+    step2/              # ScenarioCard, ScenarioResults
+    step3/              # ComparisonTable, SizingChart, CoreCountChart, Step3ReviewExport
+    wizard/             # WizardShell, SizingModeToggle, ThemeToggle
+    ui/                 # shadcn/ui components (button, dialog, tooltip, badge, etc.)
   hooks/
-    useIconFilter.ts
-    useIconSelection.ts
+    useScenariosResults.ts  # Derive-on-read: computes ScenarioResult[] from stores
   lib/
-    icons/
-      catalog.ts
-      renderIcon.ts
-    utils/
-      download.ts
-      zip.ts
-  pages/
-    Home/
-      Home.tsx
-  mcp-server/          # (if/when MCP is added; separate TS project)
-tests/
-  ...
+    sizing/             # formulas.ts, constraints.ts, defaults.ts, display.ts, chartColors.ts
+    utils/              # export.ts, clipboard.ts, persistence.ts, downloadChartPng.ts
+      import/           # parsers (liveoptic, rvtools, json), columnResolver, scopeAggregator
+  store/                # 5 Zustand stores (cluster, scenarios, wizard, theme, import)
+  schemas/              # Zod validation schemas
+  types/                # TypeScript interfaces (cluster.ts, results.ts)
 ```
 
 **Rules**
 
 - Avoid “god folders” like `utils` or `helpers` with unrelated things thrown in.
-- Co-locate tests next to the code they exercise or in a mirrored `tests/` tree, but be consistent.
+- Co-locate tests in `__tests__/` directories next to source files.
+- All sizing formulas in `src/lib/sizing/` -- never inline in components.
+- All import parsers in `src/lib/utils/import/` -- never inline in components.
 
 ---
 
@@ -246,9 +240,11 @@ tests/
 
 ### 5.1 Testing
 
+- **Vitest + React Testing Library** for all tests.
 - Prefer **small, focused tests**:
-  - unit tests for core logic (e.g. `renderIcon`).
-  - component tests for important UI flows.
+  - Unit tests for sizing formulas (`src/lib/sizing/__tests__/`).
+  - Parser tests for import logic (`src/lib/utils/import/__tests__/`).
+  - Component tests for wizard flow and forms.
 - Tests should be:
   - Fast.
   - Deterministic.
@@ -256,7 +252,8 @@ tests/
 
 **Minimum**
 
-- Core business logic (icon rendition, selection, filtering) must be covered by tests.
+- Sizing formulas must have 100% test coverage.
+- Import parsers must have test coverage for each format.
 - For bugs:
   - Add a test that reproduces the bug.
   - Fix the bug.
