@@ -45,6 +45,43 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 
 ## Phase Details
 
+### Phase 9: v1.2 Charts
+
+**Goal**: Bar chart comparison of server counts across all scenarios with PNG download
+**Depends on**: Phase 7
+**Requirements**: CHART-01, CHART-02, CHART-03
+**Success Criteria** (what must be TRUE):
+
+  1. Step 3 displays a Recharts BarChart comparing CPU/RAM/disk-limited counts per scenario
+  2. CPU bar label shows "SPECint-limited" when sizingMode is specint
+  3. "Download PNG" button triggers SVG→canvas→PNG download of the chart
+
+**Plans**: 2 plans
+
+Plans:
+
+- [x] 09-01-PLAN.md — Install recharts + Wave 0 stubs (Wave 1)
+- [x] 09-02-PLAN.md — SizingChart component + Step 3 integration (Wave 2)
+
+### Phase 10: v1.2 File Import
+
+**Goal**: RVTools xlsx and LiveOptics zip/xlsx/csv file import with preview modal
+**Depends on**: Phase 7
+**Requirements**: IMPORT-01, IMPORT-02, IMPORT-03
+**Success Criteria** (what must be TRUE):
+
+  1. FileImportButton in Step 1 accepts .xlsx/.csv/.zip and detects RVTools vs LiveOptics format
+  2. ImportPreviewModal shows derived metrics and requires "Apply" before populating CurrentClusterForm
+  3. After Apply, CurrentClusterForm fields update to reflect imported cluster values
+
+**Plans**: 3 plans
+
+Plans:
+
+- [x] 10-01-PLAN.md — Install xlsx + jszip + Wave 0 stubs (Wave 1)
+- [x] 10-02-PLAN.md — Port parsers from store-predict: fileValidation, columnResolver, formatDetector, rvtoolsParser, liveopticParser (Wave 2)
+- [x] 10-03-PLAN.md — FileImportButton + ImportPreviewModal + Step 1 wiring + form sync (Wave 2)
+
 ### Phase 11: Branding & Tech Debt
 
 **Goal**: Users see the Presizion brand identity in the app and the RAM formula display is accurate
