@@ -7,18 +7,16 @@
 import { describe, it, expect } from 'vitest';
 import type { OldCluster, Scenario } from '../../../types/cluster';
 import type { ScenarioResult } from '../../../types/results';
-import type { VsanCapacityBreakdown, ResourceBreakdown, StorageBreakdown } from '../../../types/breakdown';
+import type { ResourceBreakdown, StorageBreakdown } from '../../../types/breakdown';
 import { computeVsanBreakdown } from '../vsanBreakdown';
 
-const TOLERANCE = 0.000001;
-
 /** Helper to assert the CAP-06 invariant on a ResourceBreakdown */
-function assertInvariant(bd: ResourceBreakdown, label: string): void {
+function assertInvariant(bd: ResourceBreakdown, _label: string): void {
   expect(bd.required + bd.spare + bd.excess).toBeCloseTo(bd.total, 5);
 }
 
 /** Helper to assert the storage invariant (same as resource invariant) */
-function assertStorageInvariant(bd: StorageBreakdown, label: string): void {
+function assertStorageInvariant(bd: StorageBreakdown, _label: string): void {
   expect(bd.required + bd.spare + bd.excess).toBeCloseTo(bd.total, 5);
 }
 

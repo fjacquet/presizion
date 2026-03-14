@@ -490,15 +490,7 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
     // vSAN: ceil(15360 / 506) = ceil(30.355) = 31
     expect(vsanResult.ramLimitedCount).toBe(31);
 
-    const legacyHighRamScenario = {
-      ...highRamScenario,
-      vsanFttPolicy: undefined,
-      vsanMemoryPerHostGb: undefined,
-      vsanCompressionFactor: undefined,
-      vsanSlackPercent: undefined,
-      vsanCpuOverheadPercent: undefined,
-      vsanVmSwapEnabled: undefined,
-    };
+    const { vsanFttPolicy: _f1, vsanMemoryPerHostGb: _m1, vsanCompressionFactor: _c1, vsanSlackPercent: _s1, vsanCpuOverheadPercent: _o1, vsanVmSwapEnabled: _w1, ...legacyHighRamScenario } = highRamScenario;
     const legacyResult = computeScenarioResult(VSAN_CLUSTER, legacyHighRamScenario);
     // Legacy: ceil(15360 / 512) = ceil(30.0) = 30
     expect(legacyResult.ramLimitedCount).toBe(30);
@@ -520,15 +512,7 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
     const vsanResult = computeScenarioResult(VSAN_CLUSTER, ghzVsanScenario, 'ghz');
     expect(vsanResult.cpuLimitedCount).toBe(8);
 
-    const noVsanGhzScenario = {
-      ...ghzVsanScenario,
-      vsanFttPolicy: undefined,
-      vsanCpuOverheadPercent: undefined,
-      vsanMemoryPerHostGb: undefined,
-      vsanCompressionFactor: undefined,
-      vsanSlackPercent: undefined,
-      vsanVmSwapEnabled: undefined,
-    };
+    const { vsanFttPolicy: _f2, vsanMemoryPerHostGb: _m2, vsanCompressionFactor: _c2, vsanSlackPercent: _s2, vsanCpuOverheadPercent: _o2, vsanVmSwapEnabled: _w2, ...noVsanGhzScenario } = ghzVsanScenario;
     // No vSAN: capacity = 20 × 3.0 = 60 per node
     // ceil(403.2 / 60) = ceil(6.72) = 7
     const noVsanResult = computeScenarioResult(VSAN_CLUSTER, noVsanGhzScenario, 'ghz');
@@ -599,7 +583,7 @@ describe('Growth factor wiring (Phase 19)', () => {
     expect(result.cpuLimitedCount).toBe(8);
 
     // Without growth: should be 7
-    const noGrowth = { ...scenario, cpuGrowthPercent: undefined };
+    const noGrowth = { ...scenario, cpuGrowthPercent: 0, memoryGrowthPercent: 0, storageGrowthPercent: 0 };
     const noGrowthResult = computeScenarioResult(cluster, noGrowth);
     expect(noGrowthResult.cpuLimitedCount).toBe(7);
   });
@@ -622,7 +606,7 @@ describe('Growth factor wiring (Phase 19)', () => {
     expect(result.ramLimitedCount).toBe(2);
 
     // Without growth: should be 1
-    const noGrowth = { ...scenario, memoryGrowthPercent: undefined };
+    const noGrowth = { ...scenario, cpuGrowthPercent: 0, memoryGrowthPercent: 0, storageGrowthPercent: 0 };
     const noGrowthResult = computeScenarioResult(cluster, noGrowth);
     expect(noGrowthResult.ramLimitedCount).toBe(1);
   });
@@ -645,7 +629,7 @@ describe('Growth factor wiring (Phase 19)', () => {
     expect(result.diskLimitedCount).toBe(2);
 
     // Without growth: should be 1
-    const noGrowth = { ...scenario, storageGrowthPercent: undefined };
+    const noGrowth = { ...scenario, cpuGrowthPercent: 0, memoryGrowthPercent: 0, storageGrowthPercent: 0 };
     const noGrowthResult = computeScenarioResult(cluster, noGrowth);
     expect(noGrowthResult.diskLimitedCount).toBe(1);
   });
@@ -676,7 +660,7 @@ describe('Growth factor wiring (Phase 19)', () => {
     expect(result.diskLimitedCount).toBe(6);
 
     // Without growth: should be 3
-    const noGrowth = { ...scenario, storageGrowthPercent: undefined };
+    const noGrowth = { ...scenario, cpuGrowthPercent: 0, memoryGrowthPercent: 0, storageGrowthPercent: 0 };
     const noGrowthResult = computeScenarioResult(cluster, noGrowth);
     expect(noGrowthResult.diskLimitedCount).toBe(3);
   });

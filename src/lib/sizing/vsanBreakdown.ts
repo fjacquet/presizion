@@ -38,13 +38,17 @@ export function computeVsanBreakdown(
   scenario: Scenario,
   result: ScenarioResult,
 ): VsanCapacityBreakdown {
-  const { finalCount } = result;
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
   const freqGhz = scenario.targetCpuFrequencyGhz ?? 1;
   const isVsan = scenario.vsanFttPolicy !== undefined;
 
   // Effective VM count (with targetVmCount override)
   const effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms;
+
+  // Growth factors (compound, applied to demand — matches constraints.ts pipeline)
+  const cpuGrowthFactor = 1 + (scenario.cpuGrowthPercent ?? 0) / 100;
+  const memGrowthFactor = 1 + (scenario.memoryGrowthPercent ?? 0) / 100;
+  const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100;
 
   // =====================================================================
   // CPU Breakdown (CAP-01)
@@ -56,6 +60,7 @@ export function computeVsanBreakdown(
     coresPerServer,
     freqGhz,
     isVsan,
+    cpuGrowthFactor,
   );
 
   // =====================================================================
@@ -67,6 +72,7 @@ export function computeVsanBreakdown(
     result,
     effectiveVmCount,
     isVsan,
+    memGrowthFactor,
   );
 
   // =====================================================================
@@ -78,6 +84,7 @@ export function computeVsanBreakdown(
     result,
     effectiveVmCount,
     isVsan,
+    storageGrowthFactor,
   );
 
   // =====================================================================
@@ -114,12 +121,13 @@ function computeCpuBreakdown(
   coresPerServer: number,
   freqGhz: number,
   isVsan: boolean,
+  cpuGrowthFactor: number = 1,
 ): ResourceBreakdown {
   const { finalCount } = result;
   const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
 
-  // Demand: vCPU count * target frequency (GHz reporting)
-  const vmsRequired = cluster.totalVcpus * freqGhz;
+  // Demand: vCPU count * growth * target frequency (GHz reporting)
+  const vmsRequired = cluster.totalVcpus * cpuGrowthFactor * freqGhz;
 
   // Total configured GHz for the cluster
   const totalConfiguredGhz = finalCount * coresPerServer * freqGhz;
@@ -162,17 +170,18 @@ function computeCpuBreakdown(
 // =====================================================================
 
 function computeMemoryBreakdown(
-  cluster: OldCluster,
+  _cluster: OldCluster,
   scenario: Scenario,
   result: ScenarioResult,
   effectiveVmCount: number,
   isVsan: boolean,
+  memGrowthFactor: number = 1,
 ): ResourceBreakdown {
   const { finalCount } = result;
   const targetRamUtilPct = scenario.targetRamUtilizationPercent ?? 100;
 
-  // Demand: VM count * RAM per VM
-  const vmsRequired = effectiveVmCount * scenario.ramPerVmGb;
+  // Demand: VM count * RAM per VM * growth factor
+  const vmsRequired = effectiveVmCount * scenario.ramPerVmGb * memGrowthFactor;
 
   // vSAN memory overhead: per-host memory reservation
   const vsanMemPerHost = scenario.vsanMemoryPerHostGb ?? VSAN_DEFAULT_MEMORY_PER_HOST_GB;
@@ -214,6 +223,7 @@ function computeStorageBreakdown(
   result: ScenarioResult,
   effectiveVmCount: number,
   isVsan: boolean,
+  storageGrowthFactor: number = 1,
 ): StorageBreakdown {
   const { finalCount } = result;
 
@@ -240,8 +250,8 @@ function computeStorageBreakdown(
     });
   }
 
-  // Usable storage demand
-  const usableRequired = effectiveVmCount * scenario.diskPerVmGb;
+  // Usable storage demand (with growth factor)
+  const usableRequired = effectiveVmCount * scenario.diskPerVmGb * storageGrowthFactor;
 
   if (!isVsan) {
     // Non-vSAN: simple path

@@ -185,10 +185,10 @@ export function serverCountByVsanStorage(
   const totalRaw = computeVsanStorageRaw({
     usableGib,
     fttPolicy,
-    compressionFactor: options?.compressionFactor,
-    vmSwapEnabled: options?.vmSwapEnabled,
-    totalVmRamGib: options?.totalVmRamGib,
-    slackPercent: options?.slackPercent,
+    compressionFactor: options?.compressionFactor ?? 1,
+    vmSwapEnabled: options?.vmSwapEnabled ?? false,
+    totalVmRamGib: options?.totalVmRamGib ?? 0,
+    slackPercent: options?.slackPercent ?? VSAN_DEFAULT_SLACK_PERCENT,
   });
 
   const storageCount = Math.ceil(totalRaw / rawPerNodeGib);

@@ -8,7 +8,7 @@ import {
   serverCountByVsanStorage,
 } from '../vsanFormulas';
 import { FTT_POLICY_MAP } from '../vsanConstants';
-import type { VsanFttPolicy } from '../vsanConstants';
+
 
 // =====================================================================
 // computeVsanStorageRaw
