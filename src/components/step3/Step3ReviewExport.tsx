@@ -13,25 +13,35 @@
 import { useState, useRef, useEffect } from 'react'
 import { ComparisonTable } from './ComparisonTable'
 import { SizingChart } from './SizingChart'
+import { CoreCountChart } from './CoreCountChart'
 import { Button } from '@/components/ui/button'
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
 import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
+import { encodeSessionToHash } from '@/lib/utils/persistence'
 
 export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
   const scenarios = useScenariosStore((state) => state.scenarios)
   const results = useScenariosResults()
+  const sizingMode = useWizardStore((state) => state.sizingMode)
+  const layoutMode = useWizardStore((state) => state.layoutMode)
   const [copied, setCopied] = useState(false)
+  const [shared, setShared] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Clear timeout on unmount to prevent memory leak / setState-after-unmount warning
+  // Clear timeouts on unmount to prevent memory leak / setState-after-unmount warning
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current)
+      }
+      if (shareTimeoutRef.current !== null) {
+        clearTimeout(shareTimeoutRef.current)
       }
     }
   }, [])
@@ -59,6 +69,18 @@ export function Step3ReviewExport() {
     downloadJson('cluster-sizing.json', json)
   }
 
+  const handleShare = async (): Promise<void> => {
+    const hash = encodeSessionToHash({ cluster: currentCluster, scenarios, sizingMode, layoutMode })
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`
+    await copyToClipboard(url)
+    setShared(true)
+    if (shareTimeoutRef.current !== null) clearTimeout(shareTimeoutRef.current)
+    shareTimeoutRef.current = setTimeout(() => {
+      setShared(false)
+      shareTimeoutRef.current = null
+    }, 2000)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -78,12 +100,16 @@ export function Step3ReviewExport() {
         <Button variant="outline" onClick={handleDownloadJson}>
           Download JSON
         </Button>
+        <Button variant="outline" onClick={() => { void handleShare() }}>
+          {shared ? 'Link Copied!' : 'Share'}
+        </Button>
       </div>
 
       <ComparisonTable />
 
-      <div className="print:hidden">
+      <div className="print:hidden space-y-8">
         <SizingChart />
+        <CoreCountChart />
       </div>
     </div>
   )
