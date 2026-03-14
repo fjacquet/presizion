@@ -50,6 +50,8 @@ export const useImportStore = create<ImportState>((set, get) => ({
       ...(aggregate.cpuUtilizationPercent != null && { cpuUtilizationPercent: aggregate.cpuUtilizationPercent }),
       ...(aggregate.ramUtilizationPercent != null && { ramUtilizationPercent: aggregate.ramUtilizationPercent }),
       ...(aggregate.avgRamPerVmGb != null && { avgRamPerVmGb: aggregate.avgRamPerVmGb }),
+      ...(aggregate.cpuModel != null && { cpuModel: aggregate.cpuModel }),
+      ...(aggregate.cpuFrequencyGhz != null && { cpuFrequencyGhz: aggregate.cpuFrequencyGhz }),
     }
     useClusterStore.getState().setCurrentCluster(cluster)
   },
