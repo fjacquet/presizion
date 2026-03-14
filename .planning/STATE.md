@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: — Scope, Persistence & Branding
+milestone: v1.4
+milestone_name: — Bug Fixes, Chart Polish & UX
 status: planning
-stopped_at: Completed 15-persistence-02-PLAN.md
-last_updated: "2026-03-14T08:35:44.950Z"
-last_activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
+stopped_at: —
+last_updated: "2026-03-14"
+last_activity: 2026-03-14 — Milestone v1.4 started
 progress:
-  total_phases: 7
-  completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-13)
+See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v1.3 roadmap defined — ready to plan Phase 11
+**Current focus:** v1.4 — defining requirements from 7 GitHub issues
 
 ## Current Position
 
-Phase: Not started (roadmap defined, planning next)
+Phase: Not started (defining requirements)
 Plan: —
-Status: Planning
-Last activity: 2026-03-13 — Roadmap written; 13 requirements mapped across 5 phases (11-15)
+Status: Defining requirements
+Last activity: 2026-03-14 — Milestone v1.4 started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -47,17 +47,6 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
-| Phase 11-branding-and-tech-debt P02 | 2 | 3 tasks | 3 files |
-| Phase 11-branding-and-tech-debt P01 | 5 | 2 tasks | 3 files |
-| Phase 12-dark-mode-toggle P01 | 3 | 2 tasks | 3 files |
-| Phase 12-dark-mode-toggle P02 | 3 | 2 tasks | 3 files |
-| Phase 13-import-scope-filter P01 | 4 | 1 tasks | 9 files |
-| Phase 13-import-scope-filter P02 | 15 | 1 tasks | 4 files |
-| Phase 14-persistent-scope-widget P01 | 6 | 2 tasks | 4 files |
-| Phase 14-persistent-scope-widget P02 | 15 | 2 tasks | 5 files |
-| Phase 08-v12-planning-backfill P01 | 5 | 3 tasks | 1 files |
-| Phase 15-persistence P01 | 7 | 2 tasks | 3 files |
-| Phase 15-persistence P02 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -96,14 +85,15 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Plan Phase 11 (Branding & Tech Debt) — next step
+- Define v1.4 requirements from GitHub issues #4–#10
+- Create roadmap (phases start at 16)
 
 ### Blockers/Concerns
 
-- [BRAND-01]: Nano-Banana image generation required for logo/favicon — needs tool availability check at plan time
+- None
 
 ## Session Continuity
 
-Last session: 2026-03-14T08:21:32.209Z
-Stopped at: Completed 15-persistence-02-PLAN.md
+Last session: 2026-03-14
+Stopped at: —
 Resume file: None

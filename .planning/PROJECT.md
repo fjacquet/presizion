@@ -4,7 +4,20 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v1.3 ships with Presizion branding, dark mode toggle, multi-cluster import scope filtering, persistent scope widget, localStorage session auto-restore, and shareable URL hash encoding.
+v1.3 shipped with Presizion branding, dark mode toggle, multi-cluster import scope filtering, persistent scope widget, localStorage session auto-restore, and shareable URL hash encoding.
+
+## Current Milestone: v1.4 Bug Fixes, Chart Polish & UX
+
+**Goal:** Fix data-integrity bugs in import scoping and VM override formulas, complete the As-Is comparison column, polish charts for presentation quality, improve SPECrate UX, and add reset/SPECrate-lookup convenience features.
+
+**Target features:**
+- Fix LiveOptics import: scope ESX host config per cluster (GH #4)
+- Fix VM override: RAM/disk formulas must use overridden VM count (GH #7)
+- Complete As-Is column in Step 3 comparison table (GH #9)
+- Chart polish: legends, data labels, pCores download, professional palette (GH #8)
+- SPECrate mode: derive socket/core from benchmark, not user input (GH #6)
+- Add SPECrate lookup link for detected CPU model (GH #5)
+- Add Reset button to restart wizard from scratch (GH #10)
 
 ## Core Value
 
@@ -65,7 +78,15 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ localStorage session auto-restore on page load — v1.3 / Phase 15
 - ✓ Shareable URL hash encoding full session state — v1.3 / Phase 15
 
-### Active (v1.4 candidates)
+### Active (v1.4)
+
+- [ ] Fix LiveOptics import scoping: ESX host config must be per-cluster (GH #4)
+- [ ] Fix VM override: RAM/disk formulas must use overridden VM count (GH #7)
+- [ ] Complete As-Is column with VMs/Server, util %, total disk (GH #9)
+- [ ] Chart legends, data labels, pCores download, professional palette (GH #8)
+- [ ] SPECrate mode: derive socket/core from benchmark metadata (GH #6)
+- [ ] SPECrate lookup link for detected CPU model (GH #5)
+- [ ] Reset button with confirmation dialog (GH #10)
 
 ### Out of Scope
 
@@ -113,4 +134,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-14 after v1.3 milestone completion*
+*Last updated: 2026-03-14 after v1.4 milestone start*
