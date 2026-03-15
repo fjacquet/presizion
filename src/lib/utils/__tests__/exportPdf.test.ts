@@ -160,7 +160,7 @@ describe('exportPdf', () => {
     // Check that doc.text was called with the title
     const textCalls = mockText.mock.calls as Array<[string, number, number, Record<string, string>?]>
     const hasTitle = textCalls.some(
-      ([text]) => typeof text === 'string' && text.includes('Presizion'),
+      ([text]) => typeof text === 'string' && text.includes('Cluster Sizing Report'),
     )
     expect(hasTitle).toBe(true)
   })

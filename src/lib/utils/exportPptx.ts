@@ -9,7 +9,9 @@
 import type { OldCluster, Scenario } from '@/types/cluster'
 import type { ScenarioResult } from '@/types/results'
 import type { VsanCapacityBreakdown } from '@/types/breakdown'
+import { FTT_POLICY_MAP } from '@/lib/sizing/vsanConstants'
 import { chartRefToDataUrl, type ChartCapture } from '@/lib/utils/chartCapture'
+import { getLogoDataUrl } from '@/lib/utils/logoDataUrl'
 
 // ---------------------------------------------------------------------------
 // Color constants (hex without '#')
@@ -68,6 +70,9 @@ async function captureAllCharts(
  * Generates and downloads a PowerPoint presentation containing:
  * - Title slide with cluster summary
  * - Executive summary table
+ * - As-Is vs To-Be comparison table
+ * - Sizing assumptions (general, vSAN settings, growth projections)
+ * - Per-scenario server configuration
  * - Per-scenario capacity breakdown tables and chart images
  * - Scenario comparison table
  *
@@ -100,7 +105,16 @@ export async function exportPptx(
   // Slide 1: Title
   // -------------------------------------------------------------------
   const titleSlide = pptx.addSlide()
-  titleSlide.addText('Presizion', {
+
+  // Logo
+  try {
+    const logoUrl = await getLogoDataUrl()
+    if (logoUrl) {
+      titleSlide.addImage({ data: logoUrl, x: 0.5, y: 0.5, w: 3, h: 0.75 })
+    }
+  } catch { /* logo is optional */ }
+
+  titleSlide.addText('Cluster Sizing Report', {
     x: 0.5,
     y: 1.5,
     w: '90%',
@@ -173,6 +187,411 @@ export async function exportPptx(
       y: 1.2,
       w: 12,
       colW: [4, 2, 2.5, 1.75, 1.75],
+      border: { pt: 0.5, color: 'CFCFCF' },
+    },
+  )
+
+  // -------------------------------------------------------------------
+  // Slide 3: As-Is vs To-Be Comparison
+  // -------------------------------------------------------------------
+  const comparisonSlide = pptx.addSlide()
+  comparisonSlide.addText('As-Is vs To-Be Comparison', {
+    x: 0.5,
+    y: 0.3,
+    w: '90%',
+    fontSize: 24,
+    bold: true,
+    color: BLUE,
+  })
+
+  const asIsServerConfig =
+    cluster.socketsPerServer && cluster.coresPerSocket
+      ? `${cluster.socketsPerServer}s x ${cluster.coresPerSocket}c`
+      : '--'
+
+  const asIsPcores = String(cluster.totalPcores)
+
+  const asIsRatio =
+    cluster.totalPcores > 0
+      ? (cluster.totalVcpus / cluster.totalPcores).toFixed(1)
+      : '--'
+
+  const asIsVmsPerServer =
+    cluster.existingServerCount && cluster.existingServerCount > 0
+      ? (cluster.totalVms / cluster.existingServerCount).toFixed(1)
+      : '--'
+
+  const asIsTotalDisk =
+    cluster.totalDiskGb !== undefined
+      ? `${(cluster.totalDiskGb / 1024).toFixed(1)} TiB`
+      : '--'
+
+  const compHeaderRow = [
+    { text: 'Metric', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    { text: 'As-Is', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    ...scenarios.map((s) => ({
+      text: s.name,
+      options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 },
+    })),
+  ]
+
+  interface CompMetric {
+    readonly label: string
+    readonly asIs: string
+    readonly scenarioValues: readonly string[]
+  }
+
+  const compMetrics: CompMetric[] = [
+    {
+      label: 'Servers',
+      asIs: cluster.existingServerCount !== undefined ? String(cluster.existingServerCount) : '--',
+      scenarioValues: results.map((r) => String(r.finalCount)),
+    },
+    {
+      label: 'Server Config',
+      asIs: asIsServerConfig,
+      scenarioValues: scenarios.map((s) => `${s.socketsPerServer}s x ${s.coresPerSocket}c`),
+    },
+    {
+      label: 'Total pCores',
+      asIs: asIsPcores,
+      scenarioValues: results.map((r, idx) => {
+        const s = scenarios[idx]
+        return s ? String(r.finalCount * s.socketsPerServer * s.coresPerSocket) : '--'
+      }),
+    },
+    {
+      label: 'Limiting Resource',
+      asIs: 'N/A',
+      scenarioValues: results.map((r) => r.limitingResource),
+    },
+    {
+      label: 'vCPU:pCore Ratio',
+      asIs: asIsRatio,
+      scenarioValues: results.map((r) => r.achievedVcpuToPCoreRatio.toFixed(1)),
+    },
+    {
+      label: 'VMs/Server',
+      asIs: asIsVmsPerServer,
+      scenarioValues: results.map((r) => r.vmsPerServer.toFixed(1)),
+    },
+    {
+      label: 'Headroom %',
+      asIs: 'N/A',
+      scenarioValues: scenarios.map((s) => `${s.headroomPercent}%`),
+    },
+    {
+      label: 'CPU Util %',
+      asIs: cluster.cpuUtilizationPercent !== undefined
+        ? `${cluster.cpuUtilizationPercent.toFixed(1)}%`
+        : '--',
+      scenarioValues: results.map((r) => `${r.cpuUtilizationPercent.toFixed(1)}%`),
+    },
+    {
+      label: 'RAM Util %',
+      asIs: cluster.ramUtilizationPercent !== undefined
+        ? `${cluster.ramUtilizationPercent.toFixed(1)}%`
+        : '--',
+      scenarioValues: results.map((r) => `${r.ramUtilizationPercent.toFixed(1)}%`),
+    },
+    {
+      label: 'Total Disk',
+      asIs: asIsTotalDisk,
+      scenarioValues: results.map((r, idx) => {
+        const s = scenarios[idx]
+        return s ? `${((r.finalCount * s.diskPerServerGb) / 1024).toFixed(1)} TiB` : '--'
+      }),
+    },
+  ]
+
+  const compDataRows = compMetrics.map((m, rowIdx) => {
+    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+    return [
+      { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+      { text: m.asIs, options: { fill: { color: fillColor }, fontSize: 10 } },
+      ...m.scenarioValues.map((v) => ({
+        text: v,
+        options: { fill: { color: fillColor }, fontSize: 10 },
+      })),
+    ]
+  })
+
+  const compScenarioW = scenarios.length > 0 ? (12 - 2.5 - 2) / scenarios.length : 2
+  comparisonSlide.addTable(
+    [compHeaderRow, ...compDataRows],
+    {
+      x: 0.5,
+      y: 1.2,
+      w: 12,
+      colW: [2.5, 2, ...scenarios.map(() => compScenarioW)],
+      border: { pt: 0.5, color: 'CFCFCF' },
+    },
+  )
+
+  // -------------------------------------------------------------------
+  // Slide 4: Sizing Assumptions
+  // -------------------------------------------------------------------
+  const assumptionsSlide = pptx.addSlide()
+  assumptionsSlide.addText('Sizing Assumptions', {
+    x: 0.5,
+    y: 0.3,
+    w: '90%',
+    fontSize: 24,
+    bold: true,
+    color: BLUE,
+  })
+
+  const assumptionsHeader = [
+    { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
+    ...scenarios.map((s) => ({
+      text: s.name,
+      options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 },
+    })),
+  ]
+
+  interface AssumptionRow {
+    readonly label: string
+    readonly values: readonly string[]
+  }
+
+  const generalAssumptions: AssumptionRow[] = [
+    {
+      label: 'vCPU:pCore Ratio',
+      values: scenarios.map((s) => s.targetVcpuToPCoreRatio.toFixed(1)),
+    },
+    {
+      label: 'Headroom %',
+      values: scenarios.map((s) => `${s.headroomPercent}%`),
+    },
+    {
+      label: 'HA Reserve',
+      values: scenarios.map((s) => (s.haReserveCount === 0 ? 'None' : `N+${s.haReserveCount}`)),
+    },
+    {
+      label: 'RAM / VM (GB)',
+      values: scenarios.map((s) => s.ramPerVmGb.toFixed(1)),
+    },
+    {
+      label: 'Disk / VM (GB)',
+      values: scenarios.map((s) => s.diskPerVmGb.toFixed(1)),
+    },
+  ]
+
+  const generalDataRows = generalAssumptions.map((a, rowIdx) => {
+    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+    return [
+      { text: a.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+      ...a.values.map((v) => ({
+        text: v,
+        options: { fill: { color: fillColor }, fontSize: 10 },
+      })),
+    ]
+  })
+
+  const assumptionsColW = scenarios.length > 0 ? (12 - 3) / scenarios.length : 2
+  assumptionsSlide.addTable(
+    [assumptionsHeader, ...generalDataRows],
+    {
+      x: 0.5,
+      y: 1.2,
+      w: 12,
+      colW: [3, ...scenarios.map(() => assumptionsColW)],
+      border: { pt: 0.5, color: 'CFCFCF' },
+    },
+  )
+
+  // vSAN settings sub-table (only if at least one scenario uses vSAN)
+  const hasVsan = scenarios.some((s) => s.vsanFttPolicy !== undefined)
+  if (hasVsan) {
+    const vsanHeader = [
+      { text: 'vSAN Setting', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
+      ...scenarios.map((s) => ({
+        text: s.name,
+        options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 },
+      })),
+    ]
+
+    const vsanRows: AssumptionRow[] = [
+      {
+        label: 'FTT Policy',
+        values: scenarios.map((s) =>
+          s.vsanFttPolicy ? FTT_POLICY_MAP[s.vsanFttPolicy].label : 'N/A',
+        ),
+      },
+      {
+        label: 'Compression Factor',
+        values: scenarios.map((s) =>
+          s.vsanCompressionFactor !== undefined ? `${s.vsanCompressionFactor}x` : '1.0x',
+        ),
+      },
+      {
+        label: 'Slack %',
+        values: scenarios.map((s) =>
+          s.vsanSlackPercent !== undefined ? `${s.vsanSlackPercent}%` : '25%',
+        ),
+      },
+      {
+        label: 'CPU Overhead %',
+        values: scenarios.map((s) =>
+          s.vsanCpuOverheadPercent !== undefined ? `${s.vsanCpuOverheadPercent}%` : '10%',
+        ),
+      },
+      {
+        label: 'Memory / Host (GB)',
+        values: scenarios.map((s) =>
+          s.vsanMemoryPerHostGb !== undefined ? String(s.vsanMemoryPerHostGb) : '6',
+        ),
+      },
+      {
+        label: 'VM Swap',
+        values: scenarios.map((s) =>
+          s.vsanVmSwapEnabled ? 'Enabled' : 'Disabled (sparse)',
+        ),
+      },
+    ]
+
+    const vsanDataRows = vsanRows.map((a, rowIdx) => {
+      const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+      return [
+        { text: a.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+        ...a.values.map((v) => ({
+          text: v,
+          options: { fill: { color: fillColor }, fontSize: 10 },
+        })),
+      ]
+    })
+
+    // Compute Y offset after the general assumptions table
+    const vsanTableY = 1.2 + (generalAssumptions.length + 1) * 0.35 + 0.3
+    assumptionsSlide.addTable(
+      [vsanHeader, ...vsanDataRows],
+      {
+        x: 0.5,
+        y: vsanTableY,
+        w: 12,
+        colW: [3, ...scenarios.map(() => assumptionsColW)],
+        border: { pt: 0.5, color: 'CFCFCF' },
+      },
+    )
+  }
+
+  // Growth projections (only if at least one scenario has growth)
+  const hasGrowth = scenarios.some(
+    (s) =>
+      (s.cpuGrowthPercent !== undefined && s.cpuGrowthPercent > 0) ||
+      (s.memoryGrowthPercent !== undefined && s.memoryGrowthPercent > 0) ||
+      (s.storageGrowthPercent !== undefined && s.storageGrowthPercent > 0),
+  )
+  if (hasGrowth) {
+    const growthSlide = pptx.addSlide()
+    growthSlide.addText('Growth Projections', {
+      x: 0.5,
+      y: 0.3,
+      w: '90%',
+      fontSize: 24,
+      bold: true,
+      color: BLUE,
+    })
+
+    const growthHeader = [
+      { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
+      ...scenarios.map((s) => ({
+        text: s.name,
+        options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 },
+      })),
+    ]
+
+    const growthRows: AssumptionRow[] = [
+      {
+        label: 'CPU Growth %',
+        values: scenarios.map((s) =>
+          s.cpuGrowthPercent !== undefined ? `${s.cpuGrowthPercent}%` : '0%',
+        ),
+      },
+      {
+        label: 'Memory Growth %',
+        values: scenarios.map((s) =>
+          s.memoryGrowthPercent !== undefined ? `${s.memoryGrowthPercent}%` : '0%',
+        ),
+      },
+      {
+        label: 'Storage Growth %',
+        values: scenarios.map((s) =>
+          s.storageGrowthPercent !== undefined ? `${s.storageGrowthPercent}%` : '0%',
+        ),
+      },
+    ]
+
+    const growthDataRows = growthRows.map((a, rowIdx) => {
+      const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+      return [
+        { text: a.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+        ...a.values.map((v) => ({
+          text: v,
+          options: { fill: { color: fillColor }, fontSize: 10 },
+        })),
+      ]
+    })
+
+    growthSlide.addTable(
+      [growthHeader, ...growthDataRows],
+      {
+        x: 0.5,
+        y: 1.2,
+        w: 12,
+        colW: [3, ...scenarios.map(() => assumptionsColW)],
+        border: { pt: 0.5, color: 'CFCFCF' },
+      },
+    )
+  }
+
+  // -------------------------------------------------------------------
+  // Slide 5: Per-Scenario Server Configuration
+  // -------------------------------------------------------------------
+  const serverConfigSlide = pptx.addSlide()
+  serverConfigSlide.addText('Per-Scenario Server Configuration', {
+    x: 0.5,
+    y: 0.3,
+    w: '90%',
+    fontSize: 24,
+    bold: true,
+    color: BLUE,
+  })
+
+  const scHeader = [
+    { text: 'Parameter', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    ...scenarios.map((s) => ({
+      text: s.name,
+      options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 },
+    })),
+  ]
+
+  const scMetrics: AssumptionRow[] = [
+    { label: 'Sockets / Server', values: scenarios.map((s) => String(s.socketsPerServer)) },
+    { label: 'Cores / Socket', values: scenarios.map((s) => String(s.coresPerSocket)) },
+    { label: 'Total Cores / Server', values: scenarios.map((s) => String(s.socketsPerServer * s.coresPerSocket)) },
+    { label: 'RAM / Server (GB)', values: scenarios.map((s) => s.ramPerServerGb.toLocaleString()) },
+    { label: 'Disk / Server (GB)', values: scenarios.map((s) => s.diskPerServerGb.toLocaleString()) },
+  ]
+
+  const scDataRows = scMetrics.map((m, rowIdx) => {
+    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+    return [
+      { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+      ...m.values.map((v) => ({
+        text: v,
+        options: { fill: { color: fillColor }, fontSize: 10 },
+      })),
+    ]
+  })
+
+  serverConfigSlide.addTable(
+    [scHeader, ...scDataRows],
+    {
+      x: 0.5,
+      y: 1.2,
+      w: 12,
+      colW: [3, ...scenarios.map(() => assumptionsColW)],
       border: { pt: 0.5, color: 'CFCFCF' },
     },
   )
@@ -319,7 +738,7 @@ export async function exportPptx(
   })
 
   // Build comparison table: first column = metric, then one column per scenario
-  const compHeaderRow = [
+  const finalCompHeader = [
     { text: 'Metric', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
     ...scenarios.map((s) => ({
       text: s.name,
@@ -327,7 +746,7 @@ export async function exportPptx(
     })),
   ]
 
-  const metrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult) => string }> = [
+  const finalMetrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult) => string }> = [
     { label: 'Servers Required', values: (_s, r) => String(r.finalCount) },
     { label: 'Server Config', values: (s) => `${s.socketsPerServer}S x ${s.coresPerSocket}C` },
     { label: 'Total pCores', values: (s, r) => String(r.finalCount * s.socketsPerServer * s.coresPerSocket) },
@@ -339,7 +758,7 @@ export async function exportPptx(
     { label: 'Disk Util %', values: (_s, r) => f1(r.diskUtilizationPercent) },
   ]
 
-  const compDataRows = metrics.map((m, rowIdx) => {
+  const finalCompRows = finalMetrics.map((m, rowIdx) => {
     const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
     return [
       { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
@@ -359,7 +778,7 @@ export async function exportPptx(
     : 2
 
   compSlide.addTable(
-    [compHeaderRow, ...compDataRows],
+    [finalCompHeader, ...finalCompRows],
     {
       x: 0.5,
       y: 1.2,

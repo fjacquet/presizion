@@ -1,33 +1,43 @@
-# Presizion — Cluster Refresh Sizing Tool
+# Presizion -- Cluster Refresh Sizing Tool
 
 ![Build](https://github.com/fjacquet/cluster-sizer/actions/workflows/ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-254%2B%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-541%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-Presizion is a client-side web application for presales engineers to size a refreshed compute cluster based on existing cluster metrics. Enter your current environment, define target server scenarios, and instantly compare how many servers you need — no backend, no API, all calculations run in the browser.
+Presizion is a client-side web application for presales engineers to size a refreshed compute cluster based on existing cluster metrics. Enter your current environment, define target server scenarios, and instantly compare how many servers you need -- with vSAN-aware storage sizing, capacity breakdown charts, and growth projections. No backend, no API; all calculations run in the browser.
 
 ## Live
 
-> Deploy to GitHub Pages or any static web host — the build output is plain HTML/JS/CSS.
+> Deploy to GitHub Pages or any static web host -- the build output is plain HTML/JS/CSS.
 
 ## Quick Start
 
 ```bash
 npm install
 npm run dev       # http://localhost:5173
-npm run build     # production build → dist/
-npm run test      # run all tests
+npm run build     # production build -> dist/
+npm run test      # run all tests (541 tests)
 ```
 
 ## Features
 
-- **3-step wizard**: enter current cluster → define target scenarios → compare & export
-- **Import from file**: paste LiveOptics or RVTools exports (CSV/XLSX) to auto-fill Step 1
-- **Side-by-side comparison**: servers required, total pCores, vCPU:pCore ratio, utilization %
-- **Overflow warnings**: utilization cells flag `⚠` when a disk-limited scenario pushes CPU/RAM above 100%
-- **Multiple sizing modes**: vCPU:pCore ratio or SPECrate2017 Int Base
-- **Dark mode**: system-aware with manual toggle
-- **Export**: copy table to clipboard or download as CSV/JSON
+- **3-step wizard**: enter current cluster, define target scenarios, compare and export
+- **vSAN-aware storage sizing**: FTT policies (Mirror FTT=1/2/3, RAID-5, RAID-6), raw vs usable storage, metadata overhead, configurable slack space
+- **vSAN overhead deduction**: CPU overhead (10% default), memory overhead per host (6 GB default)
+- **Compression/dedup factors**: None, Pessimistic (1.3:1), Conservative (1.5:1), Moderate (2:1), Optimistic (3:1)
+- **Capacity breakdown tables**: Required / Reserved / HA Reserve / Spare / Excess / Total for CPU, Memory, Storage
+- **Stacked capacity bar charts**: normalized horizontal bars with per-segment percentage labels
+- **Growth projections**: per-resource compound growth rates (CPU %, Memory %, Storage %)
+- **Import from file**: RVTools (.xlsx), LiveOptics (.zip/.xlsx/.csv), or Presizion JSON session restore -- with multi-cluster scope filter
+- **Side-by-side comparison**: servers required, total pCores, vCPU:pCore ratio, utilization percentages
+- **Multiple sizing modes**: vCPU:pCore ratio or SPECrate2017 Int Base with auto-derive and SPEC lookup link
+- **Export**: clipboard copy, CSV, JSON, PNG (charts with legend), PDF report (jsPDF), PPTX presentation (pptxgenjs), print layout, shareable URL
+- **Dark mode**: light/dark/system toggle with localStorage persistence
+- **Session persistence**: localStorage auto-restore and base64url shareable URL hash
+
+## Tech Stack
+
+React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui, Zustand v5, Recharts, Zod, jsPDF + jspdf-autotable, pptxgenjs, Vitest (541 tests).
 
 ## Docs
 

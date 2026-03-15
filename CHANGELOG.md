@@ -10,7 +10,60 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - SPECint metric label corrected to `SPECrate2017_int_base` across all UI labels, tooltips, and formula strings (ADR-005).
-- Default target server updated to Dell PowerEdge R660, 2× Intel Xeon Gold 6526Y (32 pCores, `SPECrate2017_int_base` = 337 per spec.org).
+- Default target server updated to Dell PowerEdge R660, 2x Intel Xeon Gold 6526Y (32 pCores, `SPECrate2017_int_base` = 337 per spec.org).
+
+---
+
+## [2.0.0] — 2026-03-15
+
+### Added
+
+- vSAN-aware storage sizing: FTT policies (Mirror FTT=1/2/3, RAID-5, RAID-6), raw vs usable storage, metadata overhead, slack space (25% default).
+- vSAN CPU overhead (10% default) and memory overhead per host (6 GB default).
+- Compression/dedup factor: None, Pessimistic (1.3:1), Conservative (1.5:1), Moderate (2:1), Optimistic (3:1).
+- Capacity breakdown tables: Required / Reserved / HA Reserve / Spare / Excess / Total for CPU, Memory, Storage.
+- Stacked horizontal capacity bar charts (normalized to 100%, per-segment percentage labels).
+- Min-nodes-per-constraint horizontal bar chart with binding constraint highlight.
+- Growth projections per resource (CPU %, Memory %, Storage %) with compound pre-multiplication.
+- Collapsible "vSAN & Growth" section in ScenarioCard (HCI mode only for vSAN, always for growth).
+- VM swap overhead toggle (default OFF, sparse swap assumed).
+- PDF report export (jsPDF + jspdf-autotable, lazy-loaded).
+- PPTX presentation export (pptxgenjs, lazy-loaded).
+- PNG download includes legend + absolute values table below chart.
+
+---
+
+## [1.4.0] — 2026-03-14
+
+### Fixed
+
+- LiveOptics import: ESX host config (RAM/server, sockets, cores) now scoped per cluster (was reading global first host).
+- ImportPreviewModal reads scope-filtered data instead of global result.
+- VM override: RAM/Disk formula display shows overridden VM count.
+- Chart redesigned: Server Count Comparison with As-Is bar + Constraint Breakdown (split from single confusing chart).
+
+### Added
+
+- SPECrate lookup link: copies CPU model number to clipboard, opens SPEC advanced query form.
+- SPECrate auto-derive: socket/core fields read-only in SPECrate mode when import metadata available.
+- Reset button with confirmation dialog (clears all stores + localStorage, preserves theme).
+- Chart legends, data labels on bars, professional CHART_COLORS palette.
+- CoreCountChart PNG download.
+- CPU Description column alias for LiveOptics ESX Hosts.
+
+---
+
+## [1.3.0] — 2026-03-14
+
+### Added
+
+- Presizion branding: SVG wordmark logo + custom favicon.
+- Manual light/dark/system theme toggle with localStorage persistence.
+- Multi-cluster import scope filter: detect clusters/datacenters, select subset before populating form.
+- Persistent scope badge in Step 1 with live re-aggregation on scope change.
+- localStorage session auto-restore on page load.
+- Shareable URL hash encoding (base64url) for full session state.
+- RAM formula display shows utilization factor when applicable.
 
 ---
 
