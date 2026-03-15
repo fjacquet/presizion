@@ -73,6 +73,25 @@ export const scenarioSchema = z.object({
   targetVmCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
   minServerCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
   targetCpuFrequencyGhz: optionalPositiveNumber,
+
+  // vSAN settings (Phase 20 — all optional; absent = legacy sizing path per VSAN-12)
+  vsanFttPolicy: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.enum(['mirror-1', 'mirror-2', 'mirror-3', 'raid5', 'raid6']).optional(),
+  ),
+  vsanCompressionFactor: z.preprocess(
+    numericPreprocess,
+    z.union([z.literal(1.0), z.literal(1.3), z.literal(1.5), z.literal(2.0), z.literal(3.0)]).optional(),
+  ),
+  vsanSlackPercent: z.preprocess(numericPreprocess, z.number().min(0).max(100).optional()),
+  vsanCpuOverheadPercent: z.preprocess(numericPreprocess, z.number().min(0).max(100).optional()),
+  vsanMemoryPerHostGb: z.preprocess(numericPreprocess, z.number().min(0).optional()),
+  vsanVmSwapEnabled: z.boolean().optional().default(false),
+
+  // Growth projections (Phase 20 — all optional; absent = 0% growth)
+  cpuGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
+  memoryGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
+  storageGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
 });
 
 export type ScenarioInput = z.infer<typeof scenarioSchema>;

@@ -27,6 +27,7 @@ import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import type { Scenario } from '@/types/cluster'
+import { VsanGrowthSection } from './VsanGrowthSection'
 
 const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
   socketsPerServer:               'Physical CPU sockets per target server. Check the vendor spec sheet.',
@@ -78,6 +79,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const currentCluster = useClusterStore((s) => s.currentCluster)
 
   const [pinEnabled, setPinEnabled] = useState(() => !!scenario?.minServerCount)
+  const [vsanGrowthOpen, setVsanGrowthOpen] = useState(false)
 
   const form = useForm<ScenarioInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -491,6 +493,14 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 )}
               </div>
             </div>
+
+            <VsanGrowthSection
+              form={form}
+              scenarioId={scenarioId}
+              layoutMode={layoutMode}
+              open={vsanGrowthOpen}
+              onToggle={() => setVsanGrowthOpen((o) => !o)}
+            />
           </CardContent>
         </form>
       </Form>
