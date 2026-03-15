@@ -180,7 +180,13 @@ describe('ScopeBadge', () => {
     })
 
     it('does not show host count when rawByScope is null', () => {
-      setupStore({ ...MULTI_SCOPE_STATE, rawByScope: null })
+      setupStore({
+        scopeOptions: ['DC1||CL-A', 'DC1||CL-B'],
+        activeScope: ['DC1||CL-A', 'DC1||CL-B'],
+        scopeLabels: { 'DC1||CL-A': 'CL-A (DC1)', 'DC1||CL-B': 'CL-B (DC1)' },
+        rawByScope: null,
+        setActiveScope: mockSetActiveScope,
+      } as unknown as Parameters<typeof setupStore>[0])
       render(<ScopeBadge />)
       expect(screen.getByText('CL-A (DC1), CL-B (DC1)')).toBeInTheDocument()
       expect(screen.queryByText(/hosts/)).not.toBeInTheDocument()

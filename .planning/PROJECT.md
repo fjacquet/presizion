@@ -4,21 +4,13 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v2.0 shipped with vSAN-aware storage sizing (FTT, raw/usable, overhead), capacity breakdowns, stacked charts, growth projections, compression/dedup, and professional PDF + PPTX export.
-
-## Current Milestone: v2.1 Import UX & Scope Fixes
-
-**Goal:** Fix "All" scope aggregation behavior and add average VM requirements display from imported data.
-
-**Target features:**
-- Fix scope "All" to aggregate named clusters only, show clusterless hosts as "Standalone" (GH #11)
-- Calculate and display average per-VM requirements (vCPU, RAM, disk) from import data (GH #12)
+v2.1 shipped with scope aggregation fixes (standalone routing, weighted RAM, host count display) and average VM metrics in derived panel.
 
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
 
-## Current State (v2.0 — Shipped 2026-03-15)
+## Current State (v2.1 — Shipped 2026-03-15)
 
 - **Codebase:** 541 Vitest tests
 - **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Recharts 2.15 + Sonner + jsPDF + pptxgenjs
@@ -88,10 +80,10 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ Stacked capacity bar charts + min-nodes chart — v2.0 / Phase 21
 - ✓ Professional PDF + PPTX report export — v2.0 / Phase 22
 
-### Active (v2.1)
+- ✓ Scope "All" aggregates named clusters, standalone routing, weighted RAM, host count display — v2.1 / Phase 23
+- ✓ Average per-VM metrics (vCPU, RAM, Disk) in derived panel + seeding verification — v2.1 / Phase 24
 
-- [ ] Scope "All" aggregates named clusters only; clusterless hosts shown as "Standalone" (GH #11)
-- [ ] Average per-VM requirements (vCPU, RAM, disk) computed from import and displayed in Step 1 (GH #12)
+### Active (v2.2 candidates)
 
 ### Out of Scope
 
@@ -139,4 +131,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-15 after v2.1 milestone start*
+*Last updated: 2026-03-15 after v2.1 milestone completion*

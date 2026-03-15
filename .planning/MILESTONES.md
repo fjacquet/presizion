@@ -1,5 +1,22 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v2.1 -- Import UX & Scope Fixes (Shipped: 2026-03-15)
+
+**Goal:** Fix "All" scope aggregation and add average VM requirements display.
+
+**What shipped:**
+
+- Phase 23: Standalone scope routing for clusterless VMs, weighted RAM/server average, host count per scope in selector
+- Phase 24: Average vCPU/RAM/Disk per VM in Step 1 derived metrics, seeding verification tests
+
+**Requirements shipped:** 8/8 (SCOPE-07..10, AVG-01..04)
+**Codebase:** 561 tests
+
+**Archive:** `.planning/milestones/v2.1-ROADMAP.md`, `.planning/milestones/v2.1-REQUIREMENTS.md`
+**Last phase number:** 24
+
+---
+
 ## v2.0 -- vSAN-Aware Sizing Engine (Shipped: 2026-03-15)
 
 **Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdowns, growth projections, and professional report export.

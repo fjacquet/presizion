@@ -90,7 +90,7 @@ describe('useScenariosStore.seedFromCluster', () => {
     })
 
     const scenarios = useScenariosStore.getState().scenarios
-    const newScenario = scenarios[scenarios.length - 1]
+    const newScenario = scenarios[scenarios.length - 1]!
     expect(newScenario.ramPerVmGb).toBe(16)
     expect(newScenario.diskPerVmGb).toBe(50)
   })

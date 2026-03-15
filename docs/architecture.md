@@ -107,7 +107,7 @@ Holds intermediate state during file import: raw parsed data grouped by scope (c
 
 The application renders a single-page 3-step wizard:
 
-```
+```text
 App
   WizardShell
     ThemeToggle

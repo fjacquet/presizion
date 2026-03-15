@@ -26,7 +26,7 @@ interface ScopeSelectorProps {
   scopeLabels: Record<string, string>
   selectedScopes: string[]
   onToggle: (key: string, checked: boolean) => void
-  rawByScope?: Map<string, ScopeData>
+  rawByScope?: Map<string, ScopeData> | undefined
 }
 
 function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, rawByScope }: ScopeSelectorProps) {
