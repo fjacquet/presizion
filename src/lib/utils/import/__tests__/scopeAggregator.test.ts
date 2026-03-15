@@ -107,14 +107,45 @@ describe('aggregateScopes', () => {
     expect(result.warnings.some((w) => w.includes('Heterogeneous RAM'))).toBe(false)
   })
 
-  it('different ramPerServerGb across scopes -> warning with "Heterogeneous RAM"', () => {
+  it('different ramPerServerGb across scopes -> weighted average with warning', () => {
     const map = new Map<string, ScopeEntry>([
       ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 256, existingServerCount: 4 })],
       ['CL-B', makeScope({ vmCount: 3, ramPerServerGb: 512, existingServerCount: 6 })],
     ])
     const result = aggregateScopes(map, ['CL-A', 'CL-B'])
-    expect(result.ramPerServerGb).toBe(256) // first scope value
+    // (256*4 + 512*6) / (4+6) = (1024 + 3072) / 10 = 410 (rounded)
+    expect(result.ramPerServerGb).toBe(410)
     expect(result.warnings.some((w) => w.includes('Heterogeneous RAM'))).toBe(true)
+    expect(result.warnings.some((w) => w.includes('weighted average'))).toBe(true)
+  })
+
+  it('two scopes with same ramPerServerGb -> weighted avg equals that value', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 256, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3, ramPerServerGb: 256, existingServerCount: 6 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.ramPerServerGb).toBe(256)
+    expect(result.warnings.some((w) => w.includes('Heterogeneous RAM'))).toBe(false)
+  })
+
+  it('one scope with ramPerServerGb, other without -> uses the one that has it', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 512, existingServerCount: 4 })],
+      ['CL-B', makeScope({ vmCount: 3 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.ramPerServerGb).toBe(512)
+  })
+
+  it('ramPerServerGb without existingServerCount treats host count as 1', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 2, ramPerServerGb: 256 })],
+      ['CL-B', makeScope({ vmCount: 3, ramPerServerGb: 512, existingServerCount: 3 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    // (256*1 + 512*3) / (1+3) = (256 + 1536) / 4 = 448
+    expect(result.ramPerServerGb).toBe(448)
   })
 
   it('weighted average cpuUtilizationPercent by existingServerCount', () => {

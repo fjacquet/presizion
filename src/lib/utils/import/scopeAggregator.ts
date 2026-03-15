@@ -9,7 +9,7 @@ type RawByScopeMap = Map<string, ScopeData>
  * ESX field aggregation:
  * - Additive: totalPcores, existingServerCount (summed across scopes)
  * - Representative: socketsPerServer, coresPerSocket, cpuModel, cpuFrequencyGhz (first scope)
- * - Representative with warning: ramPerServerGb (first scope; warns if heterogeneous)
+ * - Weighted average by host count: ramPerServerGb (warns if heterogeneous)
  * - Weighted average by server count: cpuUtilizationPercent, ramUtilizationPercent
  */
 export function aggregateScopes(
@@ -47,8 +47,8 @@ export function aggregateScopes(
   let repCpuModel: string | undefined
   let repCpuFrequencyGhz: number | undefined
 
-  // RAM per server: representative with heterogeneity warning
-  const ramPerServerValues: number[] = []
+  // RAM per server: host-count-weighted average
+  const ramPerServerEntries: { ram: number; hosts: number }[] = []
 
   // Weighted average utilization
   let weightedCpuUtilSum = 0
@@ -88,9 +88,9 @@ export function aggregateScopes(
       repCpuFrequencyGhz = scope.cpuFrequencyGhz
     }
 
-    // RAM per server values
+    // RAM per server: collect (ram, hostCount) tuples for weighted average
     if (scope.ramPerServerGb !== undefined) {
-      ramPerServerValues.push(scope.ramPerServerGb)
+      ramPerServerEntries.push({ ram: scope.ramPerServerGb, hosts: scope.existingServerCount ?? 1 })
     }
 
     // Weighted utilization (by existingServerCount)
@@ -116,12 +116,15 @@ export function aggregateScopes(
   if (repCpuModel !== undefined) esxFields.cpuModel = repCpuModel
   if (repCpuFrequencyGhz !== undefined) esxFields.cpuFrequencyGhz = repCpuFrequencyGhz
 
-  // RAM per server: representative with heterogeneity warning
-  if (ramPerServerValues.length > 0) {
-    esxFields.ramPerServerGb = ramPerServerValues[0]!
-    const uniqueRam = new Set(ramPerServerValues)
+  // RAM per server: host-count-weighted average
+  if (ramPerServerEntries.length > 0) {
+    const totalHosts = ramPerServerEntries.reduce((s, e) => s + e.hosts, 0)
+    esxFields.ramPerServerGb = Math.round(
+      ramPerServerEntries.reduce((s, e) => s + e.ram * e.hosts, 0) / totalHosts
+    )
+    const uniqueRam = new Set(ramPerServerEntries.map(e => e.ram))
     if (uniqueRam.size > 1) {
-      allWarnings.push('Heterogeneous RAM/server detected across clusters -- using first cluster as representative.')
+      allWarnings.push('Heterogeneous RAM/server detected across clusters -- using host-count-weighted average.')
     }
   }
 
