@@ -86,13 +86,39 @@ export async function exportPdf(
   const MARGIN = 14
   const CONTENT_W = PAGE_W - 2 * MARGIN
   let y = MARGIN
+  const dateStr = new Date().toLocaleDateString()
+  void 0 // NAVY and BLUE_HEX used via RGB in setFillColor/setTextColor
 
   /** Add a new page if remaining space is insufficient */
   function ensureSpace(needed: number): void {
     if (y + needed > PAGE_H - MARGIN) {
       doc.addPage()
+      addPageFooter()
       y = MARGIN
     }
+  }
+
+  /** Add consistent footer to current page */
+  function addPageFooter(): void {
+    const pageNum = doc.getNumberOfPages()
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7)
+    doc.setTextColor(150)
+    doc.text(`Presizion  |  ${dateStr}  |  Page ${pageNum}`, PAGE_W / 2, PAGE_H - 6, { align: 'center' })
+    doc.setTextColor(0) // reset to black
+  }
+
+  /** Draw a large KPI number with label below */
+  function drawKpi(x: number, value: string, label: string): void {
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(28)
+    doc.setTextColor(59, 130, 246) // blue
+    doc.text(value, x, y, { align: 'center' })
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(107, 114, 128) // gray
+    doc.text(label, x, y + 7, { align: 'center' })
+    doc.setTextColor(0) // reset
   }
 
   /** Get finalY from the last autoTable call */
@@ -100,46 +126,68 @@ export async function exportPdf(
     return (doc as unknown as JsPdfWithAutoTable).lastAutoTable?.finalY ?? fallback
   }
 
-  // ── 4. Title page ──────────────────────────────────────────────────────
+  // ── 4. Title page (dark navy background) ────────────────────────────
+
+  // Navy background
+  doc.setFillColor(30, 58, 95) // NAVY
+  doc.rect(0, 0, PAGE_W, PAGE_H, 'F')
 
   // Logo
   try {
     const logoUrl = await getLogoDataUrl()
     if (logoUrl) {
-      doc.addImage(logoUrl, 'PNG', PAGE_W / 2 - 40, 20, 80, 20, 'presizion-logo')
+      doc.addImage(logoUrl, 'PNG', MARGIN, 30, 80, 20, 'presizion-logo')
     }
-  } catch { /* logo is optional — continue without it */ }
+  } catch { /* logo is optional */ }
 
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(22)
-  doc.text('Cluster Sizing Report', PAGE_W / 2, 60, { align: 'center' })
+  doc.setFontSize(28)
+  doc.setTextColor(255) // white
+  doc.text('Cluster Sizing Report', MARGIN, 75)
 
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(12)
-  doc.text(`Generated: ${new Date().toLocaleDateString()}`, PAGE_W / 2, 75, { align: 'center' })
+  doc.setFontSize(14)
+  doc.setTextColor(200) // light gray
+  doc.text(
+    `${cluster.totalVms} VMs  |  ${cluster.totalVcpus} vCPUs  |  ${cluster.totalPcores} pCores  |  ${scenarios.length} scenario${scenarios.length > 1 ? 's' : ''}`,
+    MARGIN, 90,
+  )
 
-  y = 95
   doc.setFontSize(11)
-  doc.text(`Total VMs: ${cluster.totalVms.toLocaleString()}`, MARGIN, y)
-  y += 7
-  doc.text(`Total vCPUs: ${cluster.totalVcpus.toLocaleString()}`, MARGIN, y)
-  y += 7
-  doc.text(`Total pCores: ${cluster.totalPcores.toLocaleString()}`, MARGIN, y)
+  doc.setTextColor(150)
+  doc.text(dateStr, MARGIN, 105)
 
   if (cluster.existingServerCount !== undefined) {
-    y += 7
-    doc.text(`Existing Servers: ${cluster.existingServerCount}`, MARGIN, y)
+    doc.text(`Existing servers: ${cluster.existingServerCount}`, MARGIN, 115)
   }
 
+  doc.setTextColor(0) // reset to black
   doc.addPage()
+  addPageFooter()
   y = MARGIN
 
-  // ── 5. Executive summary table ─────────────────────────────────────────
+  // ── 5. Executive summary with KPI callouts ──────────────────────────
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
+  doc.setTextColor(59, 130, 246) // blue
   doc.text('Executive Summary', MARGIN, y)
-  y += 8
+  doc.setTextColor(0)
+  y += 12
+
+  // KPI callout numbers
+  const bestResult = results[0]
+  if (bestResult) {
+    const kpiY = y
+    const colW = CONTENT_W / 4
+    drawKpi(MARGIN + colW * 0.5, String(cluster.existingServerCount ?? '?'), 'As-Is Servers')
+    drawKpi(MARGIN + colW * 1.5, String(bestResult.finalCount), `${scenarios[0]?.name ?? 'Target'} Servers`)
+    y = kpiY
+    drawKpi(MARGIN + colW * 2.5, `${bestResult.cpuUtilizationPercent.toFixed(0)}%`, 'CPU Utilization')
+    y = kpiY
+    drawKpi(MARGIN + colW * 3.5, `${bestResult.ramUtilizationPercent.toFixed(0)}%`, 'RAM Utilization')
+    y = kpiY + 18
+  }
 
   autoTable(doc, {
     startY: y,
@@ -167,7 +215,9 @@ export async function exportPdf(
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
+  doc.setTextColor(59, 130, 246)
   doc.text('As-Is vs To-Be Comparison', MARGIN, y)
+  doc.setTextColor(0)
   y += 8
 
   const asIsServerConfig =
@@ -275,7 +325,9 @@ export async function exportPdf(
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
+  doc.setTextColor(59, 130, 246)
   doc.text('Sizing Assumptions', MARGIN, y)
+  doc.setTextColor(0)
   y += 8
 
   // General assumptions table
@@ -440,7 +492,9 @@ export async function exportPdf(
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
+  doc.setTextColor(59, 130, 246)
   doc.text('Per-Scenario Server Configuration', MARGIN, y)
+  doc.setTextColor(0)
   y += 8
 
   const serverConfigHead = ['Parameter', ...scenarios.map((s) => s.name)]
@@ -572,7 +626,8 @@ export async function exportPdf(
   // NOTE: The detailed As-Is vs To-Be comparison is in section 5b above.
   // This final comparison table provides a concise side-by-side recap.
 
-  // ── 8. Save ────────────────────────────────────────────────────────────
+  // ── 8. Add footer to last page and save ────────────────────────────────
 
+  addPageFooter()
   doc.save('presizion-sizing-report.pdf')
 }
