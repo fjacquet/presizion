@@ -227,4 +227,4 @@ Plans:
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
-| 24. Average VM Metrics | 1/1 | Complete   | 2026-03-15 | - |
+| 24. Average VM Metrics | 1/1 | Complete    | 2026-03-15 | - |

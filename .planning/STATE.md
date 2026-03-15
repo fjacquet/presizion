@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: — Import UX & Scope Fixes
 status: executing
-stopped_at: Completed 23-02-PLAN.md (host count display in scope selectors)
-last_updated: "2026-03-15T16:22:55.615Z"
-last_activity: 2026-03-15 — Completed 23-02 host count display in scope selectors
+stopped_at: Completed 24-01-PLAN.md (avg per-VM metrics in DerivedMetricsPanel)
+last_updated: "2026-03-15T16:51:37.703Z"
+last_activity: 2026-03-15 — Completed 24-01 avg per-VM metrics in DerivedMetricsPanel
 progress:
   total_phases: 7
   completed_phases: 7
