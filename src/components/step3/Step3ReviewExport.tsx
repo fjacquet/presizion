@@ -22,6 +22,7 @@ import { encodeSessionToHash } from '@/lib/utils/persistence'
 import { exportPdf } from '@/lib/utils/exportPdf'
 import { exportPptx } from '@/lib/utils/exportPptx'
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
+import { STORE_PREDICT_URL } from '@/lib/config'
 
 export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
@@ -132,6 +133,18 @@ export function Step3ReviewExport() {
         <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
           {pptxLoading ? 'Generating...' : 'Export PPTX'}
         </Button>
+      </div>
+
+      <div className="flex items-center gap-4 text-sm text-muted-foreground print:hidden">
+        <span>External tools:</span>
+        <a
+          href={STORE_PREDICT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-primary underline-offset-3 hover:underline"
+        >
+          Storage Calculator (Store-Predict)
+        </a>
       </div>
 
       <ComparisonTable />

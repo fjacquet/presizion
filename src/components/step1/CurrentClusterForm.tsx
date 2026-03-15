@@ -255,7 +255,8 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         // Clipboard API may fail in non-secure contexts; proceed anyway
       }
     }
-    window.open('https://www.spec.org/cgi-bin/osgresults?conf=rint2017;op=form', '_blank', 'noopener,noreferrer')
+    const { SPEC_RESULTS_URL } = await import('@/lib/config')
+    window.open(SPEC_RESULTS_URL, '_blank', 'noopener,noreferrer')
   }
 
   async function handleNext() {
