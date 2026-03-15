@@ -15,6 +15,7 @@ export function ScopeBadge() {
   const scopeOptions = useImportStore((s) => s.scopeOptions)
   const activeScope = useImportStore((s) => s.activeScope)
   const scopeLabels = useImportStore((s) => s.scopeLabels)
+  const rawByScope = useImportStore((s) => s.rawByScope)
   const setActiveScope = useImportStore((s) => s.setActiveScope)
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -23,8 +24,14 @@ export function ScopeBadge() {
   // Only render for multi-scope imports
   if (scopeOptions.length <= 1) return null
 
+  const formatScopeLabel = (k: string): string => {
+    const label = scopeLabels[k] ?? k
+    const hostCount = rawByScope?.get(k)?.existingServerCount
+    return hostCount != null ? `${label} (${hostCount} hosts)` : label
+  }
+
   const activeLabels = activeScope
-    .map((k) => scopeLabels[k] ?? k)
+    .map(formatScopeLabel)
     .join(', ')
 
   const openDialog = () => {
@@ -75,7 +82,7 @@ export function ScopeBadge() {
                   htmlFor={`badge-scope-${key}`}
                   className="text-sm cursor-pointer"
                 >
-                  {scopeLabels[key] ?? key}
+                  {formatScopeLabel(key)}
                 </label>
               </div>
             ))}

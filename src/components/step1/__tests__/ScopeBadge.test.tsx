@@ -16,10 +16,16 @@ vi.mock('@/store/useImportStore', () => ({
 // Fixtures
 const mockSetActiveScope = vi.fn()
 
+const MULTI_SCOPE_RAW_BY_SCOPE = new Map([
+  ['DC1||CL-A', { totalVcpus: 80, totalVms: 40, totalDiskGb: 800, avgRamPerVmGb: 8, vmCount: 40, existingServerCount: 4, warnings: [] }],
+  ['DC1||CL-B', { totalVcpus: 40, totalVms: 20, totalDiskGb: 400, avgRamPerVmGb: 10, vmCount: 20, existingServerCount: 3, warnings: [] }],
+])
+
 const MULTI_SCOPE_STATE = {
   scopeOptions: ['DC1||CL-A', 'DC1||CL-B'],
   activeScope: ['DC1||CL-A', 'DC1||CL-B'],
   scopeLabels: { 'DC1||CL-A': 'CL-A (DC1)', 'DC1||CL-B': 'CL-B (DC1)' },
+  rawByScope: MULTI_SCOPE_RAW_BY_SCOPE,
   setActiveScope: mockSetActiveScope,
 }
 
@@ -27,6 +33,7 @@ const SINGLE_SCOPE_STATE = {
   scopeOptions: ['__all__'],
   activeScope: ['__all__'],
   scopeLabels: { __all__: 'All' },
+  rawByScope: null,
   setActiveScope: mockSetActiveScope,
 }
 
@@ -34,6 +41,7 @@ const EMPTY_STATE = {
   scopeOptions: [],
   activeScope: [],
   scopeLabels: {},
+  rawByScope: null,
   setActiveScope: mockSetActiveScope,
 }
 
@@ -68,7 +76,7 @@ describe('ScopeBadge', () => {
     it('shows active scope labels joined with comma when scopeOptions.length > 1', () => {
       setupStore(MULTI_SCOPE_STATE)
       render(<ScopeBadge />)
-      expect(screen.getByText('CL-A (DC1), CL-B (DC1)')).toBeInTheDocument()
+      expect(screen.getByText('CL-A (DC1) (4 hosts), CL-B (DC1) (3 hosts)')).toBeInTheDocument()
     })
 
     it('renders "Scope:" label text', () => {
@@ -105,12 +113,12 @@ describe('ScopeBadge', () => {
       expect(checkboxes).toHaveLength(2)
     })
 
-    it('renders scope labels in dialog', async () => {
+    it('renders scope labels with host count in dialog', async () => {
       setupStore(MULTI_SCOPE_STATE)
       render(<ScopeBadge />)
       await userEvent.click(screen.getByRole('button', { name: /edit scope/i }))
-      expect(screen.getByText('CL-A (DC1)')).toBeInTheDocument()
-      expect(screen.getByText('CL-B (DC1)')).toBeInTheDocument()
+      expect(screen.getByText('CL-A (DC1) (4 hosts)')).toBeInTheDocument()
+      expect(screen.getByText('CL-B (DC1) (3 hosts)')).toBeInTheDocument()
     })
   })
 
@@ -160,6 +168,22 @@ describe('ScopeBadge', () => {
       expect(screen.getByText('Select active clusters')).toBeInTheDocument()
       await userEvent.click(screen.getByRole('button', { name: /apply/i }))
       expect(screen.queryByText('Select active clusters')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Test 10 (SCOPE-10): host count displayed in scope labels', () => {
+    it('shows host count in badge text when rawByScope has existingServerCount', () => {
+      setupStore(MULTI_SCOPE_STATE)
+      render(<ScopeBadge />)
+      expect(screen.getByText(/4 hosts/)).toBeInTheDocument()
+      expect(screen.getByText(/3 hosts/)).toBeInTheDocument()
+    })
+
+    it('does not show host count when rawByScope is null', () => {
+      setupStore({ ...MULTI_SCOPE_STATE, rawByScope: null })
+      render(<ScopeBadge />)
+      expect(screen.getByText('CL-A (DC1), CL-B (DC1)')).toBeInTheDocument()
+      expect(screen.queryByText(/hosts/)).not.toBeInTheDocument()
     })
   })
 

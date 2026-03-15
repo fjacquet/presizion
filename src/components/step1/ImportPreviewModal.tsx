@@ -26,25 +26,31 @@ interface ScopeSelectorProps {
   scopeLabels: Record<string, string>
   selectedScopes: string[]
   onToggle: (key: string, checked: boolean) => void
+  rawByScope?: Map<string, ScopeData>
 }
 
-function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle }: ScopeSelectorProps) {
+function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, rawByScope }: ScopeSelectorProps) {
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium">Filter by cluster</p>
       <div className="space-y-1">
-        {detectedScopes.map((key) => (
-          <div key={key} className="flex items-center gap-2">
-            <Checkbox
-              id={`scope-${key}`}
-              checked={selectedScopes.includes(key)}
-              onCheckedChange={(checked) => onToggle(key, checked)}
-            />
-            <label htmlFor={`scope-${key}`} className="text-sm cursor-pointer">
-              {scopeLabels[key] ?? key}
-            </label>
-          </div>
-        ))}
+        {detectedScopes.map((key) => {
+          const hostCount = rawByScope?.get(key)?.existingServerCount
+          const label = scopeLabels[key] ?? key
+          const displayLabel = hostCount != null ? `${label} (${hostCount} hosts)` : label
+          return (
+            <div key={key} className="flex items-center gap-2">
+              <Checkbox
+                id={`scope-${key}`}
+                checked={selectedScopes.includes(key)}
+                onCheckedChange={(checked) => onToggle(key, checked)}
+              />
+              <label htmlFor={`scope-${key}`} className="text-sm cursor-pointer">
+                {displayLabel}
+              </label>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -130,6 +136,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               scopeLabels={result.scopeLabels}
               selectedScopes={selectedScopes}
               onToggle={handleToggle}
+              rawByScope={'rawByScope' in result ? result.rawByScope ?? undefined : undefined}
             />
           )}
 

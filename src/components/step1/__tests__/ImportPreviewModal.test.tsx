@@ -51,6 +51,7 @@ const SCOPE_A_DATA = {
   totalDiskGb: 800,
   avgRamPerVmGb: 8,
   vmCount: 40,
+  existingServerCount: 4,
   warnings: [],
 }
 
@@ -60,6 +61,7 @@ const SCOPE_B_DATA = {
   totalDiskGb: 400,
   avgRamPerVmGb: 10,
   vmCount: 20,
+  existingServerCount: 3,
   warnings: [],
 }
 
@@ -136,8 +138,31 @@ describe('ImportPreviewModal', () => {
 
     it('renders scope labels as checkbox labels', () => {
       render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
+      expect(screen.getByText('CL-A (DC1) (4 hosts)')).toBeInTheDocument()
+      expect(screen.getByText('CL-B (DC1) (3 hosts)')).toBeInTheDocument()
+    })
+  })
+
+  describe('Test 9 (SCOPE-10): host count displayed in scope labels', () => {
+    it('shows host count in parentheses when existingServerCount is available', () => {
+      render(<ImportPreviewModal result={MULTI_SCOPE_RESULT} {...defaultProps} />)
+      expect(screen.getByText(/4 hosts/)).toBeInTheDocument()
+      expect(screen.getByText(/3 hosts/)).toBeInTheDocument()
+    })
+
+    it('does not show host count when existingServerCount is absent', () => {
+      const noHostCountScope = new Map([
+        ['DC1||CL-A', { ...SCOPE_A_DATA, existingServerCount: undefined }],
+        ['DC1||CL-B', { ...SCOPE_B_DATA, existingServerCount: undefined }],
+      ])
+      const resultNoHosts: ClusterImportResult = {
+        ...MULTI_SCOPE_RESULT,
+        rawByScope: noHostCountScope as never,
+      }
+      render(<ImportPreviewModal result={resultNoHosts} {...defaultProps} />)
       expect(screen.getByText('CL-A (DC1)')).toBeInTheDocument()
       expect(screen.getByText('CL-B (DC1)')).toBeInTheDocument()
+      expect(screen.queryByText(/hosts/)).not.toBeInTheDocument()
     })
   })
 
