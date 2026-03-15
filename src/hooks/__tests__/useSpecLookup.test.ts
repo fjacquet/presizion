@@ -8,10 +8,9 @@ vi.mock('@/lib/utils/specLookup', () => ({
 }))
 
 import { useSpecLookup } from '../useSpecLookup'
-import { cpuModelToSlug, fetchSpecResults } from '@/lib/utils/specLookup'
+import { fetchSpecResults } from '@/lib/utils/specLookup'
 
 const mockFetch = vi.mocked(fetchSpecResults)
-const mockSlug = vi.mocked(cpuModelToSlug)
 
 const SAMPLE_RESULTS = [
   { vendor: 'Dell', system: 'PowerEdge R660', baseResult: 337, peakResult: 400, cores: 32, chips: 2 },
@@ -75,17 +74,14 @@ describe('useSpecLookup', () => {
       expect(result.current.status).toBe('ok')
     })
 
-    expect(mockSlug).toHaveBeenCalledWith('Intel Xeon Gold 6526Y')
-    expect(mockFetch).toHaveBeenCalled()
+    expect(mockFetch).toHaveBeenCalledWith('Intel Xeon Gold 6526Y')
   })
 
-  it('does not fetch when cpuModelToSlug returns empty string', () => {
-    mockSlug.mockReturnValueOnce('')
+  it('returns no-results for whitespace-only input', () => {
     const { result } = renderHook(() => useSpecLookup('   '))
 
     expect(result.current.results).toEqual([])
     expect(result.current.status).toBe('no-results')
-    expect(mockFetch).not.toHaveBeenCalled()
   })
 
   it('re-fetches when cpuModel changes', async () => {

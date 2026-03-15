@@ -1,8 +1,10 @@
 /**
- * SPEC Lookup Service — slug derivation + fetch for SPECrate2017 results.
+ * SPEC Lookup Service -- slug derivation + fetch for SPECrate2017 results.
  *
  * Converts CPU model strings to URL-safe slugs matching the spec-search
  * GitHub Pages API, then fetches and filters CINT2017rate benchmark data.
+ * Falls back to facets.json for partial model name matching.
+ * Dell vendor results are sorted first (presales tool preference).
  */
 
 import { SPEC_SEARCH_API_URL } from '../config'
@@ -42,6 +44,11 @@ interface RawSpecResponse {
   results: RawSpecEntry[]
 }
 
+/** Shape of the facets.json response */
+interface FacetsResponse {
+  processors: string[]
+}
+
 /* ------------------------------------------------------------------ */
 /*  Slug Derivation                                                    */
 /* ------------------------------------------------------------------ */
@@ -49,39 +56,50 @@ interface RawSpecResponse {
 /**
  * Convert a CPU model string to a URL-safe slug matching the spec-search
  * API convention (derived from convert_csv.py).
- *
- * Algorithm:
- *  1. Lowercase
- *  2. Strip noise: (r), (tm), cpu, processor, clock patterns, core-count patterns
- *  3. Replace non-alphanumeric sequences with a single hyphen
- *  4. Trim leading/trailing hyphens
  */
 export function cpuModelToSlug(model: string): string {
   if (!model.trim()) return ''
 
   let slug = model.toLowerCase()
-
-  // Strip trademarked noise
   slug = slug.replace(/\(r\)/g, '')
   slug = slug.replace(/\(tm\)/g, '')
-
-  // Strip "cpu" and "processor" keywords
   slug = slug.replace(/\bcpu\b/g, '')
   slug = slug.replace(/\bprocessor\b/g, '')
-
-  // Strip clock speed patterns like "@ 2.40ghz" or "2.40 ghz"
   slug = slug.replace(/@?\s*\d+(\.\d+)?\s*ghz/g, '')
-
-  // Strip core-count patterns like "96-core"
   slug = slug.replace(/\d+-core/g, '')
-
-  // Replace all non-alphanumeric sequences with a single hyphen
   slug = slug.replace(/[^a-z0-9]+/g, '-')
-
-  // Trim leading/trailing hyphens
   slug = slug.replace(/^-+|-+$/g, '')
 
   return slug
+}
+
+/* ------------------------------------------------------------------ */
+/*  Facets cache (fetched once, reused for partial matching)           */
+/* ------------------------------------------------------------------ */
+
+let cachedProcessors: string[] | null = null
+
+async function getProcessorList(): Promise<string[]> {
+  if (cachedProcessors) return cachedProcessors
+  try {
+    const res = await fetch(`${SPEC_SEARCH_API_URL}/data/facets.json`)
+    if (!res.ok) return []
+    const data: FacetsResponse = await res.json()
+    cachedProcessors = data.processors ?? []
+    return cachedProcessors
+  } catch {
+    return []
+  }
+}
+
+/** Sort Dell vendor results first, then by baseResult descending */
+function sortDellFirst(results: SpecResult[]): SpecResult[] {
+  return [...results].sort((a, b) => {
+    const aIsDell = a.vendor.toLowerCase().includes('dell') ? 0 : 1
+    const bIsDell = b.vendor.toLowerCase().includes('dell') ? 0 : 1
+    if (aIsDell !== bIsDell) return aIsDell - bIsDell
+    return b.baseResult - a.baseResult
+  })
 }
 
 /* ------------------------------------------------------------------ */
@@ -89,19 +107,51 @@ export function cpuModelToSlug(model: string): string {
 /* ------------------------------------------------------------------ */
 
 /**
- * Fetch SPECrate2017 CINT benchmark results for a given CPU slug.
+ * Fetch SPECrate2017 CINT benchmark results for a given CPU model or slug.
  *
- * - On success with matches: `{ results: [...], status: 'ok' }`
- * - On 200 but no CINT2017rate matches: `{ results: [], status: 'no-results' }`
- * - On network error or non-200: `{ results: [], status: 'error' }`
+ * Strategy:
+ * 1. Try exact slug: `processors/{slug}.json`
+ * 2. If 404, search facets.json for processor names containing the input
+ * 3. Fetch the best matching processor's JSON
+ * 4. Dell vendor results sorted first
  */
-export async function fetchSpecResults(slug: string): Promise<SpecLookupResult> {
+export async function fetchSpecResults(input: string): Promise<SpecLookupResult> {
+  const slug = cpuModelToSlug(input)
+  if (!slug) return { results: [], status: 'no-results' }
+
+  // Attempt 1: exact slug
+  const exactResult = await fetchBySlug(slug)
+  if (exactResult.status === 'ok') return exactResult
+
+  // Attempt 2: partial match via facets
+  const processors = await getProcessorList()
+  const inputLower = input.toLowerCase()
+  const matches = processors.filter(p => p.toLowerCase().includes(inputLower))
+
+  if (matches.length === 0) {
+    // Try matching the slug against processor slugs
+    const slugMatches = processors.filter(p => cpuModelToSlug(p).includes(slug))
+    if (slugMatches.length > 0) {
+      const bestSlug = cpuModelToSlug(slugMatches[0]!)
+      return fetchBySlug(bestSlug)
+    }
+    return { results: [], status: 'no-results' }
+  }
+
+  // Fetch the first match
+  const bestMatch = matches[0]!
+  const matchSlug = cpuModelToSlug(bestMatch)
+  return fetchBySlug(matchSlug)
+}
+
+/** Fetch and filter results for a specific processor slug */
+async function fetchBySlug(slug: string): Promise<SpecLookupResult> {
   try {
     const url = `${SPEC_SEARCH_API_URL}/data/processors/${slug}.json`
     const response = await fetch(url)
 
     if (!response.ok) {
-      return { results: [], status: 'error' }
+      return { results: [], status: response.status === 404 ? 'no-results' : 'error' }
     }
 
     const data: RawSpecResponse = await response.json()
@@ -121,7 +171,7 @@ export async function fetchSpecResults(slug: string): Promise<SpecLookupResult> 
       return { results: [], status: 'no-results' }
     }
 
-    return { results: filtered, status: 'ok' }
+    return { results: sortDellFirst(filtered), status: 'ok' }
   } catch {
     return { results: [], status: 'error' }
   }

@@ -227,7 +227,10 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     // eslint-disable-next-line react-hooks/incompatible-library
     const { unsubscribe } = form.watch(() => {
       if (form.formState.isValid) {
-        setCurrentCluster(form.getValues() as OldCluster)
+        // Merge form values over existing cluster to preserve non-form fields
+        // (cpuModel, cpuFrequencyGhz, avgRamPerVmGb, etc.)
+        const existing = useClusterStore.getState().currentCluster
+        setCurrentCluster({ ...existing, ...form.getValues() } as OldCluster)
       }
     })
     return unsubscribe

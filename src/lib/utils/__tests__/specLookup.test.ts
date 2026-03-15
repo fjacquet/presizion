@@ -109,24 +109,23 @@ describe('fetchSpecResults', () => {
     expect(result.results[0]!.vendor).toBe('Dell Inc.')
   })
 
-  it('returns empty array with error status on network failure', async () => {
+  it('returns no-results when network fails for both slug and facets', async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
     const result = await fetchSpecResults('invalid-slug')
 
-    expect(result.status).toBe('error')
+    expect(result.status).toBe('no-results')
     expect(result.results).toEqual([])
   })
 
-  it('returns empty array with error status on non-200 response', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-    })
+  it('returns no-results when slug 404s and facets has no match', async () => {
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 404 }) // slug fetch
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ processors: ['AMD EPYC 9004'] }) }) // facets
 
     const result = await fetchSpecResults('nonexistent-cpu')
 
-    expect(result.status).toBe('error')
+    expect(result.status).toBe('no-results')
     expect(result.results).toEqual([])
   })
 

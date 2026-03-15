@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { cpuModelToSlug, fetchSpecResults, type SpecResult, type SpecLookupResult } from '@/lib/utils/specLookup'
+import { fetchSpecResults, type SpecResult, type SpecLookupResult } from '@/lib/utils/specLookup'
 
 interface UseSpecLookupReturn {
   results: SpecResult[]
@@ -26,18 +26,10 @@ export function useSpecLookup(cpuModel: string | undefined): UseSpecLookupReturn
       return
     }
 
-    const slug = cpuModelToSlug(cpuModel)
-    if (!slug) {
-      setResults([])
-      setStatus('no-results')
-      setIsLoading(false)
-      return
-    }
-
     let cancelled = false
     setIsLoading(true)
 
-    fetchSpecResults(slug).then((result) => {
+    fetchSpecResults(cpuModel).then((result) => {
       if (!cancelled) {
         setResults(result.results)
         setStatus(result.status)
