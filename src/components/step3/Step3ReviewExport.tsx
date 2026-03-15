@@ -24,6 +24,8 @@ import { useWizardStore } from '@/store/useWizardStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
 import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
 import { encodeSessionToHash } from '@/lib/utils/persistence'
+import { exportPptx } from '@/lib/utils/exportPptx'
+import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
 
 export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
@@ -31,8 +33,10 @@ export function Step3ReviewExport() {
   const results = useScenariosResults()
   const sizingMode = useWizardStore((state) => state.sizingMode)
   const layoutMode = useWizardStore((state) => state.layoutMode)
+  const breakdowns = useVsanBreakdowns()
   const [copied, setCopied] = useState(false)
   const [shared, setShared] = useState(false)
+  const [pptxLoading, setPptxLoading] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   /** Shared chart container refs for PDF/PPTX export (Plans 02 & 03) */
@@ -85,6 +89,15 @@ export function Step3ReviewExport() {
     }, 2000)
   }
 
+  const handleExportPptx = async (): Promise<void> => {
+    setPptxLoading(true)
+    try {
+      await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+    } finally {
+      setPptxLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -106,6 +119,9 @@ export function Step3ReviewExport() {
         </Button>
         <Button variant="outline" onClick={() => { void handleShare() }}>
           {shared ? 'Link Copied!' : 'Share'}
+        </Button>
+        <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
+          {pptxLoading ? 'Generating...' : 'Export PPTX'}
         </Button>
       </div>
 
