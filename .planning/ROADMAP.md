@@ -57,7 +57,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 - [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
 - [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
 - [x] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard (completed 2026-03-15)
-- [ ] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download
+- [x] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download (completed 2026-03-15)
 - [ ] **Phase 22: PDF Report Export** - Client-side PDF generation with jsPDF + capacity tables + embedded chart images
 
 ## Phase Details
@@ -130,7 +130,7 @@ Plans:
   2. A min-nodes-per-constraint horizontal bar chart renders showing the minimum node count driven by CPU, Memory, Storage, FT&HA, and VMs, clearly indicating which constraint is binding
   3. Both charts use the existing CHART_COLORS professional palette and are consistent with existing chart styling
   4. Both charts have a PNG download button that saves the chart as an image file
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 21-01-PLAN.md — CapacityStackedChart + MinNodesChart components with tests, wired into Step3ReviewExport
@@ -173,5 +173,5 @@ Plans:
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
 | 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
-| 21. Capacity Charts | v2.0 | 0/1 | Not started | - |
+| 21. Capacity Charts | 1/1 | Complete   | 2026-03-15 | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |

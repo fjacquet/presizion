@@ -96,10 +96,10 @@
 | FORM-02 | Phase 20 | Complete |
 | FORM-03 | Phase 20 | Complete |
 | FORM-04 | Phase 20 | Complete |
-| VIZ-01 | Phase 21 | Pending |
-| VIZ-02 | Phase 21 | Pending |
-| VIZ-03 | Phase 21 | Pending |
-| VIZ-04 | Phase 21 | Pending |
+| VIZ-01 | Phase 21 | Complete |
+| VIZ-02 | Phase 21 | Complete |
+| VIZ-03 | Phase 21 | Complete |
+| VIZ-04 | Phase 21 | Complete |
 | PDF-01 | Phase 22 | Pending |
 | PDF-02 | Phase 22 | Pending |
 | PDF-03 | Phase 22 | Pending |

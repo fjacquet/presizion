@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
 status: completed
-stopped_at: Completed 20-01-PLAN.md
+stopped_at: Completed 21-01-PLAN.md
 last_updated: "2026-03-15T05:51:58.742Z"
-last_activity: 2026-03-15 — Phase 20 Plan 01 complete (vSAN & Growth collapsible form section, 12 new tests, 4 files)
+last_activity: 2026-03-15 — Phase 21 Plan 01 complete (CapacityStackedChart + MinNodesChart with PNG download, 14 new tests, 5 files)
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 86
+  completed_phases: 4
+  total_plans: 7
+  completed_plans: 7
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.0 Phase 20 — Scenario Form vSAN & Growth UI
+**Current focus:** v2.0 Phase 21 — Capacity Charts
 
 ## Current Position
 
-Phase: 20 of 22 (Scenario Form vSAN & Growth UI)
+Phase: 21 of 22 (Capacity Charts)
 Plan: 1 of 1 complete
 Status: Phase Complete
-Last activity: 2026-03-15 — Phase 20 Plan 01 complete (vSAN & Growth collapsible form section, 12 new tests, 4 files)
+Last activity: 2026-03-15 — Phase 21 Plan 01 complete (CapacityStackedChart + MinNodesChart with PNG download, 14 new tests, 5 files)
 
-Progress: [████████░░] 86%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -51,9 +51,10 @@ Progress: [████████░░] 86%
 | 19 | 3/3 | 7min | 2min |
 
 | 20 | 1/1 | 4min | 4min |
+| 21 | 1/1 | 4min | 4min |
 
 *Updated after each plan completion*
-| Phase 20 P01 | 4min | 2 tasks | 4 files |
+| Phase 21 P01 | 4min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 20-01]: Native <select> for FTT/Compression dropdowns (consistent with Input styling via Tailwind classes)
 - [Phase 20-01]: Controlled collapse state in ScenarioCard (open/onToggle props), VsanGrowthSection purely presentational
 - [Phase 20-01]: No .default() on optional numeric vSAN fields -- absent = legacy path (VSAN-12)
+- [Phase 21-01]: Recharts custom label returns invisible <text> element (not null) to satisfy ImplicitLabelType
+- [Phase 21-01]: Callback-ref pattern (useRef<Record<string, HTMLDivElement | null>>) for per-scenario chart refs
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15T05:47:39Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-15T06:15:56Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None
