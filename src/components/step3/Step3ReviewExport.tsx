@@ -35,6 +35,8 @@ export function Step3ReviewExport() {
   const [shared, setShared] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** Shared chart container refs for PDF/PPTX export (Plans 02 & 03) */
+  const chartRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Clear timeouts on unmount to prevent memory leak / setState-after-unmount warning
   useEffect(() => {
@@ -112,8 +114,8 @@ export function Step3ReviewExport() {
       <div className="print:hidden space-y-8">
         <SizingChart />
         <CoreCountChart />
-        <CapacityStackedChart />
-        <MinNodesChart />
+        <CapacityStackedChart chartRefs={chartRefs} />
+        <MinNodesChart chartRefs={chartRefs} />
       </div>
     </div>
   )

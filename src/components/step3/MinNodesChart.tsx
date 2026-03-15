@@ -32,13 +32,18 @@ interface ConstraintRow {
   readonly isBinding: boolean
 }
 
+interface MinNodesChartProps {
+  /** When provided, chart container refs are written here for PDF/PPTX export capture. */
+  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+}
+
 /**
  * Horizontal bar chart showing minimum node count per constraint.
  * The binding constraint (highest node count) is highlighted in blue;
  * non-binding constraints are slate-400.
  * One chart per scenario, each with a Download PNG button.
  */
-export function MinNodesChart() {
+export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
   const scenarios = useScenariosStore((s) => s.scenarios)
   const breakdowns = useVsanBreakdowns()
   const refs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -87,7 +92,10 @@ export function MinNodesChart() {
                 Download PNG
               </Button>
             </div>
-            <div ref={(el) => { refs.current[scenarioId] = el }}>
+            <div ref={(el) => {
+              refs.current[scenarioId] = el
+              if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el
+            }}>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart
                   data={constraintRows}

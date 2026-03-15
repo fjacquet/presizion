@@ -80,13 +80,18 @@ function normalizeRow(abs: AbsoluteRow): ChartRow {
   return { name: abs.name, required: reqPct, spare: sparePct, excess: excessPct }
 }
 
+interface CapacityStackedChartProps {
+  /** When provided, chart container refs are written here for PDF/PPTX export capture. */
+  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+}
+
 /**
  * Stacked horizontal bar chart showing capacity breakdown per scenario.
  * Rows: CPU GHz, Memory GiB, Raw Storage TiB, Usable Storage TiB.
  * Segments: Required (blue), Spare (green), Excess (amber).
  * One chart per scenario, each with a Download PNG button.
  */
-export function CapacityStackedChart() {
+export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = {}) {
   const scenarios = useScenariosStore((s) => s.scenarios)
   const layoutMode = useWizardStore((s) => s.layoutMode)
   const breakdowns = useVsanBreakdowns()
@@ -185,7 +190,10 @@ export function CapacityStackedChart() {
                 Download PNG
               </Button>
             </div>
-            <div ref={(el) => { refs.current[scenarioId] = el }}>
+            <div ref={(el) => {
+              refs.current[scenarioId] = el
+              if (chartRefs) chartRefs.current[`capacity-${scenarioId}`] = el
+            }}>
               <ResponsiveContainer width="100%" height={showStorage ? 220 : 130}>
                 <BarChart
                   data={chartRows}
