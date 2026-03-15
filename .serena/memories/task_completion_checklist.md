@@ -7,6 +7,7 @@ When finishing any coding task, run in order:
 3. `npm run build` — production build must succeed
 
 ## PR Checklist (from constitution)
+
 - [ ] Solution is simple (KISS) — could a plain function replace an abstraction?
 - [ ] No logic duplicated elsewhere (DRY)
 - [ ] Only building what is actually needed (YAGNI)

@@ -146,6 +146,7 @@ Both parsers detect datacenter and cluster scopes from VM-level rows. The scope 
 - If neither is present: `"__all__"`
 
 Scope labels are generated for display:
+
 - `"__all__"` becomes `"All"`
 - `"dc||cluster"` becomes `"cluster (dc)"`
 - Plain cluster name is used as-is
@@ -237,6 +238,7 @@ Fields containing commas, double quotes, or newlines are escaped per RFC 4180 (d
 ```
 
 Key details:
+
 - `schemaVersion` is `"1.1"`.
 - Optional cluster fields that are absent are serialized as `null` (not omitted).
 - Each scenario object includes its computed `result` inlined.

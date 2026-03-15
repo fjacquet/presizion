@@ -131,6 +131,7 @@ Export formats produce downloadable files from sizing results. The existing form
 ### Architecture
 
 Each export format has two functions:
+
 1. A **builder** that produces a string: `buildXxxContent(cluster, scenarios, results) => string`
 2. A **downloader** that triggers the browser download: `downloadXxx(filename, content) => void`
 

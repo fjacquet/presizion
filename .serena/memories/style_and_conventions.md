@@ -3,6 +3,7 @@
 Source: `docs/constitution.md`
 
 ## TypeScript
+
 - `strict: true`, `noImplicitAny`, `noUnusedLocals`, `noUnusedParameters`
 - **No `any`** — use `unknown` + narrowing instead
 - **Interfaces** for object shapes that may be extended (e.g. `OldCluster`, `Scenario`)
@@ -10,6 +11,7 @@ Source: `docs/constitution.md`
 - Explicit prop types on every component
 
 ## React
+
 - **Function components only** — no class components
 - One file = one main component
 - Components ≤ ~150 lines; extract if larger
@@ -18,17 +20,21 @@ Source: `docs/constitution.md`
 - No global state solution unless truly necessary
 
 ## Functional Style
+
 - Pure functions: same input → same output, no side effects
 - Immutable updates (spread, not mutation)
 - Composition over inheritance
 
 ## Naming
+
 - Components: PascalCase
 - Hooks: camelCase prefixed with `use`
 - Files: match component/hook name
 
 ## Commits
+
 - `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
 
 ## Key Structural Rule
+
 All sizing formulas and constants MUST live in `src/lib/sizing/` — never inline in components.

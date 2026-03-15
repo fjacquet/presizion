@@ -27,6 +27,7 @@ URL hash -> restore standard base64 -> atob() -> JSON.parse() -> Zod schema vali
 ```
 
 The implementation lives in `src/lib/utils/persistence.ts` as two pure functions:
+
 - `encodeSessionToHash(data: SessionData): string`
 - `decodeSessionFromHash(hash: string): SessionData | null`
 

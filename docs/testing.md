@@ -58,6 +58,7 @@ This convention keeps tests discoverable and close to the code they verify.
 Pure function tests for individual sizing formulas. These are the fastest and most deterministic tests in the suite.
 
 **Covered formulas**:
+
 - `serverCountByCpu` -- vCPU:pCore ratio hard cap (CALC-01)
 - `serverCountByRam` -- RAM-limited server count (CALC-02), with optional `ramUtilPct` (UTIL-03)
 - `serverCountByDisk` -- disk-limited server count (CALC-03)
@@ -66,6 +67,7 @@ Pure function tests for individual sizing formulas. These are the fastest and mo
 - `serverCountByGhz` -- GHz demand/capacity model (CALC-01-GHZ)
 
 **Patterns used**:
+
 - Named fixture constants (`F1`, `F2`, `F3`, `BOUNDARY`) with manually verified expected values documented inline
 - Floating-point safety assertions (`Math.abs(result - expected) < 0.001`)
 - Zero-guard edge cases (division by zero inputs return 0)
@@ -91,6 +93,7 @@ Each test group uses dedicated cluster+scenario fixture pairs with expected valu
 React component tests using React Testing Library. These test DOM output, user interactions, and store-driven conditional rendering.
 
 **Example**: `CurrentClusterForm.test.tsx` covers:
+
 - `INPUT-01`: Form fields for VM configuration render correctly
 - `INPUT-02`: Cluster totals fields are present
 - `INPUT-04`: Derived metrics panel updates reactively
@@ -105,6 +108,7 @@ React component tests using React Testing Library. These test DOM output, user i
 Tests for file import parsers (RVTools, LiveOptics). These mock the `@e965/xlsx` library to avoid real file I/O and focus on aggregation logic.
 
 **RVTools parser** (`rvtoolsParser.test.ts`):
+
 - Aggregates `totalVcpus` from the `CPUs` / `Num CPUs` column aliases
 - Excludes template VMs from counts
 - Computes `totalDiskGb` from `Provisioned MB` (converts MB to GB)
@@ -114,6 +118,7 @@ Tests for file import parsers (RVTools, LiveOptics). These mock the `@e965/xlsx`
 - Per-scope aggregation in `rawByScope`
 
 **LiveOptics parser** (`liveopticParser.test.ts`):
+
 - Same aggregation patterns but with LiveOptics column names (`Virtual CPU`, `Provisioned Memory (MiB)`, etc.)
 - Tests both XLSX and CSV code paths
 - ESX Hosts sheet extraction for CPU model and frequency
@@ -122,6 +127,7 @@ Tests for file import parsers (RVTools, LiveOptics). These mock the `@e965/xlsx`
 ### 5. Other Test Files
 
 The codebase includes additional test files for:
+
 - Store tests (`useWizardStore.test.ts`, `useImportStore.test.ts`, `useThemeStore.test.ts`)
 - Hook tests (`useScenariosResults.test.ts`, `useBeforeUnload.test.ts`)
 - Schema validation tests (`schemas.test.ts`)

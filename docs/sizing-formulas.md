@@ -399,12 +399,14 @@ leaving ~17% headroom before you need to add another server.
 ### Step-by-step
 
 **CALC-01 — CPU**
+
 ```
 cpuLimitedCount = ceil( 1334 × 1.20 / 4 / 64 )
                = ceil( 6.25 ) = 7
 ```
 
 **CALC-02 — RAM**
+
 ```
 ramLimitedCount = ceil( 450 × 16 × 0.80 × 1.20 / 1.0 / 512 )
                = ceil( 6912 / 512 )
@@ -412,12 +414,14 @@ ramLimitedCount = ceil( 450 × 16 × 0.80 × 1.20 / 1.0 / 512 )
 ```
 
 **CALC-03 — Disk**
+
 ```
 diskLimitedCount = ceil( 450 × 200 × 1.20 / 20000 )
                = ceil( 5.4 ) = 6
 ```
 
 **CALC-05 — Final count**
+
 ```
 rawCount = max( 7, 14, 6 ) = 14
 finalCount = 14  (no HA)
@@ -425,6 +429,7 @@ limitingResource = RAM
 ```
 
 **CALC-06 — Metrics**
+
 ```
 achievedVcpuToPCoreRatio = 1334 / (14 × 64) = 1334 / 896 ≈ 1.49  ✓ (< 4)
 

@@ -30,6 +30,7 @@ Key settings:
 ### TypeScript Config (`tsconfig.json`)
 
 Uses project references with two sub-configs:
+
 - `tsconfig.app.json` -- application source
 - `tsconfig.node.json` -- Vite config and build scripts
 
@@ -78,6 +79,7 @@ Deployment is automated via GitHub Actions. The workflow file is `.github/workfl
 **Concurrency**: The `pages` group with `cancel-in-progress: false` ensures only one deployment runs at a time without canceling in-progress deploys.
 
 **Permissions**:
+
 - `contents: read` -- checkout access
 - `pages: write` -- deploy to Pages
 - `id-token: write` -- OIDC token for Pages authentication

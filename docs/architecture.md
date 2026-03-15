@@ -232,6 +232,7 @@ The import system (`src/lib/utils/import/`) supports three source formats:
 | Presizion JSON | `.json` | `jsonParser.ts` |
 
 The `importFile()` entry point:
+
 1. Validates the file (size, extension, magic bytes)
 2. Auto-detects the format via `formatDetector.ts`
 3. Dispatches to the appropriate parser
