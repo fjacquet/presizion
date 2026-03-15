@@ -156,6 +156,6 @@ Plans:
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
-| 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete   | 2026-03-15 | - |
+| 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
