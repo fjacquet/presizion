@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button'
 import { CHART_COLORS } from '@/lib/sizing/chartColors'
 import { downloadChartPng } from '@/lib/utils/downloadChartPng'
 
-interface CapacityRow {
+/** Absolute values for label display */
+interface AbsoluteRow {
   readonly name: string
   readonly required: number
   readonly spare: number
@@ -22,12 +23,20 @@ interface CapacityRow {
   readonly total: number
 }
 
+/** Normalized to percentages (all bars same width = 100%) */
+interface ChartRow {
+  readonly name: string
+  readonly required: number
+  readonly spare: number
+  readonly excess: number
+}
+
 /**
  * Creates a custom label renderer for stacked bar segments.
  * Shows percentage of total when the segment is wide enough.
  * Returns an invisible <text> element when hidden (Recharts label prop requires ReactElement).
  */
-function renderSegmentLabel(rows: readonly CapacityRow[], dataKey: 'required' | 'spare' | 'excess') {
+function renderSegmentLabel(absRows: readonly AbsoluteRow[], dataKey: 'required' | 'spare' | 'excess') {
   return function SegmentLabel(props: {
     x?: number
     y?: number
@@ -36,12 +45,12 @@ function renderSegmentLabel(rows: readonly CapacityRow[], dataKey: 'required' | 
     index?: number
   }): React.ReactElement<SVGElement> {
     const { x = 0, y = 0, width = 0, height = 0, index = 0 } = props
-    const row = rows[index]
-    if (!row || width < 30 || row.total === 0) {
+    const row = absRows[index]
+    if (!row || width < 40 || row.total === 0) {
       return <text visibility="hidden" />
     }
-    const segmentValue = row[dataKey]
-    const pct = ((segmentValue / row.total) * 100).toFixed(0)
+    const absValue = row[dataKey]
+    const pct = ((absValue / row.total) * 100).toFixed(1)
     return (
       <text
         x={x + width / 2}
@@ -52,9 +61,20 @@ function renderSegmentLabel(rows: readonly CapacityRow[], dataKey: 'required' | 
         textAnchor="middle"
         dominantBaseline="central"
       >
-        {segmentValue.toFixed(1)} ({pct}%)
+        {pct}%
       </text>
     )
+  }
+}
+
+/** Normalize absolute row to percentages (each row sums to 100) */
+function normalizeRow(abs: AbsoluteRow): ChartRow {
+  if (abs.total === 0) return { name: abs.name, required: 0, spare: 0, excess: 0 }
+  return {
+    name: abs.name,
+    required: (abs.required / abs.total) * 100,
+    spare: (abs.spare / abs.total) * 100,
+    excess: (abs.excess / abs.total) * 100,
   }
 }
 
@@ -79,7 +99,8 @@ export function CapacityStackedChart() {
         const scenarioName = scenario.name
         const scenarioId = scenario.id
 
-        const rows: CapacityRow[] = [
+        // Absolute values (for labels and tooltips)
+        const absRows: AbsoluteRow[] = [
           {
             name: 'CPU GHz',
             required: bd.cpu.required,
@@ -120,6 +141,9 @@ export function CapacityStackedChart() {
           })(),
         ]
 
+        // Normalized to % (all bars same width = 100%)
+        const chartRows = absRows.map(normalizeRow)
+
         return (
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
@@ -143,34 +167,41 @@ export function CapacityStackedChart() {
             <div ref={(el) => { refs.current[scenarioId] = el }}>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart
-                  data={rows}
+                  data={chartRows}
                   layout="vertical"
-                  margin={{ top: 8, right: 80, left: 120, bottom: 8 }}
+                  margin={{ top: 8, right: 40, left: 120, bottom: 8 }}
                 >
-                  <XAxis type="number" hide />
+                  <XAxis type="number" hide domain={[0, 100]} />
                   <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={(v: number) => v.toFixed(1)} />
+                  <Tooltip
+                    formatter={(_v: number, _name: string, props: { payload?: ChartRow }) => {
+                      const idx = chartRows.indexOf(props.payload!)
+                      const abs = absRows[idx]
+                      if (!abs) return ''
+                      return `${abs.total.toFixed(1)} total`
+                    }}
+                  />
                   <Legend />
                   <Bar
                     dataKey="required"
                     name="Required"
                     stackId="cap"
                     fill={CHART_COLORS[0]}
-                    label={renderSegmentLabel(rows, 'required')}
+                    label={renderSegmentLabel(absRows, 'required')}
                   />
                   <Bar
                     dataKey="spare"
                     name="Spare"
                     stackId="cap"
                     fill={CHART_COLORS[1]}
-                    label={renderSegmentLabel(rows, 'spare')}
+                    label={renderSegmentLabel(absRows, 'spare')}
                   />
                   <Bar
                     dataKey="excess"
                     name="Excess"
                     stackId="cap"
                     fill={CHART_COLORS[2]}
-                    label={renderSegmentLabel(rows, 'excess')}
+                    label={renderSegmentLabel(absRows, 'excess')}
                   />
                 </BarChart>
               </ResponsiveContainer>
