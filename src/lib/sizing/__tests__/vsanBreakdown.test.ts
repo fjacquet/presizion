@@ -96,12 +96,12 @@ describe('computeVsanBreakdown', () => {
 
     const bd = computeVsanBreakdown(cluster, scenario, result);
 
-    // vmsRequired = 200 vCPUs * 2.5 GHz = 500 GHz
-    expect(bd.cpu.vmsRequired).toBeCloseTo(500, 2);
+    // vmsRequired = (200 vCPUs / 4 ratio) * 2.5 GHz = 125 GHz
+    expect(bd.cpu.vmsRequired).toBeCloseTo(125, 2);
     // No vSAN
     expect(bd.cpu.vsanConsumption).toBe(0);
-    // required = 500
-    expect(bd.cpu.required).toBeCloseTo(500, 2);
+    // required = 125
+    expect(bd.cpu.required).toBeCloseTo(125, 2);
     // total = 4 * 48 * 2.5 = 480
     expect(bd.cpu.total).toBeCloseTo(480, 2);
     // haReserve = 48 * 2.5 = 120 (one node)
@@ -110,8 +110,8 @@ describe('computeVsanBreakdown', () => {
     expect(bd.cpu.reservedMaxUtil).toBeCloseTo(0, 2);
     // spare = 0 + 120 = 120
     expect(bd.cpu.spare).toBeCloseTo(120, 2);
-    // excess = 480 - 500 - 120 = -140
-    expect(bd.cpu.excess).toBeCloseTo(-140, 2);
+    // excess = 480 - 125 - 120 = 235
+    expect(bd.cpu.excess).toBeCloseTo(235, 2);
 
     assertInvariant(bd.cpu, 'cpu');
   });
@@ -131,8 +131,8 @@ describe('computeVsanBreakdown', () => {
 
     // vsanConsumption = 4 * 48 * 2.5 * 0.10 = 48 GHz
     expect(bd.cpu.vsanConsumption).toBeCloseTo(48, 2);
-    // required = 500 + 48 = 548
-    expect(bd.cpu.required).toBeCloseTo(548, 2);
+    // required = 125 (vms) + 48 (vsan) = 173
+    expect(bd.cpu.required).toBeCloseTo(173, 2);
 
     assertInvariant(bd.cpu, 'cpu-vsan');
   });
@@ -196,11 +196,11 @@ describe('computeVsanBreakdown', () => {
 
     const bd = computeVsanBreakdown(cluster, scenario, result);
 
-    // required = 500 (same as before)
-    // reservedMaxUtil = 500 / 0.80 * (1 - 0.80) = 500 / 0.80 * 0.20 = 125
-    expect(bd.cpu.reservedMaxUtil).toBeCloseTo(125, 2);
-    // spare = 125 + 120 = 245
-    expect(bd.cpu.spare).toBeCloseTo(245, 2);
+    // required = 125 (vmsRequired with ratio=4)
+    // reservedMaxUtil = 125 / 0.80 * (1 - 0.80) = 125 / 0.80 * 0.20 = 31.25
+    expect(bd.cpu.reservedMaxUtil).toBeCloseTo(31.25, 2);
+    // spare = 31.25 + 120 = 151.25
+    expect(bd.cpu.spare).toBeCloseTo(151.25, 2);
 
     assertInvariant(bd.cpu, 'cpu-maxutil');
   });

@@ -126,8 +126,11 @@ function computeCpuBreakdown(
   const { finalCount } = result;
   const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
 
-  // Demand: vCPU count * growth * target frequency (GHz reporting)
-  const vmsRequired = cluster.totalVcpus * cpuGrowthFactor * freqGhz;
+  // Demand: in GHz mode, use vCPU * freq; in vCPU mode, normalize by ratio so required <= total
+  const ratio = scenario.targetVcpuToPCoreRatio > 0 ? scenario.targetVcpuToPCoreRatio : 1;
+  // Effective pCores needed = vCPUs / ratio (what the sizing engine actually computes)
+  const effectivePcoresNeeded = (cluster.totalVcpus * cpuGrowthFactor) / ratio;
+  const vmsRequired = effectivePcoresNeeded * freqGhz;
 
   // Total configured GHz for the cluster
   const totalConfiguredGhz = finalCount * coresPerServer * freqGhz;
