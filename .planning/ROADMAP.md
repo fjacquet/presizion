@@ -181,8 +181,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 23-01-PLAN.md — Fix parser standalone routing (RVTools + LiveOptics) and weighted RAM/server in aggregator
-- [ ] 23-02-PLAN.md — Host count display in scope selector UI (ImportPreviewModal + ScopeBadge)
+- [x] 23-01-PLAN.md — Fix parser standalone routing (RVTools + LiveOptics) and weighted RAM/server in aggregator
+- [x] 23-02-PLAN.md — Host count display in scope selector UI (ImportPreviewModal + ScopeBadge)
 
 ### Phase 24: Average VM Metrics
 
@@ -195,7 +195,10 @@ Plans:
   2. The Step 1 derived metrics section shows "Avg RAM/VM (GiB)" computed from imported RAM totals after any import
   3. The Step 1 derived metrics section shows "Avg Disk/VM (GiB)" computed from imported disk totals after any import
   4. When a new scenario is added after import, its RAM/VM and Disk/VM default fields are pre-populated with the values derived from the import data
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 24-01-PLAN.md — Add avg vCPU/RAM/Disk per VM to DerivedMetricsPanel + verify scenario seeding
 
 ## Progress
 
@@ -223,5 +226,5 @@ Plans:
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
-| 23. Scope Aggregation Fixes | 2/2 | Complete    | 2026-03-15 | - |
-| 24. Average VM Metrics | v2.1 | 0/TBD | Not started | - |
+| 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
+| 24. Average VM Metrics | v2.1 | 0/1 | Not started | - |
