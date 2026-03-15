@@ -69,7 +69,7 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 **Milestone Goal:** Fix "All" scope aggregation to correctly exclude clusterless hosts, surface those hosts as "Standalone", and display average per-VM resource requirements derived from import data to improve sizing context.
 
 - [x] **Phase 23: Scope Aggregation Fixes** - Correct "All" aggregation, Standalone labeling, weighted RAM average, and host-count display in scope selector (completed 2026-03-15)
-- [ ] **Phase 24: Average VM Metrics** - Compute and display average vCPU/RAM/Disk per VM in Step 1 derived metrics; seed those values into Step 2 scenario defaults on import
+- [x] **Phase 24: Average VM Metrics** - Compute and display average vCPU/RAM/Disk per VM in Step 1 derived metrics; seed those values into Step 2 scenario defaults on import (completed 2026-03-15)
 
 ## Phase Details
 
@@ -195,7 +195,7 @@ Plans:
   2. The Step 1 derived metrics section shows "Avg RAM/VM (GiB)" computed from imported RAM totals after any import
   3. The Step 1 derived metrics section shows "Avg Disk/VM (GiB)" computed from imported disk totals after any import
   4. When a new scenario is added after import, its RAM/VM and Disk/VM default fields are pre-populated with the values derived from the import data
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 24-01-PLAN.md — Add avg vCPU/RAM/Disk per VM to DerivedMetricsPanel + verify scenario seeding
@@ -227,4 +227,4 @@ Plans:
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
-| 24. Average VM Metrics | v2.1 | 0/1 | Not started | - |
+| 24. Average VM Metrics | 1/1 | Complete   | 2026-03-15 | - |

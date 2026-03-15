@@ -24,10 +24,10 @@
 | SCOPE-08 | Phase 23 | Complete |
 | SCOPE-09 | Phase 23 | Complete |
 | SCOPE-10 | Phase 23 | Complete |
-| AVG-01 | Phase 24 | Pending |
-| AVG-02 | Phase 24 | Pending |
-| AVG-03 | Phase 24 | Pending |
-| AVG-04 | Phase 24 | Pending |
+| AVG-01 | Phase 24 | Complete |
+| AVG-02 | Phase 24 | Complete |
+| AVG-03 | Phase 24 | Complete |
+| AVG-04 | Phase 24 | Complete |
 
 **Coverage:**
 - v2.1 requirements: 8 total

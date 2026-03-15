@@ -8,10 +8,10 @@ last_updated: "2026-03-15T16:22:55.615Z"
 last_activity: 2026-03-15 — Completed 23-02 host count display in scope selectors
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 12
-  completed_plans: 12
-  percent: 92
+  completed_phases: 7
+  total_plans: 13
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.1 Phase 23 — Scope Aggregation Fixes
+**Current focus:** v2.1 Phase 24 — Average VM Metrics (COMPLETE)
 
 ## Current Position
 
-Phase: 23 of 24 in v2.1 (Scope Aggregation Fixes)
-Plan: 2 of 2 in current phase (COMPLETE)
+Phase: 24 of 24 in v2.1 (Average VM Metrics)
+Plan: 1 of 1 in current phase (COMPLETE)
 Status: Executing
-Last activity: 2026-03-15 — Completed 23-02 host count display in scope selectors
+Last activity: 2026-03-15 — Completed 24-01 avg per-VM metrics in DerivedMetricsPanel
 
-Progress: [█████████░] 92% (v2.1 milestone)
+Progress: [██████████] 100% (v2.1 milestone)
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 92% (v2.1 milestone)
 
 *Updated after each plan completion*
 | Phase 23 P02 | 3min | 1 tasks | 4 files |
+| Phase 24 P01 | 17min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,7 @@ Recent decisions affecting current work:
 - [Phase 18-02]: Disaggregated layout overrides vSAN; layoutMode separation is already in place
 - [v2.0 general]: derive-on-read pattern in use throughout — no stale result state to manage
 - [Phase 23-02]: Host count suffix format: Label (N hosts) with graceful omission when absent
+- [Phase 24-01]: Avg RAM/VM reads avgRamPerVmGb directly; grid expanded to sm:grid-cols-5
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15T14:56:15.471Z
-Stopped at: Completed 23-02-PLAN.md (host count display in scope selectors)
+Last session: 2026-03-15T16:45:50Z
+Stopped at: Completed 24-01-PLAN.md (avg per-VM metrics in DerivedMetricsPanel)
 Resume file: None
