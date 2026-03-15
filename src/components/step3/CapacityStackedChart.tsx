@@ -67,15 +67,13 @@ function renderSegmentLabel(absRows: readonly AbsoluteRow[], dataKey: 'required'
   }
 }
 
-/** Normalize absolute row to percentages (each row sums to 100) */
+/** Normalize absolute row to percentages (capped at 100% total) */
 function normalizeRow(abs: AbsoluteRow): ChartRow {
   if (abs.total === 0) return { name: abs.name, required: 0, spare: 0, excess: 0 }
-  return {
-    name: abs.name,
-    required: (abs.required / abs.total) * 100,
-    spare: (abs.spare / abs.total) * 100,
-    excess: (abs.excess / abs.total) * 100,
-  }
+  const reqPct = Math.min((abs.required / abs.total) * 100, 100)
+  const sparePct = Math.min((abs.spare / abs.total) * 100, 100 - reqPct)
+  const excessPct = Math.max(0, 100 - reqPct - sparePct)
+  return { name: abs.name, required: reqPct, spare: sparePct, excess: excessPct }
 }
 
 /**
