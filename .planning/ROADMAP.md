@@ -52,13 +52,13 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 ### v2.0 — vSAN-Aware Sizing Engine (In Progress)
 
-**Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF report export.
+**Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF/PPTX report export.
 
 - [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
 - [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
 - [x] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard (completed 2026-03-15)
 - [x] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download (completed 2026-03-15)
-- [ ] **Phase 22: PDF Report Export** - Client-side PDF generation with jsPDF + capacity tables + embedded chart images
+- [ ] **Phase 22: PDF & PPTX Report Export** - Client-side PDF and PowerPoint generation with jsPDF, jspdf-autotable, pptxgenjs + capacity tables + embedded chart images
 
 ## Phase Details
 
@@ -133,21 +133,28 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [ ] 21-01-PLAN.md — CapacityStackedChart + MinNodesChart components with tests, wired into Step3ReviewExport
 
-### Phase 22: PDF Report Export
+### Phase 22: PDF & PPTX Report Export
 
-**Goal**: Users can export a professional PDF report from Step 3 that contains the project title page, executive summary, capacity breakdown tables, embedded chart images, and scenario comparison table — generated entirely in the browser without any server call.
+**Goal**: Users can export a professional PDF report or PowerPoint presentation from Step 3 that contains the project title page, executive summary, capacity breakdown tables, embedded chart images, and scenario comparison -- generated entirely in the browser without any server call.
 **Depends on**: Phase 21
-**Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05
+**Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05, PPTX-01, PPTX-02, PPTX-03, PPTX-04, PPTX-05
 **Success Criteria** (what must be TRUE):
 
-  1. A "Export PDF" button appears in the Step 3 export toolbar alongside existing export buttons
-  2. Clicking the button generates and downloads a PDF file without any network request
-  3. The PDF contains a title page with project info, an executive summary table, capacity breakdown tables for CPU, Memory, and Storage, and the scenario comparison table
-  4. The stacked capacity chart and min-nodes chart are embedded in the PDF as rasterized images
-  5. The PDF library (jsPDF + jspdf-autotable) is lazy-loaded and does not affect the initial page load time
-**Plans**: TBD
+  1. "Export PDF" and "Export PPTX" buttons appear in the Step 3 export toolbar alongside existing export buttons
+  2. Clicking either button generates and downloads the respective file without any network request
+  3. Both PDF and PPTX contain a title page with project info, an executive summary table, capacity breakdown tables for CPU, Memory, and Storage, chart images, and the scenario comparison table
+  4. The stacked capacity chart and min-nodes chart are embedded as rasterized images in both formats
+  5. All export libraries (jsPDF, jspdf-autotable, pptxgenjs) are lazy-loaded and do not affect initial page load time
+**Plans:** 3 plans
+
+Plans:
+
+- [ ] 22-01-PLAN.md — Install deps (jspdf, jspdf-autotable, pptxgenjs) + shared chartCapture utility + lift chart refs to Step3ReviewExport
+- [ ] 22-02-PLAN.md — PDF export (exportPdf.ts + Export PDF button)
+- [ ] 22-03-PLAN.md — PPTX export (exportPptx.ts + Export PPTX button)
 
 ## Progress
 
@@ -174,4 +181,4 @@ Plans:
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
 | 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
 | 21. Capacity Charts | 1/1 | Complete    | 2026-03-15 | - |
-| 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
+| 22. PDF & PPTX Report Export | v2.0 | 0/3 | Not started | - |
