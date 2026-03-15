@@ -18,7 +18,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SPEC-LOOKUP-01 | Phase 25 | Complete |
-| SPEC-LOOKUP-05 | Phase 25 | Pending |
+| SPEC-LOOKUP-05 | Phase 25 | Complete |
 | SPEC-LOOKUP-06 | Phase 25 | Complete |
 | SPEC-LOOKUP-07 | Phase 25 | Complete |
 | SPEC-LOOKUP-08 | Phase 25 | Complete |

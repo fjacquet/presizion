@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: — SPEC Search Integration
 status: executing
-stopped_at: Completed 25-01-PLAN.md
-last_updated: "2026-03-15T18:45:00Z"
-last_activity: 2026-03-15 — Phase 25 Plan 01 complete (SPEC Lookup Service)
+stopped_at: Completed 25-02-PLAN.md
+last_updated: "2026-03-15T18:48:32Z"
+last_activity: 2026-03-15 — Phase 25 Plan 02 complete (SPEC Lookup Button Integration)
 progress:
   total_phases: 9
-  completed_phases: 7
-  total_plans: 15
-  completed_plans: 14
-  percent: 0
+  completed_phases: 8
+  total_plans: 16
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.2 Phase 25 — SPEC Lookup Service (Plan 01 complete)
+**Current focus:** v2.2 Phase 25 — SPEC Lookup Service (Plan 02 complete)
 
 ## Current Position
 
 Phase: 25 of 26 in v2.2 (SPEC Lookup Service)
-Plan: 1 of 1 in current phase
-Status: Executing
-Last activity: 2026-03-15 — Phase 25 Plan 01 complete (SPEC Lookup Service)
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-03-15 — Phase 25 Plan 02 complete (SPEC Lookup Button Integration)
 
-Progress: [█████████░] 93% (v2.2 milestone)
+Progress: [█████████░] 94% (v2.2 milestone)
 
 ## Performance Metrics
 
@@ -46,7 +46,7 @@ Progress: [█████████░] 93% (v2.2 milestone)
 |-------|-------|-------|----------|
 | 23 | 2/2 | 6min | 3min |
 | 24 | 1/1 | 17min | 17min |
-| 25 | 1/1 | 2min | 2min |
+| 25 | 2/2 | 4min | 2min |
 
 *Updated after each plan completion*
 
@@ -62,6 +62,7 @@ Recent decisions affecting current work:
 - [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — SPEC lookup service should read cpuModel from here
 - [v2.0 general]: derive-on-read pattern in use throughout — SPEC lookup results should derive from detected CPU, not be stored
 - [Phase 25-01]: Slug algorithm mirrors spec-search convert_csv.py; SpecLookupResult uses status enum (ok/no-results/error) instead of throwing
+- [Phase 25-02]: spec-search uses hash routing /#/processor/{slug}; dead SPEC_RESULTS_URL removed from config
 
 ### Pending Todos
 
@@ -75,5 +76,5 @@ None
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 25-01-PLAN.md
+Stopped at: Completed 25-02-PLAN.md
 Resume file: None

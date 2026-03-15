@@ -79,7 +79,7 @@ Full details: `.planning/milestones/v2.1-ROADMAP.md`
 
 **Milestone Goal:** Integrate spec-search (fjacquet.github.io/spec-search) to auto-lookup SPECrate2017 benchmark scores from detected CPU models, eliminating manual SPEC website searches for both existing cluster CPUs and target scenario CPUs.
 
-- [ ] **Phase 25: SPEC Lookup Service** - Slug derivation, fetch service, error handling, URL config, and updated lookup link
+- [x] **Phase 25: SPEC Lookup Service** - Slug derivation, fetch service, error handling, URL config, and updated lookup link (completed 2026-03-15)
 - [ ] **Phase 26: SPEC Lookup UI** - Results panel display and one-click auto-fill for Step 1 and Step 2
 
 ## Phase Details
@@ -223,7 +223,7 @@ Plans:
   3. When the API is unreachable or returns a non-200 response, the service returns an empty results array and does not throw — manual entry remains available
   4. When the API returns results but none match the CPU model, the service surfaces an explicit "no results" state distinct from an error state
   5. The spec-search API base URL is defined as a named constant in `src/lib/config.ts` and the existing "Look up SPECrate" button opens spec-search pre-filtered by CPU slug instead of spec.org
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 25-01-PLAN.md — TDD: specLookup service (cpuModelToSlug + fetchSpecResults + types) and config.ts constants
@@ -270,5 +270,5 @@ Plans:
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
-| 25. SPEC Lookup Service | 1/2 | In Progress|  | - |
+| 25. SPEC Lookup Service | 2/2 | Complete   | 2026-03-15 | - |
 | 26. SPEC Lookup UI | v2.2 | 0/TBD | Not started | - |
