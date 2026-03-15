@@ -226,8 +226,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 25-01-PLAN.md — TDD: specLookup service (cpuModelToSlug + fetchSpecResults + types) and config.ts constants
-- [ ] 25-02-PLAN.md — Update CurrentClusterForm "Look up SPECrate" button to open spec-search
+- [x] 25-01-PLAN.md — TDD: specLookup service (cpuModelToSlug + fetchSpecResults + types) and config.ts constants
+- [x] 25-02-PLAN.md — Update CurrentClusterForm "Look up SPECrate" button to open spec-search
 
 ### Phase 26: SPEC Lookup UI
 
@@ -240,7 +240,11 @@ Plans:
   2. Clicking a result row in the Step 1 panel auto-fills the `specintPerServer` field with the selected base score without any further user action
   3. A equivalent SPECrate results panel and auto-fill mechanism is present in Step 2 (ScenarioCard) for the target server CPU model
   4. When no CPU model is detected or the lookup returns no results, the panel shows a clear fallback message; the manual `specintPerServer` entry field remains accessible at all times
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 26-01-PLAN.md — useSpecLookup hook + SpecResultsPanel component + Step 1 integration
+- [ ] 26-02-PLAN.md — Step 2 ScenarioCard target CPU search + SPEC results panel + regression check
 
 ## Progress
 
@@ -270,5 +274,5 @@ Plans:
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
-| 25. SPEC Lookup Service | 2/2 | Complete    | 2026-03-15 | - |
-| 26. SPEC Lookup UI | v2.2 | 0/TBD | Not started | - |
+| 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
+| 26. SPEC Lookup UI | v2.2 | 0/2 | Not started | - |
