@@ -45,8 +45,8 @@ function f2(n: number): string {
 }
 
 /** Default text options for consistency */
-const TITLE_OPTS = { x: 0.5, y: 0.2, w: '90%', fontSize: 22, bold: true, color: BLUE, fontFace: FONT } as const
-const SUBTITLE_OPTS = { x: 0.5, y: 0.65, w: '90%', fontSize: 11, color: GRAY, fontFace: FONT } as const
+const TITLE_OPTS = { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT } as const
+const SUBTITLE_OPTS = { placeholder: 'body', fontSize: 11, color: GRAY, fontFace: FONT } as const
 
 /** Cell styling helpers */
 function headerCell(text: string) {
@@ -158,11 +158,30 @@ export async function exportPptx(
   const dateStr = new Date().toLocaleDateString()
   _slideNum = 0 // reset counter
 
+  // 3a. Define slide masters with semantic placeholders
+  // Styling is minimal here — applied via addText props for flexibility
+  pptx.defineSlideMaster({
+    title: 'TITLE_SLIDE',
+    background: { color: NAVY },
+    objects: [
+      { placeholder: { options: { name: 'title', type: 'title', x: 0.5, y: 2.2, w: 12, h: 1.2 }, text: '' } },
+      { placeholder: { options: { name: 'body', type: 'body', x: 0.5, y: 3.5, w: 12, h: 0.6 }, text: '' } },
+    ],
+  })
+
+  pptx.defineSlideMaster({
+    title: 'CONTENT_SLIDE',
+    background: { color: WHITE },
+    objects: [
+      { placeholder: { options: { name: 'title', type: 'title', x: 0.5, y: 0.2, w: 12, h: 0.6 }, text: '' } },
+      { placeholder: { options: { name: 'body', type: 'body', x: 0.5, y: 0.65, w: 12, h: 0.3 }, text: '' } },
+    ],
+  })
+
   // -------------------------------------------------------------------
   // Slide 1: Title (dark navy background)
   // -------------------------------------------------------------------
-  const titleSlide = pptx.addSlide()
-  titleSlide.background = { color: NAVY }
+  const titleSlide = pptx.addSlide({ masterName: 'TITLE_SLIDE' })
 
   // Logo
   try {
@@ -173,11 +192,11 @@ export async function exportPptx(
   } catch { /* logo is optional */ }
 
   titleSlide.addText('Cluster Sizing Report', {
-    x: 0.5, y: 2.5, w: '90%', fontSize: 40, bold: true, color: WHITE, fontFace: FONT,
+    placeholder: 'title', fontSize: 40, bold: true, color: WHITE, fontFace: FONT,
   })
   titleSlide.addText(
     `${cluster.totalVms} VMs  |  ${cluster.totalVcpus} vCPUs  |  ${cluster.totalPcores} pCores  |  ${scenarios.length} scenario${scenarios.length > 1 ? 's' : ''}`,
-    { x: 0.5, y: 3.5, w: '90%', fontSize: 16, color: LIGHT_GRAY, fontFace: FONT },
+    { placeholder: 'body', fontSize: 16, color: LIGHT_GRAY, fontFace: FONT },
   )
   titleSlide.addText(dateStr, {
     x: 0.5, y: 4.5, w: '90%', fontSize: 12, color: GRAY, fontFace: FONT,
@@ -186,15 +205,8 @@ export async function exportPptx(
   // -------------------------------------------------------------------
   // Slide 2: Executive Summary
   // -------------------------------------------------------------------
-  const summarySlide = pptx.addSlide()
-  summarySlide.addText('Executive Summary', {
-    x: 0.5,
-    y: 0.3,
-    w: '90%',
-    fontSize: 24,
-    bold: true,
-    color: BLUE,
-  })
+  const summarySlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  summarySlide.addText('Executive Summary', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
   const summaryHeaderRow = [
     { text: 'Scenario', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
@@ -242,15 +254,8 @@ export async function exportPptx(
   // -------------------------------------------------------------------
   // Slide 3: As-Is vs To-Be Comparison
   // -------------------------------------------------------------------
-  const comparisonSlide = pptx.addSlide()
-  comparisonSlide.addText('As-Is vs To-Be Comparison', {
-    x: 0.5,
-    y: 0.3,
-    w: '90%',
-    fontSize: 24,
-    bold: true,
-    color: BLUE,
-  })
+  const comparisonSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  comparisonSlide.addText('As-Is vs To-Be Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
   const asIsServerConfig =
     cluster.socketsPerServer && cluster.coresPerSocket
@@ -380,15 +385,8 @@ export async function exportPptx(
   // -------------------------------------------------------------------
   // Slide 4: Sizing Assumptions
   // -------------------------------------------------------------------
-  const assumptionsSlide = pptx.addSlide()
-  assumptionsSlide.addText('Sizing Assumptions', {
-    x: 0.5,
-    y: 0.3,
-    w: '90%',
-    fontSize: 24,
-    bold: true,
-    color: BLUE,
-  })
+  const assumptionsSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  assumptionsSlide.addText('Sizing Assumptions', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
   const assumptionsHeader = [
     { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
@@ -532,15 +530,8 @@ export async function exportPptx(
       (s.storageGrowthPercent !== undefined && s.storageGrowthPercent > 0),
   )
   if (hasGrowth) {
-    const growthSlide = pptx.addSlide()
-    growthSlide.addText('Growth Projections', {
-      x: 0.5,
-      y: 0.3,
-      w: '90%',
-      fontSize: 24,
-      bold: true,
-      color: BLUE,
-    })
+    const growthSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+    growthSlide.addText('Growth Projections', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
     const growthHeader = [
       { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
@@ -598,15 +589,8 @@ export async function exportPptx(
   // -------------------------------------------------------------------
   // Slide 5: Per-Scenario Server Configuration
   // -------------------------------------------------------------------
-  const serverConfigSlide = pptx.addSlide()
-  serverConfigSlide.addText('Per-Scenario Server Configuration', {
-    x: 0.5,
-    y: 0.3,
-    w: '90%',
-    fontSize: 24,
-    bold: true,
-    color: BLUE,
-  })
+  const serverConfigSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  serverConfigSlide.addText('Per-Scenario Server Configuration', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
   const scHeader = [
     { text: 'Parameter', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
@@ -656,14 +640,9 @@ export async function exportPptx(
 
     // -- Capacity Breakdown Table slide --
     if (bd) {
-      const bdSlide = pptx.addSlide()
+      const bdSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
       bdSlide.addText(`Capacity Breakdown -- ${scenario.name}`, {
-        x: 0.5,
-        y: 0.3,
-        w: '90%',
-        fontSize: 20,
-        bold: true,
-        color: BLUE,
+        placeholder: 'title', fontSize: 20, bold: true, color: BLUE, fontFace: FONT,
       })
 
       const bdHeaderRow = [
@@ -712,7 +691,7 @@ export async function exportPptx(
 
     // -- Capacity Chart slide (1 per scenario) --
     if (charts?.capacity && bd) {
-      const capSlide = pptx.addSlide()
+      const capSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
       capSlide.addText(`Capacity Breakdown -- ${scenario.name}`, { ...TITLE_OPTS })
 
       // Legend: colored squares + labels
@@ -764,7 +743,7 @@ export async function exportPptx(
 
     // -- Min Nodes Chart slide (1 per scenario) --
     if (charts?.minnodes && bd) {
-      const mnSlide = pptx.addSlide()
+      const mnSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
       mnSlide.addText(`Minimum Nodes per Constraint -- ${scenario.name}`, { ...TITLE_OPTS })
       mnSlide.addText('The binding constraint determines the minimum cluster size.', { ...SUBTITLE_OPTS })
 
@@ -802,15 +781,8 @@ export async function exportPptx(
   // -------------------------------------------------------------------
   // Final slide: Scenario Comparison
   // -------------------------------------------------------------------
-  const compSlide = pptx.addSlide()
-  compSlide.addText('Scenario Comparison', {
-    x: 0.5,
-    y: 0.3,
-    w: '90%',
-    fontSize: 24,
-    bold: true,
-    color: BLUE,
-  })
+  const compSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  compSlide.addText('Scenario Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
 
   // Build comparison table: first column = metric, then one column per scenario
   const finalCompHeader = [

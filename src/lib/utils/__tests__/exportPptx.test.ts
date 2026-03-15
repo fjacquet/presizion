@@ -29,6 +29,7 @@ vi.mock('pptxgenjs', () => {
     title = ''
     addSlide = mockAddSlide
     writeFile = mockWriteFile
+    defineSlideMaster = vi.fn()
   }
   return { default: MockPptxGenJS }
 })
