@@ -34,6 +34,7 @@ function buildScopeLabel(scopeKey: string): string {
   if (scopeKey === '__all__') return 'All'
   if (scopeKey.includes('||')) {
     const [dc, cluster] = scopeKey.split('||')
+    if (cluster === '__standalone__') return `Standalone (${dc})`
     return `${cluster} (${dc})`
   }
   return scopeKey
@@ -111,7 +112,7 @@ export async function parseRvtools(
 
     const cluster = str(row, colMapCluster['cluster_name'])
     const dc = str(row, colMapDc['datacenter_name'])
-    const scopeKey = dc && cluster ? `${dc}||${cluster}` : cluster ? cluster : '__all__'
+    const scopeKey = dc && cluster ? `${dc}||${cluster}` : cluster ? cluster : dc ? `${dc}||__standalone__` : '__all__'
 
     // Build host-to-cluster mapping from vInfo rows
     const hostName = str(row, colMapHost['host_name'])

@@ -165,6 +165,41 @@ describe('rvtoolsParser', () => {
       const result = await parseRvtools(new ArrayBuffer(0))
       expect(result.detectedScopes).toContain('DC1||CL-A')
     })
+
+    it('VM with datacenter but no cluster routes to dc||__standalone__ (not __all__)', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { VM: 'standalone-vm', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Datacenter: 'DC1' },
+      ])
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.detectedScopes).toContain('DC1||__standalone__')
+      expect(result.detectedScopes).not.toContain('__all__')
+    })
+
+    it('VM with datacenter but no cluster gets scopeLabel "Standalone (DC1)"', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { VM: 'standalone-vm', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Datacenter: 'DC1' },
+      ])
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.scopeLabels?.['DC1||__standalone__']).toBe('Standalone (DC1)')
+    })
+
+    it('VM with no datacenter AND no cluster still produces __all__', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { VM: 'orphan-vm', CPUs: 2, Memory: 4096, 'Provisioned MB': 51200, Template: false },
+      ])
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.detectedScopes).toEqual(['__all__'])
+    })
+
+    it('buildScopeLabel handles __standalone__ scope key correctly', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        { VM: 'vm-a', CPUs: 4, Memory: 8192, 'Provisioned MB': 102400, Template: false, Cluster: 'CL-A', Datacenter: 'DC1' },
+        { VM: 'vm-b', CPUs: 2, Memory: 4096, 'Provisioned MB': 51200, Template: false, Datacenter: 'DC1' },
+      ])
+      const result = await parseRvtools(new ArrayBuffer(0))
+      expect(result.scopeLabels?.['DC1||CL-A']).toBe('CL-A (DC1)')
+      expect(result.scopeLabels?.['DC1||__standalone__']).toBe('Standalone (DC1)')
+    })
   })
 
   describe('per-scope vHost config', () => {
