@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: — Import UX & Scope Fixes
-status: executing
-stopped_at: Completed 24-01-PLAN.md (avg per-VM metrics in DerivedMetricsPanel)
-last_updated: "2026-03-15T16:52:37.069Z"
-last_activity: 2026-03-15 — Completed 24-01 avg per-VM metrics in DerivedMetricsPanel
+milestone: v2.2
+milestone_name: — SPEC Search Integration
+status: planning
+stopped_at: —
+last_updated: "2026-03-15"
+last_activity: 2026-03-15 — Milestone v2.2 started
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
