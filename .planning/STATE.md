@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
-status: completed
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-03-15T06:20:30.384Z"
-last_activity: 2026-03-15 — Phase 21 Plan 01 complete (CapacityStackedChart + MinNodesChart with PNG download, 14 new tests, 5 files)
+status: executing
+stopped_at: Completed 22-01-PLAN.md
+last_updated: "2026-03-15T07:22:26.956Z"
+last_activity: 2026-03-15 — Phase 22 Plan 01 complete (chartCapture utility, lifted chart refs, jspdf/pptxgenjs deps installed)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
-  percent: 93
+  total_plans: 10
+  completed_plans: 8
+  percent: 95
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.0 Phase 21 — Capacity Charts
+**Current focus:** v2.0 Phase 22 — PDF Report Export
 
 ## Current Position
 
-Phase: 21 of 22 (Capacity Charts)
-Plan: 1 of 1 complete
-Status: Phase Complete
-Last activity: 2026-03-15 — Phase 21 Plan 01 complete (CapacityStackedChart + MinNodesChart with PNG download, 14 new tests, 5 files)
+Phase: 22 of 22 (PDF Report Export)
+Plan: 1 of 3 complete
+Status: In Progress
+Last activity: 2026-03-15 — Phase 22 Plan 01 complete (chartCapture utility, lifted chart refs, jspdf/pptxgenjs deps installed)
 
-Progress: [█████████░] 93%
+Progress: [█████████░] 95%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 5 min
 - Total execution time: 0.9 hours
 
@@ -53,8 +53,10 @@ Progress: [█████████░] 93%
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
 
+| 22 | 1/3 | 2min | 2min |
+
 *Updated after each plan completion*
-| Phase 21 P01 | 4min | 3 tasks | 5 files |
+| Phase 22 P01 | 2min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -87,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 20-01]: No .default() on optional numeric vSAN fields -- absent = legacy path (VSAN-12)
 - [Phase 21-01]: Recharts custom label returns invisible <text> element (not null) to satisfy ImplicitLabelType
 - [Phase 21-01]: Callback-ref pattern (useRef<Record<string, HTMLDivElement | null>>) for per-scenario chart refs
+- [Phase 22-01]: chartRefToDataUrl returns logical CSS pixel dims (not 2x canvas) for correct PDF/PPTX scaling
+- [Phase 22-01]: Namespaced ref keys (capacity-{id}, minnodes-{id}) avoid collisions in shared chartRefs object
+- [Phase 22-01]: Internal refs kept alongside chartRefs for backward-compatible PNG download buttons
 
 ### Pending Todos
 
@@ -98,6 +103,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15T06:15:56Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-03-15T07:22:26.954Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None

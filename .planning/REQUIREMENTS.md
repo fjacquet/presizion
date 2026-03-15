@@ -111,12 +111,12 @@
 | PDF-01 | Phase 22 | Pending |
 | PDF-02 | Phase 22 | Pending |
 | PDF-03 | Phase 22 | Pending |
-| PDF-04 | Phase 22 | Pending |
+| PDF-04 | Phase 22 | Complete |
 | PDF-05 | Phase 22 | Pending |
 | PPTX-01 | Phase 22 | Pending |
 | PPTX-02 | Phase 22 | Pending |
 | PPTX-03 | Phase 22 | Pending |
-| PPTX-04 | Phase 22 | Pending |
+| PPTX-04 | Phase 22 | Complete |
 | PPTX-05 | Phase 22 | Pending |
 
 **Coverage:**
