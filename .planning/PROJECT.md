@@ -4,34 +4,19 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v1.4 shipped with per-cluster ESX scoping fixes, As-Is column data, chart redesign, SPECrate UX improvements, and Reset button.
-
-## Current Milestone: v2.0 vSAN-Aware Sizing Engine
-
-**Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing (FTT, raw vs usable, overhead deductions), capacity breakdown tables (Required/Spare/HA/Excess), stacked capacity charts, growth projections, compression/dedup factors, and professional PDF report export.
-
-**Target features:**
-- vSAN overhead deduction (ESA CPU ~10%, vSAN memory consumption, storage overhead)
-- Storage sizing: Raw vs Usable with FTT policies (Mirror FTT=1/2/3, RAID-5 3+1, RAID-6 4+2)
-- Capacity breakdown tables per resource (Required / Reserved at Max Util / HA / Spare / Excess / Total)
-- Stacked horizontal capacity bar charts (Required/Spare/Excess with %)
-- Min nodes per constraint horizontal bar chart (CPU, Memory, Storage, FT&HA, VMs)
-- Compression/dedup factor (None, Pessimistic 1.3:1, Conservative 1.5:1, Moderate 2:1, Optimistic 3:1)
-- Slack space for vSAN operations (25% default, configurable)
-- Growth projections per resource (CPU %, Memory %, Storage %, separate from VM count override)
-- Professional PDF report export matching VxRail Sizing Summary quality
+v2.0 shipped with vSAN-aware storage sizing (FTT, raw/usable, overhead), capacity breakdowns, stacked charts, growth projections, compression/dedup, and professional PDF + PPTX export.
 
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
 
-## Current State (v1.4 — Shipped 2026-03-14)
+## Current State (v2.0 — Shipped 2026-03-15)
 
-- **Codebase:** ~6,131 lines TypeScript (src/)
-- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Vitest (441 tests) + Sonner (toast) + Recharts 2.15
+- **Codebase:** 541 Vitest tests
+- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Recharts 2.15 + Sonner + jsPDF + pptxgenjs
 - **Deployment:** GitHub Pages at `/presizion/`
-- **Sizing modes:** vCPU-based (default) and SPECint-based (global toggle)
-- **Export formats:** Clipboard text, CSV, JSON, PNG (chart), Print/PDF, Shareable URL
+- **Sizing modes:** vCPU, SPECint, Aggressive, GHz + vSAN-aware storage (FTT, compression, overhead)
+- **Export formats:** Clipboard, CSV, JSON, PNG (chart + table), PDF report, PPTX presentation, Print, Shareable URL
 - **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → scope filter → auto-fills Step 1
 - **Branding:** Presizion SVG wordmark + custom favicon
 - **Theming:** Light/dark/system toggle with localStorage persistence
@@ -88,17 +73,15 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ SPECrate lookup link with clipboard copy of CPU model number — v1.4 / Phase 17
 - ✓ Reset button with confirmation dialog — v1.4 / Phase 17
 
-### Active (v2.0)
+- ✓ vSAN-aware storage sizing (FTT, raw/usable, metadata, slack, compression) — v2.0 / Phase 18
+- ✓ Capacity breakdown tables (Required/Reserved/HA/Spare/Excess/Total) — v2.0 / Phase 19
+- ✓ Growth projections per resource (compound pre-multiply) — v2.0 / Phase 19
+- ✓ Collapsible vSAN & Growth form section — v2.0 / Phase 20
+- ✓ Stacked capacity bar charts + min-nodes chart — v2.0 / Phase 21
+- ✓ Professional PDF + PPTX report export — v2.0 / Phase 22
 
-- [ ] vSAN overhead deduction: ESA CPU %, vSAN memory, storage overhead
-- [ ] Storage sizing: Raw vs Usable with FTT policies (Mirror, RAID-5, RAID-6)
-- [ ] Capacity breakdown tables (Required/Reserved/HA/Spare/Excess/Total) per CPU, Memory, Storage
-- [ ] Stacked horizontal capacity bar charts with percentages
-- [ ] Min nodes per constraint horizontal bar chart
-- [ ] Compression/dedup factor (None/Pessimistic/Conservative/Moderate/Optimistic)
-- [ ] vSAN slack space for operations (25% default, configurable)
-- [ ] Growth projections per resource (CPU %, Memory %, Storage %)
-- [ ] Professional PDF report export
+### Active (v2.1 candidates)
+
 
 ### Out of Scope
 
@@ -146,4 +129,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-14 after v2.0 milestone start*
+*Last updated: 2026-03-15 after v2.0 milestone completion*

@@ -4,7 +4,7 @@ milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
 status: completed
 stopped_at: Completed 22-02-PLAN.md
-last_updated: "2026-03-15T07:32:43.233Z"
+last_updated: "2026-03-15T10:15:42.827Z"
 last_activity: 2026-03-15 — Phase 22 Plan 02 complete (exportPdf utility with PDF report generation, Export PDF button in Step 3)
 progress:
   total_phases: 5

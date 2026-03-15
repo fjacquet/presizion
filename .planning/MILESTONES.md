@@ -1,5 +1,31 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v2.0 -- vSAN-Aware Sizing Engine (Shipped: 2026-03-15)
+
+**Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdowns, growth projections, and professional report export.
+
+**What shipped:**
+
+- Phase 18: vSAN formula engine -- FTT policies, compression/dedup, CPU/memory/storage overhead, min-node floors
+- Phase 19: Capacity breakdown tables (Required/Spare/HA/Excess/Total) + growth projection wiring (compound pre-multiply)
+- Phase 20: Collapsible "vSAN & Growth" form section in ScenarioCard
+- Phase 21: Stacked capacity bar charts (normalized to 100%) + min-nodes-per-constraint chart with PNG download
+- Phase 22: Professional PDF + PPTX export with dark cover, KPI callouts, As-Is/To-Be, assumptions, chart images
+- Post-phase: clickable step indicators, Store-Predict link, ratio display as N.N:1, standalone scope labeling
+
+**Requirements shipped:** 40/40 (VSAN-01..12, CAP-01..06, GROW-01..04, FORM-01..04, VIZ-01..04, PDF-01..05, PPTX-01..05)
+
+**Codebase at completion:** 541 Vitest tests, jsPDF + pptxgenjs + pptxgenjs lazy-loaded
+
+**Archive:**
+- Roadmap: `.planning/milestones/v2.0-ROADMAP.md`
+- Requirements: `.planning/milestones/v2.0-REQUIREMENTS.md`
+- Audit: `.planning/milestones/v2.0-MILESTONE-AUDIT.md`
+
+**Last phase number:** 22
+
+---
+
 ## v1.4 — Bug Fixes, Chart Polish & UX (Shipped: 2026-03-14)
 
 **Goal:** Fix data-integrity bugs, polish charts for presentation quality, improve SPECrate workflow, add reset capability.
