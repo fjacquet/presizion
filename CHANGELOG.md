@@ -14,6 +14,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.2.1] -- 2026-03-15
+
+### Fixed
+
+- RAM formula guard: `serverCountByRam` validates percent parameters in 0-100 range, clamping invalid values to 100. Prevents catastrophic 568-server bug when `targetRamUtilPct` leaks as 1.
+- cpuModel regression: `form.watch` in CurrentClusterForm was overwriting entire cluster store with form-only values, wiping cpuModel/cpuFrequencyGhz/avgRamPerVmGb. Now filters undefined values and merges over existing store.
+- PPTX utilization display: cells now show `50.0%` instead of raw `0.5`.
+- SPEC search partial match: typing "6730P" now finds "Intel Xeon 6730P" via facets.json fallback. Dell vendor results sorted first.
+- 3-way theme toggle: light -> dark -> system (was only light/dark). OS preference changes auto-apply in system mode.
+- Error toast for PDF/PPTX export failures (was silently failing).
+
+---
+
 ## [2.2.0] -- 2026-03-15
 
 ### Added

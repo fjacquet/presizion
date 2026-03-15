@@ -13,7 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **State**: Zustand v5 (5 stores) + localStorage persistence + URL hash sharing
 - **Import**: xlsx@0.18.5 (locked MIT — do not upgrade) + jszip
 - **Deployment**: GitHub Pages at `/presizion/` — pure static files, no backend
-- **Testing**: Vitest + React Testing Library (441 tests)
+- **Testing**: Vitest + React Testing Library (596 tests)
+- **Export**: jsPDF + jspdf-autotable + pptxgenjs (all lazy-loaded)
 
 ## Project Structure
 

@@ -79,7 +79,29 @@ The comparison table shows all scenarios side-by-side with the existing cluster 
 - **Copy Summary** — Markdown text for email or presentation slides
 - **Download CSV** — all inputs and outputs in a spreadsheet-compatible format
 - **Download JSON** — complete session (can be re-imported later)
-- **Print / PDF** — browser Print → Save as PDF produces a clean single-page report
+- **Export PDF** — professional multi-page report with title page, KPI callouts, As-Is/To-Be comparison, capacity breakdowns, and chart images
+- **Export PPTX** — PowerPoint presentation with semantic slide masters, dark navy cover, per-scenario chart slides with legends and absolute values tables
+- **Download PNG** — individual chart images with legends and data tables
+- **Share** — encodes full session as base64url hash in the URL
+- **Print** — browser Print dialog for paper output
+
+**Capacity breakdown charts (v2.0+):**
+
+- **Stacked Capacity Chart** — normalized to 100% width showing Required/Spare/Excess per resource (CPU GHz, Memory GiB, Raw Storage TiB, Usable Storage TiB)
+- **Min Nodes per Constraint** — horizontal bar chart identifying the binding constraint (CPU, Memory, Storage, FT&HA, VMs)
+
+**vSAN settings (v2.0+):**
+
+Each scenario can optionally include vSAN-aware storage sizing via the collapsible "vSAN & Growth" section:
+- **FTT Policy** — Mirror FTT=1/2/3, RAID-5 (3+1), RAID-6 (4+2)
+- **Compression/Dedup** — None, Pessimistic (1.3:1), Conservative (1.5:1), Moderate (2:1), Optimistic (3:1)
+- **Slack Space** — vSAN operations reserve (default 25%)
+- **CPU/Memory Overhead** — vSAN system overhead deducted from available capacity
+- **Growth Projections** — per-resource compound growth (CPU %, Memory %, Storage %)
+
+**SPEC search (v2.2+):**
+
+When a CPU model is detected from import, Presizion auto-fetches SPECrate2017 results from the spec-search API. Click a result to auto-fill the SPECint score. Also available for target CPU in Step 2 via a search field.
 
 ---
 
