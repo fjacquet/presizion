@@ -1,5 +1,22 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v2.2 -- SPEC Search Integration (Shipped: 2026-03-15)
+
+**Goal:** Integrate spec-search to auto-lookup SPECrate2017 scores, eliminating manual SPEC website searches.
+
+**What shipped:**
+
+- Phase 25: SPEC lookup service (cpuModelToSlug, fetchSpecResults, config URLs, error handling)
+- Phase 26: SpecResultsPanel + useSpecLookup hook in Step 1 and Step 2, one-click auto-fill
+
+**Requirements shipped:** 8/8 (SPEC-LOOKUP-01..08)
+**Codebase:** 596 tests
+
+**Archive:** `.planning/milestones/v2.2-ROADMAP.md`, `.planning/milestones/v2.2-REQUIREMENTS.md`
+**Last phase number:** 26
+
+---
+
 ## v2.1 -- Import UX & Scope Fixes (Shipped: 2026-03-15)
 
 **Goal:** Fix "All" scope aggregation and add average VM requirements display.

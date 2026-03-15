@@ -4,18 +4,7 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v2.1 shipped with scope aggregation fixes (standalone routing, weighted RAM, host count display) and average VM metrics in derived panel.
-
-## Current Milestone: v2.2 SPEC Search Integration
-
-**Goal:** Integrate spec-search (fjacquet.github.io/spec-search) to auto-lookup SPECrate2017 benchmark scores from detected CPU models, eliminating manual SPEC website searches.
-
-**Target features:**
-- Auto-lookup detected CPU model against spec-search static JSON API on GitHub Pages
-- Show matching SPECrate results (vendor, system, base score, cores, chips) in a results panel
-- One-click auto-fill of specintPerServer from selected result
-- Replace spec.org link with spec-search link (pre-filtered by CPU model)
-- Works for both existing cluster CPU and target scenario CPU
+v2.2 shipped with SPEC search integration — auto-lookup SPECrate2017 scores from detected CPU models via spec-search GitHub Pages API, with one-click auto-fill in Step 1 and Step 2.
 
 ## Core Value
 
@@ -94,12 +83,9 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ Scope "All" aggregates named clusters, standalone routing, weighted RAM, host count display — v2.1 / Phase 23
 - ✓ Average per-VM metrics (vCPU, RAM, Disk) in derived panel + seeding verification — v2.1 / Phase 24
 
-### Active (v2.2)
+- ✓ SPEC search integration — auto-lookup, results panel, one-click auto-fill — v2.2 / Phase 25-26
 
-- [ ] Auto-lookup CPU model against spec-search GitHub Pages API
-- [ ] Show matching SPECrate results with vendor/system/score/cores
-- [ ] One-click auto-fill specintPerServer from selected result
-- [ ] Replace spec.org link with spec-search pre-filtered link
+### Active (v2.3 candidates)
 
 ### Out of Scope
 
@@ -147,4 +133,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-15 after v2.2 milestone start*
+*Last updated: 2026-03-15 after v2.2 milestone completion*
