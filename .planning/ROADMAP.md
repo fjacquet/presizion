@@ -270,5 +270,5 @@ Plans:
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
-| 25. SPEC Lookup Service | 2/2 | Complete   | 2026-03-15 | - |
+| 25. SPEC Lookup Service | 2/2 | Complete    | 2026-03-15 | - |
 | 26. SPEC Lookup UI | v2.2 | 0/TBD | Not started | - |
