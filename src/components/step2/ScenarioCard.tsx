@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2, Copy, Info } from 'lucide-react'
+import { useSpecLookup } from '@/hooks/useSpecLookup'
+import { SpecResultsPanel } from '@/components/common/SpecResultsPanel'
 import {
   Form,
   FormControl,
@@ -81,12 +83,36 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const [pinEnabled, setPinEnabled] = useState(() => !!scenario?.minServerCount)
   const [vsanGrowthOpen, setVsanGrowthOpen] = useState(false)
 
+  // SPEC lookup: local UI state for target CPU model search (not persisted)
+  const [targetCpuModel, setTargetCpuModel] = useState('')
+  const [debouncedCpuModel, setDebouncedCpuModel] = useState<string | undefined>(undefined)
+  const [selectedTargetScore, setSelectedTargetScore] = useState<number | undefined>(undefined)
+
+  // Debounce targetCpuModel by 500ms
+  useEffect(() => {
+    if (!targetCpuModel.trim()) {
+      setDebouncedCpuModel(undefined)
+      return
+    }
+    const timer = setTimeout(() => {
+      setDebouncedCpuModel(targetCpuModel)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [targetCpuModel])
+
+  const specLookup = useSpecLookup(sizingMode === 'specint' ? debouncedCpuModel : undefined)
+
   const form = useForm<ScenarioInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(scenarioSchema) as any,
     mode: 'onBlur',
     defaultValues: scenario as ScenarioInput,
   })
+
+  const handleSpecSelect = useCallback((baseScore: number) => {
+    setSelectedTargetScore(baseScore)
+    form.setValue('targetSpecint', baseScore, { shouldValidate: true })
+  }, [form])
 
   const scenarioIdRef = useRef(scenarioId)
   scenarioIdRef.current = scenarioId
@@ -393,27 +419,53 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                   SPECrate2017 Target (required in SPECrate mode)
                 </p>
-                <Controller
-                  control={form.control}
-                  name="targetSpecint"
-                  render={({ field, fieldState }) => (
-                    <div className="space-y-1">
-                      <Label htmlFor={`${scenarioId}-targetSpecint`}>SPECrate2017_int_base / Server (target)</Label>
-                      <Input
-                        id={`${scenarioId}-targetSpecint`}
-                        type="number"
-                        min={1}
-                        data-testid={`input-targetSpecint-${scenarioId}`}
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
-                      />
-                      {fieldState.error && (
-                        <p className="text-sm text-destructive">{fieldState.error.message}</p>
-                      )}
-                    </div>
+                <div className="space-y-3">
+                  {/* Target CPU Model search input */}
+                  <div className="space-y-1">
+                    <Label htmlFor={`${scenarioId}-targetCpuModel`}>Target CPU Model</Label>
+                    <Input
+                      id={`${scenarioId}-targetCpuModel`}
+                      type="text"
+                      placeholder="e.g. Xeon Gold 6526Y"
+                      value={targetCpuModel}
+                      onChange={(e) => setTargetCpuModel(e.target.value)}
+                    />
+                  </div>
+
+                  {/* SPEC results panel */}
+                  {(debouncedCpuModel || specLookup.isLoading) && (
+                    <SpecResultsPanel
+                      results={specLookup.results}
+                      status={specLookup.status}
+                      isLoading={specLookup.isLoading}
+                      onSelect={handleSpecSelect}
+                      selectedScore={selectedTargetScore}
+                    />
                   )}
-                />
+
+                  {/* Manual targetSpecint input */}
+                  <Controller
+                    control={form.control}
+                    name="targetSpecint"
+                    render={({ field, fieldState }) => (
+                      <div className="space-y-1">
+                        <Label htmlFor={`${scenarioId}-targetSpecint`}>SPECrate2017_int_base / Server (target)</Label>
+                        <Input
+                          id={`${scenarioId}-targetSpecint`}
+                          type="number"
+                          min={1}
+                          data-testid={`input-targetSpecint-${scenarioId}`}
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                        {fieldState.error && (
+                          <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                        )}
+                      </div>
+                    )}
+                  />
+                </div>
               </div>
             )}
 
