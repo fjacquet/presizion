@@ -1,38 +1,35 @@
-# Requirements — v2.1 Import UX & Scope Fixes
+# Requirements — v2.2 SPEC Search Integration
 
 *Defined: 2026-03-15*
 
-## Scope Aggregation (SCOPE)
+## SPEC Lookup (SPEC-LOOKUP)
 
-- **SCOPE-07**: "All" scope selection aggregates only named clusters; clusterless hosts are excluded from "All" aggregation (GH #11)
-- **SCOPE-08**: Clusterless hosts with a datacenter appear as "Standalone (datacenter)" scope (verify v1.4 hotfix still working)
-- **SCOPE-09**: When all scopes selected, representative RAM/server uses weighted average by host count, not first-scope-wins (GH #11)
-- **SCOPE-10**: Scope selector shows host count per scope for transparency (e.g., "vxr-clu-win (16 hosts)")
-
-## Average VM Requirements (AVG)
-
-- **AVG-01**: After import, Step 1 derived metrics shows average vCPU per VM (totalVcpus / totalVms) (GH #12)
-- **AVG-02**: After import, Step 1 derived metrics shows average RAM per VM in GiB (GH #12)
-- **AVG-03**: After import, Step 1 derived metrics shows average Disk per VM in GiB (GH #12)
-- **AVG-04**: Average RAM/VM and Disk/VM values seed Step 2 scenario defaults on import (GH #12)
+- **SPEC-LOOKUP-01**: When a CPU model is detected from import, Presizion auto-fetches matching SPECrate2017 results from the spec-search GitHub Pages API (`fjacquet.github.io/spec-search/data/processors/{slug}.json`)
+- **SPEC-LOOKUP-02**: Matching results are displayed in a results panel showing: vendor, system name, base score (SPECrate2017_int_base), cores, chips
+- **SPEC-LOOKUP-03**: User can click a result to auto-fill `specintPerServer` in Step 1 with the selected base score
+- **SPEC-LOOKUP-04**: The lookup also works for target scenario CPU — user can search/select a SPECrate score for the target server in Step 2
+- **SPEC-LOOKUP-05**: The "Look up SPECrate" button now opens the spec-search web UI (pre-filtered by CPU model) instead of spec.org
+- **SPEC-LOOKUP-06**: The spec-search API base URL is configurable in `src/lib/config.ts`
+- **SPEC-LOOKUP-07**: Lookup handles gracefully when API is unavailable or CPU model has no matches (shows fallback message, manual entry still works)
+- **SPEC-LOOKUP-08**: CPU model slug is derived from the detected model string (e.g., "Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz" -> "intel-xeon-gold-6526y")
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCOPE-07 | Phase 23 | Complete |
-| SCOPE-08 | Phase 23 | Complete |
-| SCOPE-09 | Phase 23 | Complete |
-| SCOPE-10 | Phase 23 | Complete |
-| AVG-01 | Phase 24 | Complete |
-| AVG-02 | Phase 24 | Complete |
-| AVG-03 | Phase 24 | Complete |
-| AVG-04 | Phase 24 | Complete |
+| SPEC-LOOKUP-01 | TBD | Pending |
+| SPEC-LOOKUP-02 | TBD | Pending |
+| SPEC-LOOKUP-03 | TBD | Pending |
+| SPEC-LOOKUP-04 | TBD | Pending |
+| SPEC-LOOKUP-05 | TBD | Pending |
+| SPEC-LOOKUP-06 | TBD | Pending |
+| SPEC-LOOKUP-07 | TBD | Pending |
+| SPEC-LOOKUP-08 | TBD | Pending |
 
 **Coverage:**
-- v2.1 requirements: 8 total
-- Mapped to phases: 8
-- Unmapped: 0
+- v2.2 requirements: 8 total
+- Mapped to phases: 0
+- Unmapped: 8
 
 ---
 *Requirements defined: 2026-03-15*
