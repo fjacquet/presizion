@@ -1,8 +1,8 @@
 /**
- * ScenarioCard — Tests for SCEN-01 through SCEN-05, PERF-03
- * Requirements: SCEN-01, SCEN-02, SCEN-03, SCEN-04, SCEN-05, PERF-03
+ * ScenarioCard — Tests for SCEN-01 through SCEN-05, PERF-03, SPEC-LOOKUP-04
+ * Requirements: SCEN-01, SCEN-02, SCEN-03, SCEN-04, SCEN-05, PERF-03, SPEC-LOOKUP-04
  */
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { ScenarioCard } from '../ScenarioCard'
 import { Step2Scenarios } from '../Step2Scenarios'
@@ -15,6 +15,18 @@ import {
   DEFAULT_VCPU_TO_PCORE_RATIO,
   DEFAULT_HEADROOM_PERCENT,
 } from '@/lib/sizing/defaults'
+
+// Mock the specLookup module so we control fetch results in tests
+vi.mock('@/lib/utils/specLookup', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/utils/specLookup')>()
+  return {
+    ...actual,
+    fetchSpecResults: vi.fn().mockResolvedValue({ results: [], status: 'no-results' as const }),
+  }
+})
+
+import { fetchSpecResults } from '@/lib/utils/specLookup'
+const mockFetchSpecResults = vi.mocked(fetchSpecResults)
 
 // Reset stores between tests to avoid cross-test contamination
 beforeEach(() => {
@@ -344,6 +356,95 @@ describe('SPEC-06..09: auto-derive and read-only fields', () => {
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
     expect(screen.queryByText(/no socket\/core data from import/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
+  beforeEach(() => {
+    mockFetchSpecResults.mockReset()
+    mockFetchSpecResults.mockResolvedValue({ results: [], status: 'no-results' })
+  })
+
+  it('in SPECint mode, renders "Target CPU Model" input', () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(screen.getByPlaceholderText(/xeon gold 6526y/i)).toBeInTheDocument()
+  })
+
+  it('in vcpu mode, does NOT render "Target CPU Model" input', () => {
+    // sizingMode is 'vcpu' by default
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+    expect(screen.queryByPlaceholderText(/xeon gold 6526y/i)).not.toBeInTheDocument()
+  })
+
+  it('typing a CPU model and waiting for debounce triggers fetch and shows results panel', async () => {
+    mockFetchSpecResults.mockResolvedValue({
+      results: [
+        { vendor: 'Dell', system: 'PowerEdge R660', baseResult: 337, peakResult: 370, cores: 32, chips: 2 },
+      ],
+      status: 'ok',
+    })
+
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+
+    const cpuInput = screen.getByPlaceholderText(/xeon gold 6526y/i)
+    fireEvent.change(cpuInput, { target: { value: 'Xeon Gold 6526Y' } })
+
+    // Wait for debounce (500ms) + fetch
+    await waitFor(() => {
+      expect(mockFetchSpecResults).toHaveBeenCalled()
+    }, { timeout: 2000 })
+
+    // Results panel should show the result
+    await waitFor(() => {
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
+    })
+  })
+
+  it('clicking a result row updates targetSpecint field value', async () => {
+    mockFetchSpecResults.mockResolvedValue({
+      results: [
+        { vendor: 'Dell', system: 'PowerEdge R660', baseResult: 337, peakResult: 370, cores: 32, chips: 2 },
+      ],
+      status: 'ok',
+    })
+
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+    })
+    const scenario = useScenariosStore.getState().scenarios[0]!
+    render(<ScenarioCard scenarioId={scenario.id} />)
+
+    const cpuInput = screen.getByPlaceholderText(/xeon gold 6526y/i)
+    fireEvent.change(cpuInput, { target: { value: 'Xeon Gold 6526Y' } })
+
+    // Wait for results to appear
+    await waitFor(() => {
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
+    }, { timeout: 2000 })
+
+    // Expand the panel by clicking the toggle
+    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+
+    // Click the result row
+    await waitFor(() => {
+      expect(screen.getByText('337')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByText('337'))
+
+    // targetSpecint field should be updated
+    await waitFor(() => {
+      const specintInput = screen.getByTestId(`input-targetSpecint-${scenario.id}`) as HTMLInputElement
+      expect(specintInput.value).toBe('337')
+    })
   })
 })
 
