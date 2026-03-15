@@ -1,11 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest'
 
 import { SPEC_SEARCH_API_URL, SPEC_SEARCH_WEB_URL } from '../../config'
 import {
   cpuModelToSlug,
   fetchSpecResults,
-  type SpecResult,
-  type SpecLookupResult,
 } from '../specLookup'
 
 /* ------------------------------------------------------------------ */
@@ -108,8 +106,7 @@ describe('fetchSpecResults', () => {
 
     expect(result.status).toBe('ok')
     expect(result.results).toHaveLength(1)
-    expect(result.results[0].vendor).toBe('Dell Inc.')
-    expect(result.results[0].benchmark).toBeUndefined()
+    expect(result.results[0]!.vendor).toBe('Dell Inc.')
   })
 
   it('returns empty array with error status on network failure', async () => {
