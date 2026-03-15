@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: — SPEC Search Integration
 status: completed
-stopped_at: Completed 26-01-PLAN.md
-last_updated: "2026-03-15T19:00:09.000Z"
-last_activity: 2026-03-15 — Phase 26 Plan 01 complete (SPEC Lookup UI)
+stopped_at: Completed 26-02-PLAN.md
+last_updated: "2026-03-15T19:05:45.000Z"
+last_activity: 2026-03-15 — Phase 26 Plan 02 complete (SPEC Lookup in ScenarioCard)
 progress:
   total_phases: 9
   completed_phases: 9
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 17
+  completed_plans: 17
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.2 Phase 26 — SPEC Lookup UI (Plan 01 complete)
+**Current focus:** v2.2 Phase 26 — SPEC Lookup UI (Plan 02 complete)
 
 ## Current Position
 
 Phase: 26 of 26 in v2.2 (SPEC Lookup UI)
-Plan: 1 of 1 in current phase
+Plan: 2 of 2 in current phase
 Status: Phase Complete
-Last activity: 2026-03-15 — Phase 26 Plan 01 complete (SPEC Lookup UI)
+Last activity: 2026-03-15 — Phase 26 Plan 02 complete (SPEC Lookup in ScenarioCard)
 
 Progress: [██████████] 100% (v2.2 milestone)
 
@@ -47,7 +47,7 @@ Progress: [██████████] 100% (v2.2 milestone)
 | 23 | 2/2 | 6min | 3min |
 | 24 | 1/1 | 17min | 17min |
 | 25 | 2/2 | 4min | 2min |
-| 26 | 1/1 | 4min | 4min |
+| 26 | 2/2 | 8min | 4min |
 
 *Updated after each plan completion*
 
@@ -65,6 +65,7 @@ Recent decisions affecting current work:
 - [Phase 25-01]: Slug algorithm mirrors spec-search convert_csv.py; SpecLookupResult uses status enum (ok/no-results/error) instead of throwing
 - [Phase 25-02]: spec-search uses hash routing /#/processor/{slug}; dead SPEC_RESULTS_URL removed from config
 - [Phase 26-01]: useSpecLookup hook wraps fetchSpecResults with React state; SpecResultsPanel uses plain HTML table with Tailwind; panel collapsed by default
+- [Phase 26-02]: targetCpuModel is local UI state (not persisted); 500ms debounce via useEffect+setTimeout; SpecResultsPanel only shown when debounced value set
 
 ### Pending Todos
 
@@ -72,11 +73,11 @@ None
 
 ### Blockers/Concerns
 
-- SPEC-LOOKUP-04 (Step 2 lookup): Requires understanding how ScenarioCard currently exposes the target CPU model field before planning
 - SPEC-LOOKUP-08 (slug derivation): Slug algorithm must be validated against actual spec-search API slug format — check fjacquet.github.io/spec-search before implementing
+- Pre-existing TS errors in specLookup.test.ts (6 errors from Plan 01) -- see deferred-items.md
 
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 26-01-PLAN.md
+Stopped at: Completed 26-02-PLAN.md
 Resume file: None

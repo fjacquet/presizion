@@ -24,7 +24,7 @@
 | SPEC-LOOKUP-08 | Phase 25 | Complete |
 | SPEC-LOOKUP-02 | Phase 26 | Complete |
 | SPEC-LOOKUP-03 | Phase 26 | Complete |
-| SPEC-LOOKUP-04 | Phase 26 | Pending |
+| SPEC-LOOKUP-04 | Phase 26 | Complete |
 
 **Coverage:**
 - v2.2 requirements: 8 total

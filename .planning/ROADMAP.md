@@ -80,7 +80,7 @@ Full details: `.planning/milestones/v2.1-ROADMAP.md`
 **Milestone Goal:** Integrate spec-search (fjacquet.github.io/spec-search) to auto-lookup SPECrate2017 benchmark scores from detected CPU models, eliminating manual SPEC website searches for both existing cluster CPUs and target scenario CPUs.
 
 - [x] **Phase 25: SPEC Lookup Service** - Slug derivation, fetch service, error handling, URL config, and updated lookup link (completed 2026-03-15)
-- [ ] **Phase 26: SPEC Lookup UI** - Results panel display and one-click auto-fill for Step 1 and Step 2
+- [x] **Phase 26: SPEC Lookup UI** - Results panel display and one-click auto-fill for Step 1 and Step 2 (completed 2026-03-15)
 
 ## Phase Details
 
@@ -240,7 +240,7 @@ Plans:
   2. Clicking a result row in the Step 1 panel auto-fills the `specintPerServer` field with the selected base score without any further user action
   3. A equivalent SPECrate results panel and auto-fill mechanism is present in Step 2 (ScenarioCard) for the target server CPU model
   4. When no CPU model is detected or the lookup returns no results, the panel shows a clear fallback message; the manual `specintPerServer` entry field remains accessible at all times
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 26-01-PLAN.md — useSpecLookup hook + SpecResultsPanel component + Step 1 integration
@@ -275,4 +275,4 @@ Plans:
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 26. SPEC Lookup UI | 1/2 | In Progress|  | - |
+| 26. SPEC Lookup UI | 2/2 | Complete   | 2026-03-15 | - |
