@@ -16,7 +16,6 @@ import {
   FTT_POLICY_MAP,
   COMPRESSION_FACTOR_LABELS,
   type VsanFttPolicy,
-  type VsanCompressionFactor,
 } from '@/lib/sizing/vsanConstants'
 import {
   VSAN_DEFAULT_SLACK_PERCENT,
