@@ -26,6 +26,8 @@ import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
 import { toast } from 'sonner'
 import type { OldCluster } from '@/types/cluster'
+import { cpuModelToSlug } from '@/lib/utils/specLookup'
+import { SPEC_SEARCH_WEB_URL } from '@/lib/config'
 
 // Tooltip text constants (UX-03)
 const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
@@ -37,7 +39,7 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
   coresPerSocket: 'Physical cores per socket from spec sheet — NOT OS-reported logical processors.',
   ramPerServerGb: 'Total RAM installed per existing server (GB).',
   existingServerCount: 'Number of physical servers currently in the cluster (used for SPECint sizing).',
-  specintPerServer: 'SPECrate2017_int_base score per existing server. Find at spec.org/cpu2017/results/ → filter by server model. Default is Dell R660 with 2× Xeon Gold 6526Y (~337). Both existing and target must use the same metric.',
+  specintPerServer: 'SPECrate2017_int_base score per existing server. Find at fjacquet.github.io/spec-search → filter by processor. Default is Dell R660 with 2x Xeon Gold 6526Y (~337). Both existing and target must use the same metric.',
   cpuUtilizationPercent: 'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
   ramUtilizationPercent: 'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
   cpuFrequencyGhz: 'Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.',
@@ -254,9 +256,9 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       } catch {
         // Clipboard API may fail in non-secure contexts; proceed anyway
       }
+      const slug = cpuModelToSlug(currentCluster.cpuModel)
+      window.open(`${SPEC_SEARCH_WEB_URL}/#/processor/${slug}`, '_blank', 'noopener,noreferrer')
     }
-    const { SPEC_RESULTS_URL } = await import('@/lib/config')
-    window.open(SPEC_RESULTS_URL, '_blank', 'noopener,noreferrer')
   }
 
   async function handleNext() {
