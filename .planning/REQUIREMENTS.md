@@ -17,19 +17,19 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SPEC-LOOKUP-01 | TBD | Pending |
-| SPEC-LOOKUP-02 | TBD | Pending |
-| SPEC-LOOKUP-03 | TBD | Pending |
-| SPEC-LOOKUP-04 | TBD | Pending |
-| SPEC-LOOKUP-05 | TBD | Pending |
-| SPEC-LOOKUP-06 | TBD | Pending |
-| SPEC-LOOKUP-07 | TBD | Pending |
-| SPEC-LOOKUP-08 | TBD | Pending |
+| SPEC-LOOKUP-01 | Phase 25 | Pending |
+| SPEC-LOOKUP-05 | Phase 25 | Pending |
+| SPEC-LOOKUP-06 | Phase 25 | Pending |
+| SPEC-LOOKUP-07 | Phase 25 | Pending |
+| SPEC-LOOKUP-08 | Phase 25 | Pending |
+| SPEC-LOOKUP-02 | Phase 26 | Pending |
+| SPEC-LOOKUP-03 | Phase 26 | Pending |
+| SPEC-LOOKUP-04 | Phase 26 | Pending |
 
 **Coverage:**
 - v2.2 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-15*

@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: — SPEC Search Integration
-status: planning
-stopped_at: —
+status: ready_to_plan
+stopped_at: Roadmap created, Phase 25 ready to plan
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 — Milestone v2.2 started
+last_activity: 2026-03-15 — Roadmap v2.2 created (Phases 25-26)
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,39 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.1 Phase 24 — Average VM Metrics (COMPLETE)
+**Current focus:** v2.2 Phase 25 — SPEC Lookup Service (ready to plan)
 
 ## Current Position
 
-Phase: 24 of 24 in v2.1 (Average VM Metrics)
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Executing
-Last activity: 2026-03-15 — Completed 24-01 avg per-VM metrics in DerivedMetricsPanel
+Phase: 25 of 26 in v2.2 (SPEC Lookup Service)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-15 — Roadmap v2.2 created; v2.1 fully shipped (Phases 23-24 complete)
 
-Progress: [██████████] 100% (v2.1 milestone)
+Progress: [░░░░░░░░░░] 0% (v2.2 milestone)
 
 ## Performance Metrics
 
-**Velocity (v2.0 reference):**
+**Velocity (v2.1 reference):**
 
-- Total plans completed (v2.0): 10
-- Average duration: 4 min/plan
-- Total execution time: ~0.7 hours
+- Total plans completed (v2.1): 3
+- Average duration: ~7 min/plan
+- Total execution time: ~0.35 hours
 
-**By Phase (v2.0):**
+**By Phase (recent):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 18 | 2/2 | 6min | 3min |
-| 19 | 3/3 | 7min | 2min |
-| 20 | 1/1 | 4min | 4min |
-| 21 | 1/1 | 4min | 4min |
-| 22 | 3/3 | 12min | 4min |
 | 23 | 2/2 | 6min | 3min |
+| 24 | 1/1 | 17min | 17min |
 
 *Updated after each plan completion*
-| Phase 23 P02 | 3min | 1 tasks | 4 files |
-| Phase 24 P01 | 17min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -62,15 +56,10 @@ Progress: [██████████] 100% (v2.1 milestone)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Phase 23-01]: RVTools standalone scope uses dc||__standalone__ pattern matching LiveOptics for consistency
-- [Phase 23-01]: ramPerServerGb uses host-count-weighted average with fallback hostCount=1
-- [Phase 23-02]: Host count suffix format: 'Label (N hosts)' with graceful omission when absent
-- [v1.4 post-phase]: Standalone scope labeling hotfix shipped — SCOPE-08 now fully addressed in both parsers
-- [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — scope fixes and AVG metrics live here
-- [Phase 18-02]: Disaggregated layout overrides vSAN; layoutMode separation is already in place
-- [v2.0 general]: derive-on-read pattern in use throughout — no stale result state to manage
-- [Phase 23-02]: Host count suffix format: Label (N hosts) with graceful omission when absent
 - [Phase 24-01]: Avg RAM/VM reads avgRamPerVmGb directly; grid expanded to sm:grid-cols-5
+- [Phase 23-01]: ramPerServerGb uses host-count-weighted average with fallback hostCount=1
+- [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — SPEC lookup service should read cpuModel from here
+- [v2.0 general]: derive-on-read pattern in use throughout — SPEC lookup results should derive from detected CPU, not be stored
 
 ### Pending Todos
 
@@ -78,11 +67,11 @@ None
 
 ### Blockers/Concerns
 
-- SCOPE-08: v1.4 post-phase hotfix addressed standalone labeling — confirm whether behavior is already correct before treating as net-new
-- AVG-04: Seeding scenario defaults on import requires understanding ScenarioCard initialization path; check useImportStore and scenario creation flow before planning
+- SPEC-LOOKUP-04 (Step 2 lookup): Requires understanding how ScenarioCard currently exposes the target CPU model field before planning
+- SPEC-LOOKUP-08 (slug derivation): Slug algorithm must be validated against actual spec-search API slug format — check fjacquet.github.io/spec-search before implementing
 
 ## Session Continuity
 
-Last session: 2026-03-15T16:45:50Z
-Stopped at: Completed 24-01-PLAN.md (avg per-VM metrics in DerivedMetricsPanel)
+Last session: 2026-03-15
+Stopped at: Roadmap v2.2 created — Phase 25 ready to plan
 Resume file: None

@@ -6,7 +6,8 @@
 - ✅ **v1.3 — Scope, Persistence & Branding** — Phases 11-15 (shipped 2026-03-14)
 - ✅ **v1.4 — Bug Fixes, Chart Polish & UX** — Phases 16-17 (shipped 2026-03-14)
 - ✅ **v2.0 — vSAN-Aware Sizing Engine** — Phases 18-22 (shipped 2026-03-15)
-- 🚧 **v2.1 — Import UX & Scope Fixes** — Phases 23-24 (in progress)
+- ✅ **v2.1 — Import UX & Scope Fixes** — Phases 23-24 (shipped 2026-03-15)
+- 🚧 **v2.2 — SPEC Search Integration** — Phases 25-26 (in progress)
 
 ## Phases
 
@@ -64,12 +65,22 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
 </details>
 
-### v2.1 — Import UX & Scope Fixes (In Progress)
+<details>
+<summary>✅ v2.1 — Import UX & Scope Fixes (Phases 23-24) — SHIPPED 2026-03-15</summary>
 
-**Milestone Goal:** Fix "All" scope aggregation to correctly exclude clusterless hosts, surface those hosts as "Standalone", and display average per-VM resource requirements derived from import data to improve sizing context.
+Full details: `.planning/milestones/v2.1-ROADMAP.md`
 
-- [x] **Phase 23: Scope Aggregation Fixes** - Correct "All" aggregation, Standalone labeling, weighted RAM average, and host-count display in scope selector (completed 2026-03-15)
-- [x] **Phase 24: Average VM Metrics** - Compute and display average vCPU/RAM/Disk per VM in Step 1 derived metrics; seed those values into Step 2 scenario defaults on import (completed 2026-03-15)
+- [x] Phase 23: Scope Aggregation Fixes (2/2 plans) — completed 2026-03-15
+- [x] Phase 24: Average VM Metrics (1/1 plan) — completed 2026-03-15
+
+</details>
+
+### v2.2 — SPEC Search Integration (In Progress)
+
+**Milestone Goal:** Integrate spec-search (fjacquet.github.io/spec-search) to auto-lookup SPECrate2017 benchmark scores from detected CPU models, eliminating manual SPEC website searches for both existing cluster CPUs and target scenario CPUs.
+
+- [ ] **Phase 25: SPEC Lookup Service** - Slug derivation, fetch service, error handling, URL config, and updated lookup link
+- [ ] **Phase 26: SPEC Lookup UI** - Results panel display and one-click auto-fill for Step 1 and Step 2
 
 ## Phase Details
 
@@ -198,7 +209,34 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 24-01-PLAN.md — Add avg vCPU/RAM/Disk per VM to DerivedMetricsPanel + verify scenario seeding
+- [x] 24-01-PLAN.md — Add avg vCPU/RAM/Disk per VM to DerivedMetricsPanel + verify scenario seeding
+
+### Phase 25: SPEC Lookup Service
+
+**Goal**: A pure TypeScript service exists that derives a URL-safe slug from any CPU model string, fetches matching SPECrate2017 results from the spec-search GitHub Pages API, handles errors and empty results gracefully, exposes a configurable API base URL in `src/lib/config.ts`, and updates the existing "Look up SPECrate" button to open the spec-search web UI pre-filtered by the detected CPU model.
+**Depends on**: Phase 24
+**Requirements**: SPEC-LOOKUP-01, SPEC-LOOKUP-05, SPEC-LOOKUP-06, SPEC-LOOKUP-07, SPEC-LOOKUP-08
+**Success Criteria** (what must be TRUE):
+
+  1. Given "Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz", the slug function returns "intel-xeon-gold-6526y" (normalizes to lowercase, strips noise words, collapses non-alphanumeric to hyphens)
+  2. When a CPU model is detected from import, the service fetches `{baseUrl}/data/processors/{slug}.json` and returns the parsed results array
+  3. When the API is unreachable or returns a non-200 response, the service returns an empty results array and does not throw — manual entry remains available
+  4. When the API returns results but none match the CPU model, the service surfaces an explicit "no results" state distinct from an error state
+  5. The spec-search API base URL is defined as a named constant in `src/lib/config.ts` and the existing "Look up SPECrate" button opens spec-search pre-filtered by CPU slug instead of spec.org
+**Plans**: TBD
+
+### Phase 26: SPEC Lookup UI
+
+**Goal**: Users see a collapsible SPECrate results panel in both Step 1 and Step 2 that displays auto-fetched benchmark results (vendor, system, base score, cores, chips) for the detected CPU model, and can click any result to immediately populate the `specintPerServer` field — eliminating the need to visit any external website.
+**Depends on**: Phase 25
+**Requirements**: SPEC-LOOKUP-02, SPEC-LOOKUP-03, SPEC-LOOKUP-04
+**Success Criteria** (what must be TRUE):
+
+  1. After import with a recognized CPU model, a SPECrate results panel appears in Step 1 showing at least: vendor, system name, SPECrate2017_int_base score, core count, and chip count for each matching result
+  2. Clicking a result row in the Step 1 panel auto-fills the `specintPerServer` field with the selected base score without any further user action
+  3. A equivalent SPECrate results panel and auto-fill mechanism is present in Step 2 (ScenarioCard) for the target server CPU model
+  4. When no CPU model is detected or the lookup returns no results, the panel shows a clear fallback message; the manual `specintPerServer` entry field remains accessible at all times
+**Plans**: TBD
 
 ## Progress
 
@@ -227,4 +265,6 @@ Plans:
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
-| 24. Average VM Metrics | 1/1 | Complete    | 2026-03-15 | - |
+| 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
+| 25. SPEC Lookup Service | v2.2 | 0/TBD | Not started | - |
+| 26. SPEC Lookup UI | v2.2 | 0/TBD | Not started | - |
