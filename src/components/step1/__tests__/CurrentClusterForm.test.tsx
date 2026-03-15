@@ -1,6 +1,6 @@
 /**
- * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK
- * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK-01, SPEC-LINK-02, SPEC-LINK-03
+ * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK, SPEC-LOOKUP
+ * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK-01, SPEC-LINK-02, SPEC-LINK-03, SPEC-LOOKUP-02, SPEC-LOOKUP-03
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
@@ -9,6 +9,21 @@ import { DerivedMetricsPanel } from '../DerivedMetricsPanel'
 import { Step1CurrentCluster } from '../Step1CurrentCluster'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useWizardStore } from '@/store/useWizardStore'
+
+// Mock fetchSpecResults for SPEC-LOOKUP tests
+vi.mock('@/lib/utils/specLookup', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/utils/specLookup')>()
+  return {
+    ...actual,
+    fetchSpecResults: vi.fn().mockResolvedValue({
+      results: [
+        { vendor: 'Dell', system: 'PowerEdge R660', baseResult: 337, peakResult: 400, cores: 32, chips: 2 },
+        { vendor: 'HPE', system: 'ProLiant DL360', baseResult: 320, peakResult: 385, cores: 32, chips: 2 },
+      ],
+      status: 'ok',
+    }),
+  }
+})
 
 // Reset Zustand store before each test to prevent cross-test contamination
 beforeEach(() => {
@@ -426,5 +441,82 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     })
     render(<CurrentClusterForm onNext={vi.fn()} />)
     expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('SPEC-LOOKUP: integrated SpecResultsPanel', () => {
+  it('renders SpecResultsPanel when cpuModel is present', async () => {
+    act(() => {
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+
+    // The collapsible heading should be present
+    await waitFor(() => {
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
+    })
+  })
+
+  it('does not render SpecResultsPanel when cpuModel is absent', () => {
+    act(() => {
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+    expect(screen.queryByText('SPECrate2017 Results')).not.toBeInTheDocument()
+  })
+
+  it('shows results table when panel is expanded', async () => {
+    act(() => {
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
+    })
+
+    // Expand the panel
+    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Dell')).toBeInTheDocument()
+      expect(screen.getByText('PowerEdge R660')).toBeInTheDocument()
+      expect(screen.getByText('337')).toBeInTheDocument()
+    })
+  })
+
+  it('clicking a result row updates specintPerServer field value', async () => {
+    act(() => {
+      useWizardStore.setState({ sizingMode: 'specint' })
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+      })
+    })
+    render(<CurrentClusterForm onNext={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
+    })
+
+    // Expand and click a row
+    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Dell')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Dell'))
+
+    // The specintPerServer input should now have the value 337
+    await waitFor(() => {
+      const specInput = screen.getByTestId('input-specintPerServer') as HTMLInputElement
+      expect(specInput.value).toBe('337')
+    })
   })
 })

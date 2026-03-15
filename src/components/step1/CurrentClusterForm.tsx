@@ -28,6 +28,8 @@ import { toast } from 'sonner'
 import type { OldCluster } from '@/types/cluster'
 import { cpuModelToSlug } from '@/lib/utils/specLookup'
 import { SPEC_SEARCH_WEB_URL } from '@/lib/config'
+import { useSpecLookup } from '@/hooks/useSpecLookup'
+import { SpecResultsPanel } from '@/components/common/SpecResultsPanel'
 
 // Tooltip text constants (UX-03)
 const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
@@ -159,6 +161,8 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
   const [cpuUtilEnabled, setCpuUtilEnabled] = useState(() => currentCluster.cpuUtilizationPercent !== undefined)
   const [ramUtilEnabled, setRamUtilEnabled] = useState(() => currentCluster.ramUtilizationPercent !== undefined)
+  const [selectedSpecScore, setSelectedSpecScore] = useState<number | undefined>(undefined)
+  const { results: specResults, status: specStatus, isLoading: specLoading } = useSpecLookup(currentCluster.cpuModel)
 
   const form = useForm<CurrentClusterInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,6 +324,18 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             >
               Look up SPECrate <ExternalLink className="h-3 w-3" />
             </button>
+          )}
+          {currentCluster.cpuModel && (
+            <SpecResultsPanel
+              results={specResults}
+              status={specStatus}
+              isLoading={specLoading}
+              selectedScore={selectedSpecScore}
+              onSelect={(baseScore) => {
+                setSelectedSpecScore(baseScore)
+                form.setValue('specintPerServer', baseScore, { shouldValidate: true })
+              }}
+            />
           )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <NumericFormField control={form.control} name="existingServerCount" label="Existing Server Count" testId="input-existingServerCount" optional />

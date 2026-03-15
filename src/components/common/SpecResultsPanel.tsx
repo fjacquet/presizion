@@ -7,7 +7,7 @@ interface SpecResultsPanelProps {
   status: SpecLookupResult['status']
   isLoading: boolean
   onSelect: (baseScore: number) => void
-  selectedScore?: number
+  selectedScore?: number | undefined
 }
 
 /**
