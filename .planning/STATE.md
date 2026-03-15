@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: — Import UX & Scope Fixes
 status: executing
-stopped_at: Completed 23-01-PLAN.md (scope aggregation fixes)
-last_updated: "2026-03-15T14:47:21.950Z"
-last_activity: 2026-03-15 — Completed 23-01 scope aggregation fixes
+stopped_at: Completed 23-02-PLAN.md (host count display in scope selectors)
+last_updated: "2026-03-15T14:56:18.498Z"
+last_activity: 2026-03-15 — Completed 23-02 host count display in scope selectors
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
-  percent: 0
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 ## Current Position
 
 Phase: 23 of 24 in v2.1 (Scope Aggregation Fixes)
-Plan: 1 of 2 in current phase
+Plan: 2 of 2 in current phase (COMPLETE)
 Status: Executing
-Last activity: 2026-03-15 — Completed 23-01 scope aggregation fixes
+Last activity: 2026-03-15 — Completed 23-02 host count display in scope selectors
 
 Progress: [█████████░] 92% (v2.1 milestone)
 
@@ -49,9 +49,10 @@ Progress: [█████████░] 92% (v2.1 milestone)
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
 | 22 | 3/3 | 12min | 4min |
-| 23 | 1/2 | 3min | 3min |
+| 23 | 2/2 | 6min | 3min |
 
 *Updated after each plan completion*
+| Phase 23 P02 | 3min | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -62,10 +63,12 @@ Recent decisions affecting current work:
 
 - [Phase 23-01]: RVTools standalone scope uses dc||__standalone__ pattern matching LiveOptics for consistency
 - [Phase 23-01]: ramPerServerGb uses host-count-weighted average with fallback hostCount=1
+- [Phase 23-02]: Host count suffix format: 'Label (N hosts)' with graceful omission when absent
 - [v1.4 post-phase]: Standalone scope labeling hotfix shipped — SCOPE-08 now fully addressed in both parsers
 - [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — scope fixes and AVG metrics live here
 - [Phase 18-02]: Disaggregated layout overrides vSAN; layoutMode separation is already in place
 - [v2.0 general]: derive-on-read pattern in use throughout — no stale result state to manage
+- [Phase 23-02]: Host count suffix format: Label (N hosts) with graceful omission when absent
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15
-Stopped at: Completed 23-01-PLAN.md (scope aggregation fixes). Ready for 23-02.
+Last session: 2026-03-15T14:56:15.471Z
+Stopped at: Completed 23-02-PLAN.md (host count display in scope selectors)
 Resume file: None

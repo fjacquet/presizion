@@ -68,7 +68,7 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
 **Milestone Goal:** Fix "All" scope aggregation to correctly exclude clusterless hosts, surface those hosts as "Standalone", and display average per-VM resource requirements derived from import data to improve sizing context.
 
-- [ ] **Phase 23: Scope Aggregation Fixes** - Correct "All" aggregation, Standalone labeling, weighted RAM average, and host-count display in scope selector
+- [x] **Phase 23: Scope Aggregation Fixes** - Correct "All" aggregation, Standalone labeling, weighted RAM average, and host-count display in scope selector (completed 2026-03-15)
 - [ ] **Phase 24: Average VM Metrics** - Compute and display average vCPU/RAM/Disk per VM in Step 1 derived metrics; seed those values into Step 2 scenario defaults on import
 
 ## Phase Details
@@ -178,7 +178,7 @@ Plans:
   2. Clusterless hosts that belong to a datacenter appear as a selectable "Standalone (datacenter-name)" scope entry in the scope selector
   3. When multiple scopes are selected, the RAM/server value displayed in Step 1 is a host-count-weighted average across those scopes, not the value from whichever scope was first
   4. Each scope entry in the selector shows its host count in parentheses (e.g., "vxr-clu-win (16 hosts)") giving users immediate sizing context
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 23-01-PLAN.md — Fix parser standalone routing (RVTools + LiveOptics) and weighted RAM/server in aggregator
@@ -223,5 +223,5 @@ Plans:
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
-| 23. Scope Aggregation Fixes | 1/2 | In Progress|  | - |
+| 23. Scope Aggregation Fixes | 2/2 | Complete   | 2026-03-15 | - |
 | 24. Average VM Metrics | v2.1 | 0/TBD | Not started | - |
