@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, Database } from 'lucide-react'
+import { STORE_PREDICT_URL } from '@/lib/config'
 import { useWizardStore } from '@/store/useWizardStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
@@ -48,10 +49,19 @@ export function WizardShell() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="relative mb-6 text-center print:hidden">
-          <div className="absolute left-0 top-0">
+          <div className="absolute left-0 top-0 flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={() => setResetOpen(true)} aria-label="Reset">
               <RotateCcw className="h-4 w-4" />
             </Button>
+            <a
+              href={STORE_PREDICT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Storage Calculator (Store-Predict)"
+              className="inline-flex items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <Database className="h-4 w-4" />
+            </a>
           </div>
           <div className="absolute right-0 top-0">
             <ThemeToggle />
