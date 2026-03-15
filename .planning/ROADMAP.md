@@ -275,4 +275,4 @@ Plans:
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 26. SPEC Lookup UI | 2/2 | Complete   | 2026-03-15 | - |
+| 26. SPEC Lookup UI | 2/2 | Complete    | 2026-03-15 | - |
