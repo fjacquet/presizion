@@ -25,6 +25,7 @@ interface CapacityRow {
 /**
  * Creates a custom label renderer for stacked bar segments.
  * Shows percentage of total when the segment is wide enough.
+ * Returns an invisible <text> element when hidden (Recharts label prop requires ReactElement).
  */
 function renderLabel(rows: readonly CapacityRow[]) {
   return function SegmentLabel(props: {
@@ -34,10 +35,12 @@ function renderLabel(rows: readonly CapacityRow[]) {
     height?: number
     value?: number
     index?: number
-  }) {
+  }): React.ReactElement<SVGElement> {
     const { x = 0, y = 0, width = 0, height = 0, value = 0, index = 0 } = props
     const row = rows[index]
-    if (!row || width < 30 || row.total === 0) return null
+    if (!row || width < 30 || row.total === 0) {
+      return <text visibility="hidden" />
+    }
     return (
       <text
         x={x + width / 2}

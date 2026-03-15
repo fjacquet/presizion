@@ -14,6 +14,8 @@ import { useState, useRef, useEffect } from 'react'
 import { ComparisonTable } from './ComparisonTable'
 import { SizingChart } from './SizingChart'
 import { CoreCountChart } from './CoreCountChart'
+import { CapacityStackedChart } from './CapacityStackedChart'
+import { MinNodesChart } from './MinNodesChart'
 import { Button } from '@/components/ui/button'
 import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
@@ -110,6 +112,8 @@ export function Step3ReviewExport() {
       <div className="print:hidden space-y-8">
         <SizingChart />
         <CoreCountChart />
+        <CapacityStackedChart />
+        <MinNodesChart />
       </div>
     </div>
   )
