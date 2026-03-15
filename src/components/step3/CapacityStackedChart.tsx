@@ -5,7 +5,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts'
 import { useScenariosStore } from '@/store/useScenariosStore'
@@ -190,7 +189,6 @@ export function CapacityStackedChart() {
                       return `${val.toFixed(1)} (${pct}% of ${abs.total.toFixed(1)} total)`
                     }}
                   />
-                  <Legend />
                   <Bar
                     dataKey="required"
                     name="Required"
@@ -214,6 +212,20 @@ export function CapacityStackedChart() {
                   />
                 </BarChart>
               </ResponsiveContainer>
+              <div className="flex justify-center gap-6 text-xs text-muted-foreground pb-2">
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[0] }} />
+                  Required
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[1] }} />
+                  Spare
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[2] }} />
+                  Excess
+                </span>
+              </div>
             </div>
           </div>
         )

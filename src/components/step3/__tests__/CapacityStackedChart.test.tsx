@@ -137,10 +137,13 @@ describe('CapacityStackedChart', () => {
     expect(names.some((n) => n?.includes('Excess'))).toBe(true)
   })
 
-  it('renders Legend component', () => {
+  it('renders legend labels', () => {
     act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown])
     render(<CapacityStackedChart />)
-    expect(screen.getByTestId('legend')).toBeInTheDocument()
+    // Legend labels appear alongside bar series names
+    expect(screen.getAllByText('Required').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Spare').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Excess').length).toBeGreaterThanOrEqual(1)
   })
 })
