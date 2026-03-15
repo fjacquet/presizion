@@ -17,11 +17,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SPEC-LOOKUP-01 | Phase 25 | Pending |
+| SPEC-LOOKUP-01 | Phase 25 | Complete |
 | SPEC-LOOKUP-05 | Phase 25 | Pending |
-| SPEC-LOOKUP-06 | Phase 25 | Pending |
-| SPEC-LOOKUP-07 | Phase 25 | Pending |
-| SPEC-LOOKUP-08 | Phase 25 | Pending |
+| SPEC-LOOKUP-06 | Phase 25 | Complete |
+| SPEC-LOOKUP-07 | Phase 25 | Complete |
+| SPEC-LOOKUP-08 | Phase 25 | Complete |
 | SPEC-LOOKUP-02 | Phase 26 | Pending |
 | SPEC-LOOKUP-03 | Phase 26 | Pending |
 | SPEC-LOOKUP-04 | Phase 26 | Pending |
