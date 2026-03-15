@@ -90,7 +90,8 @@ describe('CurrentClusterForm', () => {
         currentCluster: { totalVcpus: 200, totalPcores: 0, totalVms: 50 },
       })
       render(<DerivedMetricsPanel />)
-      expect(screen.getByText('\u2014')).toBeInTheDocument()
+      // Multiple em-dashes now: ratio + avg RAM + avg Disk (vCPU/VM has a value since totalVms>0)
+      expect(screen.getAllByText('\u2014').length).toBeGreaterThanOrEqual(1)
     })
 
     it('DerivedMetricsPanel re-renders when cluster store updates', async () => {
