@@ -161,6 +161,23 @@ export function CapacityStackedChart() {
                   downloadChartPng(
                     { current: refs.current[scenarioId] ?? null },
                     `capacity-${scenarioName}.png`,
+                    {
+                      legend: [
+                        { label: 'Required', color: CHART_COLORS[0]! },
+                        { label: 'Spare', color: CHART_COLORS[1]! },
+                        { label: 'Excess', color: CHART_COLORS[2]! },
+                      ],
+                      tableHeaders: ['Required', 'Spare', 'Excess', 'Total'],
+                      tableRows: absRows.map(r => ({
+                        label: r.name,
+                        values: [
+                          r.required.toFixed(1),
+                          r.spare.toFixed(1),
+                          r.excess.toFixed(1),
+                          r.total.toFixed(1),
+                        ],
+                      })),
+                    },
                   )
                 }
                 aria-label="Download capacity chart as PNG"
