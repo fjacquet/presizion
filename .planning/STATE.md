@@ -4,7 +4,7 @@ milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
 status: completed
 stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-03-15T05:51:58.742Z"
+last_updated: "2026-03-15T06:20:30.384Z"
 last_activity: 2026-03-15 — Phase 21 Plan 01 complete (CapacityStackedChart + MinNodesChart with PNG download, 14 new tests, 5 files)
 progress:
   total_phases: 5
