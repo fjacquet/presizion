@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: — vSAN-Aware Sizing Engine
-status: completed
-stopped_at: Completed 22-02-PLAN.md
-last_updated: "2026-03-15T10:15:42.827Z"
-last_activity: 2026-03-15 — Phase 22 Plan 02 complete (exportPdf utility with PDF report generation, Export PDF button in Step 3)
+milestone: v2.1
+milestone_name: — Import UX & Scope Fixes
+status: planning
+stopped_at: —
+last_updated: "2026-03-15"
+last_activity: 2026-03-15 — Milestone v2.1 started
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State

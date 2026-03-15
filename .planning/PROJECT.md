@@ -6,6 +6,14 @@ A client-side-only static web application that helps presales engineers and solu
 
 v2.0 shipped with vSAN-aware storage sizing (FTT, raw/usable, overhead), capacity breakdowns, stacked charts, growth projections, compression/dedup, and professional PDF + PPTX export.
 
+## Current Milestone: v2.1 Import UX & Scope Fixes
+
+**Goal:** Fix "All" scope aggregation behavior and add average VM requirements display from imported data.
+
+**Target features:**
+- Fix scope "All" to aggregate named clusters only, show clusterless hosts as "Standalone" (GH #11)
+- Calculate and display average per-VM requirements (vCPU, RAM, disk) from import data (GH #12)
+
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
@@ -80,8 +88,10 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ Stacked capacity bar charts + min-nodes chart — v2.0 / Phase 21
 - ✓ Professional PDF + PPTX report export — v2.0 / Phase 22
 
-### Active (v2.1 candidates)
+### Active (v2.1)
 
+- [ ] Scope "All" aggregates named clusters only; clusterless hosts shown as "Standalone" (GH #11)
+- [ ] Average per-VM requirements (vCPU, RAM, disk) computed from import and displayed in Step 1 (GH #12)
 
 ### Out of Scope
 
@@ -129,4 +139,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
 
 ---
-*Last updated: 2026-03-15 after v2.0 milestone completion*
+*Last updated: 2026-03-15 after v2.1 milestone start*
