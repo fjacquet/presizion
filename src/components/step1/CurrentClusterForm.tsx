@@ -229,8 +229,13 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       if (form.formState.isValid) {
         // Merge form values over existing cluster to preserve non-form fields
         // (cpuModel, cpuFrequencyGhz, avgRamPerVmGb, etc.)
+        // Filter out undefined values to avoid overwriting import data with undefined
         const existing = useClusterStore.getState().currentCluster
-        setCurrentCluster({ ...existing, ...form.getValues() } as OldCluster)
+        const formValues = form.getValues()
+        const defined = Object.fromEntries(
+          Object.entries(formValues).filter(([, v]) => v !== undefined && v !== null),
+        )
+        setCurrentCluster({ ...existing, ...defined } as OldCluster)
       }
     })
     return unsubscribe

@@ -222,8 +222,8 @@ export async function exportPptx(
       { text: s.name, options: { fill: { color: fillColor }, fontSize: 10 } },
       { text: r ? String(r.finalCount) : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
       { text: r ? r.limitingResource : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
-      { text: r ? f1(r.cpuUtilizationPercent) : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
-      { text: r ? f1(r.ramUtilizationPercent) : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
+      { text: r ? `${f1(r.cpuUtilizationPercent)}%` : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
+      { text: r ? `${f1(r.ramUtilizationPercent)}%` : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
     ]
   })
 
@@ -800,9 +800,9 @@ export async function exportPptx(
     { label: 'Limiting Resource', values: (_s, r) => r.limitingResource },
     { label: 'vCPU:pCore Ratio', values: (_s, r) => `${f2(r.achievedVcpuToPCoreRatio)}:1` },
     { label: 'VMs/Server', values: (_s, r) => f2(r.vmsPerServer) },
-    { label: 'CPU Util %', values: (_s, r) => f1(r.cpuUtilizationPercent) },
-    { label: 'RAM Util %', values: (_s, r) => f1(r.ramUtilizationPercent) },
-    { label: 'Disk Util %', values: (_s, r) => f1(r.diskUtilizationPercent) },
+    { label: 'CPU Util %', values: (_s, r) => `${f1(r.cpuUtilizationPercent)}%` },
+    { label: 'RAM Util %', values: (_s, r) => `${f1(r.ramUtilizationPercent)}%` },
+    { label: 'Disk Util %', values: (_s, r) => `${f1(r.diskUtilizationPercent)}%` },
   ]
 
   const finalCompRows = finalMetrics.map((m, rowIdx) => {

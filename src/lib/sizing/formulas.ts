@@ -59,9 +59,12 @@ export function serverCountByRam(
   ramUtilPct: number = 100,
   targetRamUtilPct: number = 100,
 ): number {
+  // Guard: percent values must be 0-100, not 0-1 (ratios)
+  const safeRamUtil = ramUtilPct > 0 && ramUtilPct <= 100 ? ramUtilPct : 100;
+  const safeTargetUtil = targetRamUtilPct > 0 && targetRamUtilPct <= 100 ? targetRamUtilPct : 100;
   return Math.ceil(
-    (totalVms * ramPerVmGb * (ramUtilPct / 100) * growthHeadroomFactor) /
-      (targetRamUtilPct / 100) /
+    (totalVms * ramPerVmGb * (safeRamUtil / 100) * growthHeadroomFactor) /
+      (safeTargetUtil / 100) /
       ramPerServerGb,
   );
 }
