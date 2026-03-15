@@ -64,7 +64,7 @@ Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
 </details>
 
-### 🚧 v2.1 — Import UX & Scope Fixes (In Progress)
+### v2.1 — Import UX & Scope Fixes (In Progress)
 
 **Milestone Goal:** Fix "All" scope aggregation to correctly exclude clusterless hosts, surface those hosts as "Standalone", and display average per-VM resource requirements derived from import data to improve sizing context.
 
@@ -178,7 +178,11 @@ Plans:
   2. Clusterless hosts that belong to a datacenter appear as a selectable "Standalone (datacenter-name)" scope entry in the scope selector
   3. When multiple scopes are selected, the RAM/server value displayed in Step 1 is a host-count-weighted average across those scopes, not the value from whichever scope was first
   4. Each scope entry in the selector shows its host count in parentheses (e.g., "vxr-clu-win (16 hosts)") giving users immediate sizing context
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 23-01-PLAN.md — Fix parser standalone routing (RVTools + LiveOptics) and weighted RAM/server in aggregator
+- [ ] 23-02-PLAN.md — Host count display in scope selector UI (ImportPreviewModal + ScopeBadge)
 
 ### Phase 24: Average VM Metrics
 
@@ -219,5 +223,5 @@ Plans:
 | 20. Scenario Form — vSAN & Growth UI | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
-| 23. Scope Aggregation Fixes | v2.1 | 0/TBD | Not started | - |
+| 23. Scope Aggregation Fixes | v2.1 | 0/2 | Not started | - |
 | 24. Average VM Metrics | v2.1 | 0/TBD | Not started | - |
