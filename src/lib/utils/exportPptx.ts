@@ -686,6 +686,7 @@ export async function exportPptx(
           border: { pt: 0.5, color: 'CFCFCF' },
         },
       )
+      addFooter(bdSlide, dateStr)
     }
 
     // -- Capacity Chart slide (1 per scenario) --
