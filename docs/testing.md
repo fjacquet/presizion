@@ -9,6 +9,7 @@ Key configuration (`vitest.config.ts`):
 - **Environment**: `jsdom`
 - **Globals**: enabled (`true`) -- `describe`, `it`, `expect` are available without import, though most test files import them explicitly from `vitest` for clarity
 - **Setup file**: `src/test-setup.ts`
+- **Current test count**: 561 (as of v2.1)
 - **Test pattern**: `src/**/*.{test,spec}.{ts,tsx}`
 - **Path alias**: `@` maps to `./src`
 
@@ -124,16 +125,61 @@ Tests for file import parsers (RVTools, LiveOptics). These mock the `@e965/xlsx`
 - ESX Hosts sheet extraction for CPU model and frequency
 - Scope detection for cluster segmentation
 
-### 5. Other Test Files
+### 5. vSAN Formula Tests (`src/lib/sizing/__tests__/vsanFormulas.test.ts`)
+
+Pure function tests for the vSAN storage pipeline and overhead functions, developed using TDD (tests written before implementation).
+
+**Covered functions**:
+
+- `computeVsanStorageRaw` -- 5-step storage pipeline (compression, swap, FTT, metadata, slack)
+- `computeVsanEffectiveGhzPerNode` -- CPU overhead reduction
+- `computeVsanEffectiveRamPerNode` -- RAM overhead reduction
+- `serverCountByVsanStorage` -- Server count with FTT minimum node floor
+
+**TDD pattern**: Each function was developed test-first. The test file defines named fixtures with manually computed expected values for each pipeline step, then asserts intermediate and final results. The VSAN-09 invariant (compression applied BEFORE FTT multiplication) is explicitly tested with a dedicated fixture comparing correct vs incorrect ordering.
+
+### 6. Breakdown Invariant Tests (`src/lib/sizing/__tests__/vsanBreakdown.test.ts`)
+
+Tests for `computeVsanBreakdown`, verifying the CAP-06 invariant for every resource row:
+
+```ts
+expect(bd.cpu.required + bd.cpu.spare + bd.cpu.excess).toBeCloseTo(bd.cpu.total);
+expect(bd.memory.required + bd.memory.spare + bd.memory.excess).toBeCloseTo(bd.memory.total);
+expect(bd.storage.required + bd.storage.spare + bd.storage.excess).toBeCloseTo(bd.storage.total);
+```
+
+Tests cover: vSAN-enabled vs non-vSAN scenarios, zero-demand edge cases, disaggregated layout (storage all zeros), growth factor application, and FTT policy minimum node floor interactions.
+
+### 7. Export Function Tests (`src/lib/utils/__tests__/exportPdf.test.ts`, `exportPptx.test.ts`)
+
+Tests for PDF and PPTX export functions mock the heavy document libraries and the chart/logo capture modules:
+
+```ts
+vi.mock('jspdf', () => ({ jsPDF: vi.fn(() => mockDoc) }));
+vi.mock('jspdf-autotable', () => ({ autoTable: vi.fn() }));
+vi.mock('@/lib/utils/chartCapture', () => ({ chartRefToDataUrl: vi.fn().mockResolvedValue(null) }));
+vi.mock('@/lib/utils/logoDataUrl', () => ({ getLogoDataUrl: vi.fn().mockResolvedValue('') }));
+```
+
+For PPTX:
+
+```ts
+vi.mock('pptxgenjs', () => ({ default: vi.fn(() => mockPptx) }));
+```
+
+Tests verify that the export function calls the document library's construction methods (addPage, addText, autoTable / addSlide, addTable) and save/writeFile. They do not assert pixel-level layout -- that is validated by manual review of generated documents.
+
+### 8. Other Test Files
 
 The codebase includes additional test files for:
 
 - Store tests (`useWizardStore.test.ts`, `useImportStore.test.ts`, `useThemeStore.test.ts`)
 - Hook tests (`useScenariosResults.test.ts`, `useBeforeUnload.test.ts`)
 - Schema validation tests (`schemas.test.ts`)
-- Export/clipboard tests (`export.test.ts`, `clipboard.test.ts`)
+- Export/clipboard tests (`export.test.ts`, `clipboard.test.ts`, `exportPdf.test.ts`, `exportPptx.test.ts`)
 - UI tests (`ComparisonTable.test.tsx`, `ScenarioCard.test.tsx`, `SizingChart.test.tsx`, `WizardShell.test.tsx`, `SizingModeToggle.test.tsx`, `ThemeToggle.test.tsx`)
 - Import infrastructure tests (`fileValidation.test.ts`, `formatDetector.test.ts`, `columnResolver.test.ts`, `scopeAggregator.test.ts`)
+- vSAN tests (`vsanFormulas.test.ts`, `vsanBreakdown.test.ts`)
 - CSS/theme tests (`printCss.test.ts`, `darkMode.test.ts`)
 
 ## Fixture Patterns and Constants

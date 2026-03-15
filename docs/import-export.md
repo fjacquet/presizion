@@ -149,9 +149,24 @@ Scope labels are generated for display:
 
 - `"__all__"` becomes `"All"`
 - `"dc||cluster"` becomes `"cluster (dc)"`
+- `"dc||__standalone__"` becomes `"Standalone (dc)"` -- used for VMs that have a datacenter but no cluster assignment
 - Plain cluster name is used as-is
 
+### Standalone scope routing for clusterless VMs
+
+When a VM row has a datacenter value but no cluster value, both parsers route it to the scope key `"dc||__standalone__"` instead of `"__all__"`. This ensures clusterless VMs are attributed to their datacenter and can be selected or deselected independently during scope selection. The `buildScopeLabel` function renders these as `"Standalone (dc-name)"`.
+
 Per-scope aggregates (`ScopeData`) are stored in a `Map<string, ScopeData>` on the import result, containing `totalVcpus`, `totalVms`, `totalDiskGb`, `avgRamPerVmGb`, `vmCount`, and `warnings` for each scope.
+
+### Weighted average RAM in aggregation
+
+When multiple scopes are selected and combined by `scopeAggregator.ts`, `avgRamPerVmGb` is computed as a **VM-count-weighted average** across the selected scopes (not a simple arithmetic mean). The formula is:
+
+```
+avgRamPerVmGb = sum(scope.avgRamPerVmGb * scope.vmCount) / sum(scope.vmCount)
+```
+
+Similarly, `cpuUtilizationPercent` and `ramUtilizationPercent` are aggregated as **host-count-weighted averages** using `existingServerCount` as the weight. `ramPerServerGb` is also host-count-weighted when heterogeneous RAM configurations are detected across clusters (a warning is emitted in that case).
 
 ---
 
@@ -245,6 +260,45 @@ Key details:
 - This format can be re-imported via the JSON parser for full round-trip capability.
 
 `downloadJson()` triggers a browser file download.
+
+### PDF
+
+**Source file:** `src/lib/utils/exportPdf.ts`
+
+`exportPdf()` is an async function that lazy-loads `jsPDF` and `jspdf-autotable` via dynamic `import()` (PDF-03), captures chart images from the DOM via `chartRefToDataUrl()`, and generates a multi-page A4 portrait report.
+
+**Report structure:**
+
+1. **Title page** -- dark navy background with Presizion logo (canvas-rendered via `logoDataUrl.ts`), cluster summary KPIs, and date.
+2. **Executive summary** -- KPI callout numbers (As-Is servers, target servers, CPU/RAM utilization) and a table with one row per scenario.
+3. **As-Is vs To-Be comparison** -- metric rows comparing existing cluster with each scenario (servers, config, pCores, ratios, utilization, disk).
+4. **Sizing assumptions** -- general parameters table, vSAN settings table (conditional), growth projections table (conditional).
+5. **Per-scenario server configuration** -- sockets, cores, RAM, disk per server.
+6. **Per-scenario capacity breakdown** -- table with CPU GHz / Memory GiB / Raw Storage TiB rows (required, spare, excess, total) followed by captured chart images (capacity stacked chart and min-nodes chart).
+
+The function signature accepts parallel arrays: `(cluster, scenarios, results, breakdowns, chartRefs)`. The `chartRefs` record maps keys like `"capacity-{id}"` and `"minnodes-{id}"` to chart container elements.
+
+Output filename: `presizion-sizing-report.pdf`.
+
+### PPTX
+
+**Source file:** `src/lib/utils/exportPptx.ts`
+
+`exportPptx()` is an async function that lazy-loads `pptxgenjs` via dynamic `import()` (PPTX-03) and generates a wide-layout (13.33" x 7.5") PowerPoint presentation.
+
+**Slide structure:**
+
+1. **Title slide** -- dark navy background with logo, cluster summary, and date.
+2. **Executive summary** -- KPI callout numbers and scenario comparison table.
+3. **As-Is vs To-Be comparison** -- same metrics as the PDF comparison table.
+4. **Sizing assumptions** -- general parameters, vSAN settings (conditional), growth projections (conditional, separate slide).
+5. **Per-scenario server configuration** -- hardware specs per scenario.
+6. **Per-scenario capacity breakdown** -- one slide with breakdown table per scenario, one slide with capacity chart image and data table, one slide with min-nodes chart and constraint table.
+7. **Scenario comparison** -- final recap slide with all scenarios side by side.
+
+The function signature mirrors `exportPdf`: `(cluster, scenarios, results, breakdowns, chartRefs)`.
+
+Output filename: `presizion-sizing-report.pptx`.
 
 ### Clipboard (Plain Text Summary)
 
@@ -359,6 +413,10 @@ Used for persistence and shareable URLs. Defined in `src/lib/utils/persistence.t
 | `src/lib/utils/import/jsonParser.ts` | Presizion JSON parser |
 | `src/lib/utils/import/fileValidation.ts` | Extension check, magic byte verification |
 | `src/lib/utils/export.ts` | CSV and JSON export builders, download helpers |
+| `src/lib/utils/exportPdf.ts` | PDF report generator (lazy-loads jsPDF + jspdf-autotable) |
+| `src/lib/utils/exportPptx.ts` | PPTX presentation generator (lazy-loads pptxgenjs) |
+| `src/lib/utils/chartCapture.ts` | SVG-to-PNG chart capture utility for export |
+| `src/lib/utils/logoDataUrl.ts` | Canvas-rendered Presizion logo for PDF/PPTX title pages |
 | `src/lib/utils/clipboard.ts` | Plain text summary builder, clipboard copy |
 | `src/lib/utils/persistence.ts` | localStorage and URL hash encode/decode |
 | `src/types/cluster.ts` | `OldCluster` and `Scenario` interfaces |

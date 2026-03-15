@@ -126,23 +126,40 @@ The import flow is:
 
 ## 3. Adding a New Export Format
 
-Export formats produce downloadable files from sizing results. The existing formats are CSV and JSON, both in `src/lib/utils/export.ts`.
+Export formats produce downloadable files from sizing results. The existing formats are CSV and JSON (both in `src/lib/utils/export.ts`), PDF (`src/lib/utils/exportPdf.ts`), and PPTX (`src/lib/utils/exportPptx.ts`).
 
 ### Architecture
 
-Each export format has two functions:
+There are two patterns depending on the format complexity:
+
+**Simple formats (CSV, JSON)** use two functions:
 
 1. A **builder** that produces a string: `buildXxxContent(cluster, scenarios, results) => string`
 2. A **downloader** that triggers the browser download: `downloadXxx(filename, content) => void`
 
-### Files to Modify
+**Rich document formats (PDF, PPTX)** use a single async function:
+
+1. An **async export function** that lazy-loads the heavy dependency, captures chart images, builds the document, and triggers the download.
+   - Signature: `exportXxx(cluster, scenarios, results, breakdowns, chartRefs) => Promise<void>`
+   - Uses `chartRefToDataUrl()` from `chartCapture.ts` to convert Recharts SVGs to PNG data URLs.
+   - Uses `getLogoDataUrl()` from `logoDataUrl.ts` for the title page logo.
+
+### Files to Modify (simple format)
 
 | File | Change |
 |---|---|
 | `src/lib/utils/export.ts` | Add `buildXxxContent` and `downloadXxx` functions |
 | `src/components/step3/` | Add a download button that calls the new export |
 
-### Step-by-Step
+### Files to Modify (rich document format)
+
+| File | Change |
+|---|---|
+| `src/lib/utils/exportXxx.ts` | New file: async export function with lazy-loaded dependency |
+| `src/lib/utils/chartCapture.ts` | Reuse existing SVG-to-PNG capture utility |
+| `src/components/step3/Step3ReviewExport.tsx` | Add download button, pass `chartRefs.current` to the export function |
+
+### Step-by-Step (simple format)
 
 1. **Add the builder function** in `src/lib/utils/export.ts`:
    - Signature: `buildXxxContent(cluster: OldCluster, scenarios: readonly Scenario[], results: readonly ScenarioResult[]): string`
@@ -161,12 +178,39 @@ Each export format has two functions:
    - Test the builder function with known inputs and verify the output string.
    - Test edge cases (empty scenarios array, special characters in names).
 
-### Checklist
+### Step-by-Step (rich document format -- PDF/PPTX pattern)
+
+1. **Create a new export module** (e.g., `src/lib/utils/exportXxx.ts`):
+   - Export a single async function: `exportXxx(cluster, scenarios, results, breakdowns, chartRefs)`.
+   - Lazy-load the document library via `await import('xxx-library')` to keep the main bundle small.
+   - Capture chart images with `chartRefToDataUrl()` before building pages/slides.
+   - Add the Presizion logo via `getLogoDataUrl()`.
+   - Build the document (title page, tables, charts, footer) and trigger a save/download.
+
+2. **Wire the UI trigger** in `Step3ReviewExport.tsx`:
+   - Add an async click handler that calls the export function with `chartRefs.current`.
+   - Use the existing `chartRefs` ref lifted to `Step3ReviewExport`.
+
+3. **Write tests** in `src/lib/utils/__tests__/exportXxx.test.ts`:
+   - Mock the document library (e.g., `vi.mock('jspdf', ...)` or `vi.mock('pptxgenjs', ...)`).
+   - Mock `chartCapture.ts` and `logoDataUrl.ts`.
+   - Verify the export function calls the library's construction and save methods.
+   - See the existing `exportPdf.test.ts` and `exportPptx.test.ts` for the mocking pattern.
+
+### Checklist (simple format)
 
 - [ ] Builder function (pure, no side effects)
 - [ ] Download function (Blob + object URL pattern)
 - [ ] UI button in Step 3
 - [ ] Unit tests for the builder
+
+### Checklist (rich document format)
+
+- [ ] Async export function with lazy-loaded dependency
+- [ ] Chart capture via `chartRefToDataUrl`
+- [ ] Logo via `getLogoDataUrl`
+- [ ] UI button in `Step3ReviewExport` passing `chartRefs.current`
+- [ ] Tests with mocked document library, chart capture, and logo
 
 ---
 
@@ -205,3 +249,98 @@ Layout modes control whether disk is included as a per-server sizing constraint.
 - [ ] `ModeBtn` added to layout mode row in `SizingModeToggle.tsx`
 - [ ] Constraint integration tests
 - [ ] Toggle component tests
+
+---
+
+## 5. Adding a New vSAN Overhead Parameter
+
+vSAN overhead parameters are optional fields on the `Scenario` interface that feed into the vSAN storage pipeline. The existing parameters are: `vsanFttPolicy`, `vsanCompressionFactor`, `vsanSlackPercent`, `vsanCpuOverheadPercent`, `vsanMemoryPerHostGb`, `vsanVmSwapEnabled`.
+
+### Files to Modify
+
+| File | Change |
+|---|---|
+| `src/types/cluster.ts` | Add the new optional field to `Scenario` |
+| `src/lib/sizing/vsanConstants.ts` | Add default constant if applicable |
+| `src/lib/sizing/vsanFormulas.ts` | Update the relevant pipeline function to use the new parameter |
+| `src/lib/sizing/vsanBreakdown.ts` | Thread the new parameter through breakdown computation |
+| `src/schemas/scenarioSchema.ts` | Add Zod validation for the new field |
+| `src/lib/sizing/defaults.ts` | Add the default value to `createDefaultScenario()` |
+| `src/components/step2/ScenarioCard.tsx` | Add form input for the new parameter |
+
+### Step-by-Step
+
+1. **Add the field** to `Scenario` in `src/types/cluster.ts` as an optional `readonly` property with a JSDoc comment referencing the requirement ID.
+
+2. **Add a default constant** in `vsanConstants.ts` (e.g., `VSAN_DEFAULT_XXX = ...`).
+
+3. **Update the formula** in `vsanFormulas.ts`: add the parameter to the relevant function signature (e.g., `VsanStorageParams`) and incorporate it into the pipeline computation.
+
+4. **Update the breakdown** in `vsanBreakdown.ts`: extract the field from `scenario` and pass it to the formula.
+
+5. **Add Zod validation** in `scenarioSchema.ts` for the new field (typically `z.number().optional()` or `z.boolean().optional()`).
+
+6. **Add the form input** in `ScenarioCard.tsx` within the vSAN settings section, conditionally shown when `vsanFttPolicy` is set.
+
+7. **Write tests**:
+   - Formula unit test in `src/lib/sizing/__tests__/vsanFormulas.test.ts`.
+   - Breakdown integration test in `src/lib/sizing/__tests__/vsanBreakdown.test.ts`.
+   - Schema test for the new field.
+
+### Checklist
+
+- [ ] Optional field added to `Scenario` interface
+- [ ] Default constant in `vsanConstants.ts`
+- [ ] Formula updated in `vsanFormulas.ts`
+- [ ] Breakdown updated in `vsanBreakdown.ts`
+- [ ] Zod schema updated
+- [ ] Default value in `createDefaultScenario()`
+- [ ] Form input in `ScenarioCard.tsx`
+- [ ] Formula and breakdown tests
+
+---
+
+## 6. Adding a New Capacity Breakdown Resource
+
+Capacity breakdowns decompose cluster resources into required/spare/excess segments for charts and PDF/PPTX reports. The existing resources are CPU (GHz), Memory (GiB), and Storage (GiB). Each resource produces a `ResourceBreakdown` object satisfying the CAP-06 invariant: `required + spare + excess === total`.
+
+### Files to Modify
+
+| File | Change |
+|---|---|
+| `src/types/breakdown.ts` | Add the new resource field to `VsanCapacityBreakdown` |
+| `src/lib/sizing/vsanBreakdown.ts` | Add a `computeXxxBreakdown` internal function and wire it into `computeVsanBreakdown` |
+| `src/components/step3/CapacityStackedChart.tsx` | Add a chart row for the new resource |
+| `src/lib/utils/exportPdf.ts` | Add a table row for the new resource in the per-scenario section |
+| `src/lib/utils/exportPptx.ts` | Add a table row for the new resource in the per-scenario slide |
+
+### Step-by-Step
+
+1. **Add the field** to `VsanCapacityBreakdown` in `src/types/breakdown.ts` (typed as `ResourceBreakdown` or a custom extension).
+
+2. **Implement the breakdown function** in `vsanBreakdown.ts`:
+   - Follow the pattern of `computeCpuBreakdown` / `computeMemoryBreakdown`.
+   - Compute `vmsRequired`, `vsanConsumption`, `required`, `reservedMaxUtil`, `haReserve`, `spare`, `excess`, `total`.
+   - Enforce the CAP-06 invariant: `required + spare + excess === total`.
+   - Return `Object.freeze(...)`.
+
+3. **Wire into `computeVsanBreakdown`**: call the new function and include it in the returned object.
+
+4. **Add chart visualization** in `CapacityStackedChart.tsx`.
+
+5. **Add PDF/PPTX rows** in `exportPdf.ts` and `exportPptx.ts`.
+
+6. **Write tests**:
+   - Unit test the breakdown function with known inputs and verify the CAP-06 invariant.
+   - Test edge cases (zero demand, zero capacity).
+   - Pattern: `expect(bd.required + bd.spare + bd.excess).toBeCloseTo(bd.total)`.
+
+### Checklist
+
+- [ ] New field on `VsanCapacityBreakdown` type
+- [ ] Breakdown function in `vsanBreakdown.ts` with `Object.freeze`
+- [ ] CAP-06 invariant enforced
+- [ ] Wired into `computeVsanBreakdown`
+- [ ] Chart row in `CapacityStackedChart.tsx`
+- [ ] PDF and PPTX table rows
+- [ ] Tests verifying breakdown values and CAP-06 invariant

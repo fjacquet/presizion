@@ -9,7 +9,7 @@ Presizion uses [Zustand](https://github.com/pmndrs/zustand) for client-side stat
 | Store | File | Responsibility |
 |---|---|---|
 | `useClusterStore` | `src/store/useClusterStore.ts` | Holds the existing cluster metrics (`OldCluster`) entered in wizard Step 1. |
-| `useScenariosStore` | `src/store/useScenariosStore.ts` | Holds the list of target `Scenario[]` objects configured in wizard Step 2. |
+| `useScenariosStore` | `src/store/useScenariosStore.ts` | Holds the list of target `Scenario[]` objects configured in wizard Step 2. Each `Scenario` includes optional vSAN fields (`vsanFttPolicy`, `vsanCompressionFactor`, `vsanSlackPercent`, `vsanCpuOverheadPercent`, `vsanMemoryPerHostGb`, `vsanVmSwapEnabled`) and optional growth projection fields (`cpuGrowthPercent`, `memoryGrowthPercent`, `storageGrowthPercent`). |
 | `useWizardStore` | `src/store/useWizardStore.ts` | Tracks the current wizard step (1--3), the active `SizingMode`, and the active `LayoutMode`. |
 | `useThemeStore` | `src/store/useThemeStore.ts` | Manages the UI theme (`light`, `dark`, `system`). Persisted independently under the `presizion-theme` localStorage key. |
 | `useImportStore` | `src/store/useImportStore.ts` | Transient buffer for imported file data (RVTools, LiveOptics). Holds raw per-scope data and the active scope selection. Not persisted. |
@@ -17,6 +17,8 @@ Presizion uses [Zustand](https://github.com/pmndrs/zustand) for client-side stat
 ### What is NOT a store
 
 `ScenarioResult` (the sizing output) is never stored. It is derived on every render by the `useScenariosResults` hook. See section 3.
+
+`VsanCapacityBreakdown` (the capacity breakdown output) is also never stored. It is derived on every render by the `useVsanBreakdowns` hook. See section 3.
 
 ---
 
@@ -88,6 +90,16 @@ export function useScenariosResults(): readonly ScenarioResult[] {
 ```
 
 This guarantees results are always consistent with the current inputs. The computation is a pure function (`computeScenarioResult` in `src/lib/sizing/constraints.ts`) with no side effects.
+
+### useVsanBreakdowns
+
+**File:** `src/hooks/useVsanBreakdowns.ts`
+
+Parallel to `useScenariosResults`, this hook derives `VsanCapacityBreakdown[]` from the same three stores. It calls `computeScenarioResult` internally (not re-imported from `useScenariosResults`) because it needs both the result and the breakdown in a single pass, then maps each `(cluster, scenario, result)` triple through `computeVsanBreakdown()`. The returned breakdowns provide CPU/Memory/Storage rows for capacity charts and PDF/PPTX reports.
+
+### chartRefs pattern
+
+Chart container `ref` callbacks are lifted to `Step3ReviewExport`, which owns a single `useRef<Record<string, HTMLDivElement | null>>({})`. This ref is passed down to `CapacityStackedChart` and `MinNodesChart` via props. Each chart registers its container element under a key like `"capacity-{scenarioId}"` or `"minnodes-{scenarioId}"`. When a PDF or PPTX export is triggered, `Step3ReviewExport` passes `chartRefs.current` to the export function, which uses `chartRefToDataUrl()` to capture each chart as a PNG data URL.
 
 ---
 

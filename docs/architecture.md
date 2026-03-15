@@ -36,6 +36,8 @@ flowchart LR
 
 `ScenarioResult` is never stored in any Zustand store. It is computed on demand by the `useScenariosResults` hook, which reads `currentCluster` from `useClusterStore`, `scenarios[]` from `useScenariosStore`, and `sizingMode`/`layoutMode` from `useWizardStore`, then maps each scenario through `computeScenarioResult()`. Every React render that calls this hook gets fresh results derived from current state.
 
+Similarly, `VsanCapacityBreakdown` is never stored. The `useVsanBreakdowns` hook (`src/hooks/useVsanBreakdowns.ts`) reads the same three stores, computes `ScenarioResult` internally, then maps each scenario through `computeVsanBreakdown()`. It returns one `VsanCapacityBreakdown` per scenario, providing CPU/Memory/Storage breakdown rows for capacity charts and PDF/PPTX reports.
+
 ## 3. Layer Architecture
 
 The application is organized into four layers with strict dependency rules: each layer may only import from layers below it.
@@ -55,9 +57,9 @@ flowchart TD
 ### Layer responsibilities
 
 - **UI Layer**: Presentational React components. No inline calculations. Components read state via Zustand hooks and dispatch actions via store methods.
-- **State Layer**: Zustand stores hold mutable application state. The `useScenariosResults` hook bridges state and calculation layers.
+- **State Layer**: Zustand stores hold mutable application state. The `useScenariosResults` and `useVsanBreakdowns` hooks bridge state and calculation layers.
 - **Calculation Layer**: Pure functions that compute server counts and utilization metrics. No React imports, no side effects, no state access.
-- **Persistence + Utility Layer**: localStorage read/write, URL hash encoding/decoding, CSV/JSON export builders, file import parsers, Zod schemas for form validation.
+- **Persistence + Utility Layer**: localStorage read/write, URL hash encoding/decoding, CSV/JSON/PDF/PPTX export builders, file import parsers, Zod schemas for form validation, chart capture utilities.
 
 ## 4. Store Architecture
 
@@ -130,7 +132,9 @@ App
           ComparisonTable (side-by-side scenario comparison)
           SizingChart (Recharts bar chart)
           CoreCountChart (Recharts chart)
-          Export buttons: Copy Summary, Download CSV, Download JSON, Share
+          CapacityStackedChart (stacked bar chart per scenario)
+          MinNodesChart (constraint comparison chart per scenario)
+          Export buttons: Copy Summary, Download CSV, Download JSON, Download PDF, Download PPTX, Share
 ```
 
 ### Wizard navigation
@@ -143,7 +147,7 @@ App
 
 ## 6. Calculation Engine
 
-All sizing logic lives in `src/lib/sizing/`. It is split into two files:
+All sizing logic lives in `src/lib/sizing/`. It is split into five files:
 
 ### formulas.ts -- Pure math functions
 
@@ -176,6 +180,27 @@ Each function receives raw numeric parameters and returns `Math.ceil(...)`. No i
 10. Computes utilization metrics (CALC-06): achieved vCPU:pCore ratio, VMs/server, CPU/RAM/disk utilization percentages
 
 The returned `ScenarioResult` is `Object.freeze()`-d to enforce immutability.
+
+### vsanConstants.ts -- vSAN overhead data and type definitions
+
+Defines `VsanFttPolicy` (union of `'mirror-1' | 'mirror-2' | 'mirror-3' | 'raid5' | 'raid6'`), `FttPolicySpec` (multiplier, minNodes, label), `VsanCompressionFactor`, and the `FTT_POLICY_MAP` constant. Also exports default overhead constants: `VSAN_METADATA_OVERHEAD_RATIO` (0.02), `VSAN_DEFAULT_SLACK_PERCENT` (25), `VSAN_DEFAULT_CPU_OVERHEAD_PCT` (10), `VSAN_DEFAULT_MEMORY_PER_HOST_GB` (6). No sizing logic -- only data.
+
+### vsanFormulas.ts -- vSAN storage pipeline and overhead functions
+
+Pure functions for the vSAN storage computation pipeline:
+
+| Function | Purpose |
+|----------|---------|
+| `computeVsanStorageRaw` | 5-step pipeline: compression, swap, FTT multiplier, metadata, slack (VSAN-09 invariant: compression BEFORE FTT) |
+| `computeVsanEffectiveGhzPerNode` | Effective GHz after vSAN CPU overhead (VSAN-06) |
+| `computeVsanEffectiveRamPerNode` | Effective RAM after vSAN memory overhead (VSAN-07) |
+| `serverCountByVsanStorage` | Server count for vSAN storage constraint, enforcing FTT policy minimum node floor |
+
+All functions accept numeric parameters and return unrounded values except `serverCountByVsanStorage`, which applies `Math.ceil` and `Math.max(count, minNodes)`.
+
+### vsanBreakdown.ts -- Capacity breakdown computation
+
+`computeVsanBreakdown(cluster, scenario, result)` produces a `VsanCapacityBreakdown` with three `ResourceBreakdown` rows (CPU, Memory, Storage) and a `minNodesByConstraint` record. The CAP-06 invariant holds for every row: `required + spare + excess === total`. Used by the `useVsanBreakdowns` hook and by PDF/PPTX export functions. The `StorageBreakdown` extends `ResourceBreakdown` with vSAN-specific fields: `usableRequired`, `swapOverhead`, `metadataOverhead`, `fttOverhead`, `rawRequired`, `slackSpace`.
 
 ### defaults.ts -- Industry-standard constants
 
@@ -240,16 +265,26 @@ Both schemas use `z.preprocess()` to convert HTML form string values to numbers,
 
 ## 10. Export Capabilities
 
-Step 3 provides four export actions:
+Step 3 provides six export actions:
 
 | Action | Module | Output |
 |--------|--------|--------|
 | Copy Summary | `clipboard.ts` | Plain-text summary to clipboard |
 | Download CSV | `export.ts` | RFC 4180-compliant CSV file |
 | Download JSON | `export.ts` | Pretty-printed JSON (schema v1.1 with metadata) |
+| Download PDF | `exportPdf.ts` | Multi-page A4 sizing report with charts and tables |
+| Download PPTX | `exportPptx.ts` | Wide-layout PowerPoint presentation with slides per scenario |
 | Share | `persistence.ts` | URL with base64url-encoded session in hash fragment |
 
-All export functions are pure (except the DOM interaction for triggering downloads) and receive cluster, scenarios, and results as parameters.
+All export functions receive cluster, scenarios, and results as parameters. CSV and JSON builders are pure. PDF and PPTX exports are async -- they lazy-load their heavy dependencies (`jsPDF`/`jspdf-autotable` for PDF, `pptxgenjs` for PPTX) via dynamic `import()` to keep them out of the main bundle. Both accept a `chartRefs` record to capture Recharts SVG charts as PNG data URLs via `chartCapture.ts`, and use `logoDataUrl.ts` to render the Presizion logo onto the title page.
+
+### Supporting export modules
+
+| Module | Purpose |
+|--------|---------|
+| `chartCapture.ts` | Converts Recharts SVG elements to 2x-resolution PNG data URLs via XMLSerializer + Canvas |
+| `logoDataUrl.ts` | Renders the Presizion logo as a Canvas-drawn PNG data URL (no external image dependency) |
+| `config.ts` | Holds external URL constants (`STORE_PREDICT_URL`, `SPEC_RESULTS_URL`) for links in the UI |
 
 ## 11. Key Design Principles
 
