@@ -46,7 +46,7 @@ function f2(n: number): string {
 
 /** Default text options for consistency */
 const TITLE_OPTS = { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT } as const
-const SUBTITLE_OPTS = { placeholder: 'body', fontSize: 11, color: GRAY, fontFace: FONT } as const
+const SUBTITLE_OPTS = { x: 0.5, y: 0.65, w: 12, h: 0.3, fontSize: 11, color: GRAY, fontFace: FONT } as const
 
 /** Cell styling helpers */
 function headerCell(text: string) {
@@ -174,7 +174,6 @@ export async function exportPptx(
     background: { color: WHITE },
     objects: [
       { placeholder: { options: { name: 'title', type: 'title', x: 0.5, y: 0.2, w: 12, h: 0.6 }, text: '' } },
-      { placeholder: { options: { name: 'body', type: 'body', x: 0.5, y: 0.65, w: 12, h: 0.3 }, text: '' } },
     ],
   })
 

@@ -69,7 +69,7 @@ export function WizardShell() {
         </header>
 
         <div className="print:hidden">
-          <StepIndicator currentStep={currentStep} totalSteps={3} />
+          <StepIndicator currentStep={currentStep} totalSteps={3} onStepClick={goToStep} />
         </div>
 
         <main>
