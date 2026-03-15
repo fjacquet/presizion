@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { useScenariosStore } from '@/store/useScenariosStore'
+import { useWizardStore } from '@/store/useWizardStore'
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
 import { Button } from '@/components/ui/button'
 import { CHART_COLORS } from '@/lib/sizing/chartColors'
@@ -84,8 +85,10 @@ function normalizeRow(abs: AbsoluteRow): ChartRow {
  */
 export function CapacityStackedChart() {
   const scenarios = useScenariosStore((s) => s.scenarios)
+  const layoutMode = useWizardStore((s) => s.layoutMode)
   const breakdowns = useVsanBreakdowns()
   const refs = useRef<Record<string, HTMLDivElement | null>>({})
+  const showStorage = layoutMode !== 'disaggregated'
 
   if (scenarios.length === 0) return null
 
@@ -113,14 +116,14 @@ export function CapacityStackedChart() {
             excess: Math.max(0, bd.memory.excess),
             total: bd.memory.total,
           },
-          {
+          ...(showStorage ? [{
             name: 'Raw Storage TiB',
             required: bd.storage.required / 1024,
             spare: bd.storage.spare / 1024,
             excess: Math.max(0, bd.storage.excess) / 1024,
             total: bd.storage.total / 1024,
-          },
-          (() => {
+          }] : []),
+          ...(showStorage ? [(() => {
             if (bd.storage.total === 0) {
               return { name: 'Usable Storage TiB', required: 0, spare: 0, excess: 0, total: 0 }
             }
@@ -136,7 +139,7 @@ export function CapacityStackedChart() {
               excess: usableExcess,
               total: usableReq + usableSpare + usableExcess,
             }
-          })(),
+          })()] : []),
         ]
 
         // Normalized to % (all bars same width = 100%)
@@ -163,7 +166,7 @@ export function CapacityStackedChart() {
               </Button>
             </div>
             <div ref={(el) => { refs.current[scenarioId] = el }}>
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={showStorage ? 220 : 130}>
                 <BarChart
                   data={chartRows}
                   layout="vertical"
