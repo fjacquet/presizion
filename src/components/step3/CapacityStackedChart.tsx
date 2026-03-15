@@ -179,11 +179,15 @@ export function CapacityStackedChart() {
                   <XAxis type="number" hide domain={[0, 100]} />
                   <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
                   <Tooltip
-                    formatter={(_v: number, _name: string, props: { payload?: ChartRow }) => {
-                      const idx = chartRows.indexOf(props.payload!)
+                    formatter={(_v: number, name: string, props: { payload?: ChartRow & { name?: string } }) => {
+                      const rowName = props.payload?.name
+                      const idx = absRows.findIndex(r => r.name === rowName)
                       const abs = absRows[idx]
                       if (!abs) return ''
-                      return `${abs.total.toFixed(1)} total`
+                      const key = name === 'Required' ? 'required' : name === 'Spare' ? 'spare' : 'excess'
+                      const val = abs[key as keyof AbsoluteRow] as number
+                      const pct = abs.total > 0 ? ((val / abs.total) * 100).toFixed(1) : '0.0'
+                      return `${val.toFixed(1)} (${pct}% of ${abs.total.toFixed(1)} total)`
                     }}
                   />
                   <Legend />
