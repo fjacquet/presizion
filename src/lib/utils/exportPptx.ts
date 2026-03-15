@@ -261,7 +261,7 @@ export async function exportPptx(
 
   const asIsRatio =
     cluster.totalPcores > 0
-      ? (cluster.totalVcpus / cluster.totalPcores).toFixed(1)
+      ? `${(cluster.totalVcpus / cluster.totalPcores).toFixed(1)}:1`
       : '--'
 
   const asIsVmsPerServer =
@@ -316,7 +316,7 @@ export async function exportPptx(
     {
       label: 'vCPU:pCore Ratio',
       asIs: asIsRatio,
-      scenarioValues: results.map((r) => r.achievedVcpuToPCoreRatio.toFixed(1)),
+      scenarioValues: results.map((r) => `${r.achievedVcpuToPCoreRatio.toFixed(1)}:1`),
     },
     {
       label: 'VMs/Server',
@@ -406,7 +406,7 @@ export async function exportPptx(
   const generalAssumptions: AssumptionRow[] = [
     {
       label: 'vCPU:pCore Ratio',
-      values: scenarios.map((s) => s.targetVcpuToPCoreRatio.toFixed(1)),
+      values: scenarios.map((s) => `${s.targetVcpuToPCoreRatio.toFixed(1)}:1`),
     },
     {
       label: 'Headroom %',
@@ -826,7 +826,7 @@ export async function exportPptx(
     { label: 'Server Config', values: (s) => `${s.socketsPerServer}S x ${s.coresPerSocket}C` },
     { label: 'Total pCores', values: (s, r) => String(r.finalCount * s.socketsPerServer * s.coresPerSocket) },
     { label: 'Limiting Resource', values: (_s, r) => r.limitingResource },
-    { label: 'vCPU:pCore Ratio', values: (_s, r) => f2(r.achievedVcpuToPCoreRatio) },
+    { label: 'vCPU:pCore Ratio', values: (_s, r) => `${f2(r.achievedVcpuToPCoreRatio)}:1` },
     { label: 'VMs/Server', values: (_s, r) => f2(r.vmsPerServer) },
     { label: 'CPU Util %', values: (_s, r) => f1(r.cpuUtilizationPercent) },
     { label: 'RAM Util %', values: (_s, r) => f1(r.ramUtilizationPercent) },

@@ -146,7 +146,7 @@ export function ComparisonTable() {
                 </TableCell>
                 <TableCell className="text-center bg-muted/30">
                   {currentCluster.totalPcores > 0
-                    ? (currentCluster.totalVcpus / currentCluster.totalPcores).toFixed(1)
+                    ? `${(currentCluster.totalVcpus / currentCluster.totalPcores).toFixed(1)}:1`
                     : '—'}
                 </TableCell>
                 {results.map((result, i) => {
@@ -158,7 +158,7 @@ export function ComparisonTable() {
                       key={scenarios[i]?.id ?? i}
                       className={`text-center ${exceeds ? 'text-amber-600 font-semibold' : ''}`}
                     >
-                      {exceeds ? `⚠ ${achieved.toFixed(1)}` : achieved.toFixed(1)}
+                      {exceeds ? `⚠ ${achieved.toFixed(1)}:1` : `${achieved.toFixed(1)}:1`}
                       {exceeds && (
                         <span className="text-xs text-muted-foreground ml-1">(target: {target})</span>
                       )}

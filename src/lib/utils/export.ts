@@ -75,7 +75,7 @@ export function buildCsvContent(
       result.diskLimitedCount,
       result.finalCount,
       result.limitingResource,
-      result.achievedVcpuToPCoreRatio.toFixed(2),
+      `${result.achievedVcpuToPCoreRatio.toFixed(2)}:1`,
       result.vmsPerServer.toFixed(2),
       result.cpuUtilizationPercent.toFixed(1),
       result.ramUtilizationPercent.toFixed(1),

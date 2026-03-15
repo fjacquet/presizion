@@ -229,7 +229,7 @@ export async function exportPdf(
 
   const asIsRatio =
     cluster.totalPcores > 0
-      ? (cluster.totalVcpus / cluster.totalPcores).toFixed(1)
+      ? `${(cluster.totalVcpus / cluster.totalPcores).toFixed(1)}:1`
       : '--'
 
   const asIsVmsPerServer =
@@ -271,7 +271,7 @@ export async function exportPdf(
     [
       'vCPU:pCore Ratio',
       asIsRatio,
-      ...results.map((r) => r.achievedVcpuToPCoreRatio.toFixed(1)),
+      ...results.map((r) => `${r.achievedVcpuToPCoreRatio.toFixed(1)}:1`),
     ],
     [
       'VMs/Server',
@@ -336,7 +336,7 @@ export async function exportPdf(
   const assumptionsBody: string[][] = [
     [
       'vCPU:pCore Ratio',
-      ...scenarios.map((s) => s.targetVcpuToPCoreRatio.toFixed(1)),
+      ...scenarios.map((s) => `${s.targetVcpuToPCoreRatio.toFixed(1)}:1`),
     ],
     [
       'Headroom %',
