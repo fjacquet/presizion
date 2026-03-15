@@ -55,6 +55,14 @@
 - **PDF-04**: Charts are embedded as PNG images (SVG -> canvas -> data URL)
 - **PDF-05**: PDF export button appears alongside existing export buttons in Step 3
 
+## PPTX Report (PPTX)
+
+- **PPTX-01**: User can export a PowerPoint presentation from Step 3
+- **PPTX-02**: PPTX includes: title slide, executive summary table, capacity breakdown tables, chart images, comparison table
+- **PPTX-03**: PPTX is generated client-side using pptxgenjs (lazy-loaded)
+- **PPTX-04**: Charts are embedded as PNG images (reuses same SVG -> canvas pipeline as PDF)
+- **PPTX-05**: PPTX export button appears alongside PDF and other export buttons in Step 3
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -105,10 +113,15 @@
 | PDF-03 | Phase 22 | Pending |
 | PDF-04 | Phase 22 | Pending |
 | PDF-05 | Phase 22 | Pending |
+| PPTX-01 | Phase 22 | Pending |
+| PPTX-02 | Phase 22 | Pending |
+| PPTX-03 | Phase 22 | Pending |
+| PPTX-04 | Phase 22 | Pending |
+| PPTX-05 | Phase 22 | Pending |
 
 **Coverage:**
-- v2.0 requirements: 35 total
-- Mapped to phases: 35
+- v2.0 requirements: 40 total
+- Mapped to phases: 40
 - Unmapped: 0
 
 ---
