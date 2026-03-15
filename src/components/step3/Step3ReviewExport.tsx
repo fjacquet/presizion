@@ -1,14 +1,9 @@
 /**
  * Step 3: Review & Export
- * Requirements: EXPO-01, EXPO-02, COMP-01, COMP-02, UX-04, UX-06
+ * Requirements: EXPO-01, EXPO-02, COMP-01, COMP-02, UX-04, UX-06, PDF-01, PDF-05
  *
- * Container component:
- * - Renders ComparisonTable for side-by-side scenario view
- * - Provides "Copy Summary" button (clipboard plain-text export) with "Copied!" feedback
- * - Provides "Download CSV" button (RFC 4180 CSV file download)
- *
- * Reads state from useClusterStore, useScenariosStore, useScenariosResults.
- * No data props — all data flows from Zustand stores.
+ * Container: ComparisonTable + export buttons (Copy, CSV, JSON, Share, PDF, PPTX).
+ * All data flows from Zustand stores -- no props.
  */
 import { useState, useRef, useEffect } from 'react'
 import { ComparisonTable } from './ComparisonTable'
@@ -24,6 +19,7 @@ import { useWizardStore } from '@/store/useWizardStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
 import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
 import { encodeSessionToHash } from '@/lib/utils/persistence'
+import { exportPdf } from '@/lib/utils/exportPdf'
 import { exportPptx } from '@/lib/utils/exportPptx'
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
 
@@ -36,6 +32,7 @@ export function Step3ReviewExport() {
   const breakdowns = useVsanBreakdowns()
   const [copied, setCopied] = useState(false)
   const [shared, setShared] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [pptxLoading, setPptxLoading] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -89,6 +86,15 @@ export function Step3ReviewExport() {
     }, 2000)
   }
 
+  const handleExportPdf = async (): Promise<void> => {
+    setPdfLoading(true)
+    try {
+      await exportPdf(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
   const handleExportPptx = async (): Promise<void> => {
     setPptxLoading(true)
     try {
@@ -119,6 +125,9 @@ export function Step3ReviewExport() {
         </Button>
         <Button variant="outline" onClick={() => { void handleShare() }}>
           {shared ? 'Link Copied!' : 'Share'}
+        </Button>
+        <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
+          {pdfLoading ? 'Generating...' : 'Export PDF'}
         </Button>
         <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
           {pptxLoading ? 'Generating...' : 'Export PPTX'}
