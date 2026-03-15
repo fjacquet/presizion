@@ -1,6 +1,6 @@
 /**
- * ThemeToggle — Unit tests
- * Requirements: THEME-01
+ * ThemeToggle -- Unit tests
+ * Requirements: THEME-01, THEME-03
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
@@ -12,46 +12,41 @@ describe('ThemeToggle', () => {
     useThemeStore.setState({ theme: 'light' })
   })
 
-  it('renders a button with aria-label="Toggle theme"', () => {
+  it('renders a button with theme label', () => {
     render(<ThemeToggle />)
-    const btn = screen.getByRole('button', { name: /toggle theme/i })
+    const btn = screen.getByRole('button', { name: /theme/i })
     expect(btn).toBeInTheDocument()
   })
 
-  it('renders Sun icon when resolvedTheme() returns "dark"', () => {
-    useThemeStore.setState({ theme: 'dark' })
+  it('shows Monitor icon when theme is "system"', () => {
+    useThemeStore.setState({ theme: 'system' })
     render(<ThemeToggle />)
-    // Sun icon has a data-testid or title — check for the button with aria-label
-    const btn = screen.getByRole('button', { name: /toggle theme/i })
+    const btn = screen.getByRole('button', { name: /system/i })
     expect(btn).toBeInTheDocument()
-    // Sun icon: lucide renders an SVG; when dark, we show Sun (to switch to light)
-    // Check that the icon with "sun" name is rendered
-    const svgs = btn.querySelectorAll('svg')
-    expect(svgs.length).toBeGreaterThan(0)
+    expect(btn.querySelectorAll('svg').length).toBeGreaterThan(0)
   })
 
-  it('renders Moon icon when resolvedTheme() returns "light"', () => {
-    useThemeStore.setState({ theme: 'light' })
-    render(<ThemeToggle />)
-    const btn = screen.getByRole('button', { name: /toggle theme/i })
-    expect(btn).toBeInTheDocument()
-    const svgs = btn.querySelectorAll('svg')
-    expect(svgs.length).toBeGreaterThan(0)
-  })
-
-  it('clicking the button calls setTheme("light") when resolvedTheme() returns "dark"', () => {
-    const setTheme = vi.fn()
-    useThemeStore.setState({ theme: 'dark', setTheme })
-    render(<ThemeToggle />)
-    fireEvent.click(screen.getByRole('button', { name: /toggle theme/i }))
-    expect(setTheme).toHaveBeenCalledWith('light')
-  })
-
-  it('clicking the button calls setTheme("dark") when resolvedTheme() returns "light"', () => {
+  it('cycles light -> dark -> system -> light', () => {
     const setTheme = vi.fn()
     useThemeStore.setState({ theme: 'light', setTheme })
     render(<ThemeToggle />)
-    fireEvent.click(screen.getByRole('button', { name: /toggle theme/i }))
+    fireEvent.click(screen.getByRole('button', { name: /theme/i }))
     expect(setTheme).toHaveBeenCalledWith('dark')
+  })
+
+  it('cycles dark -> system', () => {
+    const setTheme = vi.fn()
+    useThemeStore.setState({ theme: 'dark', setTheme })
+    render(<ThemeToggle />)
+    fireEvent.click(screen.getByRole('button', { name: /theme/i }))
+    expect(setTheme).toHaveBeenCalledWith('system')
+  })
+
+  it('cycles system -> light', () => {
+    const setTheme = vi.fn()
+    useThemeStore.setState({ theme: 'system', setTheme })
+    render(<ThemeToggle />)
+    fireEvent.click(screen.getByRole('button', { name: /theme/i }))
+    expect(setTheme).toHaveBeenCalledWith('light')
   })
 })

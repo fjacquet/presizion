@@ -51,3 +51,13 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     return theme === 'system' ? getOsPref() : theme;
   },
 }));
+
+// Listen for OS preference changes — re-apply when in "system" mode
+try {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const { theme } = useThemeStore.getState();
+    if (theme === 'system') {
+      applyClass('system');
+    }
+  });
+} catch { /* matchMedia not available */ }

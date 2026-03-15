@@ -1,33 +1,43 @@
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useThemeStore } from '@/store/useThemeStore'
+import { useThemeStore, type Theme } from '@/store/useThemeStore'
+
+const CYCLE: Theme[] = ['light', 'dark', 'system']
+const LABELS: Record<Theme, string> = {
+  light: 'Light',
+  dark: 'Dark',
+  system: 'System',
+}
 
 /**
- * Sun/Moon icon button that toggles between light and dark theme.
- * When dark mode is active: shows Sun (clicking will switch to light).
- * When light mode is active: shows Moon (clicking will switch to dark).
- * Requirements: THEME-01
+ * 3-way theme toggle: light → dark → system (follows browser).
+ * Icon shows current state: Sun (light), Moon (dark), Monitor (system).
+ * Requirements: THEME-01, THEME-03
  */
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useThemeStore()
+  const { theme, setTheme, resolvedTheme } = useThemeStore()
   const resolved = resolvedTheme()
 
   function handleToggle() {
-    setTheme(resolved === 'light' ? 'dark' : 'light')
+    const idx = CYCLE.indexOf(theme)
+    const next = CYCLE[(idx + 1) % CYCLE.length]!
+    setTheme(next)
   }
+
+  const icon =
+    theme === 'system' ? <Monitor className="h-4 w-4" /> :
+    resolved === 'dark' ? <Sun className="h-4 w-4" /> :
+    <Moon className="h-4 w-4" />
 
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={handleToggle}
-      aria-label="Toggle theme"
+      aria-label={`Theme: ${LABELS[theme]}. Click to switch.`}
+      title={`Theme: ${LABELS[theme]}`}
     >
-      {resolved === 'dark' ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {icon}
     </Button>
   )
 }
