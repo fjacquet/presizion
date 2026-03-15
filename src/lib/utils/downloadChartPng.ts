@@ -81,40 +81,44 @@ export function downloadChartPng(
       yOffset += legendH
     }
 
-    // Draw table
+    // Draw table — aligned with chart Y-axis (label col) and plot area (data cols)
     if (options?.tableHeaders && options?.tableRows) {
       const tableY = yOffset + 8
-      const colCount = options.tableHeaders.length + 1 // +1 for label column
-      const colW = (chartW - 40) / colCount
-      const startX = 20
+      const labelX = 20                     // matches chart left margin
+      const dataStartX = 130               // matches chart Y-axis width (~120px + gap)
+      const dataEndX = chartW - 40         // matches chart right margin
+      const dataColW = (dataEndX - dataStartX) / options.tableHeaders.length
 
       // Header row
       ctx.font = 'bold 11px system-ui, sans-serif'
       ctx.fillStyle = '#6b7280'
-      ctx.fillText('', startX, tableY + 14)
       options.tableHeaders.forEach((h, i) => {
-        ctx.fillText(h, startX + (i + 1) * colW, tableY + 14)
+        ctx.textAlign = 'right'
+        ctx.fillText(h, dataStartX + (i + 1) * dataColW, tableY + 14)
       })
 
       // Header underline
       ctx.strokeStyle = '#e5e7eb'
       ctx.lineWidth = 1
       ctx.beginPath()
-      ctx.moveTo(startX, tableY + headerH - 2)
-      ctx.lineTo(chartW - 20, tableY + headerH - 2)
+      ctx.moveTo(labelX, tableY + headerH - 2)
+      ctx.lineTo(dataEndX + dataColW, tableY + headerH - 2)
       ctx.stroke()
 
       // Data rows
       ctx.font = '11px system-ui, sans-serif'
       options.tableRows.forEach((row, ri) => {
         const ry = tableY + headerH + ri * rowH + 14
+        ctx.textAlign = 'left'
         ctx.fillStyle = '#374151'
-        ctx.fillText(row.label, startX, ry)
+        ctx.fillText(row.label, labelX, ry)
+        ctx.textAlign = 'right'
         ctx.fillStyle = '#111827'
         row.values.forEach((v, vi) => {
-          ctx.fillText(v, startX + (vi + 1) * colW, ry)
+          ctx.fillText(v, dataStartX + (vi + 1) * dataColW, ry)
         })
       })
+      ctx.textAlign = 'left' // reset
     }
 
     canvas.toBlob((b) => {
