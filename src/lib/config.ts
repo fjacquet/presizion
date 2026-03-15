@@ -9,3 +9,9 @@ export const STORE_PREDICT_URL = 'https://store.srv1023035.hstgr.cloud/'
 
 /** SPEC benchmark results query form */
 export const SPEC_RESULTS_URL = 'https://www.spec.org/cgi-bin/osgresults?conf=rint2017;op=form'
+
+/** SPEC search GitHub Pages API base URL */
+export const SPEC_SEARCH_API_URL = 'https://fjacquet.github.io/spec-search'
+
+/** SPEC search GitHub Pages web URL */
+export const SPEC_SEARCH_WEB_URL = 'https://fjacquet.github.io/spec-search'
