@@ -17,10 +17,11 @@ The application has zero runtime server dependencies. File imports (RVTools, Liv
 
 The core data model follows a three-entity pipeline where results are always derived, never stored:
 
-```
-OldCluster (input) --+
-                     |--> computeScenarioResult() --> ScenarioResult (derived)
-Scenario   (input) --+
+```mermaid
+flowchart LR
+    A[OldCluster\ninput] --> C[computeScenarioResult]
+    B[Scenario\ninput] --> C
+    C --> D[ScenarioResult\nderived]
 ```
 
 ### Entities
@@ -39,30 +40,16 @@ Scenario   (input) --+
 
 The application is organized into four layers with strict dependency rules: each layer may only import from layers below it.
 
-```
-+-----------------------------------------------+
-|  UI Layer                                      |
-|  src/components/  (wizard shell, steps, cards) |
-+-----------------------------------------------+
-         |  reads from / dispatches to
-+-----------------------------------------------+
-|  State Layer                                   |
-|  src/store/       (Zustand stores)             |
-|  src/hooks/       (derived state hooks)        |
-+-----------------------------------------------+
-         |  calls into
-+-----------------------------------------------+
-|  Calculation Layer                             |
-|  src/lib/sizing/  (formulas, constraints,      |
-|                    defaults)                   |
-+-----------------------------------------------+
-         |  uses
-+-----------------------------------------------+
-|  Persistence + Utility Layer                   |
-|  src/lib/utils/   (persistence, export,        |
-|                    clipboard, import parsers)  |
-|  src/schemas/      (Zod validation schemas)    |
-+-----------------------------------------------+
+```mermaid
+flowchart TD
+    UI["UI Layer\nsrc/components/\nwizard shell, steps, cards"]
+    State["State Layer\nsrc/store/ (Zustand stores)\nsrc/hooks/ (derived state hooks)"]
+    Calc["Calculation Layer\nsrc/lib/sizing/\nformulas, constraints, defaults"]
+    Persist["Persistence + Utility Layer\nsrc/lib/utils/ (persistence, export, clipboard, import parsers)\nsrc/schemas/ (Zod validation schemas)"]
+
+    UI -->|reads from / dispatches to| State
+    State -->|calls into| Calc
+    Calc -->|uses| Persist
 ```
 
 ### Layer responsibilities

@@ -95,15 +95,13 @@ This guarantees results are always consistent with the current inputs. The compu
 
 The stores form a directed data flow:
 
-```
-useImportStore ──(setActiveScope)──> useClusterStore
-                                         |
-useWizardStore (sizingMode, layoutMode)  |
-         \                               |
-          \──────────> useScenariosResults() <──── useScenariosStore
-                          (hook)
-                            |
-                      ScenarioResult[]
+```mermaid
+flowchart TD
+    Import[useImportStore] -->|setActiveScope| Cluster[useClusterStore]
+    Cluster --> Hook[useScenariosResults\nhook]
+    Wizard[useWizardStore\nsizingMode, layoutMode] --> Hook
+    Scenarios[useScenariosStore] --> Hook
+    Hook --> Result[ScenarioResult array]
 ```
 
 ### Key relationships
