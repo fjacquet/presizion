@@ -22,6 +22,7 @@ import { encodeSessionToHash } from '@/lib/utils/persistence'
 import { exportPdf } from '@/lib/utils/exportPdf'
 import { exportPptx } from '@/lib/utils/exportPptx'
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
+import { toast } from 'sonner'
 
 export function Step3ReviewExport() {
   const currentCluster = useClusterStore((state) => state.currentCluster)
@@ -90,6 +91,9 @@ export function Step3ReviewExport() {
     setPdfLoading(true)
     try {
       await exportPdf(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      toast.error('PDF export failed. Check browser console for details.')
     } finally {
       setPdfLoading(false)
     }
@@ -99,6 +103,9 @@ export function Step3ReviewExport() {
     setPptxLoading(true)
     try {
       await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+    } catch (err) {
+      console.error('PPTX export failed:', err)
+      toast.error('PPTX export failed. Check browser console for details.')
     } finally {
       setPptxLoading(false)
     }
