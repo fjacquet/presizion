@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
 status: executing
-stopped_at: Completed 22-01-PLAN.md
-last_updated: "2026-03-15T07:22:26.956Z"
-last_activity: 2026-03-15 — Phase 22 Plan 01 complete (chartCapture utility, lifted chart refs, jspdf/pptxgenjs deps installed)
+stopped_at: Completed 22-03-PLAN.md
+last_updated: "2026-03-15T07:28:36.000Z"
+last_activity: 2026-03-15 — Phase 22 Plan 03 complete (exportPptx utility with PPTX generation, Export PPTX button in Step 3)
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 10
-  completed_plans: 8
-  percent: 95
+  completed_plans: 9
+  percent: 97
 ---
 
 # Project State
@@ -26,19 +26,19 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 22 of 22 (PDF Report Export)
-Plan: 1 of 3 complete
+Plan: 3 of 3 complete (Plan 02 pending)
 Status: In Progress
-Last activity: 2026-03-15 — Phase 22 Plan 01 complete (chartCapture utility, lifted chart refs, jspdf/pptxgenjs deps installed)
+Last activity: 2026-03-15 — Phase 22 Plan 03 complete (exportPptx utility with PPTX generation, Export PPTX button in Step 3)
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 97%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 5 min
-- Total execution time: 0.9 hours
+- Total execution time: 1.0 hours
 
 **By Phase:**
 
@@ -53,10 +53,11 @@ Progress: [█████████░] 95%
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
 
-| 22 | 1/3 | 2min | 2min |
+| 22 | 2/3 | 7min | 4min |
 
 *Updated after each plan completion*
 | Phase 22 P01 | 2min | 3 tasks | 7 files |
+| Phase 22 P03 | 5min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 22-01]: chartRefToDataUrl returns logical CSS pixel dims (not 2x canvas) for correct PDF/PPTX scaling
 - [Phase 22-01]: Namespaced ref keys (capacity-{id}, minnodes-{id}) avoid collisions in shared chartRefs object
 - [Phase 22-01]: Internal refs kept alongside chartRefs for backward-compatible PNG download buttons
+- [Phase 22-03]: Strip data: prefix from canvas.toDataURL() output for pptxgenjs data property compatibility
+- [Phase 22-03]: Class-based mock pattern for pptxgenjs constructor (vi.fn().mockImplementation fails with new)
+- [Phase 22-03]: Export PPTX button placed after Share in toolbar (Copy Summary | CSV | JSON | Share | Export PPTX)
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15T07:22:26.954Z
-Stopped at: Completed 22-01-PLAN.md
+Last session: 2026-03-15T07:28:36.000Z
+Stopped at: Completed 22-03-PLAN.md
 Resume file: None

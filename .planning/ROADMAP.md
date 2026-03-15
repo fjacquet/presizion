@@ -148,7 +148,7 @@ Plans:
   3. Both PDF and PPTX contain a title page with project info, an executive summary table, capacity breakdown tables for CPU, Memory, and Storage, chart images, and the scenario comparison table
   4. The stacked capacity chart and min-nodes chart are embedded as rasterized images in both formats
   5. All export libraries (jsPDF, jspdf-autotable, pptxgenjs) are lazy-loaded and do not affect initial page load time
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 
@@ -181,4 +181,4 @@ Plans:
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
 | 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
 | 21. Capacity Charts | 1/1 | Complete    | 2026-03-15 | - |
-| 22. PDF & PPTX Report Export | 1/3 | In Progress|  | - |
+| 22. PDF & PPTX Report Export | 2/3 | In Progress|  | - |
