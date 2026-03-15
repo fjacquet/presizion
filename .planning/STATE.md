@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
-status: completed
-stopped_at: Completed 19-03-PLAN.md
-last_updated: "2026-03-14T22:25:13.107Z"
-last_activity: 2026-03-14 — Phase 19 Plan 03 complete (growth display annotations + useVsanBreakdowns hook, 13 new tests, 4 files)
+status: in-progress
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-15T05:47:39Z"
+last_activity: 2026-03-15 — Phase 20 Plan 01 complete (vSAN & Growth collapsible form section, 12 new tests, 4 files)
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
-  percent: 100
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.0 Phase 19 — Capacity Breakdown & Growth Wiring
+**Current focus:** v2.0 Phase 20 — Scenario Form vSAN & Growth UI
 
 ## Current Position
 
-Phase: 19 of 22 (Capacity Breakdown & Growth Wiring)
-Plan: 3 of 3 complete
+Phase: 20 of 22 (Scenario Form vSAN & Growth UI)
+Plan: 1 of 1 complete
 Status: Phase Complete
-Last activity: 2026-03-14 — Phase 19 Plan 03 complete (growth display annotations + useVsanBreakdowns hook, 13 new tests, 4 files)
+Last activity: 2026-03-15 — Phase 20 Plan 01 complete (vSAN & Growth collapsible form section, 12 new tests, 4 files)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 5 min
-- Total execution time: 0.8 hours
+- Total execution time: 0.9 hours
 
 **By Phase:**
 
@@ -50,8 +50,10 @@ Progress: [██████████] 100%
 
 | 19 | 3/3 | 7min | 2min |
 
+| 20 | 1/1 | 4min | 4min |
+
 *Updated after each plan completion*
-| Phase 19 P03 | 3min | 2 tasks | 4 files |
+| Phase 20 P01 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 19-02]: Storage HA reserve = 1/N of total cluster raw (distinct from CPU/Memory one-node reserve)
 - [Phase 19-03]: Growth annotation inserted AFTER headroom and BEFORE first division in formula display strings
 - [Phase 19-03]: useVsanBreakdowns calls computeScenarioResult internally (single-pass, not re-imported from useScenariosResults)
+- [Phase 20-01]: Native <select> for FTT/Compression dropdowns (consistent with Input styling via Tailwind classes)
+- [Phase 20-01]: Controlled collapse state in ScenarioCard (open/onToggle props), VsanGrowthSection purely presentational
+- [Phase 20-01]: No .default() on optional numeric vSAN fields -- absent = legacy path (VSAN-12)
 
 ### Pending Todos
 
@@ -90,6 +95,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-14T22:15:29.996Z
-Stopped at: Completed 19-03-PLAN.md
+Last session: 2026-03-15T05:47:39Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None

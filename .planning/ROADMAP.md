@@ -56,7 +56,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 - [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
 - [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
-- [ ] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard
+- [x] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard (completed 2026-03-15)
 - [ ] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download
 - [ ] **Phase 22: PDF Report Export** - Client-side PDF generation with jsPDF + capacity tables + embedded chart images
 
@@ -105,7 +105,7 @@ Plans:
   2. The vSAN sub-section (FTT policy, compression factor, slack %, CPU overhead %, memory per host GB, VM swap toggle) is only visible when layoutMode is HCI
   3. The Growth sub-section (CPU %, Memory %, Storage %) is visible in both HCI and disaggregated layout modes
   4. Changing any vSAN or growth field causes the live server count in the same ScenarioCard to update without a page reload
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 20-01-PLAN.md — Extend scenarioSchema + VsanGrowthSection component + ScenarioCard integration + FORM-01..04 tests
@@ -156,6 +156,6 @@ Plans:
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
-| 20. Scenario Form — vSAN & Growth UI | v2.0 | 0/1 | Not started | - |
+| 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete   | 2026-03-15 | - |
 | 21. Capacity Charts | v2.0 | 0/TBD | Not started | - |
 | 22. PDF Report Export | v2.0 | 0/TBD | Not started | - |
