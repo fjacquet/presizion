@@ -1,7 +1,7 @@
 # Presizion -- Cluster Refresh Sizing Tool
 
 ![Build](https://github.com/fjacquet/cluster-sizer/actions/workflows/ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-541%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-596%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 Presizion is a client-side web application for presales engineers to size a refreshed compute cluster based on existing cluster metrics. Enter your current environment, define target server scenarios, and instantly compare how many servers you need -- with vSAN-aware storage sizing, capacity breakdown charts, and growth projections. No backend, no API; all calculations run in the browser.
@@ -16,7 +16,7 @@ Presizion is a client-side web application for presales engineers to size a refr
 npm install
 npm run dev       # http://localhost:5173
 npm run build     # production build -> dist/
-npm run test      # run all tests (541 tests)
+npm run test      # run all tests (596 tests)
 ```
 
 ## Features
@@ -37,7 +37,7 @@ npm run test      # run all tests (541 tests)
 
 ## Tech Stack
 
-React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui, Zustand v5, Recharts, Zod, jsPDF + jspdf-autotable, pptxgenjs, Vitest (541 tests).
+React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui, Zustand v5, Recharts, Zod, jsPDF + jspdf-autotable, pptxgenjs, Vitest (596 tests).
 
 ## Docs
 

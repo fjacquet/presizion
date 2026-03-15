@@ -284,7 +284,10 @@ All export functions receive cluster, scenarios, and results as parameters. CSV 
 |--------|---------|
 | `chartCapture.ts` | Converts Recharts SVG elements to 2x-resolution PNG data URLs via XMLSerializer + Canvas |
 | `logoDataUrl.ts` | Renders the Presizion logo as a Canvas-drawn PNG data URL (no external image dependency) |
-| `config.ts` | Holds external URL constants (`STORE_PREDICT_URL`, `SPEC_RESULTS_URL`) for links in the UI |
+| `config.ts` | Holds external URL constants (`STORE_PREDICT_URL`, `SPEC_SEARCH_API_URL`, `SPEC_SEARCH_WEB_URL`) for links in the UI |
+| `specLookup.ts` | Fetches SPECrate2017 benchmark results from the spec-search GitHub Pages static JSON API; `cpuModelToSlug` converts CPU model strings to URL-safe slugs |
+| `useSpecLookup.ts` | React hook wrapping `fetchSpecResults` with loading/error/results state management |
+| `SpecResultsPanel.tsx` | Reusable panel displaying SPEC benchmark matches (vendor, system, base score, cores, chips) with one-click auto-fill of `specintPerServer`; shared between Step 1 and Step 2 |
 
 ## 11. Key Design Principles
 

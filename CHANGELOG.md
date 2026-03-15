@@ -14,6 +14,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.2.0] -- 2026-03-15
+
+### Added
+
+- SPEC search integration: auto-lookup CPU model against spec-search GitHub Pages API
+- SpecResultsPanel: shows matching SPECrate2017 results (vendor, system, base score, cores, chips) in Step 1 and Step 2
+- One-click auto-fill of specintPerServer from selected benchmark result
+- useSpecLookup hook for React state management of SPEC lookups
+- cpuModelToSlug: derives URL-safe slug from CPU model strings (e.g., "Intel Xeon Gold 6526Y" -> "intel-xeon-gold-6526y")
+- SPEC_SEARCH_API_URL and SPEC_SEARCH_WEB_URL in config.ts
+- Graceful error handling when SPEC API unavailable or no matches
+
+### Changed
+
+- "Look up SPECrate" button now opens spec-search pre-filtered by CPU slug instead of spec.org
+- Removed dead SPEC_RESULTS_URL constant
+
+---
+
+## [2.1.0] -- 2026-03-15
+
+### Fixed
+
+- Scope "All" now aggregates named clusters only; clusterless hosts excluded from "All" totals
+- RAM/server uses host-count-weighted average instead of first-scope-wins
+- RVTools parser routes clusterless VMs to "Standalone (datacenter)" scope
+
+### Added
+
+- Host count per scope displayed in scope selector (e.g., "vxr-clu-win (16 hosts)")
+- Average vCPU/VM, RAM/VM, Disk/VM computed from import data and shown in Step 1 derived metrics
+- Import values seed Step 2 scenario defaults (ramPerVmGb, diskPerVmGb)
+
+---
+
 ## [2.0.0] — 2026-03-15
 
 ### Added

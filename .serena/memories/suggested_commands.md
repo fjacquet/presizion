@@ -1,28 +1,41 @@
 # Suggested Commands
 
-## Status
-
-Project is not yet scaffolded. Once Vite + React + TS is initialized, standard commands will be:
-
+## Development
 ```bash
-npm run dev       # Start Vite dev server
-npm run build     # Production build (outputs static assets)
-npm run preview   # Preview production build locally
-npm run test      # Run tests (Vitest expected)
-npm run lint      # ESLint
+npm run dev          # Start Vite dev server (hot reload)
+npm run build        # Production build: tsc -b && vite build
+npm run test         # Run Vitest tests
+npm run lint         # ESLint check
 ```
 
-## Scaffolding (when ready)
-
+## Testing
 ```bash
-npm create vite@latest . -- --template react-ts
-npm install
+npx vitest run                    # Run all 596 tests
+npx vitest run src/lib/sizing/    # Run sizing formula tests only
+npx vitest run --reporter=verbose # Verbose output
+npx tsc -b                        # TypeScript check (CI-matching, stricter than tsc --noEmit)
 ```
 
-## System Utilities (Darwin)
+## Important: Always use `npx tsc -b` (not `tsc --noEmit`)
+`tsc -b` uses project references mode and catches errors that `--noEmit` misses. CI runs `tsc -b`.
 
+## RTK (Token-Optimized CLI)
+Always prefix commands with `rtk` for token savings:
 ```bash
-ls / find / grep / cat   # standard unix tools available
-git status / git log     # git available
-open <file>              # macOS open command
+rtk git status       # Compact git status
+rtk git log          # Compact git log
+rtk git diff         # Compact diff
+rtk vitest run       # Failures-only test output
+rtk gh run list      # Compact CI run list
 ```
+
+## Git
+```bash
+rtk git push origin main              # Push to main
+rtk git push origin refs/tags/vX.Y    # Push specific tag (avoid ambiguous refs)
+```
+
+## Deployment
+- Auto-deploys to GitHub Pages on push to `main` via `.github/workflows/deploy.yml`
+- Build: `tsc -b && vite build` -> `dist/` directory
+- Base path: `/presizion/`

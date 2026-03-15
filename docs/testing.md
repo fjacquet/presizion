@@ -9,7 +9,7 @@ Key configuration (`vitest.config.ts`):
 - **Environment**: `jsdom`
 - **Globals**: enabled (`true`) -- `describe`, `it`, `expect` are available without import, though most test files import them explicitly from `vitest` for clarity
 - **Setup file**: `src/test-setup.ts`
-- **Current test count**: 561 (as of v2.1)
+- **Current test count**: 596 (as of v2.2)
 - **Test pattern**: `src/**/*.{test,spec}.{ts,tsx}`
 - **Path alias**: `@` maps to `./src`
 
@@ -181,6 +181,16 @@ The codebase includes additional test files for:
 - Import infrastructure tests (`fileValidation.test.ts`, `formatDetector.test.ts`, `columnResolver.test.ts`, `scopeAggregator.test.ts`)
 - vSAN tests (`vsanFormulas.test.ts`, `vsanBreakdown.test.ts`)
 - CSS/theme tests (`printCss.test.ts`, `darkMode.test.ts`)
+- SPEC lookup tests (`specLookup.test.ts`, `useSpecLookup.test.ts`, `SpecResultsPanel.test.tsx`)
+
+### 9. SPEC Lookup Tests (`src/lib/utils/__tests__/specLookup.test.ts`, `src/hooks/__tests__/useSpecLookup.test.ts`, `src/components/__tests__/SpecResultsPanel.test.tsx`)
+
+Tests for the SPEC search integration (v2.2):
+
+- `cpuModelToSlug` -- converts CPU model strings to URL-safe slugs matching spec-search filename convention
+- `fetchSpecResults` -- fetches and filters per-processor JSON from the spec-search GitHub Pages API; mocks `globalThis.fetch`
+- `useSpecLookup` hook -- manages loading/error/results state for React components; tests cover success, 404 (no matches), and network error paths
+- `SpecResultsPanel` -- renders benchmark results table, handles empty state, fires callback on row click to auto-fill specintPerServer
 
 ## Fixture Patterns and Constants
 
