@@ -130,7 +130,7 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | xlsx@0.18.5 locked | Last MIT-licensed SheetJS version — licensing constraint | ✓ Required — do not upgrade |
 | Recharts 2.15.x | React 19 compatible, widely used, low bundle overhead | ✓ Good — no compatibility issues |
 | Wave 0 it.todo stubs (Nyquist) | TDD leading indicators before implementation; forces test writing | ✓ Good — zero skipped stubs at completion |
-| Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ⚠️ Revisit — use GSD framework for all future phases |
+| Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ✓ Resolved — all phases since v1.3 use GSD framework |
 
 ---
 *Last updated: 2026-03-15 after v2.2 milestone completion*
