@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.1
-milestone_name: Import UX & Scope Fixes
-status: planning
-stopped_at: Roadmap created for v2.1 (Phases 23-24). Ready to plan Phase 23.
-last_updated: "2026-03-15"
-last_activity: 2026-03-15 — v2.1 roadmap created (Phases 23-24 defined)
+milestone_name: — Import UX & Scope Fixes
+status: executing
+stopped_at: Completed 23-01-PLAN.md (scope aggregation fixes)
+last_updated: "2026-03-15T14:47:21.950Z"
+last_activity: 2026-03-15 — Completed 23-01 scope aggregation fixes
 progress:
-  total_phases: 2
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 11
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 ## Current Position
 
 Phase: 23 of 24 in v2.1 (Scope Aggregation Fixes)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-15 — v2.1 roadmap created (Phases 23-24 defined)
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-15 — Completed 23-01 scope aggregation fixes
 
-Progress: [░░░░░░░░░░] 0% (v2.1 milestone)
+Progress: [█████████░] 92% (v2.1 milestone)
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0% (v2.1 milestone)
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
 | 22 | 3/3 | 12min | 4min |
+| 23 | 1/2 | 3min | 3min |
 
 *Updated after each plan completion*
 
@@ -59,7 +60,9 @@ Progress: [░░░░░░░░░░] 0% (v2.1 milestone)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [v1.4 post-phase]: Standalone scope labeling hotfix shipped — SCOPE-08 may already be partially addressed; verify before implementing
+- [Phase 23-01]: RVTools standalone scope uses dc||__standalone__ pattern matching LiveOptics for consistency
+- [Phase 23-01]: ramPerServerGb uses host-count-weighted average with fallback hostCount=1
+- [v1.4 post-phase]: Standalone scope labeling hotfix shipped — SCOPE-08 now fully addressed in both parsers
 - [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — scope fixes and AVG metrics live here
 - [Phase 18-02]: Disaggregated layout overrides vSAN; layoutMode separation is already in place
 - [v2.0 general]: derive-on-read pattern in use throughout — no stale result state to manage
@@ -76,5 +79,5 @@ None
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: v2.1 roadmap written (Phases 23-24). Ready to plan Phase 23.
+Stopped at: Completed 23-01-PLAN.md (scope aggregation fixes). Ready for 23-02.
 Resume file: None

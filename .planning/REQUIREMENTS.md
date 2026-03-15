@@ -20,9 +20,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCOPE-07 | Phase 23 | Pending |
-| SCOPE-08 | Phase 23 | Pending |
-| SCOPE-09 | Phase 23 | Pending |
+| SCOPE-07 | Phase 23 | Complete |
+| SCOPE-08 | Phase 23 | Complete |
+| SCOPE-09 | Phase 23 | Complete |
 | SCOPE-10 | Phase 23 | Pending |
 | AVG-01 | Phase 24 | Pending |
 | AVG-02 | Phase 24 | Pending |
