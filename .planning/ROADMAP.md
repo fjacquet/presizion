@@ -5,7 +5,8 @@
 - ✅ **v1.2 — Visualization, File Import & Tech Debt** — Phases 1-10 (shipped 2026-03-13)
 - ✅ **v1.3 — Scope, Persistence & Branding** — Phases 11-15 (shipped 2026-03-14)
 - ✅ **v1.4 — Bug Fixes, Chart Polish & UX** — Phases 16-17 (shipped 2026-03-14)
-- 🚧 **v2.0 — vSAN-Aware Sizing Engine** — Phases 18-22 (in progress)
+- ✅ **v2.0 — vSAN-Aware Sizing Engine** — Phases 18-22 (shipped 2026-03-15)
+- 🚧 **v2.1 — Import UX & Scope Fixes** — Phases 23-24 (in progress)
 
 ## Phases
 
@@ -50,15 +51,25 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### v2.0 — vSAN-Aware Sizing Engine (In Progress)
+<details>
+<summary>✅ v2.0 — vSAN-Aware Sizing Engine (Phases 18-22) — SHIPPED 2026-03-15</summary>
 
-**Milestone Goal:** Bring Presizion to VxRail Sizer-level quality with vSAN-aware storage sizing, capacity breakdown tables and charts, growth projections, and professional PDF/PPTX report export.
+Full details: `.planning/milestones/v2.0-ROADMAP.md`
 
-- [x] **Phase 18: vSAN Formula Engine** - Types, constants, and storage/CPU/memory pipeline (math before UI) (completed 2026-03-14)
-- [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
-- [x] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard (completed 2026-03-15)
-- [x] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download (completed 2026-03-15)
-- [x] **Phase 22: PDF & PPTX Report Export** - Client-side PDF and PowerPoint generation with jsPDF, jspdf-autotable, pptxgenjs + capacity tables + embedded chart images (completed 2026-03-15)
+- [x] Phase 18: vSAN Formula Engine (2/2 plans) — completed 2026-03-14
+- [x] Phase 19: Capacity Breakdown & Growth Wiring (3/3 plans) — completed 2026-03-14
+- [x] Phase 20: Scenario Form — vSAN & Growth UI (1/1 plan) — completed 2026-03-15
+- [x] Phase 21: Capacity Charts (1/1 plan) — completed 2026-03-15
+- [x] Phase 22: PDF & PPTX Report Export (3/3 plans) — completed 2026-03-15
+
+</details>
+
+### 🚧 v2.1 — Import UX & Scope Fixes (In Progress)
+
+**Milestone Goal:** Fix "All" scope aggregation to correctly exclude clusterless hosts, surface those hosts as "Standalone", and display average per-VM resource requirements derived from import data to improve sizing context.
+
+- [ ] **Phase 23: Scope Aggregation Fixes** - Correct "All" aggregation, Standalone labeling, weighted RAM average, and host-count display in scope selector
+- [ ] **Phase 24: Average VM Metrics** - Compute and display average vCPU/RAM/Disk per VM in Step 1 derived metrics; seed those values into Step 2 scenario defaults on import
 
 ## Phase Details
 
@@ -98,9 +109,9 @@ Plans:
 
 Plans:
 
-- [ ] 19-01-PLAN.md — Growth fields on Scenario + growth pre-multiply in constraints.ts
-- [ ] 19-02-PLAN.md — Breakdown types + computeVsanBreakdown pure function (TDD)
-- [ ] 19-03-PLAN.md — Formula display growth annotations + useVsanBreakdowns hook
+- [x] 19-01-PLAN.md — Growth fields on Scenario + growth pre-multiply in constraints.ts
+- [x] 19-02-PLAN.md — Breakdown types + computeVsanBreakdown pure function (TDD)
+- [x] 19-03-PLAN.md — Formula display growth annotations + useVsanBreakdowns hook
 
 ### Phase 20: Scenario Form — vSAN & Growth UI
 
@@ -117,7 +128,7 @@ Plans:
 
 Plans:
 
-- [ ] 20-01-PLAN.md — Extend scenarioSchema + VsanGrowthSection component + ScenarioCard integration + FORM-01..04 tests
+- [x] 20-01-PLAN.md — Extend scenarioSchema + VsanGrowthSection component + ScenarioCard integration + FORM-01..04 tests
 
 ### Phase 21: Capacity Charts
 
@@ -134,7 +145,7 @@ Plans:
 
 Plans:
 
-- [ ] 21-01-PLAN.md — CapacityStackedChart + MinNodesChart components with tests, wired into Step3ReviewExport
+- [x] 21-01-PLAN.md — CapacityStackedChart + MinNodesChart components with tests, wired into Step3ReviewExport
 
 ### Phase 22: PDF & PPTX Report Export
 
@@ -152,9 +163,35 @@ Plans:
 
 Plans:
 
-- [ ] 22-01-PLAN.md — Install deps (jspdf, jspdf-autotable, pptxgenjs) + shared chartCapture utility + lift chart refs to Step3ReviewExport
-- [ ] 22-02-PLAN.md — PDF export (exportPdf.ts + Export PDF button)
-- [ ] 22-03-PLAN.md — PPTX export (exportPptx.ts + Export PPTX button)
+- [x] 22-01-PLAN.md — Install deps (jspdf, jspdf-autotable, pptxgenjs) + shared chartCapture utility + lift chart refs to Step3ReviewExport
+- [x] 22-02-PLAN.md — PDF export (exportPdf.ts + Export PDF button)
+- [x] 22-03-PLAN.md — PPTX export (exportPptx.ts + Export PPTX button)
+
+### Phase 23: Scope Aggregation Fixes
+
+**Goal**: The scope selector and "All" aggregation behave correctly — clusterless hosts are excluded from "All" and appear as named "Standalone" scopes, the representative RAM/server for multi-scope selection uses a host-count-weighted average, and the scope dropdown shows host counts so users can make informed scope choices.
+**Depends on**: Phase 22
+**Requirements**: SCOPE-07, SCOPE-08, SCOPE-09, SCOPE-10
+**Success Criteria** (what must be TRUE):
+
+  1. Selecting "All" in the scope selector aggregates only named clusters; hosts with no cluster membership do not contribute to the "All" totals
+  2. Clusterless hosts that belong to a datacenter appear as a selectable "Standalone (datacenter-name)" scope entry in the scope selector
+  3. When multiple scopes are selected, the RAM/server value displayed in Step 1 is a host-count-weighted average across those scopes, not the value from whichever scope was first
+  4. Each scope entry in the selector shows its host count in parentheses (e.g., "vxr-clu-win (16 hosts)") giving users immediate sizing context
+**Plans**: TBD
+
+### Phase 24: Average VM Metrics
+
+**Goal**: After importing cluster data, users see average per-VM resource consumption (vCPU, RAM, Disk) in the Step 1 derived metrics panel, and those values are automatically seeded into new scenario defaults so initial scenario sizing reflects actual workload density.
+**Depends on**: Phase 23
+**Requirements**: AVG-01, AVG-02, AVG-03, AVG-04
+**Success Criteria** (what must be TRUE):
+
+  1. The Step 1 derived metrics section shows "Avg vCPU/VM" computed as totalVcpus / totalVms after any import
+  2. The Step 1 derived metrics section shows "Avg RAM/VM (GiB)" computed from imported RAM totals after any import
+  3. The Step 1 derived metrics section shows "Avg Disk/VM (GiB)" computed from imported disk totals after any import
+  4. When a new scenario is added after import, its RAM/VM and Disk/VM default fields are pre-populated with the values derived from the import data
+**Plans**: TBD
 
 ## Progress
 
@@ -178,7 +215,9 @@ Plans:
 | 16. Bug Fixes — Import Scoping, VM Override & As-Is | v1.4 | 2/2 | Complete | 2026-03-14 |
 | 17. Chart Polish, SPECrate UX & Reset | v1.4 | 3/3 | Complete | 2026-03-14 |
 | 18. vSAN Formula Engine | v2.0 | 2/2 | Complete | 2026-03-14 |
-| 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
-| 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
-| 21. Capacity Charts | 1/1 | Complete    | 2026-03-15 | - |
-| 22. PDF & PPTX Report Export | 3/3 | Complete    | 2026-03-15 | - |
+| 19. Capacity Breakdown & Growth Wiring | v2.0 | 3/3 | Complete | 2026-03-14 |
+| 20. Scenario Form — vSAN & Growth UI | v2.0 | 1/1 | Complete | 2026-03-15 |
+| 21. Capacity Charts | v2.0 | 1/1 | Complete | 2026-03-15 |
+| 22. PDF & PPTX Report Export | v2.0 | 3/3 | Complete | 2026-03-15 |
+| 23. Scope Aggregation Fixes | v2.1 | 0/TBD | Not started | - |
+| 24. Average VM Metrics | v2.1 | 0/TBD | Not started | - |

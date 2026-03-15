@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.1
-milestone_name: — Import UX & Scope Fixes
+milestone_name: Import UX & Scope Fixes
 status: planning
-stopped_at: —
+stopped_at: Roadmap created for v2.1 (Phases 23-24). Ready to plan Phase 23.
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 — Milestone v2.1 started
+last_activity: 2026-03-15 — v2.1 roadmap created (Phases 23-24 defined)
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,47 +18,39 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-14)
+See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.0 Phase 22 — PDF Report Export
+**Current focus:** v2.1 Phase 23 — Scope Aggregation Fixes
 
 ## Current Position
 
-Phase: 22 of 22 (PDF Report Export)
-Plan: 3 of 3 complete
-Status: Complete
-Last activity: 2026-03-15 — Phase 22 Plan 02 complete (exportPdf utility with PDF report generation, Export PDF button in Step 3)
+Phase: 23 of 24 in v2.1 (Scope Aggregation Fixes)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-03-15 — v2.1 roadmap created (Phases 23-24 defined)
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0% (v2.1 milestone)
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v2.0 reference):**
 
-- Total plans completed: 13
-- Average duration: 5 min
-- Total execution time: 1.1 hours
+- Total plans completed (v2.0): 10
+- Average duration: 4 min/plan
+- Total execution time: ~0.7 hours
 
-**By Phase:**
+**By Phase (v2.0):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 16 | 2/2 | 11min | 6min |
-| 17 | 3/3 | 14min | 5min |
 | 18 | 2/2 | 6min | 3min |
-
 | 19 | 3/3 | 7min | 2min |
-
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
-
 | 22 | 3/3 | 12min | 4min |
 
 *Updated after each plan completion*
-| Phase 22 P01 | 2min | 3 tasks | 7 files |
-| Phase 22 P02 | 5min | 2 tasks | 3 files |
-| Phase 22 P03 | 5min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,39 +59,10 @@ Progress: [██████████] 100%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [v2.0 roadmap]: Math before UI — Phase 18 (engine) must complete before Phase 20 (form UI)
-- [v2.0 roadmap]: Phase 21 (charts) depends on Phase 19 (breakdown hook), not Phase 20 (form)
-- [v2.0 roadmap]: VSAN-12: absent vSAN fields use legacy sizing path — no breaking change to existing scenarios
-- [Phase 17-03]: Reset preserves presizion-theme in localStorage; only presizion-session is cleared
-- [Phase 18-01]: raid5 multiplier = 1+1/3 (exact), not 1.33 (truncated)
-- [Phase 18-01]: Compression applied BEFORE FTT in storage pipeline (VSAN-09)
-- [Phase 18-01]: All vSAN Scenario fields optional -- absent = legacy sizing path (VSAN-12)
-- [Phase 18-02]: vSAN CPU overhead only applied in GHz sizing mode (not vcpu/specint/aggressive)
-- [Phase 18-02]: Disaggregated layout overrides vSAN for CALC-03 (diskLimitedCount=0 always)
-- [Phase 18-02]: vSAN default constants re-exported from defaults.ts for Phase 20 form use
-- [Phase 19-01]: Growth multiplies DEMAND not server count -- pipeline is demand x growthFactor x headroomFactor
-- [Phase 19-01]: SPECint mode exempt from growth (benchmark comparison, not demand-driven)
-- [Phase 19-01]: GHz mode applies cpuGrowthFactor to pCores (not vCPUs)
-- [Phase 19-01]: Absent growth fields default to 0% via null-coalescing (same pattern as vSAN fields)
-- [Phase 19-02]: Storage invariant: required = rawBeforeSlack (FTT + metadata, no slack); spare = slackSpace + haReserve
-- [Phase 19-02]: CPU breakdown reports demand in GHz (vCPU * freq) for consistent unit reporting
-- [Phase 19-02]: Storage HA reserve = 1/N of total cluster raw (distinct from CPU/Memory one-node reserve)
-- [Phase 19-03]: Growth annotation inserted AFTER headroom and BEFORE first division in formula display strings
-- [Phase 19-03]: useVsanBreakdowns calls computeScenarioResult internally (single-pass, not re-imported from useScenariosResults)
-- [Phase 20-01]: Native <select> for FTT/Compression dropdowns (consistent with Input styling via Tailwind classes)
-- [Phase 20-01]: Controlled collapse state in ScenarioCard (open/onToggle props), VsanGrowthSection purely presentational
-- [Phase 20-01]: No .default() on optional numeric vSAN fields -- absent = legacy path (VSAN-12)
-- [Phase 21-01]: Recharts custom label returns invisible <text> element (not null) to satisfy ImplicitLabelType
-- [Phase 21-01]: Callback-ref pattern (useRef<Record<string, HTMLDivElement | null>>) for per-scenario chart refs
-- [Phase 22-01]: chartRefToDataUrl returns logical CSS pixel dims (not 2x canvas) for correct PDF/PPTX scaling
-- [Phase 22-01]: Namespaced ref keys (capacity-{id}, minnodes-{id}) avoid collisions in shared chartRefs object
-- [Phase 22-01]: Internal refs kept alongside chartRefs for backward-compatible PNG download buttons
-- [Phase 22-03]: Strip data: prefix from canvas.toDataURL() output for pptxgenjs data property compatibility
-- [Phase 22-03]: Class-based mock pattern for pptxgenjs constructor (vi.fn().mockImplementation fails with new)
-- [Phase 22-03]: Export PPTX button placed after Share in toolbar (Copy Summary | CSV | JSON | Share | Export PPTX)
-- [Phase 22-02]: autoTable used as standalone function (v5 API) not prototype method -- cleaner typing and tree-shakable
-- [Phase 22-02]: doc.lastAutoTable.finalY used to track y-cursor after tables (avoids manual height calculation)
-- [Phase 22-02]: Chart images scaled proportionally to page content width (PAGE_W - 2*MARGIN) maintaining aspect ratio
+- [v1.4 post-phase]: Standalone scope labeling hotfix shipped — SCOPE-08 may already be partially addressed; verify before implementing
+- [v1.3 Phase 13]: useImportStore separates import buffer from wizard state — scope fixes and AVG metrics live here
+- [Phase 18-02]: Disaggregated layout overrides vSAN; layoutMode separation is already in place
+- [v2.0 general]: derive-on-read pattern in use throughout — no stale result state to manage
 
 ### Pending Todos
 
@@ -107,10 +70,11 @@ None
 
 ### Blockers/Concerns
 
-None
+- SCOPE-08: v1.4 post-phase hotfix addressed standalone labeling — confirm whether behavior is already correct before treating as net-new
+- AVG-04: Seeding scenario defaults on import requires understanding ScenarioCard initialization path; check useImportStore and scenario creation flow before planning
 
 ## Session Continuity
 
-Last session: 2026-03-15T07:30:14.000Z
-Stopped at: Completed 22-02-PLAN.md
+Last session: 2026-03-15
+Stopped at: v2.1 roadmap written (Phases 23-24). Ready to plan Phase 23.
 Resume file: None
