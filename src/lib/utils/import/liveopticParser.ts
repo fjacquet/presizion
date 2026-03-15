@@ -37,6 +37,7 @@ function buildScopeLabel(scopeKey: string): string {
   if (scopeKey === '__all__') return 'All'
   if (scopeKey.includes('||')) {
     const [dc, cluster] = scopeKey.split('||')
+    if (cluster === '__standalone__') return `Standalone (${dc})`
     return `${cluster} (${dc})`
   }
   return scopeKey
@@ -289,7 +290,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
 
     const cluster = str(row, colMapCluster['cluster_name'])
     const dc = str(row, colMapDc['datacenter_name'])
-    const scopeKey = dc && cluster ? `${dc}||${cluster}` : cluster ? cluster : '__all__'
+    const scopeKey = dc && cluster ? `${dc}||${cluster}` : cluster ? cluster : dc ? `${dc}||__standalone__` : '__all__'
 
     // Build host-to-cluster map from VM rows
     const vmHost = str(row, colMapVmHost['esx_host'])
