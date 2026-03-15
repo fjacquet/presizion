@@ -374,14 +374,14 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     })
   })
 
-  it('clicking the button opens spec.org results page in new tab', async () => {
+  it('clicking the button opens spec-search web UI pre-filtered by CPU slug', async () => {
     const openSpy = vi.fn()
     vi.stubGlobal('open', openSpy)
 
     act(() => {
       useWizardStore.setState({ sizingMode: 'specint' })
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
+        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz' },
       })
     })
     render(<CurrentClusterForm onNext={vi.fn()} />)
@@ -391,7 +391,13 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
 
     await waitFor(() => {
       expect(openSpy).toHaveBeenCalledWith(
-        expect.stringContaining('spec.org/cgi-bin/osgresults'),
+        expect.stringContaining('fjacquet.github.io/spec-search'),
+        '_blank',
+        'noopener,noreferrer',
+      )
+      // URL should contain the CPU slug derived from the model
+      expect(openSpy).toHaveBeenCalledWith(
+        expect.stringContaining('intel-xeon-gold-6526y'),
         '_blank',
         'noopener,noreferrer',
       )
