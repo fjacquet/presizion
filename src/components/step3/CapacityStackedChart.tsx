@@ -37,7 +37,7 @@ interface ChartRow {
  * Shows percentage of total when the segment is wide enough.
  * Returns an invisible <text> element when hidden (Recharts label prop requires ReactElement).
  */
-function renderSegmentLabel(absRows: readonly AbsoluteRow[], dataKey: 'required' | 'spare' | 'excess') {
+function renderSegmentLabel(absRows: readonly AbsoluteRow[], chartRows: readonly ChartRow[], dataKey: 'required' | 'spare' | 'excess') {
   return function SegmentLabel(props: {
     x?: number
     y?: number
@@ -46,12 +46,16 @@ function renderSegmentLabel(absRows: readonly AbsoluteRow[], dataKey: 'required'
     index?: number
   }): React.ReactElement<SVGElement> {
     const { x = 0, y = 0, width = 0, height = 0, index = 0 } = props
-    const row = absRows[index]
-    if (!row || width < 40 || row.total === 0) {
+    const abs = absRows[index]
+    const chart = chartRows[index]
+    if (!abs || !chart || width < 40 || abs.total === 0) {
       return <text visibility="hidden" />
     }
-    const absValue = row[dataKey]
-    const pct = ((absValue / row.total) * 100).toFixed(1)
+    // Show the chart percentage (capped at 100% total) not the raw ratio
+    const pct = chart[dataKey].toFixed(1)
+    // Flag overcommit: when required > total, show warning
+    const isOvercommit = dataKey === 'required' && abs.required > abs.total
+    const label = isOvercommit ? `${pct}% (!!)` : `${pct}%`
     return (
       <text
         x={x + width / 2}
@@ -62,7 +66,7 @@ function renderSegmentLabel(absRows: readonly AbsoluteRow[], dataKey: 'required'
         textAnchor="middle"
         dominantBaseline="central"
       >
-        {pct}%
+        {label}
       </text>
     )
   }
@@ -188,21 +192,21 @@ export function CapacityStackedChart() {
                     name="Required"
                     stackId="cap"
                     fill={CHART_COLORS[0]}
-                    label={renderSegmentLabel(absRows, 'required')}
+                    label={renderSegmentLabel(absRows, chartRows, 'required')}
                   />
                   <Bar
                     dataKey="spare"
                     name="Spare"
                     stackId="cap"
                     fill={CHART_COLORS[1]}
-                    label={renderSegmentLabel(absRows, 'spare')}
+                    label={renderSegmentLabel(absRows, chartRows, 'spare')}
                   />
                   <Bar
                     dataKey="excess"
                     name="Excess"
                     stackId="cap"
                     fill={CHART_COLORS[2]}
-                    label={renderSegmentLabel(absRows, 'excess')}
+                    label={renderSegmentLabel(absRows, chartRows, 'excess')}
                   />
                 </BarChart>
               </ResponsiveContainer>
