@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: — vSAN-Aware Sizing Engine
 status: executing
-stopped_at: Completed 22-03-PLAN.md
-last_updated: "2026-03-15T07:28:36.000Z"
-last_activity: 2026-03-15 — Phase 22 Plan 03 complete (exportPptx utility with PPTX generation, Export PPTX button in Step 3)
+stopped_at: Completed 22-02-PLAN.md
+last_updated: "2026-03-15T07:30:14.000Z"
+last_activity: 2026-03-15 — Phase 22 Plan 02 complete (exportPdf utility with PDF report generation, Export PDF button in Step 3)
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 10
-  completed_plans: 9
-  percent: 97
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -26,19 +26,19 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 22 of 22 (PDF Report Export)
-Plan: 3 of 3 complete (Plan 02 pending)
-Status: In Progress
-Last activity: 2026-03-15 — Phase 22 Plan 03 complete (exportPptx utility with PPTX generation, Export PPTX button in Step 3)
+Plan: 3 of 3 complete
+Status: Complete
+Last activity: 2026-03-15 — Phase 22 Plan 02 complete (exportPdf utility with PDF report generation, Export PDF button in Step 3)
 
-Progress: [█████████░] 97%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 5 min
-- Total execution time: 1.0 hours
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
@@ -53,10 +53,11 @@ Progress: [█████████░] 97%
 | 20 | 1/1 | 4min | 4min |
 | 21 | 1/1 | 4min | 4min |
 
-| 22 | 2/3 | 7min | 4min |
+| 22 | 3/3 | 12min | 4min |
 
 *Updated after each plan completion*
 | Phase 22 P01 | 2min | 3 tasks | 7 files |
+| Phase 22 P02 | 5min | 2 tasks | 3 files |
 | Phase 22 P03 | 5min | 3 tasks | 3 files |
 
 ## Accumulated Context
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 22-03]: Strip data: prefix from canvas.toDataURL() output for pptxgenjs data property compatibility
 - [Phase 22-03]: Class-based mock pattern for pptxgenjs constructor (vi.fn().mockImplementation fails with new)
 - [Phase 22-03]: Export PPTX button placed after Share in toolbar (Copy Summary | CSV | JSON | Share | Export PPTX)
+- [Phase 22-02]: autoTable used as standalone function (v5 API) not prototype method -- cleaner typing and tree-shakable
+- [Phase 22-02]: doc.lastAutoTable.finalY used to track y-cursor after tables (avoids manual height calculation)
+- [Phase 22-02]: Chart images scaled proportionally to page content width (PAGE_W - 2*MARGIN) maintaining aspect ratio
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-15T07:28:36.000Z
-Stopped at: Completed 22-03-PLAN.md
+Last session: 2026-03-15T07:30:14.000Z
+Stopped at: Completed 22-02-PLAN.md
 Resume file: None

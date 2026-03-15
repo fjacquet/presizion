@@ -58,7 +58,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 - [x] **Phase 19: Capacity Breakdown & Growth Wiring** - Hook deriving breakdown rows + growth factor application into constraints pipeline (completed 2026-03-14)
 - [x] **Phase 20: Scenario Form — vSAN & Growth UI** - Collapsible vSAN & Growth fields in ScenarioCard (completed 2026-03-15)
 - [x] **Phase 21: Capacity Charts** - Stacked capacity bar chart + min-nodes per constraint chart with PNG download (completed 2026-03-15)
-- [ ] **Phase 22: PDF & PPTX Report Export** - Client-side PDF and PowerPoint generation with jsPDF, jspdf-autotable, pptxgenjs + capacity tables + embedded chart images
+- [x] **Phase 22: PDF & PPTX Report Export** - Client-side PDF and PowerPoint generation with jsPDF, jspdf-autotable, pptxgenjs + capacity tables + embedded chart images (completed 2026-03-15)
 
 ## Phase Details
 
@@ -148,7 +148,7 @@ Plans:
   3. Both PDF and PPTX contain a title page with project info, an executive summary table, capacity breakdown tables for CPU, Memory, and Storage, chart images, and the scenario comparison table
   4. The stacked capacity chart and min-nodes chart are embedded as rasterized images in both formats
   5. All export libraries (jsPDF, jspdf-autotable, pptxgenjs) are lazy-loaded and do not affect initial page load time
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 
@@ -181,4 +181,4 @@ Plans:
 | 19. Capacity Breakdown & Growth Wiring | 3/3 | Complete    | 2026-03-14 | - |
 | 20. Scenario Form — vSAN & Growth UI | 1/1 | Complete    | 2026-03-15 | - |
 | 21. Capacity Charts | 1/1 | Complete    | 2026-03-15 | - |
-| 22. PDF & PPTX Report Export | 2/3 | In Progress|  | - |
+| 22. PDF & PPTX Report Export | 3/3 | Complete   | 2026-03-15 | - |

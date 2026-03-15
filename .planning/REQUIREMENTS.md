@@ -108,11 +108,11 @@
 | VIZ-02 | Phase 21 | Complete |
 | VIZ-03 | Phase 21 | Complete |
 | VIZ-04 | Phase 21 | Complete |
-| PDF-01 | Phase 22 | Pending |
-| PDF-02 | Phase 22 | Pending |
-| PDF-03 | Phase 22 | Pending |
+| PDF-01 | Phase 22 | Complete |
+| PDF-02 | Phase 22 | Complete |
+| PDF-03 | Phase 22 | Complete |
 | PDF-04 | Phase 22 | Complete |
-| PDF-05 | Phase 22 | Pending |
+| PDF-05 | Phase 22 | Complete |
 | PPTX-01 | Phase 22 | Complete |
 | PPTX-02 | Phase 22 | Complete |
 | PPTX-03 | Phase 22 | Complete |
