@@ -44,7 +44,7 @@ export function FileImportButton() {
       <div className="space-y-1">
         <Button
           variant="outline"
-          size="sm"
+          className="w-full sm:w-auto"
           onClick={() => inputRef.current?.click()}
           disabled={loading}
           aria-label="Import from file"

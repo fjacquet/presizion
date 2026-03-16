@@ -9,7 +9,7 @@ export function Step1CurrentCluster() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Step 1: Enter Current Cluster</h2>
           <p className="text-sm text-muted-foreground mt-1">

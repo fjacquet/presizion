@@ -51,14 +51,15 @@ export function ScopeBadge() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <span>
+    <div className="flex items-center gap-2 min-w-0 text-sm text-muted-foreground">
+      <span className="truncate max-w-[200px] sm:max-w-none">
         <span className="font-medium text-foreground">Scope:</span>{' '}
         {activeLabels}
       </span>
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
+        className="h-9 w-9 shrink-0"
         onClick={openDialog}
         aria-label="Edit scope"
       >
