@@ -73,8 +73,9 @@ export function SizingChart() {
             Download PNG
           </Button>
         </div>
-        <div ref={comparisonRef}>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="h-48 sm:h-72">
+          <div ref={comparisonRef} className="h-full">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={comparisonData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
@@ -91,6 +92,7 @@ export function SizingChart() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
@@ -107,8 +109,9 @@ export function SizingChart() {
             Download PNG
           </Button>
         </div>
-        <div ref={constraintRef}>
-          <ResponsiveContainer width="100%" height={280}>
+        <div className="h-48 sm:h-72">
+          <div ref={constraintRef} className="h-full">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
@@ -128,6 +131,7 @@ export function SizingChart() {
               )}
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

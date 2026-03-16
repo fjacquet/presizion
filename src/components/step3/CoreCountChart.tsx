@@ -49,8 +49,9 @@ export function CoreCountChart() {
           Download PNG
         </Button>
       </div>
-      <div ref={containerRef}>
-        <ResponsiveContainer width="100%" height={280}>
+      <div className="h-48 sm:h-72">
+        <div ref={containerRef} className="h-full">
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
@@ -70,6 +71,7 @@ export function CoreCountChart() {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        </div>
       </div>
     </div>
   )
