@@ -289,11 +289,11 @@ Plans:
   3. All interactive elements (buttons, step indicators, toggles, links) are tappable without precision — each has at least a 44px touch target
   4. The header toolbar (logo, theme toggle, Store-Predict link) fits on a single line at 390px without text wrapping or icons being cut off
   5. The SizingModeToggle wraps to two lines if needed at 390px but does not cause horizontal page scroll
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 28-01-PLAN.md — Global CSS: 16px input font-size (iOS auto-zoom fix) + 100dvh/vh + overflow-x:hidden on shell
-- [ ] 28-02-PLAN.md — WizardShell: compact header + touch targets + SizingModeToggle flex-wrap + StepIndicator mobile (NAV-01..04, MOBILE-01..04)
+- [ ] 28-01-PLAN.md — Global CSS: iOS auto-zoom prevention (16px input font-size), dvh viewport height, overflow-x containment (MOBILE-01, MOBILE-02, MOBILE-04)
+- [ ] 28-02-PLAN.md — WizardShell compact header, 44px touch targets, StepIndicator circles, SizingModeToggle flex-wrap, sticky Back/Next nav (MOBILE-03, NAV-01..04)
 
 ### Phase 29: Step 1 Mobile Form Layout
 
