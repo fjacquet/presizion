@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: — Mobile UX & Web App Manifest
 status: planning
-stopped_at: Completed 27-web-app-manifest-icons-01-PLAN.md
-last_updated: "2026-03-16T08:16:46.363Z"
+stopped_at: Completed 28-global-mobile-foundation-wizard-shell-01-PLAN.md
+last_updated: "2026-03-16T08:39:23.831Z"
 last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
 progress:
   total_phases: 14
   completed_phases: 10
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 20
+  completed_plans: 19
   percent: 0
 ---
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans com
 
 *Updated after each plan completion*
 | Phase 27-web-app-manifest-icons P01 | 3 | 1 tasks | 11 files |
+| Phase 28-global-mobile-foundation-wizard-shell P01 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting current work:
 - [Phase 27-web-app-manifest-icons]: Used @vite-pwa/assets-generator CLI (not vite-plugin-pwa) to avoid service worker conflicts with Vite 8
 - [Phase 27-web-app-manifest-icons]: All manifest URLs use /presizion/ absolute prefix to prevent GitHub Pages 404 on install (M-3 pitfall prevention)
 - [Phase 27-web-app-manifest-icons]: apple-mobile-web-app-status-bar-style set to default (not black-translucent) to avoid notch content overlap
+- [Phase 28-01]: Use @media (hover: none) not max-width to target touch devices for iOS auto-zoom prevention
+- [Phase 28-01]: Use inline style minHeight: 100dvh rather than Tailwind class for clean Safari < 15.4 fallback
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-16T08:13:51.276Z
-Stopped at: Completed 27-web-app-manifest-icons-01-PLAN.md
+Last session: 2026-03-16T08:39:23.828Z
+Stopped at: Completed 28-global-mobile-foundation-wizard-shell-01-PLAN.md
 Resume file: None

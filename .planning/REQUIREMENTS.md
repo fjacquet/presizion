@@ -16,10 +16,10 @@
 
 ### Global Mobile Foundation (MOBILE)
 
-- [ ] **MOBILE-01**: All form inputs render at >= 16px font-size to prevent iOS Safari auto-zoom on focus
-- [ ] **MOBILE-02**: Layout uses `dvh` units (with `vh` fallback) instead of `100vh` to prevent iOS address bar clipping
+- [x] **MOBILE-01**: All form inputs render at >= 16px font-size to prevent iOS Safari auto-zoom on focus
+- [x] **MOBILE-02**: Layout uses `dvh` units (with `vh` fallback) instead of `100vh` to prevent iOS address bar clipping
 - [ ] **MOBILE-03**: All interactive elements (buttons, links, toggles) have minimum 44px touch target size per iOS HIG / WCAG 2.5.5
-- [ ] **MOBILE-04**: Page body prevents horizontal overflow (`overflow-x: hidden`) while allowing controlled scroll inside specific containers
+- [x] **MOBILE-04**: Page body prevents horizontal overflow (`overflow-x: hidden`) while allowing controlled scroll inside specific containers
 
 ### Navigation & Wizard Shell (NAV)
 
@@ -80,10 +80,10 @@
 | MANIFEST-04 | Phase 27 | Complete |
 | MANIFEST-05 | Phase 27 | Complete |
 | MANIFEST-06 | Phase 27 | Complete |
-| MOBILE-01 | Phase 28 | Pending |
-| MOBILE-02 | Phase 28 | Pending |
+| MOBILE-01 | Phase 28 | Complete |
+| MOBILE-02 | Phase 28 | Complete |
 | MOBILE-03 | Phase 28 | Pending |
-| MOBILE-04 | Phase 28 | Pending |
+| MOBILE-04 | Phase 28 | Complete |
 | NAV-01 | Phase 28 | Pending |
 | NAV-02 | Phase 28 | Pending |
 | NAV-03 | Phase 28 | Pending |
