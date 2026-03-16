@@ -59,10 +59,10 @@ export function ComparisonTable() {
       </div>
 
       <div className="overflow-x-auto rounded-md border">
-        <Table>
+        <Table className="min-w-max">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-48 font-semibold">Metric</TableHead>
+              <TableHead className="w-48 font-semibold sticky left-0 bg-background z-10">Metric</TableHead>
               <TableHead className="font-semibold text-center bg-muted/30">As-Is</TableHead>
               {scenarios.map((scenario) => (
                 <TableHead key={scenario.id} className="font-semibold text-center">
@@ -74,7 +74,7 @@ export function ComparisonTable() {
           <TableBody>
             {/* Row 1: Servers Required — show split HA breakdown */}
             <TableRow>
-              <TableCell className="font-medium">Servers Required</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">Servers Required</TableCell>
               <TableCell className="text-center bg-muted/30">
                 {currentCluster.existingServerCount ?? '—'}
               </TableCell>
@@ -98,7 +98,7 @@ export function ComparisonTable() {
 
             {/* Row 2: Server Config */}
             <TableRow>
-              <TableCell className="font-medium">Server Config</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">Server Config</TableCell>
               <TableCell className="text-center bg-muted/30">
                 {currentCluster.socketsPerServer && currentCluster.coresPerSocket
                   ? `${currentCluster.socketsPerServer}s × ${currentCluster.coresPerSocket}c`
@@ -113,7 +113,7 @@ export function ComparisonTable() {
 
             {/* Row 3: Total pCores */}
             <TableRow>
-              <TableCell className="font-medium">Total pCores</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">Total pCores</TableCell>
               <TableCell className="text-center bg-muted/30">
                 {currentCluster.totalPcores}
               </TableCell>
@@ -126,7 +126,7 @@ export function ComparisonTable() {
 
             {/* Row 4: Limiting Resource */}
             <TableRow>
-              <TableCell className="font-medium">Limiting Resource</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">Limiting Resource</TableCell>
               <TableCell className="text-center bg-muted/30">N/A</TableCell>
               {results.map((result, i) => (
                 <TableCell key={scenarios[i]?.id ?? i} className="text-center font-bold">
@@ -138,7 +138,7 @@ export function ComparisonTable() {
             {/* Row 5: vCPU:pCore Ratio — hidden in SPECint; no warning in aggressive/ghz */}
             {showRatioRow && (
               <TableRow>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium sticky left-0 bg-background z-10">
                   vCPU:pCore Ratio
                   {(sizingMode === 'aggressive' || sizingMode === 'ghz') && (
                     <span className="text-xs text-muted-foreground ml-1">(not enforced)</span>
@@ -170,7 +170,7 @@ export function ComparisonTable() {
 
             {/* Row 6: VMs/Server */}
             <TableRow>
-              <TableCell className="font-medium">VMs/Server</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">VMs/Server</TableCell>
               <TableCell className="text-center bg-muted/30">
                 {currentCluster.existingServerCount && currentCluster.existingServerCount > 0
                   ? (currentCluster.totalVms / currentCluster.existingServerCount).toFixed(1)
@@ -185,7 +185,7 @@ export function ComparisonTable() {
 
             {/* Row 7: Headroom % */}
             <TableRow>
-              <TableCell className="font-medium">Headroom</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">Headroom</TableCell>
               <TableCell className="text-center bg-muted/30">N/A</TableCell>
               {scenarios.map((scenario) => (
                 <TableCell key={scenario.id} className="text-center">
@@ -197,7 +197,7 @@ export function ComparisonTable() {
             {/* Row 8: CPU Util % — hidden in SPECint; [sizing driver] badge in aggressive/ghz */}
             {showCpuUtilRow && (
               <TableRow>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium sticky left-0 bg-background z-10">
                   {cpuUtilIsSizingDriver && (
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 mr-1.5">
                       sizing driver
@@ -230,7 +230,7 @@ export function ComparisonTable() {
 
             {/* Row 9: RAM Util % */}
             <TableRow>
-              <TableCell className="font-medium">RAM Util %</TableCell>
+              <TableCell className="font-medium sticky left-0 bg-background z-10">RAM Util %</TableCell>
               <TableCell className="text-center bg-muted/30">
                 {currentCluster.ramUtilizationPercent !== undefined
                   ? `${currentCluster.ramUtilizationPercent.toFixed(1)}%`
@@ -255,7 +255,7 @@ export function ComparisonTable() {
 
             {/* Row 10: Disk Util % (HCI) or Total Disk Required (disaggregated) */}
             <TableRow>
-              <TableCell className="font-medium">
+              <TableCell className="font-medium sticky left-0 bg-background z-10">
                 {layoutMode === 'disaggregated' ? 'Total Disk Required' : 'Disk Util %'}
               </TableCell>
               <TableCell className="text-center bg-muted/30">
