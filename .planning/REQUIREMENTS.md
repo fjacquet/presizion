@@ -38,11 +38,11 @@
 
 ### Step 2: Scenario Cards (CARD)
 
-- [ ] **CARD-01**: Scenario cards stack full-width on mobile (no side-by-side)
-- [ ] **CARD-02**: Server config grid (sockets/cores/RAM/disk) collapses to 2-column on mobile
-- [ ] **CARD-03**: Sizing assumptions grid collapses to 2-column on mobile
-- [ ] **CARD-04**: VsanGrowthSection internal grids are responsive at 390px
-- [ ] **CARD-05**: SPEC lookup search input and results panel are usable on mobile
+- [x] **CARD-01**: Scenario cards stack full-width on mobile (no side-by-side)
+- [x] **CARD-02**: Server config grid (sockets/cores/RAM/disk) collapses to 2-column on mobile
+- [x] **CARD-03**: Sizing assumptions grid collapses to 2-column on mobile
+- [x] **CARD-04**: VsanGrowthSection internal grids are responsive at 390px
+- [x] **CARD-05**: SPEC lookup search input and results panel are usable on mobile
 
 ### Step 3: Review & Export (REVIEW)
 
@@ -93,11 +93,11 @@
 | FORM-03 | Phase 29 | Complete |
 | FORM-04 | Phase 29 | Complete |
 | FORM-05 | Phase 29 | Complete |
-| CARD-01 | Phase 30 | Pending |
-| CARD-02 | Phase 30 | Pending |
-| CARD-03 | Phase 30 | Pending |
-| CARD-04 | Phase 30 | Pending |
-| CARD-05 | Phase 30 | Pending |
+| CARD-01 | Phase 30 | Complete |
+| CARD-02 | Phase 30 | Complete |
+| CARD-03 | Phase 30 | Complete |
+| CARD-04 | Phase 30 | Complete |
+| CARD-05 | Phase 30 | Complete |
 | REVIEW-01 | Phase 31 | Pending |
 | REVIEW-02 | Phase 31 | Pending |
 | REVIEW-03 | Phase 31 | Pending |
