@@ -65,7 +65,7 @@ export function VsanGrowthSection({
           {layoutMode === 'hci' && (
             <div className="space-y-4">
               <p className="text-xs font-medium text-muted-foreground">vSAN Settings</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {/* FTT Policy dropdown */}
                 <Controller
                   control={form.control}
@@ -220,7 +220,7 @@ export function VsanGrowthSection({
           {/* Growth sub-section — always visible (FORM-03) */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">Growth Projections</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="cpuGrowthPercent"

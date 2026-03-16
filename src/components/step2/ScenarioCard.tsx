@@ -210,7 +210,8 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="icon"
+                className="h-9 w-9"
                 onClick={() => duplicateScenario(scenarioId)}
                 aria-label="Duplicate scenario"
               >
@@ -219,7 +220,8 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="icon"
+                className="h-9 w-9"
                 onClick={() => removeScenario(scenarioId)}
                 aria-label="Remove scenario"
               >
@@ -234,7 +236,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Target Server Config
               </h4>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <FormField control={form.control} name="socketsPerServer" render={({ field }) => (
                   <FormItem>
                     <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
@@ -323,7 +325,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {sizingMode === 'vcpu' && (
                   <FormField control={form.control} name="targetVcpuToPCoreRatio" render={({ field }) => (
                     <FormItem>

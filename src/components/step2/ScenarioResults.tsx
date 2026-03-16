@@ -74,7 +74,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
         <span className="text-sm text-muted-foreground">servers required</span>
         <Badge variant="secondary">{RESOURCE_LABELS[result.limitingResource]}</Badge>
       </div>
-      <div className="grid grid-cols-3 gap-3 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
         <div>
           <span className="text-muted-foreground">
             {sizingMode === 'specint' ? 'SPECrate-limited: ' : 'CPU-limited: '}
