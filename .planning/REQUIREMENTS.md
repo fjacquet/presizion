@@ -32,8 +32,8 @@
 
 - [x] **FORM-01**: Form fields stack to single-column layout on screens < 640px (currently grid-cols-2/3/4)
 - [x] **FORM-02**: DerivedMetricsPanel grid collapses to 2-3 columns on mobile (currently 5-column)
-- [ ] **FORM-03**: SPEC results panel table is horizontally scrollable on mobile if it overflows
-- [ ] **FORM-04**: ImportPreviewModal renders as a bottom Drawer on mobile (< 640px), Dialog on desktop
+- [x] **FORM-03**: SPEC results panel table is horizontally scrollable on mobile if it overflows
+- [x] **FORM-04**: ImportPreviewModal renders as a bottom Drawer on mobile (< 640px), Dialog on desktop
 - [x] **FORM-05**: File import button and scope badge are accessible and readable at 390px
 
 ### Step 2: Scenario Cards (CARD)
@@ -90,8 +90,8 @@
 | NAV-04 | Phase 28 | Complete |
 | FORM-01 | Phase 29 | Complete |
 | FORM-02 | Phase 29 | Complete |
-| FORM-03 | Phase 29 | Pending |
-| FORM-04 | Phase 29 | Pending |
+| FORM-03 | Phase 29 | Complete |
+| FORM-04 | Phase 29 | Complete |
 | FORM-05 | Phase 29 | Complete |
 | CARD-01 | Phase 30 | Pending |
 | CARD-02 | Phase 30 | Pending |

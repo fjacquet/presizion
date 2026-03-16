@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: — Mobile UX & Web App Manifest
 status: planning
-stopped_at: Completed 29-step-1-mobile-form-layout-01-PLAN.md
-last_updated: "2026-03-16T09:10:26.134Z"
+stopped_at: Completed 29-step-1-mobile-form-layout-02-PLAN.md
+last_updated: "2026-03-16T09:12:50.108Z"
 last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
 progress:
   total_phases: 14
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 22
-  completed_plans: 21
+  completed_plans: 22
   percent: 0
 ---
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans com
 | Phase 28-global-mobile-foundation-wizard-shell P01 | 1 | 2 tasks | 2 files |
 | Phase 28-global-mobile-foundation-wizard-shell P02 | 2 | 3 tasks | 5 files |
 | Phase 29-step-1-mobile-form-layout P01 | 2 | 2 tasks | 4 files |
+| Phase 29-step-1-mobile-form-layout P02 | 7 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 29-01]: DerivedMetricsPanel grid-cols-2 sm:grid-cols-5 verified correct — no change needed at 390px
 - [Phase 29-01]: FileImportButton uses default Button size (not size=sm) for ~40px height satisfying MOBILE-03 touch target
 - [Phase 29-01]: ScopeBadge edit button changed to size=icon with h-9 w-9 shrink-0 to prevent off-screen push by long labels
+- [Phase 29]: shadcn Drawer installed via npx shadcn@latest add drawer bringing vaul@1.1.2
+- [Phase 29]: useIsMobile hook defined locally in ImportPreviewModal using matchMedia (max-width: 639px)
+- [Phase 29]: matchMedia mock defaults to desktop in beforeEach for existing ImportPreviewModal tests
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-16T09:10:26.131Z
-Stopped at: Completed 29-step-1-mobile-form-layout-01-PLAN.md
+Last session: 2026-03-16T09:12:50.106Z
+Stopped at: Completed 29-step-1-mobile-form-layout-02-PLAN.md
 Resume file: None

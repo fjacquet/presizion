@@ -92,7 +92,7 @@ Full details: `.planning/milestones/v2.2-ROADMAP.md`
 
 - [x] **Phase 27: Web App Manifest & Icons** - Installable PWA identity: manifest file, icon PNGs, and iOS/Android meta tags in index.html (completed 2026-03-16)
 - [x] **Phase 28: Global Mobile Foundation & Wizard Shell** - Viewport sizing, overflow control, touch targets, compact header/nav that underpin all three steps (completed 2026-03-16)
-- [ ] **Phase 29: Step 1 Mobile Form Layout** - Single-column form grids, touch-friendly inputs, and ImportPreviewModal as a mobile bottom Drawer
+- [x] **Phase 29: Step 1 Mobile Form Layout** - Single-column form grids, touch-friendly inputs, and ImportPreviewModal as a mobile bottom Drawer (completed 2026-03-16)
 - [ ] **Phase 30: Step 2 Scenario Cards** - Stacked full-width scenario cards with collapsed grids and responsive vSAN/SPEC sections at 390px
 - [ ] **Phase 31: Step 3 Review & Export** - Horizontally-scrollable comparison table, responsive chart heights, bottom-sheet export actions, and iOS PDF fallback
 
@@ -383,6 +383,6 @@ Plans:
 | 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
 | 27. Web App Manifest & Icons | 1/1 | Complete    | 2026-03-16 | - |
 | 28. Global Mobile Foundation & Wizard Shell | 2/2 | Complete    | 2026-03-16 | - |
-| 29. Step 1 Mobile Form Layout | 1/2 | In Progress|  | - |
+| 29. Step 1 Mobile Form Layout | 2/2 | Complete   | 2026-03-16 | - |
 | 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
 | 31. Step 3 Review & Export | v2.4 | 0/3 | Not started | - |
