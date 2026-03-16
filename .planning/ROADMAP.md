@@ -336,7 +336,7 @@ Plans:
 
 Plans:
 
-- [ ] 30-01-PLAN.md — Mobile-first grids for ScenarioCard, VsanGrowthSection, ScenarioResults, Step2Scenarios header + CARD-05 verify (CARD-01..05)
+- [x] 30-01-PLAN.md — Mobile-first grids for ScenarioCard, VsanGrowthSection, ScenarioResults, Step2Scenarios header + CARD-05 verify (CARD-01..05)
 
 ### Phase 31: Step 3 Review & Export
 
@@ -351,13 +351,13 @@ Plans:
   4. On iOS Safari, tapping "Export PDF" opens the PDF in a new browser tab with a toast explaining how to save it — the export does not silently fail or show a broken download
   5. Tapping "Download Chart PNG" on mobile produces a downloadable PNG file — the chart canvas renders correctly on a high-density (3x) screen without blurring
   6. The core count chart and capacity stacked chart are legible at 390px width — axis labels, bar segments, and legend entries are readable without overlapping
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 31-01-PLAN.md — ComparisonTable horizontal scroll + sticky first column + min-w-max inner table (REVIEW-01)
-- [ ] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + chart legibility at 390px (REVIEW-02, REVIEW-06)
-- [ ] 31-03-PLAN.md — Export bottom sheet (shadcn Sheet) + iOS PDF/PPTX fallback + PNG devicePixelRatio fix (REVIEW-03, REVIEW-04, REVIEW-05)
+- [ ] 31-01-PLAN.md — ComparisonTable horizontal scroll with sticky first column and min-w-max inner table (REVIEW-01)
+- [ ] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + CapacityStackedChart legibility at 390px (REVIEW-02, REVIEW-05, REVIEW-06)
+- [ ] 31-03-PLAN.md — Export bottom sheet (shadcn Drawer) on mobile + iOS PDF/PPTX fallback + useIsMobile extraction (REVIEW-03, REVIEW-04, REVIEW-05)
 
 ## Progress
 
@@ -392,5 +392,5 @@ Plans:
 | 27. Web App Manifest & Icons | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 28. Global Mobile Foundation & Wizard Shell | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
-| 30. Step 2 Scenario Cards | 1/1 | Complete    | 2026-03-16 | - |
+| 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 31. Step 3 Review & Export | v2.4 | 0/3 | Not started | - |
