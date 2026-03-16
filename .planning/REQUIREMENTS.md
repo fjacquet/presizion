@@ -74,42 +74,42 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MANIFEST-01 | — | Pending |
-| MANIFEST-02 | — | Pending |
-| MANIFEST-03 | — | Pending |
-| MANIFEST-04 | — | Pending |
-| MANIFEST-05 | — | Pending |
-| MANIFEST-06 | — | Pending |
-| MOBILE-01 | — | Pending |
-| MOBILE-02 | — | Pending |
-| MOBILE-03 | — | Pending |
-| MOBILE-04 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| FORM-01 | — | Pending |
-| FORM-02 | — | Pending |
-| FORM-03 | — | Pending |
-| FORM-04 | — | Pending |
-| FORM-05 | — | Pending |
-| CARD-01 | — | Pending |
-| CARD-02 | — | Pending |
-| CARD-03 | — | Pending |
-| CARD-04 | — | Pending |
-| CARD-05 | — | Pending |
-| REVIEW-01 | — | Pending |
-| REVIEW-02 | — | Pending |
-| REVIEW-03 | — | Pending |
-| REVIEW-04 | — | Pending |
-| REVIEW-05 | — | Pending |
-| REVIEW-06 | — | Pending |
+| MANIFEST-01 | Phase 27 | Pending |
+| MANIFEST-02 | Phase 27 | Pending |
+| MANIFEST-03 | Phase 27 | Pending |
+| MANIFEST-04 | Phase 27 | Pending |
+| MANIFEST-05 | Phase 27 | Pending |
+| MANIFEST-06 | Phase 27 | Pending |
+| MOBILE-01 | Phase 28 | Pending |
+| MOBILE-02 | Phase 28 | Pending |
+| MOBILE-03 | Phase 28 | Pending |
+| MOBILE-04 | Phase 28 | Pending |
+| NAV-01 | Phase 28 | Pending |
+| NAV-02 | Phase 28 | Pending |
+| NAV-03 | Phase 28 | Pending |
+| NAV-04 | Phase 28 | Pending |
+| FORM-01 | Phase 29 | Pending |
+| FORM-02 | Phase 29 | Pending |
+| FORM-03 | Phase 29 | Pending |
+| FORM-04 | Phase 29 | Pending |
+| FORM-05 | Phase 29 | Pending |
+| CARD-01 | Phase 30 | Pending |
+| CARD-02 | Phase 30 | Pending |
+| CARD-03 | Phase 30 | Pending |
+| CARD-04 | Phase 30 | Pending |
+| CARD-05 | Phase 30 | Pending |
+| REVIEW-01 | Phase 31 | Pending |
+| REVIEW-02 | Phase 31 | Pending |
+| REVIEW-03 | Phase 31 | Pending |
+| REVIEW-04 | Phase 31 | Pending |
+| REVIEW-05 | Phase 31 | Pending |
+| REVIEW-06 | Phase 31 | Pending |
 
 **Coverage:**
 - v2.4 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30
+- Mapped to phases: 30
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-16*
-*Last updated: 2026-03-16 after initial definition*
+*Last updated: 2026-03-16 — traceability mapped to Phases 27-31*

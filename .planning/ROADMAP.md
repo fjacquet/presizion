@@ -7,7 +7,8 @@
 - ✅ **v1.4 — Bug Fixes, Chart Polish & UX** — Phases 16-17 (shipped 2026-03-14)
 - ✅ **v2.0 — vSAN-Aware Sizing Engine** — Phases 18-22 (shipped 2026-03-15)
 - ✅ **v2.1 — Import UX & Scope Fixes** — Phases 23-24 (shipped 2026-03-15)
-- 🚧 **v2.2 — SPEC Search Integration** — Phases 25-26 (in progress)
+- ✅ **v2.2 — SPEC Search Integration** — Phases 25-26 (shipped 2026-03-15)
+- 🚧 **v2.4 — Mobile UX & Web App Manifest** — Phases 27-31 (in progress)
 
 ## Phases
 
@@ -75,12 +76,25 @@ Full details: `.planning/milestones/v2.1-ROADMAP.md`
 
 </details>
 
-### v2.2 — SPEC Search Integration (In Progress)
+<details>
+<summary>✅ v2.2 — SPEC Search Integration (Phases 25-26) — SHIPPED 2026-03-15</summary>
 
-**Milestone Goal:** Integrate spec-search (fjacquet.github.io/spec-search) to auto-lookup SPECrate2017 benchmark scores from detected CPU models, eliminating manual SPEC website searches for both existing cluster CPUs and target scenario CPUs.
+Full details: `.planning/milestones/v2.2-ROADMAP.md`
 
-- [x] **Phase 25: SPEC Lookup Service** - Slug derivation, fetch service, error handling, URL config, and updated lookup link (completed 2026-03-15)
-- [x] **Phase 26: SPEC Lookup UI** - Results panel display and one-click auto-fill for Step 1 and Step 2 (completed 2026-03-15)
+- [x] Phase 25: SPEC Lookup Service (2/2 plans) — completed 2026-03-15
+- [x] Phase 26: SPEC Lookup UI (2/2 plans) — completed 2026-03-15
+
+</details>
+
+### v2.4 — Mobile UX & Web App Manifest (In Progress)
+
+**Milestone Goal:** Retrofit Presizion for phone use — every step usable at 390px with proper touch targets, no horizontal overflow, and installable from iOS/Android home screen via web app manifest.
+
+- [ ] **Phase 27: Web App Manifest & Icons** - Installable PWA identity: manifest file, icon PNGs, and iOS/Android meta tags in index.html
+- [ ] **Phase 28: Global Mobile Foundation & Wizard Shell** - Viewport sizing, overflow control, touch targets, compact header/nav that underpin all three steps
+- [ ] **Phase 29: Step 1 Mobile Form Layout** - Single-column form grids, touch-friendly inputs, and ImportPreviewModal as a mobile bottom Drawer
+- [ ] **Phase 30: Step 2 Scenario Cards** - Stacked full-width scenario cards with collapsed grids and responsive vSAN/SPEC sections at 390px
+- [ ] **Phase 31: Step 3 Review & Export** - Horizontally-scrollable comparison table, responsive chart heights, bottom-sheet export actions, and iOS PDF fallback
 
 ## Phase Details
 
@@ -243,8 +257,99 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 26-01-PLAN.md — useSpecLookup hook + SpecResultsPanel component + Step 1 integration
-- [ ] 26-02-PLAN.md — Step 2 ScenarioCard target CPU search + SPEC results panel + regression check
+- [x] 26-01-PLAN.md — useSpecLookup hook + SpecResultsPanel component + Step 1 integration
+- [x] 26-02-PLAN.md — Step 2 ScenarioCard target CPU search + SPEC results panel + regression check
+
+### Phase 27: Web App Manifest & Icons
+
+**Goal**: Presizion is installable to the iPhone and Android home screen — users tapping "Add to Home Screen" get the Presizion icon, a standalone launch experience (no browser chrome), and a themed address bar matching the app's brand color.
+**Depends on**: Phase 26
+**Requirements**: MANIFEST-01, MANIFEST-02, MANIFEST-03, MANIFEST-04, MANIFEST-05, MANIFEST-06
+**Success Criteria** (what must be TRUE):
+
+  1. Opening Presizion in Chrome on Android and tapping "Add to Home Screen" installs it with the correct Presizion icon (192px) and launches in standalone mode (no browser chrome visible)
+  2. Opening Presizion in Safari on iPhone and tapping "Add to Home Screen" installs it with the Presizion icon (180px apple-touch-icon), not a page screenshot
+  3. The browser address bar displays the app's brand theme-color when the page is active (visible in Chrome on Android and supported browsers)
+  4. Launching Presizion from the home screen opens to `/presizion/` without a 404, regardless of iOS or Android
+  5. The viewport renders without unexpected white bars or clipped edges on iPhone — `viewport-fit=cover` is applied and safe-area insets are available for future use
+**Plans**: TBD
+
+Plans:
+- [ ] 27-01-PLAN.md — Icon generation script + manifest.webmanifest + index.html meta tags (MANIFEST-01..06)
+
+### Phase 28: Global Mobile Foundation & Wizard Shell
+
+**Goal**: The WizardShell and global CSS provide a stable mobile base that all three wizard steps build on — correct viewport height, no page-level horizontal overflow, touch-friendly minimum target sizes, and compact navigation elements that fit on a 390px screen without wrapping or clipping.
+**Depends on**: Phase 27
+**Requirements**: MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, NAV-01, NAV-02, NAV-03, NAV-04
+**Success Criteria** (what must be TRUE):
+
+  1. On an iPhone 14 (390px viewport), the app footer/navigation is not hidden behind the Safari address bar — content ends above the browser chrome, not behind it
+  2. Tapping any input in any wizard step does not trigger iOS Safari's auto-zoom — all inputs remain at their original zoom level after focus
+  3. All interactive elements (buttons, step indicators, toggles, links) are tappable without precision — each has at least a 44px touch target
+  4. The header toolbar (logo, theme toggle, Store-Predict link) fits on a single line at 390px without text wrapping or icons being cut off
+  5. The SizingModeToggle wraps to two lines if needed at 390px but does not cause horizontal page scroll
+**Plans**: TBD
+
+Plans:
+- [ ] 28-01-PLAN.md — Global CSS: 16px input font-size (iOS auto-zoom fix) + 100dvh/vh + overflow-x:hidden on shell
+- [ ] 28-02-PLAN.md — WizardShell: compact header + touch targets + SizingModeToggle flex-wrap + StepIndicator mobile (NAV-01..04, MOBILE-01..04)
+
+### Phase 29: Step 1 Mobile Form Layout
+
+**Goal**: A presales engineer on a phone can enter or import current cluster data in Step 1 without horizontal scrolling, pinching, or squinting — every form section stacks to a single column, import works via a bottom drawer, and all inputs meet touch-target requirements.
+**Depends on**: Phase 28
+**Requirements**: FORM-01, FORM-02, FORM-03, FORM-04, FORM-05
+**Success Criteria** (what must be TRUE):
+
+  1. All CurrentClusterForm input groups display as single-column stacks at 390px — no field is clipped or requires horizontal scroll to reach
+  2. The DerivedMetricsPanel collapses from 5 columns to 2-3 columns at 390px — all metric values are readable without overflow
+  3. The SPEC results panel table is horizontally scrollable at 390px — a user can swipe to reveal additional columns without causing page-level scroll
+  4. On a phone, tapping the file import button opens the ImportPreviewModal as a bottom drawer that slides up from the screen edge, not a center dialog that may be clipped
+  5. The file import button and scope badge are fully readable and tappable at 390px — neither is truncated or overlapping another element
+**Plans**: TBD
+
+Plans:
+- [ ] 29-01-PLAN.md — CurrentClusterForm grid audit: grid-cols-1 sm:grid-cols-N throughout all form sections (FORM-01, FORM-02, FORM-05)
+- [ ] 29-02-PLAN.md — ImportPreviewModal Dialog-to-Drawer on mobile + SPEC results panel horizontal scroll (FORM-03, FORM-04)
+
+### Phase 30: Step 2 Scenario Cards
+
+**Goal**: A presales engineer on a phone can define and review sizing scenarios in Step 2 — scenario cards stack full-width, all configuration grids collapse to readable column counts, and the vSAN/SPEC lookup sections remain functional at 390px.
+**Depends on**: Phase 28
+**Requirements**: CARD-01, CARD-02, CARD-03, CARD-04, CARD-05
+**Success Criteria** (what must be TRUE):
+
+  1. At 390px, scenario cards stack vertically at full width — no two cards appear side by side, and each card's content is fully visible without horizontal scrolling
+  2. The server config inputs (sockets/server, cores/socket, RAM/server, disk/server) display in a 2-column grid at 390px — all four inputs are visible without scrolling within the card
+  3. The sizing assumptions inputs (vCPU ratio, headroom, utilization targets) display in a 2-column grid at 390px — all inputs are visible and tappable
+  4. The vSAN & Growth collapsible section's internal fields are readable and enterable at 390px — no field is clipped or hidden outside the viewport
+  5. The SPEC lookup search input and results panel in Step 2 are usable at 390px — the search field accepts input and results rows are readable without horizontal overflow
+**Plans**: TBD
+
+Plans:
+- [ ] 30-01-PLAN.md — ScenarioCard grid audit + card stacking + VsanGrowthSection responsive grids (CARD-01..04)
+- [ ] 30-02-PLAN.md — SPEC lookup panel mobile layout in ScenarioCard (CARD-05)
+
+### Phase 31: Step 3 Review & Export
+
+**Goal**: A presales engineer on a phone can review sizing results and export them from Step 3 — the comparison table scrolls horizontally with a fixed first column, charts are sized for the phone screen, and all export options are reachable via a bottom sheet without a cramped button row.
+**Depends on**: Phase 30
+**Requirements**: REVIEW-01, REVIEW-02, REVIEW-03, REVIEW-04, REVIEW-05, REVIEW-06
+**Success Criteria** (what must be TRUE):
+
+  1. The comparison table scrolls horizontally at 390px — the "Metric" first column stays fixed while scenario columns scroll right, and no scenario data is hidden or inaccessible
+  2. All four charts (sizing, core count, capacity stacked, min-nodes) render within the phone's visible area — chart height is shorter on mobile (h-48 equivalent) and no chart bleeds outside the viewport
+  3. On mobile, the export options appear in a bottom sheet that slides up from the screen edge — the button row is not present in its desktop form, replaced by a single "Export" trigger
+  4. On iOS Safari, tapping "Export PDF" opens the PDF in a new browser tab with a toast explaining how to save it — the export does not silently fail or show a broken download
+  5. Tapping "Download Chart PNG" on mobile produces a downloadable PNG file — the chart canvas renders correctly on a high-density (3x) screen without blurring
+  6. The core count chart and capacity stacked chart are legible at 390px width — axis labels, bar segments, and legend entries are readable without overlapping
+**Plans**: TBD
+
+Plans:
+- [ ] 31-01-PLAN.md — ComparisonTable horizontal scroll + sticky first column + min-w-max inner table (REVIEW-01)
+- [ ] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + chart legibility at 390px (REVIEW-02, REVIEW-06)
+- [ ] 31-03-PLAN.md — Export bottom sheet (shadcn Sheet) + iOS PDF/PPTX fallback + PNG devicePixelRatio fix (REVIEW-03, REVIEW-04, REVIEW-05)
 
 ## Progress
 
@@ -275,4 +380,9 @@ Plans:
 | 23. Scope Aggregation Fixes | v2.1 | 2/2 | Complete | 2026-03-15 |
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 26. SPEC Lookup UI | 2/2 | Complete    | 2026-03-15 | - |
+| 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
+| 27. Web App Manifest & Icons | v2.4 | 0/1 | Not started | - |
+| 28. Global Mobile Foundation & Wizard Shell | v2.4 | 0/2 | Not started | - |
+| 29. Step 1 Mobile Form Layout | v2.4 | 0/2 | Not started | - |
+| 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
+| 31. Step 3 Review & Export | v2.4 | 0/3 | Not started | - |
