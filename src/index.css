@@ -131,6 +131,20 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
+}
+
+/* MOBILE-01: prevent iOS Safari auto-zoom on input focus */
+@media (hover: none) {
+  input,
+  input[type="number"],
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 h1,
