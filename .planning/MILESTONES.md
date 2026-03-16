@@ -1,5 +1,21 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v2.3 -- Spec-Search vCPU + Avg VM Reports (Shipped: 2026-03-16)
+
+**Goal:** Enable CPU lookup in vCPU sizing mode and add average VM metrics to report exports.
+
+**What shipped:**
+
+- Spec-search CPU lookup in vCPU mode: selecting a SPEC result auto-fills sockets/server and cores/socket
+- Avg vCPU/VM, Avg RAM/VM (GiB), Avg Disk/VM (GiB) rows in PDF and PPTX As-Is vs To-Be comparison tables
+- SpecResultsPanel.onSelect widened to pass full SpecResult object
+
+**Requirements shipped:** Ad-hoc (no GSD phases — single-commit feature release)
+**Codebase:** 596 tests
+**Last phase number:** 26
+
+---
+
 ## v2.2 -- SPEC Search Integration (Shipped: 2026-03-15)
 
 **Goal:** Integrate spec-search to auto-lookup SPECrate2017 scores, eliminating manual SPEC website searches.

@@ -85,7 +85,15 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 
 - ✓ SPEC search integration — auto-lookup, results panel, one-click auto-fill — v2.2 / Phase 25-26
 
-### Active (v2.3 candidates)
+### Active (v2.4 — Mobile UX & Web App Manifest)
+
+- [ ] Web app manifest with Presizion icons for iPhone/Android "Add to Home Screen"
+- [ ] Apple-specific meta tags (apple-touch-icon, apple-mobile-web-app-capable, status-bar-style)
+- [ ] Full responsive redesign targeting iPhone 14/15 (390px) — all 3 wizard steps
+- [ ] Mobile-optimized Step 1: single-column form, touch-friendly inputs, collapsible sections
+- [ ] Mobile-optimized Step 2: stacked scenario cards, compact server config grid
+- [ ] Mobile-optimized Step 3: horizontally scrollable comparison table, responsive charts, touch-friendly export buttons
+- [ ] Mobile-optimized navigation: wizard step indicators, sizing mode toggle, header toolbar
 
 ### Out of Scope
 
@@ -94,7 +102,7 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - TCO/ROI or pricing/BOM calculations — capacity sizing only
 - Per-VM-level modeling — aggregate calculations only
 - Integration with vCenter, CloudIQ, or any external system
-- PWA / offline capability — basic static hosting is sufficient
+- Service worker / offline capability — manifest is for branding only, not full PWA
 - Localization / i18n — English only
 
 ## Context
@@ -133,4 +141,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ✓ Resolved — all phases since v1.3 use GSD framework |
 
 ---
-*Last updated: 2026-03-15 after v2.2 milestone completion*
+*Last updated: 2026-03-16 after v2.4 milestone start (Mobile UX & Web App Manifest)*
