@@ -4,21 +4,21 @@
 
 A client-side-only static web application that helps presales engineers and solution architects quickly size a refreshed server cluster from existing environment metrics. Users enter current cluster data (vCPUs, pCores, VMs, RAM, disk, server config), define one or more target scenarios, and receive server count recommendations with per-constraint breakdowns — entirely in the browser, with no backend or external integrations.
 
-v2.2 shipped with SPEC search integration — auto-lookup SPECrate2017 scores from detected CPU models via spec-search GitHub Pages API, with one-click auto-fill in Step 1 and Step 2.
+v2.4 shipped with full mobile-first responsive redesign — installable via iPhone/Android home screen, every wizard step usable at 390px with touch-friendly controls, horizontal scroll comparison table, responsive charts, and export bottom sheet on mobile.
 
 ## Core Value
 
 The sizing math must be correct: given the same inputs, the tool must produce server counts that match what a reference spreadsheet would calculate, with transparent formulas behind every number.
 
-## Current State (v2.1 — Shipped 2026-03-15)
+## Current State (v2.4 — Shipped 2026-03-16)
 
-- **Codebase:** 541 Vitest tests
-- **Tech stack:** React 19 + TypeScript strict + Vite + Tailwind v4 + shadcn/ui + Zustand v5 + Recharts 2.15 + Sonner + jsPDF + pptxgenjs
+- **Codebase:** 653 Vitest tests
+- **Tech stack:** React 19 + TypeScript strict + Vite 8 + Tailwind v4 + shadcn/ui + Zustand v5 + Recharts 2.15 + Sonner + jsPDF + pptxgenjs + vaul (Drawer)
 - **Deployment:** GitHub Pages at `/presizion/`
-- **Sizing modes:** vCPU, SPECint, Aggressive, GHz + vSAN-aware storage (FTT, compression, overhead)
-- **Export formats:** Clipboard, CSV, JSON, PNG (chart + table), PDF report, PPTX presentation, Print, Shareable URL
-- **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → scope filter → auto-fills Step 1
-- **Branding:** Presizion SVG wordmark + custom favicon
+- **Sizing modes:** vCPU (with spec-search CPU lookup), SPECint, Aggressive, GHz + vSAN-aware storage (FTT, compression, overhead)
+- **Export formats:** Clipboard, CSV, JSON, PNG (chart + table), PDF report, PPTX presentation, Print, Shareable URL — bottom sheet on mobile, iOS PDF fallback
+- **File import:** RVTools .xlsx, LiveOptics .zip/.xlsx/.csv → scope filter → auto-fills Step 1 — Drawer modal on mobile
+- **Branding:** Presizion SVG wordmark + custom favicon + web app manifest (installable on iPhone/Android)
 - **Theming:** Light/dark/system toggle with localStorage persistence
 - **Persistence:** localStorage auto-restore + base64url shareable URL hash
 
@@ -85,15 +85,16 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 
 - ✓ SPEC search integration — auto-lookup, results panel, one-click auto-fill — v2.2 / Phase 25-26
 
-### Active (v2.4 — Mobile UX & Web App Manifest)
+- ✓ Spec-search CPU lookup in vCPU mode + avg VM metrics in PDF/PPTX reports — v2.3
+- ✓ Web app manifest with Presizion icons for iPhone/Android home screen — v2.4 / Phase 27
+- ✓ iOS auto-zoom prevention, dvh viewport, overflow containment — v2.4 / Phase 28
+- ✓ 44px touch targets, compact header, sticky bottom nav — v2.4 / Phase 28
+- ✓ Mobile-optimized Step 1: single-column form, Drawer import modal — v2.4 / Phase 29
+- ✓ Mobile-optimized Step 2: stacked scenario cards, responsive grids — v2.4 / Phase 30
+- ✓ Mobile-optimized Step 3: sticky scroll table, responsive charts, export bottom sheet, iOS PDF fallback — v2.4 / Phase 31
 
-- [ ] Web app manifest with Presizion icons for iPhone/Android "Add to Home Screen"
-- [ ] Apple-specific meta tags (apple-touch-icon, apple-mobile-web-app-capable, status-bar-style)
-- [ ] Full responsive redesign targeting iPhone 14/15 (390px) — all 3 wizard steps
-- [ ] Mobile-optimized Step 1: single-column form, touch-friendly inputs, collapsible sections
-- [ ] Mobile-optimized Step 2: stacked scenario cards, compact server config grid
-- [ ] Mobile-optimized Step 3: horizontally scrollable comparison table, responsive charts, touch-friendly export buttons
-- [ ] Mobile-optimized navigation: wizard step indicators, sizing mode toggle, header toolbar
+### Active (v2.5 candidates)
+
 
 ### Out of Scope
 
@@ -102,7 +103,7 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - TCO/ROI or pricing/BOM calculations — capacity sizing only
 - Per-VM-level modeling — aggregate calculations only
 - Integration with vCenter, CloudIQ, or any external system
-- Service worker / offline capability — manifest is for branding only, not full PWA
+- Service worker / offline capability — manifest is for branding only (shipped v2.4), not full PWA
 - Localization / i18n — English only
 
 ## Context
@@ -141,4 +142,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ✓ Resolved — all phases since v1.3 use GSD framework |
 
 ---
-*Last updated: 2026-03-16 after v2.4 milestone start (Mobile UX & Web App Manifest)*
+*Last updated: 2026-03-16 after v2.4 milestone completion (Mobile UX & Web App Manifest)*

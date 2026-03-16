@@ -1,5 +1,26 @@
 # Milestones: Cluster Refresh Sizing Tool
 
+## v2.4 -- Mobile UX & Web App Manifest (Shipped: 2026-03-16)
+
+**Goal:** Retrofit Presizion for phone use — installable via home screen, every step usable at 390px.
+
+**What shipped:**
+
+- Phase 27: Web app manifest with Presizion icons (192, 512, maskable, apple-touch-icon 180)
+- Phase 28: Global mobile foundation — iOS auto-zoom fix, dvh viewport, 44px touch targets, compact header, sticky bottom nav
+- Phase 29: Step 1 mobile form layout — single-column grids, ImportPreviewModal as Drawer on mobile, SPEC table horizontal scroll
+- Phase 30: Step 2 scenario cards — stacked full-width, collapsed grids, responsive vSAN/SPEC sections
+- Phase 31: Step 3 review & export — sticky first column on comparison table, responsive chart heights, export bottom sheet, iOS PDF fallback
+
+**Requirements shipped:** 30/30 (MANIFEST-01..06, MOBILE-01..04, NAV-01..04, FORM-01..05, CARD-01..05, REVIEW-01..06)
+**Codebase:** 653 tests
+**New dependencies:** vaul (shadcn Drawer)
+
+**Archive:** `.planning/milestones/v2.4-ROADMAP.md`, `.planning/milestones/v2.4-REQUIREMENTS.md`
+**Last phase number:** 31
+
+---
+
 ## v2.3 -- Spec-Search vCPU + Avg VM Reports (Shipped: 2026-03-16)
 
 **Goal:** Enable CPU lookup in vCPU sizing mode and add average VM metrics to report exports.

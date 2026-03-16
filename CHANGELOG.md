@@ -5,6 +5,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.4.0] -- 2026-03-16
+
+### Added
+
+- Web app manifest (`manifest.webmanifest`) with Presizion icons — installable on iPhone/Android home screen via "Add to Home Screen"
+- Apple-touch-icon (180px), theme-color meta tags (light/dark), viewport-fit=cover for iOS safe areas
+- iOS Safari auto-zoom prevention: all inputs render at 16px on touch devices
+- `100dvh` viewport height on WizardShell — no content hidden behind iOS Safari address bar
+- 44px minimum touch targets on all interactive elements (buttons, step indicators, toggles)
+- Compact header with hidden tagline on mobile, sticky bottom Back/Next navigation
+- SizingModeToggle flex-wrap at 390px
+- Single-column form grids on mobile across all 3 wizard steps
+- ImportPreviewModal renders as bottom Drawer on mobile (< 640px), Dialog on desktop
+- Scenario cards stack full-width on mobile with collapsed 2-column grids
+- ComparisonTable horizontal scroll with sticky "Metric" first column
+- Responsive chart heights (`h-48` on mobile, `h-72` on desktop) for all 4 charts
+- Export bottom sheet (shadcn Drawer) on mobile — single "Export / Share" trigger
+- iOS Safari PDF export fallback (opens in new tab via pre-opened window)
+- iOS Safari PPTX guard (toast explaining desktop-only limitation)
+- `useIsMobile` shared hook in `src/hooks/useIsMobile.ts`
+
+### Changed
+
+- CapacityStackedChart left margin reduced (120→90) and YAxis width (110→80) for 390px legibility
+
+---
+
 ## [2.3.0] -- 2026-03-16
 
 ### Added
