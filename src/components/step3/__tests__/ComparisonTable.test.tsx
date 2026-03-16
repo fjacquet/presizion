@@ -292,6 +292,33 @@ describe('ComparisonTable', () => {
     })
   })
 
+  describe('MOBILE-SCROLL: horizontal scroll with sticky first column', () => {
+    it('Table element has min-w-max class', () => {
+      render(<ComparisonTable />)
+      const table = document.querySelector('table')
+      expect(table).toBeTruthy()
+      expect(table?.className).toContain('min-w-max')
+    })
+
+    it('Metric header cell has sticky positioning classes', () => {
+      render(<ComparisonTable />)
+      const metricHeader = screen.getByRole('columnheader', { name: 'Metric' })
+      expect(metricHeader.className).toContain('sticky')
+      expect(metricHeader.className).toContain('left-0')
+      expect(metricHeader.className).toContain('bg-background')
+      expect(metricHeader.className).toContain('z-10')
+    })
+
+    it('first body cells have sticky positioning classes', () => {
+      render(<ComparisonTable />)
+      const serversCell = screen.getByText('Servers Required')
+      expect(serversCell.className).toContain('sticky')
+      expect(serversCell.className).toContain('left-0')
+      expect(serversCell.className).toContain('bg-background')
+      expect(serversCell.className).toContain('z-10')
+    })
+  })
+
   describe('REPT-01: As-Is column in comparison table', () => {
     it('renders an "As-Is" column header', () => {
       render(<ComparisonTable />)
