@@ -96,4 +96,13 @@ describe('SpecResultsPanel', () => {
     fireEvent.click(screen.getByText('SPECrate2017 Results'))
     expect(screen.getByText(/loading/i)).toBeInTheDocument()
   })
+
+  it('renders table with min-w-max class for horizontal scroll', () => {
+    render(
+      <SpecResultsPanel results={SAMPLE_RESULTS} status="ok" isLoading={false} onSelect={vi.fn()} />
+    )
+    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+    const table = document.querySelector('table')
+    expect(table?.className).toContain('min-w-max')
+  })
 })

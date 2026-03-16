@@ -56,7 +56,7 @@ export function SpecResultsPanel({
 
           {!isLoading && status === 'ok' && results.length > 0 && (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="min-w-max w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-muted-foreground">
                     <th className="py-1 pr-3">Vendor</th>
