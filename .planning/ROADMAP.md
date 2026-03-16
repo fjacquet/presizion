@@ -272,7 +272,7 @@ Plans:
   3. The browser address bar displays the app's brand theme-color when the page is active (visible in Chrome on Android and supported browsers)
   4. Launching Presizion from the home screen opens to `/presizion/` without a 404, regardless of iOS or Android
   5. The viewport renders without unexpected white bars or clipped edges on iPhone — `viewport-fit=cover` is applied and safe-area insets are available for future use
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
 - [ ] 27-01-PLAN.md — Icon generation script + manifest.webmanifest + index.html meta tags (MANIFEST-01..06)
