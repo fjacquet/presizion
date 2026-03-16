@@ -307,7 +307,7 @@ Plans:
   3. The SPEC results panel table is horizontally scrollable at 390px — a user can swipe to reveal additional columns without causing page-level scroll
   4. On a phone, tapping the file import button opens the ImportPreviewModal as a bottom drawer that slides up from the screen edge, not a center dialog that may be clipped
   5. The file import button and scope badge are fully readable and tappable at 390px — neither is truncated or overlapping another element
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 29-01-PLAN.md — CurrentClusterForm grid audit: grid-cols-1 sm:grid-cols-N throughout all form sections (FORM-01, FORM-02, FORM-05)
