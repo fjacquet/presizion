@@ -90,7 +90,7 @@ Full details: `.planning/milestones/v2.2-ROADMAP.md`
 
 **Milestone Goal:** Retrofit Presizion for phone use — every step usable at 390px with proper touch targets, no horizontal overflow, and installable from iOS/Android home screen via web app manifest.
 
-- [ ] **Phase 27: Web App Manifest & Icons** - Installable PWA identity: manifest file, icon PNGs, and iOS/Android meta tags in index.html
+- [x] **Phase 27: Web App Manifest & Icons** - Installable PWA identity: manifest file, icon PNGs, and iOS/Android meta tags in index.html (completed 2026-03-16)
 - [ ] **Phase 28: Global Mobile Foundation & Wizard Shell** - Viewport sizing, overflow control, touch targets, compact header/nav that underpin all three steps
 - [ ] **Phase 29: Step 1 Mobile Form Layout** - Single-column form grids, touch-friendly inputs, and ImportPreviewModal as a mobile bottom Drawer
 - [ ] **Phase 30: Step 2 Scenario Cards** - Stacked full-width scenario cards with collapsed grids and responsive vSAN/SPEC sections at 390px
@@ -381,7 +381,7 @@ Plans:
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
 | 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 27. Web App Manifest & Icons | v2.4 | 0/1 | Not started | - |
+| 27. Web App Manifest & Icons | 1/1 | Complete   | 2026-03-16 | - |
 | 28. Global Mobile Foundation & Wizard Shell | v2.4 | 0/2 | Not started | - |
 | 29. Step 1 Mobile Form Layout | v2.4 | 0/2 | Not started | - |
 | 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
