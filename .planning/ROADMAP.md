@@ -206,6 +206,7 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 23-01-PLAN.md — Fix parser standalone routing (RVTools + LiveOptics) and weighted RAM/server in aggregator
 - [x] 23-02-PLAN.md — Host count display in scope selector UI (ImportPreviewModal + ScopeBadge)
 
@@ -223,6 +224,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 24-01-PLAN.md — Add avg vCPU/RAM/Disk per VM to DerivedMetricsPanel + verify scenario seeding
 
 ### Phase 25: SPEC Lookup Service
@@ -240,6 +242,7 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 25-01-PLAN.md — TDD: specLookup service (cpuModelToSlug + fetchSpecResults + types) and config.ts constants
 - [x] 25-02-PLAN.md — Update CurrentClusterForm "Look up SPECrate" button to open spec-search
 
@@ -257,6 +260,7 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 26-01-PLAN.md — useSpecLookup hook + SpecResultsPanel component + Step 1 integration
 - [x] 26-02-PLAN.md — Step 2 ScenarioCard target CPU search + SPEC results panel + regression check
 
@@ -275,6 +279,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
+
 - [x] 27-01-PLAN.md — Icon generation script + manifest.webmanifest + index.html meta tags (MANIFEST-01..06)
 
 ### Phase 28: Global Mobile Foundation & Wizard Shell
@@ -292,6 +297,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
+
 - [x] 28-01-PLAN.md — Global CSS: iOS auto-zoom prevention (16px input font-size), dvh viewport height, overflow-x containment (MOBILE-01, MOBILE-02, MOBILE-04)
 - [x] 28-02-PLAN.md — WizardShell compact header, 44px touch targets, StepIndicator circles, SizingModeToggle flex-wrap, sticky Back/Next nav (MOBILE-03, NAV-01..04)
 
@@ -310,6 +316,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
+
 - [x] 29-01-PLAN.md — CurrentClusterForm grid audit: grid-cols-1 sm:grid-cols-N throughout all form sections (FORM-01, FORM-02, FORM-05)
 - [x] 29-02-PLAN.md — ImportPreviewModal Dialog-to-Drawer on mobile + SPEC results panel horizontal scroll (FORM-03, FORM-04)
 
@@ -328,6 +335,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
+
 - [ ] 30-01-PLAN.md — Mobile-first grids for ScenarioCard, VsanGrowthSection, ScenarioResults, Step2Scenarios header + CARD-05 verify (CARD-01..05)
 
 ### Phase 31: Step 3 Review & Export
@@ -346,6 +354,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
+
 - [ ] 31-01-PLAN.md — ComparisonTable horizontal scroll + sticky first column + min-w-max inner table (REVIEW-01)
 - [ ] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + chart legibility at 390px (REVIEW-02, REVIEW-06)
 - [ ] 31-03-PLAN.md — Export bottom sheet (shadcn Sheet) + iOS PDF/PPTX fallback + PNG devicePixelRatio fix (REVIEW-03, REVIEW-04, REVIEW-05)
