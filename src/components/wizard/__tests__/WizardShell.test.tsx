@@ -182,6 +182,73 @@ describe('WizardShell', () => {
     })
   })
 
+  describe('Phase 28: Mobile foundation', () => {
+    it('NAV-01: tagline paragraph has hidden sm:block for mobile compaction', () => {
+      render(<WizardShell />)
+      const tagline = screen.getByText(/size your refreshed cluster/i)
+      expect(tagline.className).toMatch(/hidden/)
+      expect(tagline.className).toMatch(/sm:block/)
+    })
+
+    it('MOBILE-03: Reset button has 44px touch target', () => {
+      render(<WizardShell />)
+      const resetBtn = screen.getByRole('button', { name: /reset/i })
+      expect(resetBtn.className).toMatch(/h-11/)
+      expect(resetBtn.className).toMatch(/w-11/)
+    })
+
+    it('MOBILE-03: Store-Predict link has 44px touch target', () => {
+      render(<WizardShell />)
+      const storeLink = screen.getByTitle(/storage calculator/i)
+      expect(storeLink.className).toMatch(/h-11/)
+      expect(storeLink.className).toMatch(/w-11/)
+    })
+
+    it('NAV-04: Back/Next bar has sticky positioning on step 2', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      const backBtn = screen.getByRole('button', { name: /back/i })
+      const navBar = backBtn.closest('div')
+      expect(navBar?.className).toMatch(/sticky/)
+      expect(navBar?.className).toMatch(/bottom-0/)
+    })
+
+    it('NAV-04: Back/Next buttons have min-h-[44px] touch target', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      const backBtn = screen.getByRole('button', { name: /back/i })
+      expect(backBtn.className).toMatch(/min-h-\[44px\]/)
+      const nextBtn = screen.getByRole('button', { name: /next/i })
+      expect(nextBtn.className).toMatch(/min-h-\[44px\]/)
+    })
+
+    it('NAV-04: main has pb-20 padding when currentStep > 1', () => {
+      useWizardStore.setState({ currentStep: 2 })
+      const { container } = render(<WizardShell />)
+      const main = container.querySelector('main')
+      expect(main?.className).toMatch(/pb-20/)
+    })
+
+    it('NAV-04: main has no pb-20 padding on step 1', () => {
+      useWizardStore.setState({ currentStep: 1 })
+      const { container } = render(<WizardShell />)
+      const main = container.querySelector('main')
+      expect(main?.className ?? '').not.toMatch(/pb-20/)
+    })
+
+    it('MOBILE-02: outermost div has overflow-x-hidden', () => {
+      const { container } = render(<WizardShell />)
+      const outerDiv = container.firstElementChild as HTMLElement
+      expect(outerDiv.className).toMatch(/overflow-x-hidden/)
+    })
+
+    it('MOBILE-02: outermost div has 100dvh minHeight style', () => {
+      const { container } = render(<WizardShell />)
+      const outerDiv = container.firstElementChild as HTMLElement
+      expect(outerDiv.style.minHeight).toBe('100dvh')
+    })
+  })
+
   describe('RESET-01..04: Reset button and confirmation', () => {
     const resetClusterSpy = vi.fn()
     const setScenariosSpy = vi.fn()

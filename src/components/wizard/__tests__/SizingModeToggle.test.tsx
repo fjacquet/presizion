@@ -45,4 +45,24 @@ describe('SizingModeToggle', () => {
     fireEvent.click(screen.getByRole('button', { name: /vcpu/i }))
     expect(setSizingMode).toHaveBeenCalledWith('vcpu')
   })
+
+  describe('Phase 28: Mobile foundation', () => {
+    it('NAV-03: sizing mode group has flex-wrap class', () => {
+      render(<SizingModeToggle />)
+      const group = screen.getByRole('group', { name: /sizing mode/i })
+      expect(group.className).toMatch(/flex-wrap/)
+    })
+
+    it('MOBILE-03: mode buttons have min-h-[44px] touch target', () => {
+      render(<SizingModeToggle />)
+      const vcpuBtn = screen.getByRole('button', { name: /vcpu/i })
+      expect(vcpuBtn.className).toMatch(/min-h-\[44px\]/)
+    })
+
+    it('NAV-03: layout mode group has flex-wrap class', () => {
+      render(<SizingModeToggle />)
+      const group = screen.getByRole('group', { name: /layout mode/i })
+      expect(group.className).toMatch(/flex-wrap/)
+    })
+  })
 })
