@@ -1,8 +1,9 @@
 /**
  * ImportPreviewModal tests for SCOPE-02 and SCOPE-04
  * Tests scope selector rendering, selection behavior, and import buffer wiring
+ * Also covers FORM-04: mobile Drawer vs desktop Dialog rendering
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ImportPreviewModal } from '../ImportPreviewModal'
 import type { ClusterImportResult } from '@/lib/utils/import'
@@ -111,14 +112,33 @@ const defaultProps = {
   onClose: vi.fn(),
 }
 
+function mockMatchMedia(mobile: boolean) {
+  vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+    matches: mobile && query === '(max-width: 639px)',
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+  })))
+}
+
 describe('ImportPreviewModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default to desktop viewport (matchMedia returns false for mobile query)
+    mockMatchMedia(false)
     // Re-bind mocks after clearAllMocks
     vi.mocked(clusterStoreModule.useClusterStore).mockImplementation((selector) =>
       selector({ setCurrentCluster: mockSetCurrentCluster, currentCluster: {} as never, resetCluster: vi.fn() })
     )
     vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue(AGGREGATED_RESULT)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   // Note: useImportStore mock re-binding is not needed because it uses the
@@ -262,6 +282,20 @@ describe('ImportPreviewModal', () => {
       fireEvent.click(applyBtn)
 
       expect(mockSetImportBuffer).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('mobile drawer (FORM-04)', () => {
+    it('renders Drawer with "Import Preview" title on mobile viewport', () => {
+      mockMatchMedia(true)
+      render(<ImportPreviewModal result={SINGLE_SCOPE_RESULT} {...defaultProps} />)
+      expect(screen.getByText('Import Preview')).toBeInTheDocument()
+    })
+
+    it('renders Dialog on desktop viewport', () => {
+      mockMatchMedia(false)
+      render(<ImportPreviewModal result={SINGLE_SCOPE_RESULT} {...defaultProps} />)
+      expect(screen.getByText('Import Preview')).toBeInTheDocument()
     })
   })
 })

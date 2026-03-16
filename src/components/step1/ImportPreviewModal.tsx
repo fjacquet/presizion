@@ -1,5 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useClusterStore } from '@/store/useClusterStore'
@@ -56,11 +64,27 @@ function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, 
   )
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches
+  )
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 639px)')
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+  return isMobile
+}
+
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
   const setScenarios = useScenariosStore((s) => s.setScenarios)
   const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
   const setImportBuffer = useImportStore((s) => s.setImportBuffer)
+
+  const isMobile = useIsMobile()
 
   const isJson = result.sourceFormat === 'presizion-json'
 
@@ -120,6 +144,101 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
   const pcoresKnown = !isJson && result.totalPcores != null && result.totalPcores > 0
 
+  const sharedContent = (
+    <>
+      {isMultiScope && 'scopeLabels' in result && result.scopeLabels != null && result.detectedScopes != null && (
+        <ScopeSelector
+          detectedScopes={result.detectedScopes}
+          scopeLabels={result.scopeLabels}
+          selectedScopes={selectedScopes}
+          onToggle={handleToggle}
+          rawByScope={'rawByScope' in result ? result.rawByScope ?? undefined : undefined}
+        />
+      )}
+
+      <div className="space-y-1 text-sm">
+        <p><span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}</p>
+
+        {isJson ? (
+          <>
+            <p><span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}</p>
+            <p><span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}</p>
+            <p><span className="font-medium">Total VMs:</span> {result.cluster.totalVms}</p>
+            {result.cluster.totalDiskGb != null && (
+              <p><span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB</p>
+            )}
+            <p><span className="font-medium">Scenarios:</span> {result.scenarios.length}</p>
+          </>
+        ) : (
+          <>
+            <p><span className="font-medium">VMs found:</span> {previewCluster.vmCount}</p>
+            <p><span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}</p>
+            <p><span className="font-medium">Total VMs:</span> {previewCluster.totalVms}</p>
+            <p><span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB</p>
+            <p className="text-muted-foreground">
+              <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
+              {previewCluster.avgRamPerVmGb} GB
+            </p>
+            {result.totalPcores != null && (
+              <p><span className="font-medium">Total pCores:</span> {result.totalPcores}</p>
+            )}
+            {result.existingServerCount != null && (
+              <p><span className="font-medium">Existing servers:</span> {result.existingServerCount}</p>
+            )}
+            {result.socketsPerServer != null && (
+              <p><span className="font-medium">Sockets/server:</span> {result.socketsPerServer}</p>
+            )}
+            {result.coresPerSocket != null && (
+              <p><span className="font-medium">Cores/socket:</span> {result.coresPerSocket}</p>
+            )}
+            {result.ramPerServerGb != null && (
+              <p><span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB</p>
+            )}
+            {result.cpuUtilizationPercent != null && (
+              <p><span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%</p>
+            )}
+            {result.ramUtilizationPercent != null && (
+              <p><span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%</p>
+            )}
+          </>
+        )}
+      </div>
+
+      {'warnings' in result && result.warnings.length > 0 && (
+        <div className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
+          {result.warnings.map((w, i) => <p key={i}>&#x26A0; {w}</p>)}
+        </div>
+      )}
+
+      {!isJson && !pcoresKnown && (
+        <p className="text-xs text-muted-foreground">
+          <strong>Note:</strong> Total pCores could not be read from this file and must be
+          entered manually before advancing to Step 2.
+        </p>
+      )}
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={(o) => { if (!o) onClose() }}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader>
+            <DrawerTitle>Import Preview</DrawerTitle>
+            <DrawerDescription>Review the extracted data before populating the form.</DrawerDescription>
+          </DrawerHeader>
+          <div className="px-4 pb-2 overflow-y-auto space-y-4">
+            {sharedContent}
+          </div>
+          <DrawerFooter>
+            <Button onClick={handleApply}>Apply</Button>
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    )
+  }
+
   return (
     <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
       <Dialog.Portal>
@@ -130,76 +249,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             Review the extracted data before populating the form.
           </Dialog.Description>
 
-          {isMultiScope && 'scopeLabels' in result && result.scopeLabels != null && result.detectedScopes != null && (
-            <ScopeSelector
-              detectedScopes={result.detectedScopes}
-              scopeLabels={result.scopeLabels}
-              selectedScopes={selectedScopes}
-              onToggle={handleToggle}
-              rawByScope={'rawByScope' in result ? result.rawByScope ?? undefined : undefined}
-            />
-          )}
-
-          <div className="space-y-1 text-sm">
-            <p><span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}</p>
-
-            {isJson ? (
-              <>
-                <p><span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}</p>
-                <p><span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}</p>
-                <p><span className="font-medium">Total VMs:</span> {result.cluster.totalVms}</p>
-                {result.cluster.totalDiskGb != null && (
-                  <p><span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB</p>
-                )}
-                <p><span className="font-medium">Scenarios:</span> {result.scenarios.length}</p>
-              </>
-            ) : (
-              <>
-                <p><span className="font-medium">VMs found:</span> {previewCluster.vmCount}</p>
-                <p><span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}</p>
-                <p><span className="font-medium">Total VMs:</span> {previewCluster.totalVms}</p>
-                <p><span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB</p>
-                <p className="text-muted-foreground">
-                  <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
-                  {previewCluster.avgRamPerVmGb} GB
-                </p>
-                {result.totalPcores != null && (
-                  <p><span className="font-medium">Total pCores:</span> {result.totalPcores}</p>
-                )}
-                {result.existingServerCount != null && (
-                  <p><span className="font-medium">Existing servers:</span> {result.existingServerCount}</p>
-                )}
-                {result.socketsPerServer != null && (
-                  <p><span className="font-medium">Sockets/server:</span> {result.socketsPerServer}</p>
-                )}
-                {result.coresPerSocket != null && (
-                  <p><span className="font-medium">Cores/socket:</span> {result.coresPerSocket}</p>
-                )}
-                {result.ramPerServerGb != null && (
-                  <p><span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB</p>
-                )}
-                {result.cpuUtilizationPercent != null && (
-                  <p><span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%</p>
-                )}
-                {result.ramUtilizationPercent != null && (
-                  <p><span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%</p>
-                )}
-              </>
-            )}
-          </div>
-
-          {'warnings' in result && result.warnings.length > 0 && (
-            <div className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
-              {result.warnings.map((w, i) => <p key={i}>⚠ {w}</p>)}
-            </div>
-          )}
-
-          {!isJson && !pcoresKnown && (
-            <p className="text-xs text-muted-foreground">
-              <strong>Note:</strong> Total pCores could not be read from this file and must be
-              entered manually before advancing to Step 2.
-            </p>
-          )}
+          {sharedContent}
 
           <div className="flex gap-3 justify-end">
             <Button variant="outline" onClick={onClose}>Cancel</Button>

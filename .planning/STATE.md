@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: — Mobile UX & Web App Manifest
 status: planning
-stopped_at: Completed 28-global-mobile-foundation-wizard-shell-02-PLAN.md
-last_updated: "2026-03-16T08:47:55.598Z"
+stopped_at: Completed 29-step-1-mobile-form-layout-01-PLAN.md
+last_updated: "2026-03-16T09:10:26.134Z"
 last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
 progress:
   total_phases: 14
   completed_phases: 11
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 22
+  completed_plans: 21
   percent: 0
 ---
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans com
 | Phase 27-web-app-manifest-icons P01 | 3 | 1 tasks | 11 files |
 | Phase 28-global-mobile-foundation-wizard-shell P01 | 1 | 2 tasks | 2 files |
 | Phase 28-global-mobile-foundation-wizard-shell P02 | 2 | 3 tasks | 5 files |
+| Phase 29-step-1-mobile-form-layout P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - [Phase 28-02]: Used CSS child selector [&_button]:h-11 [&_button]:w-11 on ThemeToggle wrapper to achieve 44px touch target without modifying ThemeToggle.tsx
 - [Phase 28-02]: sticky bottom-0 on mobile with sm:static on desktop avoids element duplication for sticky Back/Next nav
 - [Phase 28-02]: paddingBottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) as inline style — Tailwind cannot express env() calculations
+- [Phase 29-01]: DerivedMetricsPanel grid-cols-2 sm:grid-cols-5 verified correct — no change needed at 390px
+- [Phase 29-01]: FileImportButton uses default Button size (not size=sm) for ~40px height satisfying MOBILE-03 touch target
+- [Phase 29-01]: ScopeBadge edit button changed to size=icon with h-9 w-9 shrink-0 to prevent off-screen push by long labels
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-16T08:43:55.442Z
-Stopped at: Completed 28-global-mobile-foundation-wizard-shell-02-PLAN.md
+Last session: 2026-03-16T09:10:26.131Z
+Stopped at: Completed 29-step-1-mobile-form-layout-01-PLAN.md
 Resume file: None
