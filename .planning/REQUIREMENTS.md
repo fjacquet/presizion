@@ -47,11 +47,11 @@
 ### Step 3: Review & Export (REVIEW)
 
 - [x] **REVIEW-01**: Comparison table scrolls horizontally with a sticky first column ("Metric") at 390px
-- [ ] **REVIEW-02**: Chart heights are responsive — shorter on mobile (e.g., h-48) vs desktop (h-72)
-- [ ] **REVIEW-03**: Export actions presented as a bottom sheet (shadcn Sheet) on mobile instead of a button row
-- [ ] **REVIEW-04**: iOS Safari PDF export uses fallback strategy (open in new tab) since blob download is broken
-- [ ] **REVIEW-05**: Chart PNG download continues to work on mobile (canvas rendering)
-- [ ] **REVIEW-06**: Core count chart and capacity stacked chart are readable at 390px width
+- [x] **REVIEW-02**: Chart heights are responsive — shorter on mobile (e.g., h-48) vs desktop (h-72)
+- [x] **REVIEW-03**: Export actions presented as a bottom sheet (shadcn Sheet) on mobile instead of a button row
+- [x] **REVIEW-04**: iOS Safari PDF export uses fallback strategy (open in new tab) since blob download is broken
+- [x] **REVIEW-05**: Chart PNG download continues to work on mobile (canvas rendering)
+- [x] **REVIEW-06**: Core count chart and capacity stacked chart are readable at 390px width
 
 ## Future Requirements (v2.5+)
 
@@ -99,11 +99,11 @@
 | CARD-04 | Phase 30 | Complete |
 | CARD-05 | Phase 30 | Complete |
 | REVIEW-01 | Phase 31 | Complete |
-| REVIEW-02 | Phase 31 | Pending |
-| REVIEW-03 | Phase 31 | Pending |
-| REVIEW-04 | Phase 31 | Pending |
-| REVIEW-05 | Phase 31 | Pending |
-| REVIEW-06 | Phase 31 | Pending |
+| REVIEW-02 | Phase 31 | Complete |
+| REVIEW-03 | Phase 31 | Complete |
+| REVIEW-04 | Phase 31 | Complete |
+| REVIEW-05 | Phase 31 | Complete |
+| REVIEW-06 | Phase 31 | Complete |
 
 **Coverage:**
 - v2.4 requirements: 30 total
