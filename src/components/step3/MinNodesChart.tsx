@@ -92,11 +92,12 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
                 Download PNG
               </Button>
             </div>
-            <div ref={(el) => {
-              refs.current[scenarioId] = el
-              if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el
-            }}>
-              <ResponsiveContainer width="100%" height={220}>
+            <div className="h-[180px] sm:h-[220px]">
+              <div className="h-full" ref={(el) => {
+                refs.current[scenarioId] = el
+                if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el
+              }}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={constraintRows}
                   layout="vertical"
@@ -120,6 +121,7 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </div>
         )

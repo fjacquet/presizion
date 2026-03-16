@@ -51,7 +51,8 @@ export async function exportPdf(
   results: readonly ScenarioResult[],
   breakdowns: readonly VsanCapacityBreakdown[],
   chartRefs: Record<string, HTMLDivElement | null>,
-): Promise<void> {
+  iosWindow?: Window | null,
+): Promise<{ openedInNewTab: boolean }> {
   // 1. Lazy-load jsPDF and jspdf-autotable
   const [jspdfModule, autoTableModule] = await Promise.all([
     import('jspdf'),
@@ -659,5 +660,12 @@ export async function exportPdf(
   // ── 8. Add footer to last page and save ────────────────────────────────
 
   addPageFooter()
-  doc.save('presizion-sizing-report.pdf')
+  if (iosWindow) {
+    const blobUri = String(doc.output('bloburi'))
+    iosWindow.location.href = blobUri
+    return { openedInNewTab: true }
+  } else {
+    doc.save('presizion-sizing-report.pdf')
+    return { openedInNewTab: false }
+  }
 }

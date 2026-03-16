@@ -142,4 +142,12 @@ describe('MinNodesChart', () => {
     render(<MinNodesChart />)
     expect(screen.getByTestId('label-list')).toBeInTheDocument()
   })
+
+  it('renders h-full div inside responsive wrapper for PNG capture', () => {
+    act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
+    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown])
+    const { container } = render(<MinNodesChart />)
+    const hFullDivs = container.querySelectorAll('div.h-full')
+    expect(hFullDivs.length).toBeGreaterThanOrEqual(1)
+  })
 })

@@ -18,6 +18,7 @@ const mockSetFontSize = vi.fn().mockReturnThis()
 const mockAddPage = vi.fn().mockReturnThis()
 const mockAddImage = vi.fn().mockReturnThis()
 const mockSave = vi.fn()
+const mockOutput = vi.fn().mockReturnValue('blob:mock-uri')
 
 vi.mock('jspdf', () => {
   class MockJsPDF {
@@ -30,6 +31,7 @@ vi.mock('jspdf', () => {
     addPage = mockAddPage
     addImage = mockAddImage
     save = mockSave
+    output = mockOutput
     getNumberOfPages = vi.fn().mockReturnValue(1)
     internal = {
       pageSize: {
@@ -148,7 +150,7 @@ describe('exportPdf', () => {
 
   it('does not throw when called with empty scenarios and null chartRefs', async () => {
     const { exportPdf } = await import('../exportPdf')
-    await expect(exportPdf(cluster, [], [], [], {})).resolves.toBeUndefined()
+    await expect(exportPdf(cluster, [], [], [], {})).resolves.toMatchObject({ openedInNewTab: false })
   })
 
   it('calls autoTable at least 3 times (summary + breakdown + comparison) for one scenario', async () => {

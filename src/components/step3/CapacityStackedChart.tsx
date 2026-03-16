@@ -190,18 +190,19 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
                 Download PNG
               </Button>
             </div>
-            <div ref={(el) => {
-              refs.current[scenarioId] = el
-              if (chartRefs) chartRefs.current[`capacity-${scenarioId}`] = el
-            }}>
-              <ResponsiveContainer width="100%" height={showStorage ? 220 : 130}>
+            <div className={showStorage ? 'h-[140px] sm:h-[220px]' : 'h-[100px] sm:h-[130px]'}>
+              <div className="h-full" ref={(el) => {
+                refs.current[scenarioId] = el
+                if (chartRefs) chartRefs.current[`capacity-${scenarioId}`] = el
+              }}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartRows}
                   layout="vertical"
-                  margin={{ top: 8, right: 40, left: 120, bottom: 8 }}
+                  margin={{ top: 8, right: 40, left: 90, bottom: 8 }}
                 >
                   <XAxis type="number" hide domain={[0, 100]} />
-                  <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
                   <Tooltip
                     formatter={(_v: number, name: string, props: { payload?: ChartRow & { name?: string } }) => {
                       const rowName = props.payload?.name
@@ -237,20 +238,21 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
                   />
                 </BarChart>
               </ResponsiveContainer>
-              <div className="flex justify-center gap-6 text-xs text-muted-foreground pb-2">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[0] }} />
-                  Required
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[1] }} />
-                  Spare
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[2] }} />
-                  Excess
-                </span>
               </div>
+            </div>
+            <div className="flex justify-center gap-6 text-xs text-muted-foreground pb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[0] }} />
+                Required
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[1] }} />
+                Spare
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[2] }} />
+                Excess
+              </span>
             </div>
           </div>
         )

@@ -101,7 +101,14 @@ export function Step3ReviewExport() {
   const handleExportPdf = async (): Promise<void> => {
     setPdfLoading(true)
     try {
-      await exportPdf(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+      const iosWindow = isIOS ? window.open('about:blank', '_blank') : null
+
+      const result = await exportPdf(currentCluster, scenarios, results, breakdowns, chartRefs.current, iosWindow)
+
+      if (result.openedInNewTab) {
+        toast.info('PDF opened in new tab — tap Share then Save to Files.')
+      }
     } catch (err) {
       console.error('PDF export failed:', err)
       toast.error('PDF export failed. Check browser console for details.')
@@ -111,6 +118,11 @@ export function Step3ReviewExport() {
   }
 
   const handleExportPptx = async (): Promise<void> => {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    if (isIOS) {
+      toast.info('PPTX download is not supported in Safari. Use Chrome or a desktop browser.')
+      return
+    }
     setPptxLoading(true)
     try {
       await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current)

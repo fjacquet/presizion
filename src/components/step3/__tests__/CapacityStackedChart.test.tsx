@@ -146,4 +146,12 @@ describe('CapacityStackedChart', () => {
     expect(screen.getAllByText('Spare').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('Excess').length).toBeGreaterThanOrEqual(1)
   })
+
+  it('renders h-full div inside responsive wrapper for PNG capture', () => {
+    act(() => { useScenariosStore.setState({ scenarios: [baseScenario] }) })
+    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown])
+    const { container } = render(<CapacityStackedChart />)
+    const hFullDivs = container.querySelectorAll('div.h-full')
+    expect(hFullDivs.length).toBeGreaterThanOrEqual(1)
+  })
 })
