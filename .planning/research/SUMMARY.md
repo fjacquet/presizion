@@ -1,226 +1,204 @@
 # Project Research Summary
 
-**Project:** Cluster Refresh Sizing Tool (cluster-sizer)
-**Domain:** Client-side static web app — presales infrastructure sizing calculator
-**Researched:** 2026-03-12
+**Project:** Presizion v2.4 — Mobile-First Responsive Redesign + Web App Manifest
+**Domain:** Mobile UX retrofit for data-dense React presales sizing tool
+**Researched:** 2026-03-16
 **Confidence:** HIGH
 
 ## Executive Summary
 
-The cluster-sizer is a presales capacity planning tool that calculates how many servers are needed to refresh a virtualized cluster. Research confirms this is a well-understood problem domain with established competitors (Nutanix Sizer, WintelGuy, vSphere Community Calculator), but none of the existing tools combines formula transparency, multi-scenario comparison with cloning, and a copy-paste-ready text output — all three of which are required for the presales workflow. The recommended approach is a 100% client-side React 19 + TypeScript application deployed to GitHub Pages, with no backend, no authentication, and no external data dependencies. The architecture pattern is a 3-step wizard with a strictly isolated calculation layer (`src/lib/sizing/`), three narrow Zustand state slices, and React Hook Form + Zod per step.
+Presizion v2.4 is a presentational-only upgrade to a working desktop application. The core challenge is retrofitting mobile responsiveness onto a data-dense, multi-step wizard designed for desktop presales use. All four research streams agree on the same conclusion: the existing stack (React 19 + Tailwind v4 + shadcn/ui + Recharts) is fully sufficient — no new runtime dependencies are required except a one-time dev-side icon generation tool. The changes are additive, low-risk, and purely CSS/markup-level with one structural exception (ImportPreviewModal Dialog-to-Drawer on mobile). The sizing formula layer and all Zustand stores remain untouched.
 
-The most critical design decision is to keep all sizing math in pure TypeScript functions that have zero React dependencies. This is both a testability requirement (the formulas must be validated against a reference spreadsheet) and a maintainability requirement (presales engineers must be able to defend every number in a customer meeting). The formula transparency panel — showing formula strings and concrete parameter values — is a hard requirement, not a polish item. Shipping without it produces a black box that presales engineers cannot use.
+The recommended approach follows a strict "mobile-first Tailwind class layering" pattern: write base classes for 390px (iPhone 14/15), then add `sm:` overrides for 640px+. The architecture research identified a clear build order — manifest and icons first (zero regression risk), then WizardShell shell layout, then per-step forms and cards, then charts last (needs stable surrounding layout before device testing). The most consequential UX decision confirmed by FEATURES.md is to keep the Step 3 comparison table as a horizontally scrollable table with a sticky first column — not convert it to cards. Cards would destroy the side-by-side scenario comparison, which is the core product value.
 
-The primary risks are numerical: floating-point drift in chained intermediate calculations can shift server counts by ±1 on boundary inputs, and the NaN cascade from empty form fields corrupts all downstream outputs silently. Both must be addressed in the foundational phase, before any UI is built. The secondary risk is scope creep — pre-defined hardware SKU catalogs, TCO pricing, backend user accounts, and real-time vCenter integration are all commonly requested and all wrong for this tool's charter.
+The key risks are iOS-specific: Safari's auto-zoom on sub-16px inputs (M-1), the `100vh` clipping bug (M-2), the manifest `apple-touch-icon` requirement (M-4), and jsPDF/PPTX blob download failure on Safari (M-8). All have known mitigations. The iOS PDF export pitfall carries the highest remediation cost if discovered late — it requires rearchitecting the export path and can only be tested on a physical device. Every other pitfall resolves with a single CSS rule or HTML tag addition.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is modern, stable, and verified against npm registry as of March 2026. The combination of React 19, Vite 7, TypeScript 5.9, Tailwind CSS v4, and shadcn/ui v4 represents a cohesive toolchain where each component has been validated for compatibility with the others. The key compatibility constraint is that Vite 7 requires Node.js 20.19+ or 22.12+; Tailwind v4 with shadcn v4 is the required pairing (shadcn v3 does not support Tailwind v4); and Vitest major version must track Vite major version.
-
-State management uses Zustand v5 (not React Context) because the scenario data is accessed across many subtrees and Context would trigger full subtree re-renders — unacceptable given the <200ms recalculation budget. Form management uses React Hook Form v7 (not Formik) because uncontrolled inputs prevent per-keystroke full-form re-renders. Zod v4 provides schema validation and TypeScript type inference from a single schema definition.
+The existing stack handles everything. Tailwind v4 breakpoints (`sm` = 640px, `md` = 768px), `overflow-x-auto`, `min-h-[44px]`, `env(safe-area-inset-bottom)`, and `100dvh` are all built in. Recharts `ResponsiveContainer` already handles width scaling — only height needs a Tailwind wrapper class. The one new dependency is `@vite-pwa/assets-generator` as a dev-only CLI for icon generation. The `vite-plugin-pwa` full plugin must be avoided — it installs service worker infrastructure that is explicitly out of scope and has a known conflict with Vite 8's `manifest.json` build output.
 
 **Core technologies:**
+- Tailwind CSS v4 (already installed): all mobile responsive utilities, breakpoints, safe-area env() — no plugin needed
+- shadcn/ui Drawer (add via `npx shadcn@latest add drawer`): ImportPreviewModal mobile bottom-sheet path
+- Recharts ResponsiveContainer (already installed): width-responsive; height fixed via Tailwind wrapper `h-48 sm:h-72` pattern
+- @vite-pwa/assets-generator (new dev dep only): one-time CLI to generate 180/192/512px PNGs from source SVG
+- manual `public/manifest.webmanifest` (new static file): no build plugin needed; Vite copies `public/` verbatim
 
-- React 19.2.4: UI rendering — native `use()` hook, improved concurrent rendering, no server features needed
-- TypeScript 5.9.3: Static typing — strict mode required; sizing formulas are safety-critical
-- Vite 7.3.1: Build tooling — produces pure static assets, trivial GitHub Pages deployment via `base` config
-- React Hook Form 7.71.2: Form state — uncontrolled inputs, re-renders only changed field, integrates with shadcn Form primitive
-- Zod v4: Schema validation — 14x faster than v3, `z.infer<>` eliminates double-declaring types
-- Zustand 5.0.11: Global state — 3KB, no provider wrap, uses `useSyncExternalStore`; three narrow slices
-- shadcn/ui v4 + Tailwind CSS v4: Component library — copy-owned components, full ARIA compliance, CSS-first config
-- papaparse 5.5.3: CSV export — RFC 4180 compliant, no backend required
-- Vitest 4.0.18: Unit testing — reuses Vite config, Jest-compatible API
+**Critical constraints:** `xlsx@0.18.5` locked — do not touch. `vite-plugin-pwa` must NOT be installed (Vite 8 conflict + service worker out of scope). `sm:` in Tailwind means 640px+ — it is NOT a mobile breakpoint; unprefixed classes are the mobile default.
 
 ### Expected Features
 
-The MVP feature set is defined by what presales engineers need to replace a reference spreadsheet for a standard cluster refresh. The key competitive insight is that multi-scenario comparison with scenario duplication and a copy-paste text summary are gaps in all existing tools — these are the primary differentiators.
+**Must have (table stakes for v2.4):**
+- Single-column form layout in Step 1 — multi-column grids clip at 390px
+- Touch targets minimum 44px height on all inputs, buttons, selects (iOS HIG + WCAG 2.5.5)
+- Horizontal-scroll comparison table with sticky first column in Step 3 (NN/G confirmed: only correct pattern for comparison tables)
+- Responsive chart height — charts must not overflow 390px viewport
+- `overflow-x: hidden` at wizard shell level to prevent page-level horizontal scroll bleed
+- Web app manifest (`manifest.webmanifest`) with 192x192 + 512x512 icons
+- `apple-touch-icon` 180x180 PNG + `<link>` in index.html (iOS Safari ignores manifest icons; this tag is mandatory)
+- `apple-mobile-web-app-capable` + `apple-mobile-web-app-status-bar-style` meta tags (must appear together)
+- `theme-color` meta tag with light/dark media query variants
 
-**Must have (table stakes) — v1:**
+**Should have (differentiators for v2.4):**
+- Bottom sheet / drawer for export actions (7 export buttons overflow at 390px; shadcn Sheet already available)
+- Collapsible form sections on mobile for Step 1 advanced options
+- Sticky bottom wizard nav bar with iOS safe-area inset padding
+- Maskable icon for Android adaptive launcher (20% safe zone required)
 
-- Current environment input form (VMs, vCPUs, RAM, disk, existing server config) — raw material for all calculations
-- Derived metric auto-calculation (vCPU:pCore ratio, RAM/VM, VMs/server) with <200ms re-render
-- Target server configuration input (cores/socket, sockets, RAM, disk) per scenario
-- Server count output per constraint (CPU-limited, RAM-limited, disk-limited, final max)
-- Limiting-resource identification — identifies which constraint drives the count with callout text
-- Per-server utilization and VM density at final server count — the presales sanity check
-- Configurable sizing assumptions (vCPU:pCore overcommit, RAM headroom %, disk headroom %) with industry defaults (4:1, 20%, 20%)
-- Inline formula display with concrete parameter values — presales engineers must defend every number
-- Input validation with inline error messages — prevents nonsense output
-- Side-by-side scenario comparison (at minimum 2 simultaneous scenarios)
-- Scenario duplication — reduces re-entry friction for scenario variants
-- Plain-text summary for copy-paste into slides or email
-- JSON and CSV download — auditable record of inputs and outputs
+**Defer to v2.5+:**
+- Compact scenario card summary-first / expand-to-edit pattern
+- Dedicated mobile bottom tab bar replacing top step indicators
+- Progressive disclosure toggles for Step 3 capacity breakdown rows
 
-**Should have (competitive) — v1.x after validation:**
-
-- N+1 HA-aware server count toggle (separate from utilization headroom)
-- Growth buffer input (% VM growth over N months)
-- localStorage persistence
-- Shareable URL (state encoded in URL hash)
-- Printable / PDF-ready layout (CSS @media print)
-
-**Defer (v2+):**
-
-- Assumption-sensitivity delta table
-- More than 3 simultaneous scenarios
-- Workload profile presets (VDI-heavy, DB-heavy)
-- Dark mode / theming
-
-**Anti-features to reject regardless of request:**
-
-- Pre-defined hardware SKU catalog (goes stale, kills vendor-neutral positioning)
-- TCO / pricing / BOM output (price data changes constantly, wrong product category)
-- Backend user accounts (turns static tool into a web app requiring auth and GDPR compliance)
-- Real-time vCenter / CloudIQ integration (presales engineers lack production API access)
-- Per-VM workload modeling (requires data that doesn't exist in presales)
+**Anti-features confirmed by research (do not implement):**
+- Service worker / offline caching (explicitly out of scope per PROJECT.md; infrequent use makes caching unhelpful)
+- Touch swipe for wizard step navigation (conflicts with file drag-drop zone in Step 1)
+- Native Web Share API for exports (iOS Safari has no PDF blob support via Web Share as of 2026)
+- Full card-view conversion for comparison table (destroys column-per-scenario comparison value)
 
 ### Architecture Approach
 
-The architecture is a 3-step wizard (Current Environment → Scenarios → Review and Export) built on three strictly separated layers: a Presentation Layer (WizardShell, step components, ExportToolbar), a State Layer (three narrow Zustand slices for wizard navigation, cluster data, and scenarios), and a Calculation Layer (`src/lib/sizing/` — pure TypeScript, zero React imports). Derived results (`ScenarioResult[]`) are never stored in Zustand; they are computed on-demand in the `useScenariosResults()` hook which calls the sizing library. This prevents cache invalidation bugs and is fast enough given the O(n) arithmetic with n ≤ 10 scenarios.
+The redesign is purely presentational. No Zustand stores, sizing formulas, Zod schemas, or calculation hooks change. The one structural exception is `ImportPreviewModal`, which gains a `useIsMobile` hook and conditionally renders shadcn Drawer (bottom sheet) on narrow viewports vs. the existing Dialog on desktop. All other changes are Tailwind class additions to existing components: mobile-first class layering replaces current desktop-biased grids.
 
-**Major components:**
+**Major components and their mobile changes:**
+1. `index.html` — add manifest link, dual theme-color, apple-touch-icon, apple meta tags
+2. `public/manifest.webmanifest` (new) — PWA identity file; icon references must use `/presizion/` base prefix
+3. `WizardShell` — compact header on xs, sticky bottom nav bar, `pb-20` on main, `100dvh` fix
+4. `StepIndicator` + `SizingModeToggle` — touch target 44px, `flex-wrap` on mode toggle
+5. `Step1CurrentCluster` + `CurrentClusterForm` — `grid-cols-1 sm:grid-cols-N` audit throughout all sections
+6. `ImportPreviewModal` — Dialog + Drawer responsive pattern (install shadcn Drawer)
+7. `ScenarioCard` + `ScenarioResults` — collapse 4-col grids to 1-col on xs
+8. `Step3ReviewExport` — `flex flex-wrap gap-2` on export button row + shadcn Sheet bottom drawer
+9. `ComparisonTable` — `min-w-max` on inner Table to prevent collapse instead of scroll
+10. All four charts — `h-48 sm:h-72` wrapper div, `height="100%"` on ResponsiveContainer
 
-1. `WizardShell` + `StepIndicator` — step routing, navigation guards, progress display
-2. `Step1CurrentCluster` (form + `DerivedMetricsPanel`) — current environment input with live derived metrics
-3. `Step2Scenarios` (tabbed `ScenarioCard` instances + `ScenarioResults`) — per-scenario server config input with live calculation preview
-4. `Step3ReviewExport` (`ComparisonTable` + `ExportToolbar`) — side-by-side comparison and export triggers
-5. `src/lib/sizing/` (`formulas.ts`, `constraints.ts`, `derived.ts`, `defaults.ts`) — all sizing math, fully unit-testable
-6. `src/lib/export/` (`clipboard.ts`, `csvExport.ts`, `jsonExport.ts`) — pure export utilities, no React
-7. `src/store/` (3 Zustand slices), `src/hooks/` (`useScenariosResults`, `useWizardNavigation`), `src/schemas/` (Zod schemas)
+**Key pattern rule:** Every existing `grid-cols-2` or `grid-cols-4` without a mobile base must become `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`. Using `sm:grid-cols-1` to "reset" is wrong — `sm:` applies at 640px+, not on mobile.
 
-**Key architectural rules:**
-
-- Components never call sizing lib functions directly — only through hooks
-- Sizing lib never imports from React — fully decoupled and unit-testable
-- Export utilities are pure functions called from click handlers — not reactive state
-- Scenario duplication uses a `createEmptyScenario()` factory to prevent uncontrolled input bugs
-- Mode `onBlur` for Zod validation, `onChange` for live store writes in Step 2
+**Icon generation pipeline:** `public/icons.svg` (existing) → one-time `node scripts/gen-icons.mjs` using `sharp` devDependency → `apple-touch-icon.png` (180x180), `icon-192.png`, `icon-512.png` in `public/`.
 
 ### Critical Pitfalls
 
-1. **Floating-point drift in sizing formulas** — Chain intermediate arithmetic at full precision; apply `Math.ceil` only at the final output. Add unit tests with reference spreadsheet fixture inputs verified within 0.001 tolerance. Never use `Math.round` for server count (always `Math.ceil`). Address in Phase 1 before any UI is built.
+1. **M-1: iOS Safari auto-zoom on sub-16px inputs** — Safari auto-zooms when any input has computed font-size below 16px (Tailwind `text-sm` = 14px). Fix globally with `@media (hover: none) { input { font-size: 16px; } }` in global CSS. Do NOT use `maximum-scale=1` (WCAG violation). Must address before any per-step mobile layout work.
 
-2. **NaN cascade from empty numeric inputs** — `<input type="number">` returns `""` (a string) when empty; `parseFloat("") === NaN` silently poisons all downstream calculations. Implement a `parseNumericInput(raw: string): number | null` helper and pass all form values through it before calling sizing functions. Use `z.preprocess` with explicit empty-string-to-undefined conversion, not `z.coerce.number()`. Address in the same PR as the first numeric input field.
+2. **M-2: `100vh` clips content behind iOS browser chrome** — iOS Safari calculates `100vh` as the chrome-hidden height; on page load with chrome visible, content clips below fold. Replace `min-height: 100vh` with `min-height: 100dvh` (add `100vh` fallback for Safari < 16.0). Address in WizardShell phase.
 
-3. **Hyperthreading double-counting** — OS tools report logical CPUs (threads), not physical cores. A user who copies from Task Manager will enter 2x the real core count, halving the calculated server count. Label inputs explicitly as "Physical cores (NOT hyperthreaded logical CPUs)" and add a defensive validator: warn if `pCores > sockets × 32`.
+3. **M-3 + M-4: Two manifest pitfalls that always travel together** — (a) `start_url` and `scope` must be `/presizion/` not `/` — wrong path causes 404 on home screen launch; (b) iOS Safari ignores manifest icons entirely — `<link rel="apple-touch-icon">` in `index.html` is non-negotiable. Verify in Chrome DevTools Application tab for M-3; verify on physical iPhone for M-4.
 
-4. **HA headroom omission** — A server count that fills capacity 100% with no fault tolerance will fail at deployment. Treat HA reserve as a separate, explicit formula parameter (default: 1 host), not part of the utilization headroom percentage. Show `required_raw` and `required_with_ha` separately in the results panel. Address simultaneously with initial formula implementation.
+4. **M-6: Comparison table overflow propagates to page body** — A table wider than 390px with only `overflow-x-auto` on its wrapper will still cause page-level horizontal scroll if an ancestor element lacks `overflow-x: hidden`. Wrap table in `overflow-x-auto w-full` AND add `overflow-x: hidden` to the wizard shell. Also add `min-w-max` to inner `<Table>` — without it the browser compresses columns to fit rather than scroll.
 
-5. **Uncontrolled-to-controlled input flip** — TypeScript optional properties initialize to `undefined`, causing React's "changing uncontrolled input to controlled" warning and silent state loss when scenarios are duplicated. Define a `createEmptyScenario()` factory with `Required<ScenarioInput>` return type; use it everywhere a new scenario is created.
-
-6. **Multi-step cross-step validation gap** — Per-step Zod validation does not catch logical inconsistencies across steps when the user navigates back and changes Step 1 values. Keep all state in Zustand, run full sizing calculation on every state change, and display derived warnings (not blocking errors) in a persistent panel visible at all steps.
+5. **M-8: jsPDF/PPTX download broken on iOS Safari** — Safari revokes blob URLs before fetch completes. For PDF: use `window.open(blobUrl)` for inline viewing with a "Tap share icon to save" toast. For PPTX: show an explicit unsupported message (do not silently fail). Test on physical device only — simulator does not replicate blob behavior. This is the highest-cost pitfall if caught after launch.
 
 ## Implications for Roadmap
 
-The research unanimously points to a bottom-up build order: math first, state second, UI third. The sizing library is the correctness foundation; every UI component is just a way to collect inputs and display outputs from the library. Building UI before the math is tested is the primary source of bugs in this domain.
+Both ARCHITECTURE.md and PITFALLS.md converge on the same dependency-ordered build sequence. The phases below follow that order with FEATURES.md P1/P2 priorities and PITFALLS.md phase-to-pitfall mapping.
 
-### Phase 1: Foundation — Data Types, Sizing Library, and State
+### Phase A: Web App Manifest + Icons
 
-**Rationale:** Architecture research explicitly places types, schemas, sizing lib, and Zustand stores as the first build order. Pitfalls research confirms that floating-point drift, NaN cascade, and HA headroom omission must be caught before any UI exists. These are the correctness-critical units.
-**Delivers:** A fully unit-tested calculation engine that matches the reference spreadsheet. All TypeScript interfaces. Three Zustand slices. Zod schemas. No UI yet — but the entire business logic can be verified.
-**Addresses:** All P1 calculation features (server count per constraint, utilization, VM density, configurable assumptions, derived metrics)
-**Avoids:** Floating-point drift (unit tests against fixtures), NaN cascade (parseNumericInput helper), HA headroom omission (first-class formula parameter), inline formulas in components (lib isolation enforced from day one)
+**Rationale:** Pure addition to `public/` and `index.html`. Zero regression risk. No component changes. Independent of all other work. Must come first so icon files exist when manifest and meta tags reference them. Addresses all three manifest pitfalls (M-3, M-4, M-5) in complete isolation from component work.
+**Delivers:** Installable PWA branding — home screen icon on iOS and Android, standalone launch, theme-color address bar styling.
+**Addresses:** All P1 manifest features (manifest, apple-touch-icon, apple meta tags, theme-color, maskable icon).
+**Avoids:** M-3 (wrong start_url/scope), M-4 (iOS ignores manifest icons), M-5 (status-bar-style without standalone capable tag).
+**Implementation tasks:** Install `@vite-pwa/assets-generator` (dev dep), run icon generation script, create `manifest.webmanifest` in `public/`, add meta tags to `index.html`.
 
-### Phase 2: Input Forms — Step 1 and Step 2 with Live Calculation
+### Phase B: WizardShell + Global Mobile Foundation
 
-**Rationale:** Step 1 (current cluster input) establishes the React Hook Form + Zod + Zustand write pipeline that all subsequent steps reuse. Step 2 (scenario cards) builds on Step 1's patterns and adds the live recalculation flow. The DerivedMetricsPanel proves formula transparency in the UI.
-**Delivers:** A working 2-step data entry experience with live server count outputs visible in ScenarioCards. Per-field validation. Formula display panels.
-**Uses:** react-hook-form + Zod resolver, shadcn Form/Input/Card primitives, useScenariosResults hook
-**Implements:** Step1CurrentCluster, CurrentClusterForm, DerivedMetricsPanel, Step2Scenarios, ScenarioCard, ScenarioResults
-**Avoids:** Uncontrolled-to-controlled flip (createEmptyScenario factory), validation mode anti-pattern (onBlur for Zod, onChange for store writes), hyperthreading mislabeling (input labels and defensive validator)
+**Rationale:** The shell container dimensions affect all per-step layout work. The `100dvh` fix, `overflow-x: hidden` at shell level, sticky bottom nav, compact header, and safe-area insets must be established before per-step audits — otherwise component measurements reference a broken parent. The global CSS input font-size rule (M-1 fix) belongs here as a single-file change that covers all inputs across all steps.
+**Delivers:** Correct viewport sizing, no page-level horizontal scroll, thumb-reachable navigation bar, iOS safe-area support across all steps.
+**Addresses:** Step navigation P1 feature, sticky nav bar P2 feature.
+**Avoids:** M-1 (auto-zoom — global CSS), M-2 (100vh clipping — 100dvh), M-6 (page overflow — overflow-x:hidden on shell).
+**Implementation tasks:** WizardShell sticky bottom nav + `pb-20` on main, `100dvh` in root CSS, `overflow-x: hidden` on shell, SizingModeToggle `flex-wrap` + touch targets, StepIndicator 44px height.
 
-### Phase 3: Comparison, Export, and Wizard Shell
+### Phase C: Step 1 Mobile Form Layout
 
-**Rationale:** Step 3 is purely read-only against the store and the results hook — no new form patterns. The WizardShell wraps all steps and adds navigation guards. Export utilities are pure functions with no React dependencies. This phase completes the MVP.
-**Delivers:** Side-by-side comparison table, copy-to-clipboard plain-text summary, JSON and CSV download, full 3-step wizard navigation with step indicator. Complete MVP.
-**Uses:** papaparse for CSV, Clipboard API wrapper, Blob/URL.createObjectURL for file downloads
-**Implements:** Step3ReviewExport, ComparisonTable, ExportToolbar, WizardShell, StepIndicator, all export utilities
-**Avoids:** Export as reactive state (pure function in onClick), Blob URL memory leak (revokeObjectURL), multi-step cross-step validation gap (holistic validation at export), CSV injection (field value sanitization)
+**Rationale:** Step 1 is the entry point and most form-dense step. All grid-to-single-column audits concentrate here. Must come after Phase B so shell dimensions are correct. ImportPreviewModal Drawer (the one structural change in this milestone) lives here since it is invoked from Step 1's FileImportButton — scoping it here keeps the structural change isolated and early.
+**Delivers:** Fully responsive current-cluster data entry on 390px — all grids single-column on mobile, full-width buttons, touch-safe inputs, Import modal usable as a bottom Drawer.
+**Addresses:** P1 single-column form layout, P1 44px touch targets, P2 collapsible form sections.
+**Avoids:** Per-component grid overflow, ImportPreviewModal cramped on mobile.
+**Implementation tasks:** `Step1CurrentCluster` header stack, `CurrentClusterForm` grid audit, `DerivedMetricsPanel` 2-column verification, `FileImportButton` full-width, `ImportPreviewModal` Dialog-to-Drawer (install shadcn Drawer, add `useIsMobile` hook).
 
-### Phase 4: GitHub Pages Deployment and Polish
+### Phase D: Step 2 Scenario Cards
 
-**Rationale:** Deployment is straightforward but has one non-obvious pitfall (missing `base` path in vite.config.ts) that causes a blank page. UI polish (formula tooltips, binding-constraint callout text, step counter, copy-to-clipboard feedback) is deferred from previous phases to avoid scope creep during foundation work.
-**Delivers:** Publicly accessible tool on GitHub Pages. StatusBadge for limiting resource. Inline formula tooltips. Clipboard success/failure toast.
-**Avoids:** GitHub Pages blank page (base path config verified with `vite build && npx serve dist`), missing clipboard feedback (useClipboard hook with success/error state)
+**Rationale:** Depends on Phase B shell layout for correct card widths. Independent of Step 1 and Step 3 — no shared components with those steps. Primarily mechanical: collapse 4-column grids to 1-column and verify card stacking and constraint result panels.
+**Delivers:** Readable scenario configuration on 390px — single-column card inputs, stacked constraint results, VsanGrowthSection grid audited.
+**Addresses:** P1 scenario card stacking.
+**Avoids:** Component-level grid overflow on 390px.
+**Implementation tasks:** `Step2Scenarios` header `flex-col`, `ScenarioCard` grid `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`, `ScenarioResults` `grid-cols-1 sm:grid-cols-3`, `VsanGrowthSection` internal grid audit.
 
-### Phase 5: v1.x Enhancements (Post-Validation)
+### Phase E: Step 3 Export + Table + Charts
 
-**Rationale:** These features add real value but require validation that users actually need them. Ship the MVP, observe how presales engineers use the tool, then add.
-**Delivers:** N+1 HA toggle, growth buffer input, localStorage persistence, shareable URL (hash state), printable layout
-**Uses:** Zustand `persist` middleware (zero architectural change), URL hash encoding, CSS @media print
+**Rationale:** Must come last. Chart device testing is the acceptance criterion and cannot happen until surrounding layout is stable. Table overflow fix depends on shell-level `overflow-x: hidden` from Phase B. iOS export pitfall (M-8) requires physical device testing. The `downloadChartPng.ts` devicePixelRatio fix (M-9) naturally co-locates with chart work.
+**Delivers:** Comparison table scrollable on mobile with sticky first column, charts correctly sized, export buttons accessible via bottom sheet on 390px, PNG exports sharp on 3x retina screens.
+**Addresses:** P1 comparison table + sticky column, P1 responsive charts, P2 export bottom sheet.
+**Avoids:** M-6 (table collapse — inner min-width fix), M-7 (Recharts resize failure — min-w-0 on parent + width="100%"), M-8 (iOS PDF/PPTX export — inline viewer + toast), M-9 (PNG blurry on 3x — devicePixelRatio scaling).
+**Implementation tasks:** `ComparisonTable` min-width + touch-action pan-x, all four charts `h-48 sm:h-72` + `height="100%"`, `Step3ReviewExport` flex-wrap + shadcn Sheet export drawer, `downloadChartPng.ts` `Math.min(devicePixelRatio, 2)` scaling.
 
 ### Phase Ordering Rationale
 
-- **Math before UI:** The sizing library must be correct before any component depends on it. Bugs discovered after UI exists require hunting through component files; bugs in an isolated pure-function module are trivial to fix.
-- **Step 1 before Step 2 before Step 3:** The data flows Step 1 → Step 2 → Step 3. The OldCluster data set in Step 1 is a required input for scenario calculations in Step 2, which produces the results displayed in Step 3.
-- **Foundation pitfalls must be addressed in Phase 1:** NaN cascade, floating-point drift, and HA omission have HIGH recovery costs if discovered after the UI is built. Fixing them before UI eliminates that risk entirely.
-- **Export deferred to Phase 3:** Export utilities read from the same store and results hook as the comparison table — they add no new state concerns and are naturally grouped with the final-step UI.
+- Manifest before components: zero regression risk; creates icon assets referenced by later meta tags.
+- WizardShell before steps: shell overflow and viewport settings affect all per-step dimension calculations; global CSS M-1 fix applied once rather than per-component.
+- Step 1 before Step 2: ImportPreviewModal structural change (Dialog+Drawer) is the most complex single-component change; better to tackle early while iteration scope is limited.
+- Step 3 last: charts require stable surrounding layout for device testing; iOS export (M-8) testing requires physical device availability; all other phases must be stable first.
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
+Phases with standard, well-documented patterns — no additional research needed:
+- **Phase A (Manifest):** MDN, Apple developer docs, and PITFALLS.md cover all cases explicitly. Mechanical implementation.
+- **Phase B (WizardShell):** Tailwind `100dvh`, `overflow-x: hidden`, safe-area env() all well-documented. Sticky nav code example in ARCHITECTURE.md.
+- **Phase C (Step 1 forms):** Tailwind grid breakpoints are mechanical. ImportPreviewModal Drawer pattern has full code example in ARCHITECTURE.md.
+- **Phase D (Step 2 cards):** Same grid pattern as Phase C — purely mechanical.
 
-- **Phase 5 (Shareable URL):** URL hash state encoding/decoding strategy and size limits for large scenario sets need validation before implementation
-- **Phase 5 (localStorage persistence):** Zustand persist middleware has schema migration concerns if the state shape evolves; migration strategy needs design
-
-Phases with standard, well-documented patterns (skip research-phase):
-
-- **Phase 1 (Sizing library):** Pure TypeScript math with Vitest — textbook unit testing, no novel patterns
-- **Phase 2 (React Hook Form + Zod + Zustand):** Multiple high-quality reference implementations exist; the exact pipeline is documented in detail in ARCHITECTURE.md
-- **Phase 3 (Export utilities):** Clipboard API, Blob download, and papaparse are all well-documented with no gotchas beyond what PITFALLS.md already captures
-- **Phase 4 (GitHub Pages deployment):** One-line Vite config change; well-documented
+Phases that may need targeted investigation during implementation:
+- **Phase E, iOS export (M-8):** The `window.open(blobUrl)` PDF approach needs testing on a physical iPhone before implementation begins. If it fails, the `datauristring` + hidden anchor fallback has its own Safari quirks. Flag: ensure physical iPhone access before starting Phase E export work.
+- **Phase E, Recharts resize (M-7):** If `min-w-0` parent + `ResponsiveContainer width="100%"` does not resolve orientation-change resize, the `key={orientationType}` force-remount fallback adds complexity. Research the specific Recharts 2.15.4 behavior before assuming the simple fix works.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All versions verified against npm registry March 2026; compatibility matrix explicitly validated (React 19 + RTL v16, Vite 7 + Vitest 4, Tailwind v4 + shadcn v4, Zod v4 + resolvers v3) |
-| Features | HIGH | Core sizing features verified against 4 production tools (Nutanix Sizer, WintelGuy, vSphere Calculator, Dell EIPT); competitive gaps confirmed by direct tool analysis |
-| Architecture | HIGH | Patterns sourced from multiple production React multi-step form guides; wizard + pure calc layer + Zustand slices is a well-established combination |
-| Pitfalls | HIGH (formulas), MEDIUM (UX) | Formula pitfalls (floating-point, NaN, hyperthreading, HA) sourced from primary references and production bug reports; UX pitfalls from community sources corroborated by multiple guides |
+| Stack | HIGH | All recommendations verified against official Tailwind v4, MDN, Apple developer, and Recharts docs. @vite-pwa/assets-generator verified via npm page and GitHub README (MEDIUM on that specific tool, HIGH overall). |
+| Features | HIGH | NN/G research on mobile tables, Apple developer docs for iOS meta tags, and Recharts docs cross-confirmed. Feature priorities align consistently across sources. |
+| Architecture | HIGH | Build order and component change map derived from established Tailwind mobile-first patterns. ImportPreviewModal Drawer pattern backed by official shadcn docs with code example. |
+| Pitfalls | HIGH | All 9 pitfalls sourced from official bug trackers (jsPDF GitHub, Recharts GitHub), official Apple docs, MDN, and CSS-Tricks. M-8 confirmed by multiple jsPDF GitHub issues with explicit iOS Safari reproduction steps. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Reference spreadsheet fixture values:** The calculation engine needs at least 3 known input/output pairs from the reference spreadsheet to write accurate unit test fixtures. These must be provided or verified by the project owner before Phase 1 can be completed.
-- **Exact vCPU:pCore default:** Industry consensus is 4:1 for general workloads. If the project has a specific customer segment (VDI-heavy, database-heavy), the default may need adjustment. Validate with project owner before shipping.
-- **Scenario count maximum:** Research recommends 2-3 simultaneous scenarios for MVP. If the target users regularly compare 4+ options, the UI layout needs re-evaluation. Validate with one presales engineer before finalizing the Step 2 layout.
-- **N+1 in MVP vs v1.x:** The pitfalls research recommends HA reserve as a first-class formula parameter from Phase 1. The features research defers the N+1 toggle to v1.x. Resolve this tension: the HA reserve value should be in the formula from day one (even if hardcoded to 1), but the UI toggle exposing it to users can be deferred.
+- **devicePixelRatio handling in downloadChartPng.ts:** The fix (`Math.min(window.devicePixelRatio, 2)`) is confirmed, but the existing utility needs auditing — dpr scaling may already be present for 2x desktop screens, requiring only extension to 3x, not a full rewrite.
+- **shadcn Drawer installation:** `npx shadcn@latest add drawer` is the documented command. Verify against the project's pinned shadcn version before running — Vaul may already be installed as a transitive dependency, in which case only the component wrapper needs adding.
+- **VsanGrowthSection grid internals:** Marked as "audit internal grids" in ARCHITECTURE.md. Exact grid structure not enumerated in research. Treat as same pattern as ScenarioCard but verify during implementation.
+- **iOS PPTX export UX:** M-8 mitigation recommends a toast explaining Safari limitation. Decide during implementation whether to disable the PPTX button on iOS or show the toast after attempting download — both are valid UX choices not resolved by research alone.
 
 ## Sources
 
 ### Primary (HIGH confidence)
 
-- npm registry — all version numbers verified March 2026
-- <https://vite.dev/guide/static-deploy> — GitHub Pages base path configuration
-- <https://ui.shadcn.com/docs/tailwind-v4> — shadcn Tailwind v4 support status
-- <https://zod.dev/v4> — Zod v4 release notes, performance benchmarks, migration guide
-- <https://react-hook-form.com/> — controlled vs. uncontrolled performance rationale
-- <https://zustand.docs.pmnd.rs/> — Zustand v5 useSyncExternalStore notes
-- <https://www.papaparse.com/docs> — unparse() API for CSV export
-- React issues #7779 and #1549 — controlled/uncontrolled input behavior
-- Zod discussions #2814 and #2461 — coerce.number() empty-string-to-zero behavior
+- [Tailwind CSS v4 Responsive Design](https://tailwindcss.com/docs/responsive-design) — breakpoints, mobile-first approach, breakpoint variables
+- [MDN: Web Application Manifest](https://developer.mozilla.org/en-US/docs/Web/Manifest) — manifest field reference, start_url, scope
+- [MDN: Making PWAs Installable](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable) — minimum manifest requirements, service worker not required
+- [Apple: Configuring Web Applications](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html) — apple-touch-icon, apple-mobile-web-app-capable, status-bar-style
+- [Recharts ResponsiveContainer API](https://recharts.org/?p=%2Fen-US%2Fapi%2FResponsiveContainer) — width/height props, resize behavior
+- [shadcn/ui Drawer Component](https://ui.shadcn.com/docs/components/radix/drawer) — Vaul drawer, mobile bottom sheet
+- [NN/G: Mobile Tables](https://www.nngroup.com/articles/mobile-tables/) — horizontal scroll + sticky first column as correct pattern for comparison tables
+- [NN/G: Bottom Sheets](https://www.nngroup.com/articles/bottom-sheet/) — export action grouping on mobile
+- [jsPDF GitHub Issue #3059](https://github.com/parallax/jsPDF/issues/3059) — iOS Safari blob URL failure confirmed
+- [Recharts GitHub Issue #172](https://github.com/recharts/recharts/issues/172) — ResponsiveContainer resize failure on orientation change
 
 ### Secondary (MEDIUM confidence)
 
-- Nutanix Sizer product page — feature competitive analysis
-- WintelGuy vmcalc.pl — live tool analysis, feature gaps
-- vSphere Cluster Calculator user guide — feature gaps
-- VMware vCPU-to-pCPU ratio guidelines 2025 — default ratio validation
-- claritydev.net — React multi-step wizard patterns
-- buildwithmatija.com — React Hook Form + Zustand + Zod pipeline
-- LogRocket — multi-step form patterns
-- Robin Wieruch — JavaScript rounding errors
-- Broadcom Community — CPU overcommit hyperthreading mistake
+- [CSS-Tricks: 16px text prevents iOS form zoom](https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/) — M-1 auto-zoom fix
+- [iOS PWA Compatibility — firt.dev](https://firt.dev/notes/pwa-ios/) — authoritative iOS Safari PWA behavior tracker
+- [web.dev: Web App Manifest](https://web.dev/learn/pwa/web-app-manifest) — icon sizing, maskable icon purpose field
+- [Understanding svh, lvh, dvh](https://medium.com/@tharunbalaji110/understanding-mobile-viewport-units-a-complete-guide-to-svh-lvh-and-dvh-0c905d96e21a) — M-2 100dvh fix rationale
+- [vite-pwa/assets-generator GitHub](https://github.com/vite-pwa/assets-generator) — minimal2023 preset, CLI usage
 
-### Tertiary (LOW confidence, corroborated)
+### Tertiary (LOW confidence — validate during implementation)
 
-- WebSearch — recharts vs Chart.js for React TypeScript (multiple sources agree)
-- WebSearch — Zustand vs Jotai vs Context 2025 (multiple sources agree)
+- Recharts + `@container` query interaction — one source notes potential ResizeObserver conflict with container queries; validate before using container queries on chart wrappers
+- shadcn Drawer exact install command for this project's pinned shadcn version — verify `npx shadcn@latest add drawer` before running
 
 ---
-*Research completed: 2026-03-12*
+*Research completed: 2026-03-16*
 *Ready for roadmap: yes*
