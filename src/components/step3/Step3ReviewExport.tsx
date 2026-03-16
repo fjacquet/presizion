@@ -12,7 +12,17 @@ import { CoreCountChart } from './CoreCountChart'
 import { CapacityStackedChart } from './CapacityStackedChart'
 import { MinNodesChart } from './MinNodesChart'
 import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerClose,
+} from '@/components/ui/drawer'
 import { useScenariosResults } from '@/hooks/useScenariosResults'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useWizardStore } from '@/store/useWizardStore'
@@ -31,6 +41,7 @@ export function Step3ReviewExport() {
   const sizingMode = useWizardStore((state) => state.sizingMode)
   const layoutMode = useWizardStore((state) => state.layoutMode)
   const breakdowns = useVsanBreakdowns()
+  const isMobile = useIsMobile()
   const [copied, setCopied] = useState(false)
   const [shared, setShared] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -120,26 +131,66 @@ export function Step3ReviewExport() {
         </p>
       </div>
 
-      <div className="flex gap-3 mb-6 print:hidden">
-        <Button variant="outline" onClick={() => { void handleCopy() }}>
-          {copied ? 'Copied!' : 'Copy Summary'}
-        </Button>
-        <Button variant="outline" onClick={handleDownloadCsv}>
-          Download CSV
-        </Button>
-        <Button variant="outline" onClick={handleDownloadJson}>
-          Download JSON
-        </Button>
-        <Button variant="outline" onClick={() => { void handleShare() }}>
-          {shared ? 'Link Copied!' : 'Share'}
-        </Button>
-        <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
-          {pdfLoading ? 'Generating...' : 'Export PDF'}
-        </Button>
-        <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
-          {pptxLoading ? 'Generating...' : 'Export PPTX'}
-        </Button>
-      </div>
+      {isMobile ? (
+        <div className="mb-6 print:hidden">
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant="outline" className="w-full">Export / Share</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Export Results</DrawerTitle>
+              </DrawerHeader>
+              <div className="flex flex-col gap-3 p-4 overflow-y-auto">
+                <Button variant="outline" onClick={() => { void handleCopy() }}>
+                  {copied ? 'Copied!' : 'Copy Summary'}
+                </Button>
+                <Button variant="outline" onClick={handleDownloadCsv}>
+                  Download CSV
+                </Button>
+                <Button variant="outline" onClick={handleDownloadJson}>
+                  Download JSON
+                </Button>
+                <Button variant="outline" onClick={() => { void handleShare() }}>
+                  {shared ? 'Link Copied!' : 'Share'}
+                </Button>
+                <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
+                  {pdfLoading ? 'Generating...' : 'Export PDF'}
+                </Button>
+                <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
+                  {pptxLoading ? 'Generating...' : 'Export PPTX'}
+                </Button>
+              </div>
+              <DrawerFooter>
+                <DrawerClose asChild>
+                  <Button variant="outline">Close</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      ) : (
+        <div className="flex gap-3 mb-6 print:hidden">
+          <Button variant="outline" onClick={() => { void handleCopy() }}>
+            {copied ? 'Copied!' : 'Copy Summary'}
+          </Button>
+          <Button variant="outline" onClick={handleDownloadCsv}>
+            Download CSV
+          </Button>
+          <Button variant="outline" onClick={handleDownloadJson}>
+            Download JSON
+          </Button>
+          <Button variant="outline" onClick={() => { void handleShare() }}>
+            {shared ? 'Link Copied!' : 'Share'}
+          </Button>
+          <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
+            {pdfLoading ? 'Generating...' : 'Export PDF'}
+          </Button>
+          <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
+            {pptxLoading ? 'Generating...' : 'Export PPTX'}
+          </Button>
+        </div>
+      )}
 
       <ComparisonTable />
 

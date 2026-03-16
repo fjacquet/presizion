@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import {
   Drawer,
@@ -14,6 +14,7 @@ import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useImportStore } from '@/store/useImportStore'
 import { aggregateScopes } from '@/lib/utils/import/scopeAggregator'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import type { AnyImportResult, ScopeData } from '@/lib/utils/import'
 
 interface ImportPreviewModalProps {
@@ -62,20 +63,6 @@ function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, 
       </div>
     </div>
   )
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches
-  )
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(max-width: 639px)')
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-  return isMobile
 }
 
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
