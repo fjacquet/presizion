@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: — Mobile UX & Web App Manifest
 status: planning
-stopped_at: Completed 30-step-2-scenario-cards-01-PLAN.md
-last_updated: "2026-03-16T09:35:38.796Z"
+stopped_at: Completed 31-step-3-review-export-01-PLAN.md
+last_updated: "2026-03-16T09:59:19.957Z"
 last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
 progress:
   total_phases: 14
   completed_phases: 13
-  total_plans: 23
-  completed_plans: 23
+  total_plans: 26
+  completed_plans: 24
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans com
 | Phase 29-step-1-mobile-form-layout P01 | 2 | 2 tasks | 4 files |
 | Phase 29-step-1-mobile-form-layout P02 | 7 | 2 tasks | 5 files |
 | Phase 30-step-2-scenario-cards P01 | 2min | 1 tasks | 4 files |
+| Phase 31-step-3-review-export P01 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase 29]: matchMedia mock defaults to desktop in beforeEach for existing ImportPreviewModal tests
 - [Phase 30-01]: ScenarioCard grids use grid-cols-1 sm:grid-cols-2 md:grid-cols-4 (3-tier breakpoint matching Phase 29 pattern)
 - [Phase 30-01]: Card Duplicate/Remove buttons changed to size=icon h-9 w-9 — consistent with Phase 29 ScopeBadge touch target pattern
+- [Phase 31-01]: bg-background (not bg-white) required on sticky cells — tracks light/dark CSS variables correctly
+- [Phase 31-01]: min-w-max on Table + overflow-x-auto wrapper enables horizontal scroll at 390px without responsive breakpoints
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-16T09:31:32.316Z
-Stopped at: Completed 30-step-2-scenario-cards-01-PLAN.md
+Last session: 2026-03-16T09:59:19.955Z
+Stopped at: Completed 31-step-3-review-export-01-PLAN.md
 Resume file: None
