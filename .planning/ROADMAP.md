@@ -381,7 +381,7 @@ Plans:
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
 | 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 27. Web App Manifest & Icons | 1/1 | Complete   | 2026-03-16 | - |
+| 27. Web App Manifest & Icons | 1/1 | Complete    | 2026-03-16 | - |
 | 28. Global Mobile Foundation & Wizard Shell | v2.4 | 0/2 | Not started | - |
 | 29. Step 1 Mobile Form Layout | v2.4 | 0/2 | Not started | - |
 | 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
