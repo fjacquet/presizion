@@ -275,7 +275,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 27-01-PLAN.md — Icon generation script + manifest.webmanifest + index.html meta tags (MANIFEST-01..06)
+- [x] 27-01-PLAN.md — Icon generation script + manifest.webmanifest + index.html meta tags (MANIFEST-01..06)
 
 ### Phase 28: Global Mobile Foundation & Wizard Shell
 
@@ -292,8 +292,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 28-01-PLAN.md — Global CSS: iOS auto-zoom prevention (16px input font-size), dvh viewport height, overflow-x containment (MOBILE-01, MOBILE-02, MOBILE-04)
-- [ ] 28-02-PLAN.md — WizardShell compact header, 44px touch targets, StepIndicator circles, SizingModeToggle flex-wrap, sticky Back/Next nav (MOBILE-03, NAV-01..04)
+- [x] 28-01-PLAN.md — Global CSS: iOS auto-zoom prevention (16px input font-size), dvh viewport height, overflow-x containment (MOBILE-01, MOBILE-02, MOBILE-04)
+- [x] 28-02-PLAN.md — WizardShell compact header, 44px touch targets, StepIndicator circles, SizingModeToggle flex-wrap, sticky Back/Next nav (MOBILE-03, NAV-01..04)
 
 ### Phase 29: Step 1 Mobile Form Layout
 
@@ -310,8 +310,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 29-01-PLAN.md — CurrentClusterForm grid audit: grid-cols-1 sm:grid-cols-N throughout all form sections (FORM-01, FORM-02, FORM-05)
-- [ ] 29-02-PLAN.md — ImportPreviewModal Dialog-to-Drawer on mobile + SPEC results panel horizontal scroll (FORM-03, FORM-04)
+- [x] 29-01-PLAN.md — CurrentClusterForm grid audit: grid-cols-1 sm:grid-cols-N throughout all form sections (FORM-01, FORM-02, FORM-05)
+- [x] 29-02-PLAN.md — ImportPreviewModal Dialog-to-Drawer on mobile + SPEC results panel horizontal scroll (FORM-03, FORM-04)
 
 ### Phase 30: Step 2 Scenario Cards
 
@@ -325,11 +325,10 @@ Plans:
   3. The sizing assumptions inputs (vCPU ratio, headroom, utilization targets) display in a 2-column grid at 390px — all inputs are visible and tappable
   4. The vSAN & Growth collapsible section's internal fields are readable and enterable at 390px — no field is clipped or hidden outside the viewport
   5. The SPEC lookup search input and results panel in Step 2 are usable at 390px — the search field accepts input and results rows are readable without horizontal overflow
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 30-01-PLAN.md — ScenarioCard grid audit + card stacking + VsanGrowthSection responsive grids (CARD-01..04)
-- [ ] 30-02-PLAN.md — SPEC lookup panel mobile layout in ScenarioCard (CARD-05)
+- [ ] 30-01-PLAN.md — Mobile-first grids for ScenarioCard, VsanGrowthSection, ScenarioResults, Step2Scenarios header + CARD-05 verify (CARD-01..05)
 
 ### Phase 31: Step 3 Review & Export
 
@@ -381,8 +380,8 @@ Plans:
 | 24. Average VM Metrics | v2.1 | 1/1 | Complete | 2026-03-15 |
 | 25. SPEC Lookup Service | v2.2 | 2/2 | Complete | 2026-03-15 |
 | 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
-| 27. Web App Manifest & Icons | 1/1 | Complete    | 2026-03-16 | - |
-| 28. Global Mobile Foundation & Wizard Shell | 2/2 | Complete    | 2026-03-16 | - |
-| 29. Step 1 Mobile Form Layout | 2/2 | Complete    | 2026-03-16 | - |
-| 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
+| 27. Web App Manifest & Icons | v2.4 | 1/1 | Complete | 2026-03-16 |
+| 28. Global Mobile Foundation & Wizard Shell | v2.4 | 2/2 | Complete | 2026-03-16 |
+| 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
+| 30. Step 2 Scenario Cards | v2.4 | 0/1 | Not started | - |
 | 31. Step 3 Review & Export | v2.4 | 0/3 | Not started | - |
