@@ -374,11 +374,12 @@ describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
     expect(screen.getByPlaceholderText(/xeon gold 6526y/i)).toBeInTheDocument()
   })
 
-  it('in vcpu mode, does NOT render "Target CPU Model" input', () => {
+  it('in vcpu mode, renders "Look up target CPU" search for auto-filling cores/sockets', () => {
     // sizingMode is 'vcpu' by default
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
-    expect(screen.queryByPlaceholderText(/xeon gold 6526y/i)).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/xeon gold 6526y/i)).toBeInTheDocument()
+    expect(screen.getByText(/look up target cpu/i)).toBeInTheDocument()
   })
 
   it('typing a CPU model and waiting for debounce triggers fetch and shows results panel', async () => {

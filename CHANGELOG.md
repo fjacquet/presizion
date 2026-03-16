@@ -5,12 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased]
+## [2.3.0] -- 2026-03-16
+
+### Added
+
+- Spec-search CPU lookup in vCPU mode: search for a target CPU model in Step 2, selecting a SPEC result auto-fills sockets/server and cores/socket from benchmark data (cores, chips)
+- Average VM metrics in reports: Avg vCPU/VM, Avg RAM/VM (GiB), Avg Disk/VM (GiB) rows added to As-Is vs To-Be comparison table in both PDF and PPTX exports
 
 ### Changed
 
-- SPECint metric label corrected to `SPECrate2017_int_base` across all UI labels, tooltips, and formula strings (ADR-005).
-- Default target server updated to Dell PowerEdge R660, 2x Intel Xeon Gold 6526Y (32 pCores, `SPECrate2017_int_base` = 337 per spec.org).
+- `SpecResultsPanel.onSelect` now passes the full `SpecResult` object (cores, chips, vendor, system) instead of just the base score, enabling richer integrations
+- SPECint metric label corrected to `SPECrate2017_int_base` across all UI labels, tooltips, and formula strings (ADR-005)
+- Default target server updated to Dell PowerEdge R660, 2x Intel Xeon Gold 6526Y (32 pCores, `SPECrate2017_int_base` = 337 per spec.org)
 
 ---
 

@@ -71,6 +71,9 @@ The comparison table shows all scenarios side-by-side with the existing cluster 
 | **Limiting Resource** | Which constraint drove the server count |
 | **vCPU:pCore Ratio** | Achieved ratio with this server count |
 | **VMs/Server** | Average VM density |
+| **Avg vCPU/VM** | Average vCPU count per VM |
+| **Avg RAM/VM (GiB)** | Average RAM per VM (As-Is from import, To-Be from scenario assumption) |
+| **Avg Disk/VM (GiB)** | Average disk per VM (As-Is from import, To-Be from scenario assumption) |
 | **Headroom** | Configured headroom % |
 | **CPU/RAM/Disk Util %** | Projected utilization (green < 70%, amber < 90%, red ≥ 90%) |
 
@@ -101,7 +104,11 @@ Each scenario can optionally include vSAN-aware storage sizing via the collapsib
 
 **SPEC search (v2.2+):**
 
-When a CPU model is detected from import, Presizion auto-fetches SPECrate2017 results from the spec-search API. Click a result to auto-fill the SPECint score. Also available for target CPU in Step 2 via a search field.
+When a CPU model is detected from import, Presizion auto-fetches SPECrate2017 results from the spec-search API. Click a result to auto-fill the SPECint score. Also available for target CPU in Step 2 via a search field. In vCPU mode (v2.3+), selecting a SPEC result also auto-fills sockets/server and cores/socket.
+
+**Average VM metrics in reports (v2.3+):**
+
+The As-Is vs To-Be comparison table in PDF and PPTX exports now includes Avg vCPU/VM, Avg RAM/VM (GiB), and Avg Disk/VM (GiB) — matching the derived metrics shown in the Step 1 UI.
 
 ---
 
@@ -144,6 +151,8 @@ CPU-limited servers = ceil((totalVcpus × headroomFactor) / vcpuToPcoreRatio / c
 ```
 
 Use this for like-for-like refreshes or when you don't have SPECrate2017 scores.
+
+**CPU lookup (v2.3+):** In Step 2, the "Look up target CPU" field lets you search for a CPU model in the spec-search database. Selecting a result auto-fills sockets/server and cores/socket from the benchmark data.
 
 ### SPECrate2017 mode
 

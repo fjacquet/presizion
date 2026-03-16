@@ -6,7 +6,7 @@ interface SpecResultsPanelProps {
   results: SpecResult[]
   status: SpecLookupResult['status']
   isLoading: boolean
-  onSelect: (baseScore: number) => void
+  onSelect: (result: SpecResult) => void
   selectedScore?: number | undefined
 }
 
@@ -73,7 +73,7 @@ export function SpecResultsPanel({
                       className={`cursor-pointer hover:bg-muted ${
                         selectedScore === row.baseResult ? 'bg-primary/10' : ''
                       }`}
-                      onClick={() => onSelect(row.baseResult)}
+                      onClick={() => onSelect(row)}
                     >
                       <td className="py-1 pr-3">{row.vendor}</td>
                       <td className="py-1 pr-3">{row.system}</td>

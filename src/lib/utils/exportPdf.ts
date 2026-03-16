@@ -242,6 +242,21 @@ export async function exportPdf(
       ? `${(cluster.totalDiskGb / 1024).toFixed(1)} TiB`
       : '--'
 
+  const avgVcpuPerVm =
+    cluster.totalVms > 0
+      ? (cluster.totalVcpus / cluster.totalVms).toFixed(1)
+      : '--'
+
+  const avgRamPerVm =
+    cluster.avgRamPerVmGb != null
+      ? cluster.avgRamPerVmGb.toFixed(1)
+      : '--'
+
+  const avgDiskPerVm =
+    cluster.totalDiskGb != null && cluster.totalVms > 0
+      ? (cluster.totalDiskGb / cluster.totalVms).toFixed(1)
+      : '--'
+
   const comparisonHead = ['Metric', 'As-Is', ...scenarios.map((s) => s.name)]
 
   const comparisonBody: string[][] = [
@@ -277,6 +292,21 @@ export async function exportPdf(
       'VMs/Server',
       asIsVmsPerServer,
       ...results.map((r) => r.vmsPerServer.toFixed(1)),
+    ],
+    [
+      'Avg vCPU/VM',
+      avgVcpuPerVm,
+      ...scenarios.map(() => avgVcpuPerVm),
+    ],
+    [
+      'Avg RAM/VM (GiB)',
+      avgRamPerVm,
+      ...scenarios.map((s) => s.ramPerVmGb.toFixed(1)),
+    ],
+    [
+      'Avg Disk/VM (GiB)',
+      avgDiskPerVm,
+      ...scenarios.map((s) => s.diskPerVmGb.toFixed(1)),
     ],
     [
       'Headroom %',

@@ -339,9 +339,9 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               status={specStatus}
               isLoading={specLoading}
               selectedScore={selectedSpecScore}
-              onSelect={(baseScore) => {
-                setSelectedSpecScore(baseScore)
-                form.setValue('specintPerServer', baseScore, { shouldValidate: true })
+              onSelect={(result) => {
+                setSelectedSpecScore(result.baseResult)
+                form.setValue('specintPerServer', result.baseResult, { shouldValidate: true })
               }}
             />
           )}

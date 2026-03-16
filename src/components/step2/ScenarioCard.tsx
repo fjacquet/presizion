@@ -29,6 +29,7 @@ import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import type { Scenario } from '@/types/cluster'
+import type { SpecResult } from '@/lib/utils/specLookup'
 import { VsanGrowthSection } from './VsanGrowthSection'
 
 const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
@@ -100,7 +101,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     return () => clearTimeout(timer)
   }, [targetCpuModel])
 
-  const specLookup = useSpecLookup(sizingMode === 'specint' ? debouncedCpuModel : undefined)
+  const specLookup = useSpecLookup(
+    sizingMode === 'specint' || sizingMode === 'vcpu' ? debouncedCpuModel : undefined,
+  )
 
   const form = useForm<ScenarioInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,9 +112,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     defaultValues: scenario as ScenarioInput,
   })
 
-  const handleSpecSelect = useCallback((baseScore: number) => {
-    setSelectedTargetScore(baseScore)
-    form.setValue('targetSpecint', baseScore, { shouldValidate: true })
+  const handleSpecSelect = useCallback((result: SpecResult) => {
+    setSelectedTargetScore(result.baseResult)
+    form.setValue('targetSpecint', result.baseResult, { shouldValidate: true })
   }, [form])
 
   const scenarioIdRef = useRef(scenarioId)
@@ -273,6 +276,34 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
                   No socket/core data from import — enter manually.
                 </p>
+              )}
+              {sizingMode === 'vcpu' && (
+                <div className="mt-3 space-y-2">
+                  <Label htmlFor={`${scenarioId}-vcpuTargetCpu`}>Look up target CPU (optional)</Label>
+                  <Input
+                    id={`${scenarioId}-vcpuTargetCpu`}
+                    type="text"
+                    placeholder="e.g. Xeon Gold 6526Y"
+                    value={targetCpuModel}
+                    onChange={(e) => setTargetCpuModel(e.target.value)}
+                  />
+                  {(debouncedCpuModel || specLookup.isLoading) && (
+                    <SpecResultsPanel
+                      results={specLookup.results}
+                      status={specLookup.status}
+                      isLoading={specLookup.isLoading}
+                      onSelect={(result) => {
+                        setSelectedTargetScore(result.baseResult)
+                        if (result.chips > 0 && result.cores > 0) {
+                          const coresPerSocket = Math.round(result.cores / result.chips)
+                          form.setValue('socketsPerServer', result.chips, { shouldValidate: true })
+                          form.setValue('coresPerSocket', coresPerSocket, { shouldValidate: true })
+                        }
+                      }}
+                      selectedScore={selectedTargetScore}
+                    />
+                  )}
+                </div>
               )}
             </section>
 

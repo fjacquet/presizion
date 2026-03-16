@@ -53,7 +53,7 @@ describe('SpecResultsPanel', () => {
 
     // Click the row containing Dell
     fireEvent.click(screen.getByText('Dell'))
-    expect(onSelect).toHaveBeenCalledWith(337)
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ baseResult: 337 }))
   })
 
   it('highlights the selected row', () => {

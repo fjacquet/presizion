@@ -278,6 +278,21 @@ export async function exportPptx(
       ? `${(cluster.totalDiskGb / 1024).toFixed(1)} TiB`
       : '--'
 
+  const avgVcpuPerVm =
+    cluster.totalVms > 0
+      ? (cluster.totalVcpus / cluster.totalVms).toFixed(1)
+      : '--'
+
+  const avgRamPerVm =
+    cluster.avgRamPerVmGb != null
+      ? cluster.avgRamPerVmGb.toFixed(1)
+      : '--'
+
+  const avgDiskPerVm =
+    cluster.totalDiskGb != null && cluster.totalVms > 0
+      ? (cluster.totalDiskGb / cluster.totalVms).toFixed(1)
+      : '--'
+
   const compHeaderRow = [
     { text: 'Metric', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
     { text: 'As-Is', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
@@ -326,6 +341,21 @@ export async function exportPptx(
       label: 'VMs/Server',
       asIs: asIsVmsPerServer,
       scenarioValues: results.map((r) => r.vmsPerServer.toFixed(1)),
+    },
+    {
+      label: 'Avg vCPU/VM',
+      asIs: avgVcpuPerVm,
+      scenarioValues: scenarios.map(() => avgVcpuPerVm),
+    },
+    {
+      label: 'Avg RAM/VM (GiB)',
+      asIs: avgRamPerVm,
+      scenarioValues: scenarios.map((s) => s.ramPerVmGb.toFixed(1)),
+    },
+    {
+      label: 'Avg Disk/VM (GiB)',
+      asIs: avgDiskPerVm,
+      scenarioValues: scenarios.map((s) => s.diskPerVmGb.toFixed(1)),
     },
     {
       label: 'Headroom %',
