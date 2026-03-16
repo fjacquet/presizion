@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: — Mobile UX & Web App Manifest
 status: planning
-stopped_at: Completed 28-global-mobile-foundation-wizard-shell-01-PLAN.md
-last_updated: "2026-03-16T08:39:23.831Z"
+stopped_at: Completed 28-global-mobile-foundation-wizard-shell-02-PLAN.md
+last_updated: "2026-03-16T08:43:55.444Z"
 last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
 progress:
   total_phases: 14
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
   percent: 0
 ---
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans com
 *Updated after each plan completion*
 | Phase 27-web-app-manifest-icons P01 | 3 | 1 tasks | 11 files |
 | Phase 28-global-mobile-foundation-wizard-shell P01 | 1 | 2 tasks | 2 files |
+| Phase 28-global-mobile-foundation-wizard-shell P02 | 2 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - [Phase 27-web-app-manifest-icons]: apple-mobile-web-app-status-bar-style set to default (not black-translucent) to avoid notch content overlap
 - [Phase 28-01]: Use @media (hover: none) not max-width to target touch devices for iOS auto-zoom prevention
 - [Phase 28-01]: Use inline style minHeight: 100dvh rather than Tailwind class for clean Safari < 15.4 fallback
+- [Phase 28-02]: Used CSS child selector [&_button]:h-11 [&_button]:w-11 on ThemeToggle wrapper to achieve 44px touch target without modifying ThemeToggle.tsx
+- [Phase 28-02]: sticky bottom-0 on mobile with sm:static on desktop avoids element duplication for sticky Back/Next nav
+- [Phase 28-02]: paddingBottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) as inline style — Tailwind cannot express env() calculations
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-16T08:39:23.828Z
-Stopped at: Completed 28-global-mobile-foundation-wizard-shell-01-PLAN.md
+Last session: 2026-03-16T08:43:55.442Z
+Stopped at: Completed 28-global-mobile-foundation-wizard-shell-02-PLAN.md
 Resume file: None

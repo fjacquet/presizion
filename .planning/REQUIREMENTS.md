@@ -18,15 +18,15 @@
 
 - [x] **MOBILE-01**: All form inputs render at >= 16px font-size to prevent iOS Safari auto-zoom on focus
 - [x] **MOBILE-02**: Layout uses `dvh` units (with `vh` fallback) instead of `100vh` to prevent iOS address bar clipping
-- [ ] **MOBILE-03**: All interactive elements (buttons, links, toggles) have minimum 44px touch target size per iOS HIG / WCAG 2.5.5
+- [x] **MOBILE-03**: All interactive elements (buttons, links, toggles) have minimum 44px touch target size per iOS HIG / WCAG 2.5.5
 - [x] **MOBILE-04**: Page body prevents horizontal overflow (`overflow-x: hidden`) while allowing controlled scroll inside specific containers
 
 ### Navigation & Wizard Shell (NAV)
 
-- [ ] **NAV-01**: Header toolbar is compact on mobile (< 640px) — logo, theme toggle, and Store-Predict link fit on one line without wrapping
-- [ ] **NAV-02**: Wizard step indicators are usable at 390px — clickable, readable labels, clear active state
-- [ ] **NAV-03**: SizingModeToggle wraps gracefully at 390px (flex-wrap) without clipping or horizontal overflow
-- [ ] **NAV-04**: Step navigation (Next/Back buttons) is accessible and touch-friendly on mobile
+- [x] **NAV-01**: Header toolbar is compact on mobile (< 640px) — logo, theme toggle, and Store-Predict link fit on one line without wrapping
+- [x] **NAV-02**: Wizard step indicators are usable at 390px — clickable, readable labels, clear active state
+- [x] **NAV-03**: SizingModeToggle wraps gracefully at 390px (flex-wrap) without clipping or horizontal overflow
+- [x] **NAV-04**: Step navigation (Next/Back buttons) is accessible and touch-friendly on mobile
 
 ### Step 1: Cluster Form (FORM)
 
@@ -82,12 +82,12 @@
 | MANIFEST-06 | Phase 27 | Complete |
 | MOBILE-01 | Phase 28 | Complete |
 | MOBILE-02 | Phase 28 | Complete |
-| MOBILE-03 | Phase 28 | Pending |
+| MOBILE-03 | Phase 28 | Complete |
 | MOBILE-04 | Phase 28 | Complete |
-| NAV-01 | Phase 28 | Pending |
-| NAV-02 | Phase 28 | Pending |
-| NAV-03 | Phase 28 | Pending |
-| NAV-04 | Phase 28 | Pending |
+| NAV-01 | Phase 28 | Complete |
+| NAV-02 | Phase 28 | Complete |
+| NAV-03 | Phase 28 | Complete |
+| NAV-04 | Phase 28 | Complete |
 | FORM-01 | Phase 29 | Pending |
 | FORM-02 | Phase 29 | Pending |
 | FORM-03 | Phase 29 | Pending |
