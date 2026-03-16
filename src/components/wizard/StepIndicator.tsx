@@ -28,7 +28,7 @@ export function StepIndicator({ currentStep, totalSteps, labels = DEFAULT_LABELS
                 onClick={() => isClickable && onStepClick(step)}
                 disabled={!isClickable}
                 className={[
-                  'flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors',
+                  'flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors',
                   isActive
                     ? 'border-primary bg-primary text-primary-foreground'
                     : isCompleted

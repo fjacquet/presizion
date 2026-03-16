@@ -32,7 +32,7 @@ function ModeBtn({
       disabled={disabled}
       onClick={onClick}
       className={[
-        'px-3 py-1 text-sm rounded-sm transition-colors',
+        'px-3 py-2 text-sm rounded-sm transition-colors min-h-[44px]',
         isActive ? (amber ? AMBER_ACTIVE : ACTIVE) : INACTIVE,
         disabled ? 'opacity-40 cursor-not-allowed' : '',
       ].join(' ')}
@@ -64,7 +64,7 @@ export function SizingModeToggle() {
   return (
     <div className="flex flex-col items-center gap-1.5 mt-2">
       {/* Row 1 — Sizing mode */}
-      <div role="group" aria-label="Sizing mode" className="flex gap-0.5 border rounded-md p-0.5 bg-muted/40">
+      <div role="group" aria-label="Sizing mode" className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40">
         <ModeBtn label="vCPU" isActive={sizingMode === 'vcpu'} onClick={() => setSizingMode('vcpu' as SizingMode)} />
         <ModeBtn label="SPECrate2017" isActive={sizingMode === 'specint'} onClick={() => setSizingMode('specint' as SizingMode)} />
 
@@ -115,7 +115,7 @@ export function SizingModeToggle() {
       </div>
 
       {/* Row 2 — Layout mode */}
-      <div role="group" aria-label="Layout mode" className="flex gap-0.5 border rounded-md p-0.5 bg-muted/40">
+      <div role="group" aria-label="Layout mode" className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40">
         {(['hci', 'disaggregated'] as LayoutMode[]).map((lm) => (
           <ModeBtn
             key={lm}
