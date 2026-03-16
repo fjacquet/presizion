@@ -383,6 +383,6 @@ Plans:
 | 26. SPEC Lookup UI | v2.2 | 2/2 | Complete | 2026-03-15 |
 | 27. Web App Manifest & Icons | 1/1 | Complete    | 2026-03-16 | - |
 | 28. Global Mobile Foundation & Wizard Shell | 2/2 | Complete    | 2026-03-16 | - |
-| 29. Step 1 Mobile Form Layout | 2/2 | Complete   | 2026-03-16 | - |
+| 29. Step 1 Mobile Form Layout | 2/2 | Complete    | 2026-03-16 | - |
 | 30. Step 2 Scenario Cards | v2.4 | 0/2 | Not started | - |
 | 31. Step 3 Review & Export | v2.4 | 0/3 | Not started | - |
