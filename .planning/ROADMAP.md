@@ -393,4 +393,4 @@ Plans:
 | 28. Global Mobile Foundation & Wizard Shell | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
-| 31. Step 3 Review & Export | 3/3 | Complete   | 2026-03-16 | - |
+| 31. Step 3 Review & Export | 3/3 | Complete    | 2026-03-16 | - |
