@@ -267,7 +267,8 @@ export function ComparisonTable() {
                 ? scenarios.map((scenario, i) => {
                     const effectiveVmCount = scenario.targetVmCount ?? currentCluster.totalVms
                     const headroomFactor = 1 + scenario.headroomPercent / 100
-                    const totalGb = Math.round(effectiveVmCount * scenario.diskPerVmGb * headroomFactor)
+                    const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100
+                    const totalGb = Math.round(effectiveVmCount * scenario.diskPerVmGb * storageGrowthFactor * headroomFactor)
                     return (
                       <TableCell key={scenario.id ?? i} className="text-center">
                         {totalGb.toLocaleString()} GB

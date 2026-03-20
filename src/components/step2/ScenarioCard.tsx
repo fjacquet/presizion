@@ -115,6 +115,11 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const handleSpecSelect = useCallback((result: SpecResult) => {
     setSelectedTargetScore(result.baseResult)
     form.setValue('targetSpecint', result.baseResult, { shouldValidate: true })
+    if (result.chips > 0 && result.cores > 0) {
+      const coresPerSocket = Math.round(result.cores / result.chips)
+      form.setValue('socketsPerServer', result.chips, { shouldValidate: true })
+      form.setValue('coresPerSocket', coresPerSocket, { shouldValidate: true })
+    }
   }, [form])
 
   const scenarioIdRef = useRef(scenarioId)
