@@ -218,7 +218,9 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       })
       // Sync checkbox enabled state when cluster is imported
       if (currentCluster.cpuUtilizationPercent !== undefined) setCpuUtilEnabled(true)
+      else setCpuUtilEnabled(false)
       if (currentCluster.ramUtilizationPercent !== undefined) setRamUtilEnabled(true)
+      else setRamUtilEnabled(false)
     }
   }, [currentCluster, form])
 
@@ -235,6 +237,13 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         const defined = Object.fromEntries(
           Object.entries(formValues).filter(([, v]) => v !== undefined && v !== null),
         )
+        // Utilization fields must propagate undefined to clear store values when unchecked
+        const utilFields = ['cpuUtilizationPercent', 'ramUtilizationPercent'] as const
+        for (const key of utilFields) {
+          if (formValues[key] === undefined) {
+            (defined as Record<string, unknown>)[key] = undefined
+          }
+        }
         setCurrentCluster({ ...existing, ...defined } as OldCluster)
       }
     })
