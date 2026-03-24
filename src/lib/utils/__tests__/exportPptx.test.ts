@@ -140,11 +140,11 @@ describe('exportPptx', () => {
     await expect(exportPptx(cluster, [], [], [], {})).resolves.toBeUndefined()
   })
 
-  it('creates multiple slides (title + summary + breakdown + comparison)', async () => {
+  it('creates multiple slides (title + summary + comparison + sizing params = at least 4)', async () => {
     const { exportPptx } = await import('../exportPptx')
     await exportPptx(cluster, [scenario], [result], [breakdown], {})
-    // Title + Summary + Breakdown table (1 scenario) + Comparison = at least 4 slides
-    // No chart slides since chartRefToDataUrl returns null
+    // Title + Summary + As-Is vs To-Be Comparison + Sizing Parameters = at least 4 slides
+    // No chart slides since chartRefToDataUrl returns null, no bdSlide or compSlide
     expect(mockAddSlide.mock.calls.length).toBeGreaterThanOrEqual(4)
   })
 
@@ -235,5 +235,22 @@ describe('exportPptx', () => {
       return textArr.some((t) => t.text.includes('\u25CF'))
     })
     expect(hasDot).toBe(true)
+  })
+
+  // ---------------------------------------------------------------------------
+  // MERGE-01: Sizing Parameters slide replaces separate Assumptions/Config/Growth
+  // ---------------------------------------------------------------------------
+  it('creates a "Sizing Parameters" slide title, not "Sizing Assumptions" or "Server Configuration"', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const textCalls = mockAddText.mock.calls as Array<[string | Record<string, unknown>, Record<string, unknown>]>
+    const slideTitles = textCalls
+      .filter(([, opts]) => opts?.placeholder === 'title')
+      .map(([text]) => (typeof text === 'string' ? text : ''))
+
+    expect(slideTitles).toContain('Sizing Parameters')
+    expect(slideTitles).not.toContain('Sizing Assumptions')
+    expect(slideTitles).not.toContain('Per-Scenario Server Configuration')
+    expect(slideTitles).not.toContain('Growth Projections')
   })
 })
