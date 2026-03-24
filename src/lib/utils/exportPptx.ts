@@ -23,6 +23,11 @@ const DARK = '1F2937'
 const GRAY = '6B7280'
 const LIGHT_GRAY = 'F3F4F6'
 const WHITE = 'FFFFFF'
+const NAVY = '1E3A5F'
+const UTIL_GREEN = '22C55E'
+const UTIL_AMBER = 'F59E0B'
+const UTIL_RED = 'EF4444'
+const KPI_FILL = 'E8EDF2'
 const FONT = 'Calibri'
 
 // ---------------------------------------------------------------------------
@@ -45,12 +50,12 @@ function f2(n: number): string {
 }
 
 /** Default text options for consistency */
-const TITLE_OPTS = { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT } as const
+const TITLE_OPTS = { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT } as const
 const SUBTITLE_OPTS = { x: 0.5, y: 0.65, w: 12, h: 0.3, fontSize: 11, color: GRAY, fontFace: FONT } as const
 
 /** Cell styling helpers */
 function headerCell(text: string) {
-  return { text, options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10, fontFace: FONT } }
+  return { text, options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10, fontFace: FONT } }
 }
 function _grayHeaderCell(text: string) {
   return { text, options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10, fontFace: FONT } }
@@ -60,7 +65,28 @@ function dataCell(text: string, rowIdx: number, bold = false) {
   return { text, options: { fill: { color: rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE }, fontSize: 10, fontFace: FONT, bold } }
 }
 
-const NAVY = '1E3A5F'
+/** Returns a color hex string based on utilization percentage thresholds */
+function utilColorDot(pct: number): string {
+  if (pct < 70) return UTIL_GREEN
+  if (pct <= 85) return UTIL_AMBER
+  return UTIL_RED
+}
+
+/** Table cell with colored utilization dot prefix (TextProps[] style) */
+function utilCell(pct: number, rowIdx: number) {
+  return {
+    text: [
+      { text: '\u25CF ', options: { color: utilColorDot(pct), fontSize: 10, fontFace: FONT } },
+      { text: `${pct.toFixed(1)}%`, options: { color: DARK, fontSize: 10, fontFace: FONT } },
+    ],
+    options: { fill: { color: rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE } },
+  }
+}
+
+/** Plain table cell with alternating row fill (used when util value is undefined) */
+function plainCell(text: string, rowIdx: number) {
+  return { text, options: { fill: { color: rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE }, fontSize: 10, fontFace: FONT } }
+}
 
 /** Add consistent footer: logo hint, date, slide number */
 let _slideNum = 0
@@ -75,7 +101,7 @@ function addFooter(slide: { addText: (t: string | Array<{text: string; options?:
   )
 }
 
-/** Add a large KPI callout number at the top of a slide */
+/** Add a large KPI callout number at the top of a slide using rounded-rectangle shape backgrounds */
 function addKpiCallout(
   slide: { addText: (t: string, o: Record<string, unknown>) => void },
   items: Array<{ value: string; label: string }>,
@@ -83,12 +109,16 @@ function addKpiCallout(
 ) {
   const colW = 12.33 / items.length
   items.forEach((item, i) => {
+    const x = 0.5 + i * colW
     slide.addText(item.value, {
-      x: 0.5 + i * colW, y, w: colW, h: 0.6,
-      fontSize: 44, bold: true, color: BLUE, fontFace: FONT, align: 'center',
+      x, y, w: colW * 0.85, h: 0.75,
+      shape: 'roundRect',
+      rectRadius: 0.3,
+      fill: { color: KPI_FILL },
+      fontSize: 44, bold: true, color: NAVY, fontFace: FONT, align: 'center', valign: 'middle',
     })
     slide.addText(item.label, {
-      x: 0.5 + i * colW, y: y + 0.55, w: colW, h: 0.3,
+      x, y: y + 0.8, w: colW, h: 0.3,
       fontSize: 11, color: GRAY, fontFace: FONT, align: 'center',
     })
   })
@@ -173,7 +203,8 @@ export async function exportPptx(
     title: 'CONTENT_SLIDE',
     background: { color: WHITE },
     objects: [
-      { placeholder: { options: { name: 'title', type: 'title', x: 0.5, y: 0.2, w: 12, h: 0.6 }, text: '' } },
+      { rect: { x: 0, y: 0, w: 0.3, h: 7.5, fill: { color: NAVY }, line: { color: NAVY } } },
+      { placeholder: { options: { name: 'title', type: 'title', x: 0.65, y: 0.2, w: 11.85, h: 0.6 }, text: '' } },
     ],
   })
 
@@ -205,14 +236,14 @@ export async function exportPptx(
   // Slide 2: Executive Summary
   // -------------------------------------------------------------------
   const summarySlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  summarySlide.addText('Executive Summary', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+  summarySlide.addText('Executive Summary', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   const summaryHeaderRow = [
-    { text: 'Scenario', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
-    { text: 'Servers', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
-    { text: 'Limiting Resource', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
-    { text: 'CPU Util %', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
-    { text: 'RAM Util %', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 11 } },
+    { text: 'Scenario', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 11 } },
+    { text: 'Servers', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 11 } },
+    { text: 'Limiting Resource', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 11 } },
+    { text: 'CPU Util %', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 11 } },
+    { text: 'RAM Util %', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 11 } },
   ]
 
   const summaryDataRows = scenarios.map((s, i) => {
@@ -222,8 +253,8 @@ export async function exportPptx(
       { text: s.name, options: { fill: { color: fillColor }, fontSize: 10 } },
       { text: r ? String(r.finalCount) : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
       { text: r ? r.limitingResource : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
-      { text: r ? `${f1(r.cpuUtilizationPercent)}%` : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
-      { text: r ? `${f1(r.ramUtilizationPercent)}%` : '-', options: { fill: { color: fillColor }, fontSize: 10 } },
+      r ? utilCell(r.cpuUtilizationPercent, i) : plainCell('-', i),
+      r ? utilCell(r.ramUtilizationPercent, i) : plainCell('-', i),
     ]
   })
 
@@ -254,7 +285,7 @@ export async function exportPptx(
   // Slide 3: As-Is vs To-Be Comparison
   // -------------------------------------------------------------------
   const comparisonSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  comparisonSlide.addText('As-Is vs To-Be Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+  comparisonSlide.addText('As-Is vs To-Be Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   const asIsServerConfig =
     cluster.socketsPerServer && cluster.coresPerSocket
@@ -294,18 +325,19 @@ export async function exportPptx(
       : '--'
 
   const compHeaderRow = [
-    { text: 'Metric', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
-    { text: 'As-Is', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    { text: 'Metric', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
+    { text: 'As-Is', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
     ...scenarios.map((s) => ({
       text: s.name,
-      options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 },
+      options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 },
     })),
   ]
 
+  type TableCellObj = { text: unknown; options: Record<string, unknown> }
   interface CompMetric {
     readonly label: string
-    readonly asIs: string
-    readonly scenarioValues: readonly string[]
+    readonly asIs: string | TableCellObj
+    readonly scenarioValues: readonly (string | TableCellObj)[]
   }
 
   const compMetrics: CompMetric[] = [
@@ -365,16 +397,16 @@ export async function exportPptx(
     {
       label: 'CPU Util %',
       asIs: cluster.cpuUtilizationPercent !== undefined
-        ? `${cluster.cpuUtilizationPercent.toFixed(1)}%`
-        : '--',
-      scenarioValues: results.map((r) => `${r.cpuUtilizationPercent.toFixed(1)}%`),
+        ? utilCell(cluster.cpuUtilizationPercent, 10)
+        : plainCell('--', 10),
+      scenarioValues: results.map((r) => utilCell(r.cpuUtilizationPercent, 10)),
     },
     {
       label: 'RAM Util %',
       asIs: cluster.ramUtilizationPercent !== undefined
-        ? `${cluster.ramUtilizationPercent.toFixed(1)}%`
-        : '--',
-      scenarioValues: results.map((r) => `${r.ramUtilizationPercent.toFixed(1)}%`),
+        ? utilCell(cluster.ramUtilizationPercent, 11)
+        : plainCell('--', 11),
+      scenarioValues: results.map((r) => utilCell(r.ramUtilizationPercent, 11)),
     },
     {
       label: 'Total Disk',
@@ -388,13 +420,17 @@ export async function exportPptx(
 
   const compDataRows = compMetrics.map((m, rowIdx) => {
     const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+    const asIsCell = typeof m.asIs === 'string'
+      ? { text: m.asIs, options: { fill: { color: fillColor }, fontSize: 10 } }
+      : m.asIs
     return [
       { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
-      { text: m.asIs, options: { fill: { color: fillColor }, fontSize: 10 } },
-      ...m.scenarioValues.map((v) => ({
-        text: v,
-        options: { fill: { color: fillColor }, fontSize: 10 },
-      })),
+      asIsCell,
+      ...m.scenarioValues.map((v) =>
+        typeof v === 'string'
+          ? { text: v, options: { fill: { color: fillColor }, fontSize: 10 } }
+          : v,
+      ),
     ]
   })
 
@@ -415,7 +451,7 @@ export async function exportPptx(
   // Slide 4: Sizing Assumptions
   // -------------------------------------------------------------------
   const assumptionsSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  assumptionsSlide.addText('Sizing Assumptions', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+  assumptionsSlide.addText('Sizing Assumptions', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   const assumptionsHeader = [
     { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
@@ -560,7 +596,7 @@ export async function exportPptx(
   )
   if (hasGrowth) {
     const growthSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-    growthSlide.addText('Growth Projections', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+    growthSlide.addText('Growth Projections', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
     const growthHeader = [
       { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
@@ -619,13 +655,13 @@ export async function exportPptx(
   // Slide 5: Per-Scenario Server Configuration
   // -------------------------------------------------------------------
   const serverConfigSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  serverConfigSlide.addText('Per-Scenario Server Configuration', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+  serverConfigSlide.addText('Per-Scenario Server Configuration', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   const scHeader = [
-    { text: 'Parameter', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    { text: 'Parameter', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
     ...scenarios.map((s) => ({
       text: s.name,
-      options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 },
+      options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 },
     })),
   ]
 
@@ -671,15 +707,15 @@ export async function exportPptx(
     if (bd) {
       const bdSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
       bdSlide.addText(`Capacity Breakdown -- ${scenario.name}`, {
-        placeholder: 'title', fontSize: 20, bold: true, color: BLUE, fontFace: FONT,
+        placeholder: 'title', fontSize: 20, bold: true, color: NAVY, fontFace: FONT,
       })
 
       const bdHeaderRow = [
-        { text: 'Resource', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
-        { text: 'Required', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
-        { text: 'Spare', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
-        { text: 'Excess', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
-        { text: 'Total Configured', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+        { text: 'Resource', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
+        { text: 'Required', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
+        { text: 'Spare', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
+        { text: 'Excess', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
+        { text: 'Total Configured', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
       ]
 
       const bdDataRows = [
@@ -812,27 +848,28 @@ export async function exportPptx(
   // Final slide: Scenario Comparison
   // -------------------------------------------------------------------
   const compSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  compSlide.addText('Scenario Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: BLUE, fontFace: FONT })
+  compSlide.addText('Scenario Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   // Build comparison table: first column = metric, then one column per scenario
   const finalCompHeader = [
-    { text: 'Metric', options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 } },
+    { text: 'Metric', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
     ...scenarios.map((s) => ({
       text: s.name,
-      options: { bold: true, fill: { color: BLUE }, color: WHITE, fontSize: 10 },
+      options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 },
     })),
   ]
 
-  const finalMetrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult) => string }> = [
+  type FinalCellValue = string | { text: unknown; options: Record<string, unknown> }
+  const finalMetrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult, rowIdx: number) => FinalCellValue }> = [
     { label: 'Servers Required', values: (_s, r) => String(r.finalCount) },
     { label: 'Server Config', values: (s) => `${s.socketsPerServer}S x ${s.coresPerSocket}C` },
     { label: 'Total pCores', values: (s, r) => String(r.finalCount * s.socketsPerServer * s.coresPerSocket) },
     { label: 'Limiting Resource', values: (_s, r) => r.limitingResource },
     { label: 'vCPU:pCore Ratio', values: (_s, r) => `${f2(r.achievedVcpuToPCoreRatio)}:1` },
     { label: 'VMs/Server', values: (_s, r) => f2(r.vmsPerServer) },
-    { label: 'CPU Util %', values: (_s, r) => `${f1(r.cpuUtilizationPercent)}%` },
-    { label: 'RAM Util %', values: (_s, r) => `${f1(r.ramUtilizationPercent)}%` },
-    { label: 'Disk Util %', values: (_s, r) => `${f1(r.diskUtilizationPercent)}%` },
+    { label: 'CPU Util %', values: (_s, r, ri) => utilCell(r.cpuUtilizationPercent, ri) },
+    { label: 'RAM Util %', values: (_s, r, ri) => utilCell(r.ramUtilizationPercent, ri) },
+    { label: 'Disk Util %', values: (_s, r, ri) => utilCell(r.diskUtilizationPercent, ri) },
   ]
 
   const finalCompRows = finalMetrics.map((m, rowIdx) => {
@@ -841,10 +878,11 @@ export async function exportPptx(
       { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
       ...scenarios.map((s, j) => {
         const r = results[j]
-        return {
-          text: r ? m.values(s, r) : '-',
-          options: { fill: { color: fillColor }, fontSize: 10 },
-        }
+        if (!r) return { text: '-', options: { fill: { color: fillColor }, fontSize: 10 } }
+        const val = m.values(s, r, rowIdx)
+        return typeof val === 'string'
+          ? { text: val, options: { fill: { color: fillColor }, fontSize: 10 } }
+          : val
       }),
     ]
   })
