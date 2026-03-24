@@ -400,12 +400,12 @@ Plans:
   2. Each per-scenario capacity chart slide also contains the corresponding capacity breakdown table in the same slide — the standalone capacity breakdown table slide no longer exists as a separate slide
   3. The exported PPTX does not contain a "Scenario Comparison" slide — the As-Is vs To-Be comparison table slide serves as the definitive comparison and no duplicate slide appears
   4. The total slide count of an exported deck decreases by at least 3 compared to the pre-v2.5 baseline for a single-scenario export — confirming all three merges took effect
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 
-- [ ] 33-01-PLAN.md — MERGE-01: Merge Assumptions + Server Config + Growth tables into single "Sizing Parameters" slide in exportPptx.ts
-- [ ] 33-02-PLAN.md — MERGE-02 + MERGE-03: Move capacity breakdown table onto chart slide and remove Scenario Comparison slide
+- [ ] 33-01-PLAN.md — MERGE-01: Merge Assumptions + Server Config + Growth into single "Sizing Parameters" slide + add MERGE-01 test
+- [ ] 33-02-PLAN.md — MERGE-02 + MERGE-03: Delete standalone bdSlide and final compSlide + add MERGE-02/03 tests
 
 ## Progress
 
