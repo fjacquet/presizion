@@ -382,7 +382,7 @@ Plans:
   3. Section header rows in table slides (e.g., "CPU", "Memory", "Storage") render with a dark background band and light-colored text, visually separating them from data rows
   4. KPI callout values (server count, limiting resource) are displayed inside rounded-rectangle shape backgrounds — not as plain text — giving them visual emphasis
   5. Adding a new scenario from the Step 2 UI results in a card whose name field reads "To-Be" by default, without requiring any user edit
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 
@@ -400,7 +400,7 @@ Plans:
   2. Each per-scenario capacity chart slide also contains the corresponding capacity breakdown table in the same slide — the standalone capacity breakdown table slide no longer exists as a separate slide
   3. The exported PPTX does not contain a "Scenario Comparison" slide — the As-Is vs To-Be comparison table slide serves as the definitive comparison and no duplicate slide appears
   4. The total slide count of an exported deck decreases by at least 3 compared to the pre-v2.5 baseline for a single-scenario export — confirming all three merges took effect
-**Plans**: TBD
+**Plans:** TBD
 
 Plans:
 
