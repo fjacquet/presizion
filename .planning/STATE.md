@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: — PPTX Export Overhaul & UX Polish
 status: unknown
-stopped_at: Completed 32-01-PLAN.md
+stopped_at: Completed 32-02-PLAN.md
 last_updated: "2026-03-24T14:25:08.478Z"
 progress:
   total_phases: 16
   completed_phases: 14
   total_plans: 28
-  completed_plans: 27
+  completed_plans: 28
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-24)
 
 ## Current Position
 
-Phase: 32 (pptx-visual-polish-ux-fix) — EXECUTING
-Plan: 1 of 2
+Phase: 32 (pptx-visual-polish-ux-fix) — COMPLETE
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -42,7 +42,8 @@ Plan: 1 of 2
 | 31 | 3/3 | 16min | 5min |
 
 *Updated after each plan completion*
-| Phase 32 P01 | 5 | 1 tasks | 2 files |
+| Phase 32 P01 | 5min | 1 tasks | 2 files |
+| Phase 32 P02 | 11min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -56,6 +57,7 @@ Recent decisions affecting current work:
 - [Phase 31-step-3-review-export]: useIsMobile extracted to shared `src/hooks/useIsMobile.ts`
 - [Phase 31-step-3-review-export]: iOS PDF: caller pre-opens about:blank synchronously before async export to bypass iOS popup blocker
 - [Phase 32]: Default scenario name changed from 'New Scenario' to 'To-Be' — presales standard terminology
+- [Phase 32-02]: NAVY constant moved before TITLE_OPTS to avoid TDZ error; mockDefineSlideMaster promoted to module-level mock for testability
 
 ### Pending Todos
 

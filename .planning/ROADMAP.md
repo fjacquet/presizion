@@ -104,7 +104,7 @@ Full details: `.planning/milestones/v2.4-ROADMAP.md`
 
 **Milestone Goal:** Transform the PPTX export from sparse white slides into a dense, visually polished presales deck, and fix the default scenario name.
 
-- [ ] **Phase 32: PPTX Visual Polish & UX Fix** - Slide master accent strip, utilization color-coding, section header bands, KPI shape backgrounds, and default scenario rename
+- [x] **Phase 32: PPTX Visual Polish & UX Fix** - Slide master accent strip, utilization color-coding, section header bands, KPI shape backgrounds, and default scenario rename (completed 2026-03-24)
 - [ ] **Phase 33: PPTX Slide Consolidation** - Merge Assumptions/Config/Growth into one slide, merge capacity table into chart slide, remove redundant Scenario Comparison slide
 
 ## Phase Details
@@ -382,7 +382,7 @@ Plans:
   3. Section header rows in table slides (e.g., "CPU", "Memory", "Storage") render with a dark background band and light-colored text, visually separating them from data rows
   4. KPI callout values (server count, limiting resource) are displayed inside rounded-rectangle shape backgrounds — not as plain text — giving them visual emphasis
   5. Adding a new scenario from the Step 2 UI results in a card whose name field reads "To-Be" by default, without requiring any user edit
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 
@@ -442,5 +442,5 @@ Plans:
 | 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 31. Step 3 Review & Export | v2.4 | 3/3 | Complete | 2026-03-16 |
-| 32. PPTX Visual Polish & UX Fix | 1/2 | In Progress|  | - |
+| 32. PPTX Visual Polish & UX Fix | 2/2 | Complete   | 2026-03-24 | - |
 | 33. PPTX Slide Consolidation | v2.5 | 0/2 | Not started | - |

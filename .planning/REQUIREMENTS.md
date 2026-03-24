@@ -15,14 +15,14 @@ Requirements for PPTX Export Overhaul & UX Polish milestone.
 
 ### Visual Polish
 
-- [ ] **VISUAL-01**: Content slide master includes colored left sidebar accent strip
-- [ ] **VISUAL-02**: Utilization cells color-coded (green/amber/red thresholds)
-- [ ] **VISUAL-03**: Section headers use dark background bands
-- [ ] **VISUAL-04**: KPI callout boxes use rounded-rectangle shape backgrounds
+- [x] **VISUAL-01**: Content slide master includes colored left sidebar accent strip
+- [x] **VISUAL-02**: Utilization cells color-coded (green/amber/red thresholds)
+- [x] **VISUAL-03**: Section headers use dark background bands
+- [x] **VISUAL-04**: KPI callout boxes use rounded-rectangle shape backgrounds
 
 ### UX
 
-- [ ] **UX-01**: Default scenario name changed from "New Scenario" to "To-Be"
+- [x] **UX-01**: Default scenario name changed from "New Scenario" to "To-Be"
 
 ## Future Requirements
 
@@ -44,11 +44,11 @@ None planned.
 | MERGE-01 | Phase 33 | Pending |
 | MERGE-02 | Phase 33 | Pending |
 | MERGE-03 | Phase 33 | Pending |
-| VISUAL-01 | Phase 32 | Pending |
-| VISUAL-02 | Phase 32 | Pending |
-| VISUAL-03 | Phase 32 | Pending |
-| VISUAL-04 | Phase 32 | Pending |
-| UX-01 | Phase 32 | Pending |
+| VISUAL-01 | Phase 32 | Complete |
+| VISUAL-02 | Phase 32 | Complete |
+| VISUAL-03 | Phase 32 | Complete |
+| VISUAL-04 | Phase 32 | Complete |
+| UX-01 | Phase 32 | Complete |
 
 **Coverage:**
 - v2.5 requirements: 8 total
