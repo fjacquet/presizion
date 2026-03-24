@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.4
-milestone_name: — Mobile UX & Web App Manifest
+milestone: v2.5
+milestone_name: — PPTX Export Overhaul & UX Polish
 status: planning
-stopped_at: Completed 31-step-3-review-export-03-PLAN.md
-last_updated: "2026-03-16T10:08:36.496Z"
-last_activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
+stopped_at: ""
+last_updated: "2026-03-24T00:00:00.000Z"
+last_activity: 2026-03-24 — Milestone v2.5 started
 progress:
-  total_phases: 14
-  completed_phases: 14
-  total_plans: 26
-  completed_plans: 26
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -18,19 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-16)
+See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.4 — Mobile UX & Web App Manifest (Phase 27: Web App Manifest & Icons)
+**Current focus:** v2.5 — PPTX Export Overhaul & UX Polish
 
 ## Current Position
 
-Phase: 27 of 31 (Web App Manifest & Icons)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-03-16 — Roadmap created, 30/30 requirements mapped to Phases 27-31
-
-Progress: [░░░░░░░░░░] 0% (v2.4 milestone — 0/10 plans complete)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-24 — Milestone v2.5 started
 
 ## Performance Metrics
 

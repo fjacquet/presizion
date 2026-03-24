@@ -93,8 +93,21 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 - ✓ Mobile-optimized Step 2: stacked scenario cards, responsive grids — v2.4 / Phase 30
 - ✓ Mobile-optimized Step 3: sticky scroll table, responsive charts, export bottom sheet, iOS PDF fallback — v2.4 / Phase 31
 
-### Active (v2.5 candidates)
+## Current Milestone: v2.5 — PPTX Export Overhaul & UX Polish
 
+**Goal:** Transform the PPTX export from sparse white slides into a dense, visually polished presales deck, and fix default scenario naming.
+
+**Target features:**
+- Consolidate sparse PPTX slides (Assumptions + Server Config + Growth → 1 slide)
+- Remove duplicate content (kill Scenario Comparison slide — already in As-Is vs To-Be)
+- Merge per-scenario capacity breakdown table into chart slide
+- Add visual accents (colored sidebar strips, utilization color-coding)
+- Rename default scenario from "New Scenario" to "To-Be"
+
+### Active
+
+- [ ] PPTX slide consolidation and visual overhaul
+- [ ] Default scenario name change ("New Scenario" → "To-Be")
 
 ### Out of Scope
 
@@ -142,4 +155,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ✓ Resolved — all phases since v1.3 use GSD framework |
 
 ---
-*Last updated: 2026-03-16 after v2.4 milestone completion (Mobile UX & Web App Manifest)*
+*Last updated: 2026-03-24 after v2.5 milestone start (PPTX Export Overhaul & UX Polish)*
