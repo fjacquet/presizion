@@ -41,20 +41,20 @@ None planned.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MERGE-01 | TBD | Pending |
-| MERGE-02 | TBD | Pending |
-| MERGE-03 | TBD | Pending |
-| VISUAL-01 | TBD | Pending |
-| VISUAL-02 | TBD | Pending |
-| VISUAL-03 | TBD | Pending |
-| VISUAL-04 | TBD | Pending |
-| UX-01 | TBD | Pending |
+| MERGE-01 | Phase 33 | Pending |
+| MERGE-02 | Phase 33 | Pending |
+| MERGE-03 | Phase 33 | Pending |
+| VISUAL-01 | Phase 32 | Pending |
+| VISUAL-02 | Phase 32 | Pending |
+| VISUAL-03 | Phase 32 | Pending |
+| VISUAL-04 | Phase 32 | Pending |
+| UX-01 | Phase 32 | Pending |
 
 **Coverage:**
 - v2.5 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8 ⚠️
+- Mapped to phases: 8
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-24*
-*Last updated: 2026-03-24 after initial definition*
+*Last updated: 2026-03-24 — traceability mapped to Phases 32-33*

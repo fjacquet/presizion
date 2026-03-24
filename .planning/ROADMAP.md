@@ -8,7 +8,8 @@
 - ✅ **v2.0 — vSAN-Aware Sizing Engine** — Phases 18-22 (shipped 2026-03-15)
 - ✅ **v2.1 — Import UX & Scope Fixes** — Phases 23-24 (shipped 2026-03-15)
 - ✅ **v2.2 — SPEC Search Integration** — Phases 25-26 (shipped 2026-03-15)
-- 🚧 **v2.4 — Mobile UX & Web App Manifest** — Phases 27-31 (in progress)
+- ✅ **v2.4 — Mobile UX & Web App Manifest** — Phases 27-31 (shipped 2026-03-16)
+- 🚧 **v2.5 — PPTX Export Overhaul & UX Polish** — Phases 32-33 (in progress)
 
 ## Phases
 
@@ -86,15 +87,25 @@ Full details: `.planning/milestones/v2.2-ROADMAP.md`
 
 </details>
 
-### v2.4 — Mobile UX & Web App Manifest (In Progress)
+<details>
+<summary>✅ v2.4 — Mobile UX & Web App Manifest (Phases 27-31) — SHIPPED 2026-03-16</summary>
 
-**Milestone Goal:** Retrofit Presizion for phone use — every step usable at 390px with proper touch targets, no horizontal overflow, and installable from iOS/Android home screen via web app manifest.
+Full details: `.planning/milestones/v2.4-ROADMAP.md`
 
-- [x] **Phase 27: Web App Manifest & Icons** - Installable PWA identity: manifest file, icon PNGs, and iOS/Android meta tags in index.html (completed 2026-03-16)
-- [x] **Phase 28: Global Mobile Foundation & Wizard Shell** - Viewport sizing, overflow control, touch targets, compact header/nav that underpin all three steps (completed 2026-03-16)
-- [x] **Phase 29: Step 1 Mobile Form Layout** - Single-column form grids, touch-friendly inputs, and ImportPreviewModal as a mobile bottom Drawer (completed 2026-03-16)
-- [x] **Phase 30: Step 2 Scenario Cards** - Stacked full-width scenario cards with collapsed grids and responsive vSAN/SPEC sections at 390px (completed 2026-03-16)
-- [x] **Phase 31: Step 3 Review & Export** - Horizontally-scrollable comparison table, responsive chart heights, bottom-sheet export actions, and iOS PDF fallback (completed 2026-03-16)
+- [x] Phase 27: Web App Manifest & Icons (1/1 plan) — completed 2026-03-16
+- [x] Phase 28: Global Mobile Foundation & Wizard Shell (2/2 plans) — completed 2026-03-16
+- [x] Phase 29: Step 1 Mobile Form Layout (2/2 plans) — completed 2026-03-16
+- [x] Phase 30: Step 2 Scenario Cards (1/1 plan) — completed 2026-03-16
+- [x] Phase 31: Step 3 Review & Export (3/3 plans) — completed 2026-03-16
+
+</details>
+
+### v2.5 — PPTX Export Overhaul & UX Polish (In Progress)
+
+**Milestone Goal:** Transform the PPTX export from sparse white slides into a dense, visually polished presales deck, and fix the default scenario name.
+
+- [ ] **Phase 32: PPTX Visual Polish & UX Fix** - Slide master accent strip, utilization color-coding, section header bands, KPI shape backgrounds, and default scenario rename
+- [ ] **Phase 33: PPTX Slide Consolidation** - Merge Assumptions/Config/Growth into one slide, merge capacity table into chart slide, remove redundant Scenario Comparison slide
 
 ## Phase Details
 
@@ -276,7 +287,7 @@ Plans:
   3. The browser address bar displays the app's brand theme-color when the page is active (visible in Chrome on Android and supported browsers)
   4. Launching Presizion from the home screen opens to `/presizion/` without a 404, regardless of iOS or Android
   5. The viewport renders without unexpected white bars or clipped edges on iPhone — `viewport-fit=cover` is applied and safe-area insets are available for future use
-**Plans**: 1 plan
+**Plans**: 1/1 plans complete
 
 Plans:
 
@@ -294,7 +305,7 @@ Plans:
   3. All interactive elements (buttons, step indicators, toggles, links) are tappable without precision — each has at least a 44px touch target
   4. The header toolbar (logo, theme toggle, Store-Predict link) fits on a single line at 390px without text wrapping or icons being cut off
   5. The SizingModeToggle wraps to two lines if needed at 390px but does not cause horizontal page scroll
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
 
@@ -313,7 +324,7 @@ Plans:
   3. The SPEC results panel table is horizontally scrollable at 390px — a user can swipe to reveal additional columns without causing page-level scroll
   4. On a phone, tapping the file import button opens the ImportPreviewModal as a bottom drawer that slides up from the screen edge, not a center dialog that may be clipped
   5. The file import button and scope badge are fully readable and tappable at 390px — neither is truncated or overlapping another element
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
 
@@ -332,7 +343,7 @@ Plans:
   3. The sizing assumptions inputs (vCPU ratio, headroom, utilization targets) display in a 2-column grid at 390px — all inputs are visible and tappable
   4. The vSAN & Growth collapsible section's internal fields are readable and enterable at 390px — no field is clipped or hidden outside the viewport
   5. The SPEC lookup search input and results panel in Step 2 are usable at 390px — the search field accepts input and results rows are readable without horizontal overflow
-**Plans**: 1 plan
+**Plans**: 1/1 plans complete
 
 Plans:
 
@@ -351,13 +362,50 @@ Plans:
   4. On iOS Safari, tapping "Export PDF" opens the PDF in a new browser tab with a toast explaining how to save it — the export does not silently fail or show a broken download
   5. Tapping "Download Chart PNG" on mobile produces a downloadable PNG file — the chart canvas renders correctly on a high-density (3x) screen without blurring
   6. The core count chart and capacity stacked chart are legible at 390px width — axis labels, bar segments, and legend entries are readable without overlapping
-**Plans**: 3 plans
+**Plans**: 3/3 plans complete
 
 Plans:
 
-- [ ] 31-01-PLAN.md — ComparisonTable horizontal scroll with sticky first column and min-w-max inner table (REVIEW-01)
-- [ ] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + CapacityStackedChart legibility at 390px (REVIEW-02, REVIEW-05, REVIEW-06)
-- [ ] 31-03-PLAN.md — Export bottom sheet (shadcn Drawer) on mobile + iOS PDF/PPTX fallback + useIsMobile extraction (REVIEW-03, REVIEW-04, REVIEW-05)
+- [x] 31-01-PLAN.md — ComparisonTable horizontal scroll with sticky first column and min-w-max inner table (REVIEW-01)
+- [x] 31-02-PLAN.md — All four charts responsive height (h-48 sm:h-72) + CapacityStackedChart legibility at 390px (REVIEW-02, REVIEW-05, REVIEW-06)
+- [x] 31-03-PLAN.md — Export bottom sheet (shadcn Drawer) on mobile + iOS PDF/PPTX fallback + useIsMobile extraction (REVIEW-03, REVIEW-04, REVIEW-05)
+
+### Phase 32: PPTX Visual Polish & UX Fix
+
+**Goal**: The exported PPTX deck looks like a professional presales presentation — every content slide carries a colored left sidebar accent strip, utilization cells are color-coded by threshold, section headers use dark background bands, KPI callout boxes have rounded-rectangle shape backgrounds, and newly created scenarios default to the name "To-Be" instead of "New Scenario".
+**Depends on**: Phase 31
+**Requirements**: VISUAL-01, VISUAL-02, VISUAL-03, VISUAL-04, UX-01
+**Success Criteria** (what must be TRUE):
+
+  1. Exporting PPTX produces a file where every content slide (not the cover) displays a colored vertical accent strip on the left edge, matching the brand palette
+  2. In the As-Is vs To-Be comparison table slide, cells whose utilization value falls below 60% are green, 60-80% are amber, and above 80% are red — matching the app's color-coding convention
+  3. Section header rows in table slides (e.g., "CPU", "Memory", "Storage") render with a dark background band and light-colored text, visually separating them from data rows
+  4. KPI callout values (server count, limiting resource) are displayed inside rounded-rectangle shape backgrounds — not as plain text — giving them visual emphasis
+  5. Adding a new scenario from the Step 2 UI results in a card whose name field reads "To-Be" by default, without requiring any user edit
+**Plans**: TBD
+
+Plans:
+
+- [ ] 32-01-PLAN.md — UX-01: Change default scenario name from "New Scenario" to "To-Be" in defaults.ts + update tests
+- [ ] 32-02-PLAN.md — VISUAL-01..04: Slide master accent strip, utilization color-coding, section header bands, KPI shape backgrounds in exportPptx.ts
+
+### Phase 33: PPTX Slide Consolidation
+
+**Goal**: The exported PPTX deck contains fewer, denser slides — the three sparse parameter slides (Assumptions, Server Config, Growth) are merged into a single "Sizing Parameters" slide, the per-scenario capacity breakdown table is moved onto the same slide as its chart, and the final "Scenario Comparison" slide is removed because its content is already present in the As-Is vs To-Be slide.
+**Depends on**: Phase 32
+**Requirements**: MERGE-01, MERGE-02, MERGE-03
+**Success Criteria** (what must be TRUE):
+
+  1. The exported PPTX contains exactly one "Sizing Parameters" slide that presents all sizing assumptions, server configuration, and growth settings in a single, well-structured layout — the separate Assumptions, Server Config, and Growth slides no longer exist
+  2. Each per-scenario capacity chart slide also contains the corresponding capacity breakdown table in the same slide — the standalone capacity breakdown table slide no longer exists as a separate slide
+  3. The exported PPTX does not contain a "Scenario Comparison" slide — the As-Is vs To-Be comparison table slide serves as the definitive comparison and no duplicate slide appears
+  4. The total slide count of an exported deck decreases by at least 3 compared to the pre-v2.5 baseline for a single-scenario export — confirming all three merges took effect
+**Plans**: TBD
+
+Plans:
+
+- [ ] 33-01-PLAN.md — MERGE-01: Merge Assumptions + Server Config + Growth tables into single "Sizing Parameters" slide in exportPptx.ts
+- [ ] 33-02-PLAN.md — MERGE-02 + MERGE-03: Move capacity breakdown table onto chart slide and remove Scenario Comparison slide
 
 ## Progress
 
@@ -393,4 +441,6 @@ Plans:
 | 28. Global Mobile Foundation & Wizard Shell | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
-| 31. Step 3 Review & Export | 3/3 | Complete    | 2026-03-16 | - |
+| 31. Step 3 Review & Export | v2.4 | 3/3 | Complete | 2026-03-16 |
+| 32. PPTX Visual Polish & UX Fix | v2.5 | 0/2 | Not started | - |
+| 33. PPTX Slide Consolidation | v2.5 | 0/2 | Not started | - |
