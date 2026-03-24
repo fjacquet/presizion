@@ -10,8 +10,8 @@ Requirements for PPTX Export Overhaul & UX Polish milestone.
 ### Slide Consolidation
 
 - [x] **MERGE-01**: Assumptions + Server Config + Growth tables merged into single "Sizing Parameters" slide
-- [ ] **MERGE-02**: Per-scenario capacity breakdown table merged into capacity chart slide
-- [ ] **MERGE-03**: Final "Scenario Comparison" slide removed (duplicate of As-Is vs To-Be)
+- [x] **MERGE-02**: Per-scenario capacity breakdown table merged into capacity chart slide
+- [x] **MERGE-03**: Final "Scenario Comparison" slide removed (duplicate of As-Is vs To-Be)
 
 ### Visual Polish
 
@@ -42,8 +42,8 @@ None planned.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | MERGE-01 | Phase 33 | Complete |
-| MERGE-02 | Phase 33 | Pending |
-| MERGE-03 | Phase 33 | Pending |
+| MERGE-02 | Phase 33 | Complete |
+| MERGE-03 | Phase 33 | Complete |
 | VISUAL-01 | Phase 32 | Complete |
 | VISUAL-02 | Phase 32 | Complete |
 | VISUAL-03 | Phase 32 | Complete |
