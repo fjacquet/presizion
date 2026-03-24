@@ -143,9 +143,9 @@ describe('exportPptx', () => {
   it('creates multiple slides (title + summary + comparison + sizing params = at least 4)', async () => {
     const { exportPptx } = await import('../exportPptx')
     await exportPptx(cluster, [scenario], [result], [breakdown], {})
-    // Title + Summary + As-Is vs To-Be Comparison + Sizing Parameters = at least 4 slides
+    // Title + Summary + As-Is vs To-Be Comparison + Sizing Parameters = exactly 4 slides
     // No chart slides since chartRefToDataUrl returns null, no bdSlide or compSlide
-    expect(mockAddSlide.mock.calls.length).toBeGreaterThanOrEqual(4)
+    expect(mockAddSlide.mock.calls.length).toBe(4)
   })
 
   it('generates a table on the executive summary slide', async () => {
@@ -252,5 +252,46 @@ describe('exportPptx', () => {
     expect(slideTitles).not.toContain('Sizing Assumptions')
     expect(slideTitles).not.toContain('Per-Scenario Server Configuration')
     expect(slideTitles).not.toContain('Growth Projections')
+  })
+
+  // ---------------------------------------------------------------------------
+  // MERGE-03: No final "Scenario Comparison" slide (As-Is vs To-Be is authoritative)
+  // ---------------------------------------------------------------------------
+  it('does not create a "Scenario Comparison" slide', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const textCalls = mockAddText.mock.calls as Array<[string | Record<string, unknown>, Record<string, unknown>]>
+    const slideTitles = textCalls
+      .filter(([, opts]) => opts?.placeholder === 'title')
+      .map(([text]) => (typeof text === 'string' ? text : ''))
+
+    expect(slideTitles).not.toContain('Scenario Comparison')
+    // The As-Is vs To-Be Comparison slide should still exist
+    expect(slideTitles).toContain('As-Is vs To-Be Comparison')
+  })
+
+  // ---------------------------------------------------------------------------
+  // MERGE-02: No standalone capacity breakdown table slide
+  // ---------------------------------------------------------------------------
+  it('does not create a standalone capacity breakdown table slide when chart is null', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const textCalls = mockAddText.mock.calls as Array<[string | Record<string, unknown>, Record<string, unknown>]>
+    // With chartRefToDataUrl returning null, no "Capacity Breakdown" title should appear
+    // (it was only on the standalone bdSlide which is now removed, and capSlide is skipped when chart is null)
+    const capacityTitles = textCalls
+      .filter(([text]) => typeof text === 'string' && text.includes('Capacity Breakdown'))
+    expect(capacityTitles).toHaveLength(0)
+  })
+
+  // ---------------------------------------------------------------------------
+  // Slide count: exactly 4 slides for single scenario without charts (post-consolidation)
+  // ---------------------------------------------------------------------------
+  it('creates exactly 4 slides for single scenario without charts (post-consolidation)', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    // Post-consolidation: Title(1) + Summary(2) + AsIsVsToBeComparison(3) + SizingParameters(4)
+    // No chart slides (mock returns null), no bdSlide, no compSlide
+    expect(mockAddSlide.mock.calls.length).toBe(4)
   })
 })
