@@ -60,7 +60,6 @@ function headerCell(text: string) {
 function _grayHeaderCell(text: string) {
   return { text, options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10, fontFace: FONT } }
 }
-void _grayHeaderCell // suppress unused warning
 function dataCell(text: string, rowIdx: number, bold = false) {
   return { text, options: { fill: { color: rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE }, fontSize: 10, fontFace: FONT, bold } }
 }
@@ -448,10 +447,10 @@ export async function exportPptx(
   addFooter(comparisonSlide, dateStr)
 
   // -------------------------------------------------------------------
-  // Slide 4: Sizing Assumptions
+  // Slide 4: Sizing Parameters (merged: Assumptions + Server Config + Growth)
   // -------------------------------------------------------------------
-  const assumptionsSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  assumptionsSlide.addText('Sizing Assumptions', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
+  const sizingParamsSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
+  sizingParamsSlide.addText('Sizing Parameters', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
 
   const assumptionsHeader = [
     { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
@@ -501,7 +500,7 @@ export async function exportPptx(
   })
 
   const assumptionsColW = scenarios.length > 0 ? (12 - 3) / scenarios.length : 2
-  assumptionsSlide.addTable(
+  sizingParamsSlide.addTable(
     [assumptionsHeader, ...generalDataRows],
     {
       x: 0.5,
@@ -575,7 +574,7 @@ export async function exportPptx(
 
     // Compute Y offset after the general assumptions table
     const vsanTableY = 1.2 + (generalAssumptions.length + 1) * 0.35 + 0.3
-    assumptionsSlide.addTable(
+    sizingParamsSlide.addTable(
       [vsanHeader, ...vsanDataRows],
       {
         x: 0.5,
@@ -587,7 +586,47 @@ export async function exportPptx(
     )
   }
 
-  // Growth projections (only if at least one scenario has growth)
+  // Server Configuration section — stacked below assumptions on the same slide
+  const assumptionsTableRows = generalAssumptions.length + 1 // +1 for header
+  const vsanTableRows = hasVsan ? (6 + 1) : 0 // 6 vSAN data rows + 1 header
+  const serverConfigY = 1.2 + (assumptionsTableRows * 0.35) + (hasVsan ? 0.3 + vsanTableRows * 0.35 : 0) + 0.3
+
+  const scHeader = [
+    _grayHeaderCell('Server Configuration'),
+    ...scenarios.map((s) => _grayHeaderCell(s.name)),
+  ]
+
+  const scMetrics: AssumptionRow[] = [
+    { label: 'Sockets / Server', values: scenarios.map((s) => String(s.socketsPerServer)) },
+    { label: 'Cores / Socket', values: scenarios.map((s) => String(s.coresPerSocket)) },
+    { label: 'Total Cores / Server', values: scenarios.map((s) => String(s.socketsPerServer * s.coresPerSocket)) },
+    { label: 'RAM / Server (GB)', values: scenarios.map((s) => s.ramPerServerGb.toLocaleString()) },
+    { label: 'Disk / Server (GB)', values: scenarios.map((s) => s.diskPerServerGb.toLocaleString()) },
+  ]
+
+  const scDataRows = scMetrics.map((m, rowIdx) => {
+    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
+    return [
+      { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+      ...m.values.map((v) => ({
+        text: v,
+        options: { fill: { color: fillColor }, fontSize: 10 },
+      })),
+    ]
+  })
+
+  sizingParamsSlide.addTable(
+    [scHeader, ...scDataRows],
+    {
+      x: 0.5,
+      y: serverConfigY,
+      w: 12,
+      colW: [3, ...scenarios.map(() => assumptionsColW)],
+      border: { pt: 0.5, color: 'CFCFCF' },
+    },
+  )
+
+  // Growth projections (only if at least one scenario has growth) — stacked below server config
   const hasGrowth = scenarios.some(
     (s) =>
       (s.cpuGrowthPercent !== undefined && s.cpuGrowthPercent > 0) ||
@@ -595,15 +634,11 @@ export async function exportPptx(
       (s.storageGrowthPercent !== undefined && s.storageGrowthPercent > 0),
   )
   if (hasGrowth) {
-    const growthSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-    growthSlide.addText('Growth Projections', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
+    const growthY = serverConfigY + (scMetrics.length + 1) * 0.35 + 0.3
 
-    const growthHeader = [
-      { text: 'Parameter', options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 } },
-      ...scenarios.map((s) => ({
-        text: s.name,
-        options: { bold: true, fill: { color: GRAY }, color: WHITE, fontSize: 10 },
-      })),
+    const growthSectionHeader = [
+      _grayHeaderCell('Growth Projections'),
+      ...scenarios.map((s) => _grayHeaderCell(s.name)),
     ]
 
     const growthRows: AssumptionRow[] = [
@@ -630,71 +665,26 @@ export async function exportPptx(
     const growthDataRows = growthRows.map((a, rowIdx) => {
       const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
       return [
-        { text: a.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
+        { text: a.label, options: { bold: true, fill: { color: fillColor }, fontSize: 9 } },
         ...a.values.map((v) => ({
           text: v,
-          options: { fill: { color: fillColor }, fontSize: 10 },
+          options: { fill: { color: fillColor }, fontSize: 9 },
         })),
       ]
     })
 
-    growthSlide.addTable(
-      [growthHeader, ...growthDataRows],
+    sizingParamsSlide.addTable(
+      [growthSectionHeader, ...growthDataRows],
       {
         x: 0.5,
-        y: 1.2,
+        y: growthY,
         w: 12,
         colW: [3, ...scenarios.map(() => assumptionsColW)],
         border: { pt: 0.5, color: 'CFCFCF' },
       },
     )
   }
-  addFooter(assumptionsSlide, dateStr)
-
-  // -------------------------------------------------------------------
-  // Slide 5: Per-Scenario Server Configuration
-  // -------------------------------------------------------------------
-  const serverConfigSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  serverConfigSlide.addText('Per-Scenario Server Configuration', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
-
-  const scHeader = [
-    { text: 'Parameter', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-    ...scenarios.map((s) => ({
-      text: s.name,
-      options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 },
-    })),
-  ]
-
-  const scMetrics: AssumptionRow[] = [
-    { label: 'Sockets / Server', values: scenarios.map((s) => String(s.socketsPerServer)) },
-    { label: 'Cores / Socket', values: scenarios.map((s) => String(s.coresPerSocket)) },
-    { label: 'Total Cores / Server', values: scenarios.map((s) => String(s.socketsPerServer * s.coresPerSocket)) },
-    { label: 'RAM / Server (GB)', values: scenarios.map((s) => s.ramPerServerGb.toLocaleString()) },
-    { label: 'Disk / Server (GB)', values: scenarios.map((s) => s.diskPerServerGb.toLocaleString()) },
-  ]
-
-  const scDataRows = scMetrics.map((m, rowIdx) => {
-    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
-    return [
-      { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
-      ...m.values.map((v) => ({
-        text: v,
-        options: { fill: { color: fillColor }, fontSize: 10 },
-      })),
-    ]
-  })
-
-  serverConfigSlide.addTable(
-    [scHeader, ...scDataRows],
-    {
-      x: 0.5,
-      y: 1.2,
-      w: 12,
-      colW: [3, ...scenarios.map(() => assumptionsColW)],
-      border: { pt: 0.5, color: 'CFCFCF' },
-    },
-  )
-  addFooter(serverConfigSlide, dateStr)
+  addFooter(sizingParamsSlide, dateStr)
 
   // -------------------------------------------------------------------
   // Per-scenario slides: Capacity Breakdown Table + Charts
