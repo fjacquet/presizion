@@ -4,7 +4,7 @@ milestone: v2.5
 milestone_name: — PPTX Export Overhaul & UX Polish
 status: unknown
 stopped_at: Completed 33-02-PLAN.md
-last_updated: "2026-03-24T15:07:00.912Z"
+last_updated: "2026-03-24T15:11:00.977Z"
 progress:
   total_phases: 16
   completed_phases: 16

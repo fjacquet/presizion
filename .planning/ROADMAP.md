@@ -443,4 +443,4 @@ Plans:
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 31. Step 3 Review & Export | v2.4 | 3/3 | Complete | 2026-03-16 |
 | 32. PPTX Visual Polish & UX Fix | 2/2 | Complete    | 2026-03-24 | - |
-| 33. PPTX Slide Consolidation | 2/2 | Complete   | 2026-03-24 | - |
+| 33. PPTX Slide Consolidation | 2/2 | Complete    | 2026-03-24 | - |
