@@ -400,7 +400,7 @@ Plans:
   2. Each per-scenario capacity chart slide also contains the corresponding capacity breakdown table in the same slide — the standalone capacity breakdown table slide no longer exists as a separate slide
   3. The exported PPTX does not contain a "Scenario Comparison" slide — the As-Is vs To-Be comparison table slide serves as the definitive comparison and no duplicate slide appears
   4. The total slide count of an exported deck decreases by at least 3 compared to the pre-v2.5 baseline for a single-scenario export — confirming all three merges took effect
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 
@@ -443,4 +443,4 @@ Plans:
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 31. Step 3 Review & Export | v2.4 | 3/3 | Complete | 2026-03-16 |
 | 32. PPTX Visual Polish & UX Fix | 2/2 | Complete    | 2026-03-24 | - |
-| 33. PPTX Slide Consolidation | v2.5 | 0/2 | Not started | - |
+| 33. PPTX Slide Consolidation | 1/2 | In Progress|  | - |
