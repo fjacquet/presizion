@@ -44,11 +44,6 @@ function f1(n: number): string {
   return n.toFixed(1)
 }
 
-/** Format a number to 2 decimal places. */
-function f2(n: number): string {
-  return n.toFixed(2)
-}
-
 /** Default text options for consistency */
 const TITLE_OPTS = { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT } as const
 const SUBTITLE_OPTS = { x: 0.5, y: 0.65, w: 12, h: 0.3, fontSize: 11, color: GRAY, fontFace: FONT } as const
@@ -156,8 +151,7 @@ async function captureAllCharts(
  * - As-Is vs To-Be comparison table
  * - Sizing assumptions (general, vSAN settings, growth projections)
  * - Per-scenario server configuration
- * - Per-scenario capacity breakdown tables and chart images
- * - Scenario comparison table
+ * - Per-scenario capacity chart with breakdown table
  *
  * @param cluster    - Current cluster metrics
  * @param scenarios  - Target sizing scenarios
@@ -693,59 +687,7 @@ export async function exportPptx(
     const bd = breakdowns[i]
     const charts = allCharts[i]
 
-    // -- Capacity Breakdown Table slide --
-    if (bd) {
-      const bdSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-      bdSlide.addText(`Capacity Breakdown -- ${scenario.name}`, {
-        placeholder: 'title', fontSize: 20, bold: true, color: NAVY, fontFace: FONT,
-      })
-
-      const bdHeaderRow = [
-        { text: 'Resource', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-        { text: 'Required', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-        { text: 'Spare', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-        { text: 'Excess', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-        { text: 'Total Configured', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-      ]
-
-      const bdDataRows = [
-        [
-          { text: 'CPU GHz', options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.cpu.required), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.cpu.spare), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.cpu.excess), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.cpu.total), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-        ],
-        [
-          { text: 'Memory GiB', options: { fill: { color: WHITE }, fontSize: 10 } },
-          { text: f1(bd.memory.required), options: { fill: { color: WHITE }, fontSize: 10 } },
-          { text: f1(bd.memory.spare), options: { fill: { color: WHITE }, fontSize: 10 } },
-          { text: f1(bd.memory.excess), options: { fill: { color: WHITE }, fontSize: 10 } },
-          { text: f1(bd.memory.total), options: { fill: { color: WHITE }, fontSize: 10 } },
-        ],
-        [
-          { text: 'Raw Storage TiB', options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.storage.required / 1024), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.storage.spare / 1024), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.storage.excess / 1024), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-          { text: f1(bd.storage.total / 1024), options: { fill: { color: LIGHT_GRAY }, fontSize: 10 } },
-        ],
-      ]
-
-      bdSlide.addTable(
-        [bdHeaderRow, ...bdDataRows],
-        {
-          x: 0.5,
-          y: 1.2,
-          w: 12,
-          colW: [2.5, 2.4, 2.4, 2.4, 2.3],
-          border: { pt: 0.5, color: 'CFCFCF' },
-        },
-      )
-      addFooter(bdSlide, dateStr)
-    }
-
-    // -- Capacity Chart slide (1 per scenario) --
+    // -- Capacity Chart slide (1 per scenario, includes breakdown table) --
     if (charts?.capacity && bd) {
       const capSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
       capSlide.addText(`Capacity Breakdown -- ${scenario.name}`, { ...TITLE_OPTS })
@@ -833,66 +775,6 @@ export async function exportPptx(
       addFooter(mnSlide, dateStr)
     }
   })
-
-  // -------------------------------------------------------------------
-  // Final slide: Scenario Comparison
-  // -------------------------------------------------------------------
-  const compSlide = pptx.addSlide({ masterName: 'CONTENT_SLIDE' })
-  compSlide.addText('Scenario Comparison', { placeholder: 'title', fontSize: 22, bold: true, color: NAVY, fontFace: FONT })
-
-  // Build comparison table: first column = metric, then one column per scenario
-  const finalCompHeader = [
-    { text: 'Metric', options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 } },
-    ...scenarios.map((s) => ({
-      text: s.name,
-      options: { bold: true, fill: { color: NAVY }, color: WHITE, fontSize: 10 },
-    })),
-  ]
-
-  type FinalCellValue = string | { text: string | Array<{text: string; options?: Record<string, unknown>}>; options: Record<string, unknown> }
-  const finalMetrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult, rowIdx: number) => FinalCellValue }> = [
-    { label: 'Servers Required', values: (_s, r) => String(r.finalCount) },
-    { label: 'Server Config', values: (s) => `${s.socketsPerServer}S x ${s.coresPerSocket}C` },
-    { label: 'Total pCores', values: (s, r) => String(r.finalCount * s.socketsPerServer * s.coresPerSocket) },
-    { label: 'Limiting Resource', values: (_s, r) => r.limitingResource },
-    { label: 'vCPU:pCore Ratio', values: (_s, r) => `${f2(r.achievedVcpuToPCoreRatio)}:1` },
-    { label: 'VMs/Server', values: (_s, r) => f2(r.vmsPerServer) },
-    { label: 'CPU Util %', values: (_s, r, ri) => utilCell(r.cpuUtilizationPercent, ri) },
-    { label: 'RAM Util %', values: (_s, r, ri) => utilCell(r.ramUtilizationPercent, ri) },
-    { label: 'Disk Util %', values: (_s, r, ri) => utilCell(r.diskUtilizationPercent, ri) },
-  ]
-
-  const finalCompRows = finalMetrics.map((m, rowIdx) => {
-    const fillColor = rowIdx % 2 === 0 ? LIGHT_GRAY : WHITE
-    return [
-      { text: m.label, options: { bold: true, fill: { color: fillColor }, fontSize: 10 } },
-      ...scenarios.map((s, j) => {
-        const r = results[j]
-        if (!r) return { text: '-', options: { fill: { color: fillColor }, fontSize: 10 } }
-        const val = m.values(s, r, rowIdx)
-        return typeof val === 'string'
-          ? { text: val, options: { fill: { color: fillColor }, fontSize: 10 } }
-          : val
-      }),
-    ]
-  })
-
-  // Column widths: first col 2.5", then split remaining ~9.5" among scenarios
-  const scenarioColW = scenarios.length > 0
-    ? (12 - 2.5) / scenarios.length
-    : 2
-
-  compSlide.addTable(
-    [finalCompHeader, ...finalCompRows],
-    {
-      x: 0.5,
-      y: 1.2,
-      w: 12,
-      colW: [2.5, ...scenarios.map(() => scenarioColW)],
-      border: { pt: 0.5, color: 'CFCFCF' },
-    },
-  )
-  addFooter(compSlide, dateStr)
 
   // -------------------------------------------------------------------
   // Save the file
