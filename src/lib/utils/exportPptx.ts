@@ -333,7 +333,7 @@ export async function exportPptx(
     })),
   ]
 
-  type TableCellObj = { text: unknown; options: Record<string, unknown> }
+  type TableCellObj = { text: string | Array<{text: string; options?: Record<string, unknown>}>; options: Record<string, unknown> }
   interface CompMetric {
     readonly label: string
     readonly asIs: string | TableCellObj
@@ -859,7 +859,7 @@ export async function exportPptx(
     })),
   ]
 
-  type FinalCellValue = string | { text: unknown; options: Record<string, unknown> }
+  type FinalCellValue = string | { text: string | Array<{text: string; options?: Record<string, unknown>}>; options: Record<string, unknown> }
   const finalMetrics: Array<{ label: string; values: (s: Scenario, r: ScenarioResult, rowIdx: number) => FinalCellValue }> = [
     { label: 'Servers Required', values: (_s, r) => String(r.finalCount) },
     { label: 'Server Config', values: (s) => `${s.socketsPerServer}S x ${s.coresPerSocket}C` },

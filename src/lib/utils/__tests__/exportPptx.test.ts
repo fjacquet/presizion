@@ -210,7 +210,7 @@ describe('exportPptx', () => {
     const textCalls = mockAddText.mock.calls as Array<[string, Record<string, unknown>]>
     const kpiCalls = textCalls.filter(([, opts]) => opts?.shape === 'roundRect')
     expect(kpiCalls.length).toBeGreaterThan(0)
-    const [, firstKpiOpts] = kpiCalls[0]
+    const [, firstKpiOpts] = kpiCalls[0]!
     expect(firstKpiOpts.rectRadius).toBe(0.3)
     expect(firstKpiOpts.fill).toEqual({ color: 'E8EDF2' })
   })
