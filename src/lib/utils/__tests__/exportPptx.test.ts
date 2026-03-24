@@ -140,12 +140,12 @@ describe('exportPptx', () => {
     await expect(exportPptx(cluster, [], [], [], {})).resolves.toBeUndefined()
   })
 
-  it('creates multiple slides (title + summary + comparison + sizing params = at least 4)', async () => {
+  it('creates multiple slides (title + summary + comparison = 3)', async () => {
     const { exportPptx } = await import('../exportPptx')
     await exportPptx(cluster, [scenario], [result], [breakdown], {})
-    // Title + Summary + As-Is vs To-Be Comparison + Sizing Parameters = exactly 4 slides
-    // No chart slides since chartRefToDataUrl returns null, no bdSlide or compSlide
-    expect(mockAddSlide.mock.calls.length).toBe(4)
+    // Title + Summary + As-Is vs To-Be Comparison = exactly 3 slides
+    // Sizing Parameters merged into comparison table; no chart slides (mock returns null)
+    expect(mockAddSlide.mock.calls.length).toBe(3)
   })
 
   it('generates a table on the executive summary slide', async () => {
@@ -238,20 +238,22 @@ describe('exportPptx', () => {
   })
 
   // ---------------------------------------------------------------------------
-  // MERGE-01: Sizing Parameters slide replaces separate Assumptions/Config/Growth
+  // MERGE-01: Sizing Parameters merged into As-Is vs To-Be Comparison table
   // ---------------------------------------------------------------------------
-  it('creates a "Sizing Parameters" slide title, not "Sizing Assumptions" or "Server Configuration"', async () => {
+  it('includes server config rows (e.g. "Sockets / Server") in the comparison table', async () => {
     const { exportPptx } = await import('../exportPptx')
     await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const allCalls = mockAddTable.mock.calls as Array<[Array<Array<{ text: string }>>, unknown]>
+    const hasServerConfig = allCalls.some(([rows]) =>
+      rows.some((row) => row.some((cell) => cell.text === 'Sockets / Server')),
+    )
+    expect(hasServerConfig).toBe(true)
+    // No separate Sizing Parameters slide title should exist
     const textCalls = mockAddText.mock.calls as Array<[string | Record<string, unknown>, Record<string, unknown>]>
     const slideTitles = textCalls
       .filter(([, opts]) => opts?.placeholder === 'title')
       .map(([text]) => (typeof text === 'string' ? text : ''))
-
-    expect(slideTitles).toContain('Sizing Parameters')
-    expect(slideTitles).not.toContain('Sizing Assumptions')
-    expect(slideTitles).not.toContain('Per-Scenario Server Configuration')
-    expect(slideTitles).not.toContain('Growth Projections')
+    expect(slideTitles).not.toContain('Sizing Parameters')
   })
 
   // ---------------------------------------------------------------------------
@@ -285,13 +287,13 @@ describe('exportPptx', () => {
   })
 
   // ---------------------------------------------------------------------------
-  // Slide count: exactly 4 slides for single scenario without charts (post-consolidation)
+  // Slide count: exactly 3 slides for single scenario without charts (post-consolidation)
   // ---------------------------------------------------------------------------
-  it('creates exactly 4 slides for single scenario without charts (post-consolidation)', async () => {
+  it('creates exactly 3 slides for single scenario without charts (post-consolidation)', async () => {
     const { exportPptx } = await import('../exportPptx')
     await exportPptx(cluster, [scenario], [result], [breakdown], {})
-    // Post-consolidation: Title(1) + Summary(2) + AsIsVsToBeComparison(3) + SizingParameters(4)
-    // No chart slides (mock returns null), no bdSlide, no compSlide
-    expect(mockAddSlide.mock.calls.length).toBe(4)
+    // Post-consolidation: Title(1) + Summary(2) + AsIsVsToBeComparison(3)
+    // Sizing Parameters merged into comparison table; no chart slides (mock returns null)
+    expect(mockAddSlide.mock.calls.length).toBe(3)
   })
 })
