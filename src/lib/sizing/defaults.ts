@@ -56,7 +56,7 @@ export const DEFAULT_TARGET_SPECINT = 337;
 export function createDefaultScenario(): Scenario {
   return {
     id: crypto.randomUUID(),
-    name: 'New Scenario',
+    name: 'To-Be',
     socketsPerServer: 2,
     coresPerSocket: 16,
     ramPerServerGb: 512,
