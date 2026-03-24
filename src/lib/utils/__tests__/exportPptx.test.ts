@@ -16,6 +16,7 @@ const mockWriteFile = vi.fn().mockResolvedValue('ok')
 const mockAddText = vi.fn().mockReturnThis()
 const mockAddTable = vi.fn().mockReturnThis()
 const mockAddImage = vi.fn().mockReturnThis()
+const mockDefineSlideMaster = vi.fn()
 const mockAddSlide = vi.fn().mockReturnValue({
   addText: mockAddText,
   addTable: mockAddTable,
@@ -29,7 +30,7 @@ vi.mock('pptxgenjs', () => {
     title = ''
     addSlide = mockAddSlide
     writeFile = mockWriteFile
-    defineSlideMaster = vi.fn()
+    defineSlideMaster = mockDefineSlideMaster
   }
   return { default: MockPptxGenJS }
 })
@@ -163,5 +164,76 @@ describe('exportPptx', () => {
       rows.some((row) => row.some((cell) => cell.text === 'Test Scenario')),
     )
     expect(hasScenarioName).toBe(true)
+  })
+
+  // ---------------------------------------------------------------------------
+  // VISUAL-01: Accent strip in CONTENT_SLIDE master definition
+  // ---------------------------------------------------------------------------
+  it('defines CONTENT_SLIDE master with navy accent strip rect', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const dsmCalls = mockDefineSlideMaster.mock.calls as Array<[{ title: string; objects: Array<Record<string, unknown>> }]>
+    const contentCall = dsmCalls.find((c) => c[0]?.title === 'CONTENT_SLIDE')
+    expect(contentCall).toBeDefined()
+    if (contentCall) {
+      const objects = contentCall[0].objects
+      const rectObj = objects.find((o) => 'rect' in o)
+      expect(rectObj).toBeDefined()
+      const rect = (rectObj as { rect: { fill: { color: string } } }).rect
+      expect(rect.fill.color).toBe('1E3A5F')
+    }
+  })
+
+  // ---------------------------------------------------------------------------
+  // VISUAL-03: No table header rows use BLUE (3B82F6); main tables use NAVY (1E3A5F)
+  // ---------------------------------------------------------------------------
+  it('uses navy fill in table header cells (not blue)', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const tableCalls = mockAddTable.mock.calls as Array<[Array<Array<{ text: string; options?: { fill?: { color: string } } }>>, unknown]>
+    const headerFills = tableCalls.flatMap(([rows]) => {
+      const firstRow = rows[0]
+      return firstRow ? firstRow.map((cell) => cell.options?.fill?.color).filter(Boolean) : []
+    })
+    // No header fill should be old BLUE (3B82F6) — it was replaced by NAVY (1E3A5F) or kept as GRAY
+    expect(headerFills).not.toContain('3B82F6')
+    // At least some headers should use NAVY
+    expect(headerFills).toContain('1E3A5F')
+  })
+
+  // ---------------------------------------------------------------------------
+  // VISUAL-04: KPI callout with roundRect shape and fill
+  // ---------------------------------------------------------------------------
+  it('renders KPI callouts with roundRect shape and fill', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const textCalls = mockAddText.mock.calls as Array<[string, Record<string, unknown>]>
+    const kpiCalls = textCalls.filter(([, opts]) => opts?.shape === 'roundRect')
+    expect(kpiCalls.length).toBeGreaterThan(0)
+    const [, firstKpiOpts] = kpiCalls[0]
+    expect(firstKpiOpts.rectRadius).toBe(0.3)
+    expect(firstKpiOpts.fill).toEqual({ color: 'E8EDF2' })
+  })
+
+  // ---------------------------------------------------------------------------
+  // VISUAL-02: Utilization cells contain colored dot TextProps[]
+  // ---------------------------------------------------------------------------
+  it('renders utilization cells with colored dot TextProps array', async () => {
+    const { exportPptx } = await import('../exportPptx')
+    await exportPptx(cluster, [scenario], [result], [breakdown], {})
+    const tableCalls = mockAddTable.mock.calls as Array<[unknown[][], unknown]>
+    const cellsWithTextArray = tableCalls.flatMap(([rows]) =>
+      rows.flatMap((row: unknown[]) =>
+        row.filter((cell: unknown) => Array.isArray((cell as { text: unknown }).text))
+      )
+    )
+    // Should have at least one cell with TextProps[] (the utilization cells)
+    expect(cellsWithTextArray.length).toBeGreaterThan(0)
+    // Check that one of them contains the bullet dot character ●
+    const hasDot = cellsWithTextArray.some((cell: unknown) => {
+      const textArr = (cell as { text: Array<{ text: string }> }).text
+      return textArr.some((t) => t.text.includes('\u25CF'))
+    })
+    expect(hasDot).toBe(true)
   })
 })
