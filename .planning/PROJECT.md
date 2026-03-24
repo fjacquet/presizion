@@ -106,7 +106,7 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 
 ### Active
 
-- [ ] PPTX slide consolidation (Phase 33)
+- [x] PPTX slide consolidation — 3 slides merged, 2 redundant slides removed — Validated Phase 33
 - [x] Visual accents — accent strip, navy headers, util color dots, KPI boxes — Validated Phase 32
 - [x] Default scenario name change ("New Scenario" → "To-Be") — Validated Phase 32
 
@@ -156,4 +156,4 @@ The sizing math must be correct: given the same inputs, the tool must produce se
 | Phases 8-10 as informal sprint | Accelerated delivery; documentation backfilled in Phase 8 | ✓ Resolved — all phases since v1.3 use GSD framework |
 
 ---
-*Last updated: 2026-03-24 after Phase 32 complete (PPTX Visual Polish & UX Fix)*
+*Last updated: 2026-03-24 after Phase 33 complete (PPTX Slide Consolidation) — v2.5 milestone complete*
