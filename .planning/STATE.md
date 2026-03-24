@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.5
 milestone_name: — PPTX Export Overhaul & UX Polish
-status: ready_to_plan
-stopped_at: "Phase 32 — roadmap created, ready to plan"
-last_updated: "2026-03-24T00:00:00.000Z"
-last_activity: 2026-03-24 — Roadmap created for v2.5 (Phases 32-33)
+status: unknown
+stopped_at: Completed 32-01-PLAN.md
+last_updated: "2026-03-24T14:25:08.478Z"
 progress:
-  total_phases: 2
-  completed_phases: 0
-  total_plans: 4
-  completed_plans: 0
-  percent: 0
+  total_phases: 16
+  completed_phases: 14
+  total_plans: 28
+  completed_plans: 27
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-24)
 
 **Core value:** The sizing math must be correct — given the same inputs, the tool must produce server counts that match a reference spreadsheet, with transparent formulas behind every number.
-**Current focus:** v2.5 — PPTX Export Overhaul & UX Polish (Phase 32 next)
+**Current focus:** Phase 32 — pptx-visual-polish-ux-fix
 
 ## Current Position
 
-Phase: 32 of 33 (PPTX Visual Polish & UX Fix) — not started
-Plan: —
-Status: Ready to plan Phase 32
-Last activity: 2026-03-24 — Roadmap created, 8/8 requirements mapped to Phases 32-33
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 32 (pptx-visual-polish-ux-fix) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -48,6 +42,7 @@ Progress: [░░░░░░░░░░] 0%
 | 31 | 3/3 | 16min | 5min |
 
 *Updated after each plan completion*
+| Phase 32 P01 | 5 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -60,6 +55,7 @@ Recent decisions affecting current work:
 - [v2.5 scope]: No new dependencies — pptxgenjs already provides shape/color APIs for visual polish
 - [Phase 31-step-3-review-export]: useIsMobile extracted to shared `src/hooks/useIsMobile.ts`
 - [Phase 31-step-3-review-export]: iOS PDF: caller pre-opens about:blank synchronously before async export to bypass iOS popup blocker
+- [Phase 32]: Default scenario name changed from 'New Scenario' to 'To-Be' — presales standard terminology
 
 ### Pending Todos
 
@@ -71,6 +67,6 @@ None identified for v2.5 — changes are isolated to two files with no new deps.
 
 ## Session Continuity
 
-Last session: 2026-03-24
-Stopped at: Roadmap created for v2.5, ready to plan Phase 32
+Last session: 2026-03-24T14:25:08.474Z
+Stopped at: Completed 32-01-PLAN.md
 Resume file: None

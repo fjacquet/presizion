@@ -382,7 +382,7 @@ Plans:
   3. Section header rows in table slides (e.g., "CPU", "Memory", "Storage") render with a dark background band and light-colored text, visually separating them from data rows
   4. KPI callout values (server count, limiting resource) are displayed inside rounded-rectangle shape backgrounds — not as plain text — giving them visual emphasis
   5. Adding a new scenario from the Step 2 UI results in a card whose name field reads "To-Be" by default, without requiring any user edit
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 
@@ -442,5 +442,5 @@ Plans:
 | 29. Step 1 Mobile Form Layout | v2.4 | 2/2 | Complete | 2026-03-16 |
 | 30. Step 2 Scenario Cards | v2.4 | 1/1 | Complete | 2026-03-16 |
 | 31. Step 3 Review & Export | v2.4 | 3/3 | Complete | 2026-03-16 |
-| 32. PPTX Visual Polish & UX Fix | v2.5 | 0/2 | Not started | - |
+| 32. PPTX Visual Polish & UX Fix | 1/2 | In Progress|  | - |
 | 33. PPTX Slide Consolidation | v2.5 | 0/2 | Not started | - |
