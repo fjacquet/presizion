@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.6.0] -- 2026-04-13
+
+### Added
+
+- **Cluster Totals** section in Step 3 ComparisonTable: Total vCPUs, Total pCores, Total VMs, Total RAM (GB), Total Disk (GB — HCI/vSAN only)
+- Table rows reorganized into two logical groups: per-node sizing parameters, then cluster-wide totals
+- `UtilizationCell` shared component for DRY utilization rendering with color-coding and target display
+
+### Changed
+
+- ComparisonTable refactored from 370-line monolith into focused sub-components: `NodeSizingRows`, `UtilizationRows`, `ClusterTotalRows` (all under 150 lines)
+- Cluster total calculations extracted to pure functions in `src/lib/sizing/clusterTotals.ts`
+- Total Disk row hidden in disaggregated mode (only shown in HCI/vSAN)
+
+### Fixed
+
+- All pre-existing ESLint errors (16 errors, 1 warning) across `ScenarioCard`, `button`, `useSpecLookup`, `constraints.test`, `vsanBreakdown.test`
+
+---
+
 ## [2.4.0] -- 2026-03-16
 
 ### Added
