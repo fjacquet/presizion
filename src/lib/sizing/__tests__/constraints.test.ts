@@ -1,7 +1,15 @@
 // VALIDATION.md: CALC-04 (N+1 HA), CALC-05 (max constraint + limiting resource), CALC-06 (utilization metrics)
 // Imported function will come from src/lib/sizing/constraints.ts (Plan 02)
 import { describe, it, expect } from 'vitest';
+import type { Scenario } from '../../../types/cluster';
 import { computeScenarioResult } from '../constraints';
+
+/** Strip vSAN props from a scenario to produce a legacy (non-vSAN) scenario for comparison. */
+function stripVsanProps<T extends Partial<Scenario>>(scenario: T): Omit<T, 'vsanFttPolicy' | 'vsanMemoryPerHostGb' | 'vsanCompressionFactor' | 'vsanSlackPercent' | 'vsanCpuOverheadPercent' | 'vsanVmSwapEnabled'> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured to exclude from rest
+  const { vsanFttPolicy, vsanMemoryPerHostGb, vsanCompressionFactor, vsanSlackPercent, vsanCpuOverheadPercent, vsanVmSwapEnabled, ...rest } = scenario;
+  return rest;
+}
 
 // CPU-limited full scenario fixture (reused across CALC-04/05/06 tests)
 // OldCluster: totalVcpus=3200, totalVms=100, totalPcores=800
@@ -490,7 +498,7 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
     // vSAN: ceil(15360 / 506) = ceil(30.355) = 31
     expect(vsanResult.ramLimitedCount).toBe(31);
 
-    const { vsanFttPolicy: _f1, vsanMemoryPerHostGb: _m1, vsanCompressionFactor: _c1, vsanSlackPercent: _s1, vsanCpuOverheadPercent: _o1, vsanVmSwapEnabled: _w1, ...legacyHighRamScenario } = highRamScenario;
+    const legacyHighRamScenario = stripVsanProps(highRamScenario);
     const legacyResult = computeScenarioResult(VSAN_CLUSTER, legacyHighRamScenario);
     // Legacy: ceil(15360 / 512) = ceil(30.0) = 30
     expect(legacyResult.ramLimitedCount).toBe(30);
@@ -512,7 +520,7 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
     const vsanResult = computeScenarioResult(VSAN_CLUSTER, ghzVsanScenario, 'ghz');
     expect(vsanResult.cpuLimitedCount).toBe(8);
 
-    const { vsanFttPolicy: _f2, vsanMemoryPerHostGb: _m2, vsanCompressionFactor: _c2, vsanSlackPercent: _s2, vsanCpuOverheadPercent: _o2, vsanVmSwapEnabled: _w2, ...noVsanGhzScenario } = ghzVsanScenario;
+    const noVsanGhzScenario = stripVsanProps(ghzVsanScenario);
     // No vSAN: capacity = 20 × 3.0 = 60 per node
     // ceil(403.2 / 60) = ceil(6.72) = 7
     const noVsanResult = computeScenarioResult(VSAN_CLUSTER, noVsanGhzScenario, 'ghz');

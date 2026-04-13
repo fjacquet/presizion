@@ -128,7 +128,6 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   updateScenarioRef.current = updateScenario
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/incompatible-library
     const subscription = form.watch((values) => {
       const result = scenarioSchema.safeParse(values)
       if (result.success) {
@@ -153,6 +152,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
         form.setValue(field, storeVal as never, { shouldDirty: false, shouldValidate: false })
       }
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional primitive deps to avoid infinite loop (see comment above)
   }, [
     scenario?.socketsPerServer,
     scenario?.coresPerSocket,

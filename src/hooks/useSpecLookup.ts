@@ -19,15 +19,9 @@ export function useSpecLookup(cpuModel: string | undefined): UseSpecLookupReturn
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (!cpuModel) {
-      setResults([])
-      setStatus('no-results')
-      setIsLoading(false)
-      return
-    }
+    if (!cpuModel) return
 
     let cancelled = false
-    setIsLoading(true)
 
     fetchSpecResults(cpuModel).then((result) => {
       if (!cancelled) {
@@ -36,6 +30,9 @@ export function useSpecLookup(cpuModel: string | undefined): UseSpecLookupReturn
         setIsLoading(false)
       }
     })
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync reset before async fetch is intentional
+    setIsLoading(true)
 
     return () => {
       cancelled = true

@@ -11,11 +11,13 @@ import type { ResourceBreakdown, StorageBreakdown } from '../../../types/breakdo
 import { computeVsanBreakdown } from '../vsanBreakdown';
 
 /** Helper to assert the CAP-06 invariant on a ResourceBreakdown */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function assertInvariant(bd: ResourceBreakdown, _label: string): void {
   expect(bd.required + bd.spare + bd.excess).toBeCloseTo(bd.total, 5);
 }
 
 /** Helper to assert the storage invariant (same as resource invariant) */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function assertStorageInvariant(bd: StorageBreakdown, _label: string): void {
   expect(bd.required + bd.spare + bd.excess).toBeCloseTo(bd.total, 5);
 }
