@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.6.3] -- 2026-04-17
+
+### Changed
+
+- Bumped 18 patch/minor dep releases across prod and dev (react 19.2.5, vite 8.0.8, vitest 4.1.4, zustand 5.0.12, tailwindcss 4.2.2, shadcn 4.3.0, base-ui 1.4.0, react-hook-form 7.72.1, jspdf 4.2.1, and tooling).
+- Adopted TypeScript 6 and `@types/node` 25 — typecheck clean, 665 tests pass, prod build succeeds.
+- Adopted Node 24 runtime for the GitHub Actions deploy workflow, including `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` so pre-bundled JS actions drop the Node 20 deprecation banner.
+
+### Fixed
+
+- Dropped deprecated `baseUrl` from `tsconfig.app.json` (TS 7 warning) and added `src/vite-env.d.ts` so TS still resolves CSS/asset side-effect imports.
+
+---
+
 ## [2.6.2] -- 2026-04-17
 
 ### Security
