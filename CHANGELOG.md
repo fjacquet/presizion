@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.6.1] -- 2026-04-17
+
+### Fixed
+
+- **SPEC lookup broken in production**: spec-search moved its JSON output to `/data/cpu2017/…` when SPECjbb2015 support landed, so every `fetchSpecResults` call was hitting 404 and silently returning no results. Added `SPEC_SEARCH_CPU2017_DATA_URL` in `config.ts` and routed both fetches (facets + per-processor) through it. Schemas unchanged; no other edits needed.
+
+---
+
 ## [2.6.0] -- 2026-04-13
 
 ### Added
