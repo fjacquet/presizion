@@ -36,15 +36,21 @@ interface ChartRow {
  * Shows percentage of total when the segment is wide enough.
  * Returns an invisible <text> element when hidden (Recharts label prop requires ReactElement).
  */
+interface SegmentLabelProps {
+  x?: string | number | undefined
+  y?: string | number | undefined
+  width?: string | number | undefined
+  height?: string | number | undefined
+  index?: number | undefined
+}
+
 function renderSegmentLabel(absRows: readonly AbsoluteRow[], chartRows: readonly ChartRow[], dataKey: 'required' | 'spare' | 'excess') {
-  return function SegmentLabel(props: {
-    x?: number
-    y?: number
-    width?: number
-    height?: number
-    index?: number
-  }): React.ReactElement<SVGElement> {
-    const { x = 0, y = 0, width = 0, height = 0, index = 0 } = props
+  return function SegmentLabel(props: SegmentLabelProps): React.ReactElement<SVGElement> {
+    const x = Number(props.x ?? 0)
+    const y = Number(props.y ?? 0)
+    const width = Number(props.width ?? 0)
+    const height = Number(props.height ?? 0)
+    const index = props.index ?? 0
     const abs = absRows[index]
     const chart = chartRows[index]
     if (!abs || !chart || width < 40 || abs.total === 0) {
@@ -82,7 +88,7 @@ function normalizeRow(abs: AbsoluteRow): ChartRow {
 
 interface CapacityStackedChartProps {
   /** When provided, chart container refs are written here for PDF/PPTX export capture. */
-  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+  readonly chartRefs?: React.RefObject<Record<string, HTMLDivElement | null>>
 }
 
 /**
@@ -204,8 +210,9 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
                   <XAxis type="number" hide domain={[0, 100]} />
                   <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
                   <Tooltip
-                    formatter={(_v: number, name: string, props: { payload?: ChartRow & { name?: string } }) => {
-                      const rowName = props.payload?.name
+                    formatter={(_v, name, item) => {
+                      const payload = (item as { payload?: ChartRow & { name?: string } }).payload
+                      const rowName = payload?.name
                       const idx = absRows.findIndex(r => r.name === rowName)
                       const abs = absRows[idx]
                       if (!abs) return ''

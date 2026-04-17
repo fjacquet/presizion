@@ -86,7 +86,7 @@ export function SizingChart() {
                 {comparisonData.map((entry, idx) => (
                   <Cell
                     key={idx}
-                    fill={entry.isAsIs ? AS_IS_COLOR : CHART_COLORS[(idx - (hasAsIs ? 1 : 0)) % CHART_COLORS.length]}
+                    fill={entry.isAsIs ? AS_IS_COLOR : (CHART_COLORS[(idx - (hasAsIs ? 1 : 0)) % CHART_COLORS.length] ?? AS_IS_COLOR)}
                   />
                 ))}
               </Bar>
