@@ -1,7 +1,17 @@
-import type { ClusterImportResult, ScopeData } from './index'
+import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
+import type { PowerState } from '@/types/exclusions'
 import { RVTOOLS_ALIASES, RVTOOLS_VHOST_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
+
+function parsePowerState(raw: string): PowerState | undefined {
+  const s = raw.toLowerCase().replace(/\s+/g, '')
+  if (s === 'poweredon' || s === 'on') return 'poweredOn'
+  if (s === 'poweredoff' || s === 'off') return 'poweredOff'
+  if (s === 'suspended') return 'suspended'
+  if (s === '') return undefined
+  return 'unknown'
+}
 
 /** Host column aliases on vInfo sheet for host-to-cluster mapping */
 const VINFO_HOST_ALIASES: Record<string, string[]> = {
@@ -83,6 +93,7 @@ export async function parseRvtools(
   if (rows.length === 0) return {
     totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0, warnings: [],
     detectedScopes: ['__all__'], scopeLabels: { __all__: 'All' }, rawByScope: new Map(),
+    vmRowsByScope: new Map(),
   }
 
   const headers = Object.keys(rows[0] ?? {})
@@ -99,6 +110,8 @@ export async function parseRvtools(
 
   const scopeMap = new Map<string, ScopeAccum>()
   const hostToCluster = new Map<string, string>()
+  const vmRowsByScope = new Map<string, ScopedVmRow[]>()
+  const hasPowerStateCol = colMap['power_state'] !== undefined
 
   for (const row of rows) {
     if (isTruthy(row, colMap['is_template'])) continue
@@ -119,6 +132,21 @@ export async function parseRvtools(
     if (hostName && scopeKey !== '__all__') {
       hostToCluster.set(hostName, scopeKey)
     }
+
+    const vmName = str(row, colMap['vm_name'])
+    const powerStateRaw = hasPowerStateCol ? str(row, colMap['power_state']) : ''
+    const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined
+    const vmRow: ScopedVmRow = {
+      name: vmName,
+      scopeKey,
+      vcpus: cpus,
+      ramMib: mem,
+      diskMib: disk,
+      ...(powerState !== undefined && { powerState }),
+    }
+    const existingRows = vmRowsByScope.get(scopeKey) ?? []
+    existingRows.push(vmRow)
+    vmRowsByScope.set(scopeKey, existingRows)
 
     const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
     scopeMap.set(scopeKey, {
@@ -157,6 +185,7 @@ export async function parseRvtools(
     detectedScopes,
     scopeLabels,
     rawByScope,
+    vmRowsByScope,
   }
 
   // vHost sheet -- extract per-scope host config (sockets, cores, RAM, model, frequency)

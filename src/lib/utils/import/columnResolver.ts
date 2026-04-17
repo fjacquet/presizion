@@ -8,6 +8,7 @@ export const RVTOOLS_ALIASES: ColumnAliasMap = {
   memory_mib: ['Memory', 'Memory MB', 'Memory MiB'],
   provisioned_mib: ['Provisioned MB', 'Provisioned MiB'],
   is_template: ['Template'],
+  power_state: ['Powerstate', 'Power State', 'Power'],
 }
 
 export const LIVEOPTICS_ALIASES: ColumnAliasMap = {
