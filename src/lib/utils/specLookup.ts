@@ -7,7 +7,7 @@
  * Dell vendor results are sorted first (presales tool preference).
  */
 
-import { SPEC_SEARCH_API_URL } from '../config'
+import { SPEC_SEARCH_CPU2017_DATA_URL } from '../config'
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -82,7 +82,7 @@ let cachedProcessors: string[] | null = null
 async function getProcessorList(): Promise<string[]> {
   if (cachedProcessors) return cachedProcessors
   try {
-    const res = await fetch(`${SPEC_SEARCH_API_URL}/data/facets.json`)
+    const res = await fetch(`${SPEC_SEARCH_CPU2017_DATA_URL}/facets.json`)
     if (!res.ok) return []
     const data: FacetsResponse = await res.json()
     cachedProcessors = data.processors ?? []
@@ -147,7 +147,7 @@ export async function fetchSpecResults(input: string): Promise<SpecLookupResult>
 /** Fetch and filter results for a specific processor slug */
 async function fetchBySlug(slug: string): Promise<SpecLookupResult> {
   try {
-    const url = `${SPEC_SEARCH_API_URL}/data/processors/${slug}.json`
+    const url = `${SPEC_SEARCH_CPU2017_DATA_URL}/processors/${slug}.json`
     const response = await fetch(url)
 
     if (!response.ok) {
