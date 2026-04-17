@@ -1,4 +1,5 @@
-import type { ClusterImportResult, ScopeData } from './index'
+import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
+import type { PowerState } from '@/types/exclusions'
 import {
   LIVEOPTICS_ALIASES,
   LIVEOPTICS_ESX_HOSTS_ALIASES,
@@ -13,6 +14,15 @@ const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
 interface VmRow {
   [key: string]: unknown
+}
+
+function parsePowerState(raw: string): PowerState | undefined {
+  const s = raw.toLowerCase().replace(/\s+/g, '')
+  if (s === 'poweredon' || s === 'on') return 'poweredOn'
+  if (s === 'poweredoff' || s === 'off') return 'poweredOff'
+  if (s === 'suspended') return 'suspended'
+  if (s === '') return undefined
+  return 'unknown'
 }
 
 function num(row: VmRow, col: string | undefined): number {
@@ -257,6 +267,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
     result: {
       totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0, warnings: [],
       detectedScopes: ['__all__'], scopeLabels: { __all__: 'All' }, rawByScope: new Map(),
+      vmRowsByScope: new Map(),
     },
     hostToCluster: new Map(),
   }
@@ -277,6 +288,8 @@ function aggregate(rows: VmRow[]): AggregateOutput {
 
   const scopeMap = new Map<string, ScopeAccum>()
   const hostToCluster = new Map<string, string>()
+  const vmRowsByScope = new Map<string, ScopedVmRow[]>()
+  const hasPowerStateCol = colMap['power_state'] !== undefined
 
   for (const row of rows) {
     if (isTruthy(row, colMap['is_template'])) continue
@@ -297,6 +310,21 @@ function aggregate(rows: VmRow[]): AggregateOutput {
     if (vmHost && scopeKey !== '__all__') {
       hostToCluster.set(vmHost, scopeKey)
     }
+
+    const vmName = str(row, colMap['vm_name'])
+    const powerStateRaw = hasPowerStateCol ? str(row, colMap['power_state']) : ''
+    const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined
+    const vmRow: ScopedVmRow = {
+      name: vmName,
+      scopeKey,
+      vcpus: cpus,
+      ramMib: mem,
+      diskMib: disk,
+      ...(powerState !== undefined && { powerState }),
+    }
+    const existingRows = vmRowsByScope.get(scopeKey) ?? []
+    existingRows.push(vmRow)
+    vmRowsByScope.set(scopeKey, existingRows)
 
     const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
     scopeMap.set(scopeKey, {
@@ -336,6 +364,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
       detectedScopes,
       scopeLabels,
       rawByScope,
+      vmRowsByScope,
     },
     hostToCluster,
   }
