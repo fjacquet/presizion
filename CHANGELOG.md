@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.6.2] -- 2026-04-17
+
+### Security
+
+- Cleared 11 npm audit advisories (4 moderate, 6 high, 1 critical) via `npm audit fix`; transitive deps only, 665 tests still pass.
+
+### Changed
+
+- Bumped deploy workflow to Node 24 to drop the Node 20 deprecation warnings on pinned JavaScript actions.
+
+---
+
 ## [2.6.1] -- 2026-04-17
 
 ### Fixed
