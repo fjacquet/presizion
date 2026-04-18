@@ -515,6 +515,13 @@ Wireframes are not included here but can be added in a future UX deliverable.
 - **Presizion JSON import** — full session restore from a previously exported JSON file.
 - **Lazy IT seeding** — after any file import, existing scenarios automatically inherit `avgRamPerVmGb` and `diskPerVmGb` from the imported cluster data.
 
+### v2.7 (shipped)
+
+- **Per-VM exclusions (issue #13)** — users may exclude individual VMs via glob name patterns (e.g. `test-*`), exact-name lists, power-state toggle (drop powered-off), or per-row overrides. Aggregates (total vCPUs/VMs/disk, avg RAM/VM) recompute live from the kept subset.
+  - **User story**: *As a presales engineer, I want to drop decommissioned or lab VMs from the source file so the refresh sizing reflects the production workload we actually intend to migrate.*
+  - **Persistence**: rules persist via localStorage, JSON export, and URL hash; raw VM rows stay session-only (see ADR-021).
+  - **Entry points**: inline step 2 of the Import Preview modal; edit-in-place summary card at the top of Step 1.
+
 ### v2+ (backlog)
 
 - **localStorage persistence** — restore last-used inputs on next visit (PERS-01).

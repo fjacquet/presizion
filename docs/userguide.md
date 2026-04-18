@@ -242,3 +242,32 @@ Use **Download JSON** in Step 3. The JSON file contains all inputs and scenarios
 **The SPECrate2017 mode is greyed out / not changing anything.**
 
 SPECrate2017 mode requires three values: `Existing Server Count`, `SPECrate2017_int_base / Server (existing)` in Step 1, and `SPECrate2017_int_base / Server (target)` in the scenario card. If any of these are blank, the mode toggle is available but the formula falls back gracefully.
+
+---
+
+## Excluding VMs from Sizing (v2.7)
+
+Not every VM in your source file belongs in the refreshed cluster. Presizion lets you drop decommissioned, test, or legacy workloads so the sizing reflects the workload you actually intend to migrate.
+
+### When the Import Preview appears
+
+After selecting scopes (for multi-cluster imports), click **Next** to reach the **Exclude VMs** step. You can:
+
+- **Name pattern** — one or more globs separated by commas (e.g. `test-*, lab-*`). Case-insensitive.
+- **Exact names** — paste a newline-separated list of VM names to exclude.
+- **Exclude powered-off VMs** — toggle on when the source file contains power-state data.
+- **Review VMs individually** — expand the list and tick/untick specific rows; these per-VM overrides always win over the global rules.
+
+Live counts update as you type: *Excluded: N of M (reason breakdown)*.
+
+### Editing from Step 1
+
+The Step 1 page shows a summary card listing the active rules. Click **Edit** to reopen the exclusion panel without re-importing (works only within the same session — see below).
+
+### Session reload
+
+Rules persist across reloads; raw VM rows do not. After reload, the summary card shows your rules in read-only mode. To edit per-row overrides, re-import the source file — the same pattern will re-match against the fresh data.
+
+### Sharing a URL with exclusions
+
+Shareable URL hashes include your rules. If the payload exceeds ~8 KB, per-row overrides are dropped and the recipient sees a toast explaining the truncation.

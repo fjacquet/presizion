@@ -1,10 +1,12 @@
 import type { OldCluster, Scenario } from '@/types/cluster'
+import type { ExclusionRules } from '@/types/exclusions'
 import { ImportError } from './fileValidation'
 
 export interface JsonImportResult {
   sourceFormat: 'presizion-json'
   cluster: OldCluster
   scenarios: Scenario[]
+  exclusions?: ExclusionRules
 }
 
 export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
@@ -70,11 +72,32 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
     }
   })
 
-  return { sourceFormat: 'presizion-json', cluster, scenarios: parsedScenarios }
+  const exclusions = parseExclusionsBlock((parsed as Record<string, unknown>).exclusions)
+
+  return {
+    sourceFormat: 'presizion-json',
+    cluster,
+    scenarios: parsedScenarios,
+    ...(exclusions !== undefined && { exclusions }),
+  }
 }
 
 function num(v: unknown, field: string): number {
   const n = typeof v === 'number' ? v : Number(v)
   if (!Number.isFinite(n)) throw new ImportError(`JSON field "${field}" is not a valid number.`)
   return n
+}
+
+function parseExclusionsBlock(raw: unknown): ExclusionRules | undefined {
+  if (raw == null || typeof raw !== 'object') return undefined
+  const r = raw as Record<string, unknown>
+  const stringArray = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
+  return {
+    namePattern: typeof r.namePattern === 'string' ? r.namePattern : '',
+    exactNames: stringArray(r.exactNames),
+    excludePoweredOff: r.excludePoweredOff === true,
+    manuallyExcluded: stringArray(r.manuallyExcluded),
+    manuallyIncluded: stringArray(r.manuallyIncluded),
+  }
 }

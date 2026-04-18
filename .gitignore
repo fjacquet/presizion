@@ -43,3 +43,5 @@ Thumbs.db
 
 # Claude Code local state (worktrees, local settings)
 .claude/
+# Added by code-review-graph
+.code-review-graph/

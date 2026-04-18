@@ -1,4 +1,15 @@
-export type ScopeData = Omit<ClusterImportResult, 'sourceFormat' | 'detectedScopes' | 'scopeLabels' | 'rawByScope'>
+import type { PowerState } from '@/types/exclusions'
+
+export interface VmRow {
+  readonly name: string
+  readonly scopeKey: string
+  readonly vcpus: number
+  readonly ramMib: number
+  readonly diskMib: number
+  readonly powerState?: PowerState
+}
+
+export type ScopeData = Omit<ClusterImportResult, 'sourceFormat' | 'detectedScopes' | 'scopeLabels' | 'rawByScope' | 'vmRowsByScope'>
 
 export interface ClusterImportResult {
   totalVcpus: number
@@ -22,6 +33,8 @@ export interface ClusterImportResult {
   detectedScopes?: string[]
   scopeLabels?: Record<string, string>
   rawByScope?: Map<string, ScopeData>
+  /** Per-scope raw VM rows, session-only. Never persisted. Undefined for JSON imports. */
+  vmRowsByScope?: Map<string, VmRow[]>
 }
 
 export { ImportError } from './fileValidation'

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import {
   Drawer,
@@ -15,6 +15,7 @@ import { useScenariosStore } from '@/store/useScenariosStore'
 import { useImportStore } from '@/store/useImportStore'
 import { aggregateScopes } from '@/lib/utils/import/scopeAggregator'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import { VmExclusionPanel } from '@/components/exclusions/VmExclusionPanel'
 import type { AnyImportResult, ScopeData } from '@/lib/utils/import'
 
 interface ImportPreviewModalProps {
@@ -85,11 +86,16 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
   // Track previous result to reset selection state when a new import arrives
   const [prevResult, setPrevResult] = useState<AnyImportResult>(result)
   const [selectedScopes, setSelectedScopes] = useState<string[]>(scopesFromResult)
+  const [step, setStep] = useState<'scope' | 'exclusions'>('scope')
 
   if (prevResult !== result) {
     setPrevResult(result)
     setSelectedScopes(scopesFromResult)
+    setStep('scope')
   }
+
+  const canShowExclusions =
+    !isJson && 'vmRowsByScope' in result && result.vmRowsByScope != null
 
   const previewCluster: ScopeData =
     isMultiScope && 'rawByScope' in result && result.rawByScope != null
@@ -123,11 +129,24 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       setCurrentCluster(cluster)
       seedFromCluster(cluster)
       if (result.rawByScope != null && result.detectedScopes != null && result.scopeLabels != null) {
-        setImportBuffer(result.rawByScope, result.scopeLabels, selectedScopes)
+        setImportBuffer(
+          result.rawByScope,
+          result.scopeLabels,
+          selectedScopes,
+          'vmRowsByScope' in result ? result.vmRowsByScope : undefined,
+        )
       }
     }
     onClose()
   }
+
+  const exclusionRows = useMemo(() => {
+    if (!canShowExclusions) return []
+    const map = 'vmRowsByScope' in result ? result.vmRowsByScope : undefined
+    if (map == null) return []
+    const keys = selectedScopes.length > 0 ? selectedScopes : [...map.keys()]
+    return keys.flatMap((k) => map.get(k) ?? [])
+  }, [canShowExclusions, result, selectedScopes])
 
   const pcoresKnown = !isJson && result.totalPcores != null && result.totalPcores > 0
 
@@ -206,6 +225,24 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
     </>
   )
 
+  const body = step === 'scope' ? sharedContent : <VmExclusionPanel rows={exclusionRows} />
+
+  const footerButtons = (
+    <>
+      <Button variant="outline" onClick={onClose}>Cancel</Button>
+      {step === 'scope' && canShowExclusions ? (
+        <Button onClick={() => setStep('exclusions')}>Next</Button>
+      ) : step === 'exclusions' ? (
+        <>
+          <Button variant="outline" onClick={() => setStep('scope')}>Back</Button>
+          <Button onClick={handleApply}>Apply</Button>
+        </>
+      ) : (
+        <Button onClick={handleApply}>Apply</Button>
+      )}
+    </>
+  )
+
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(o) => { if (!o) onClose() }}>
@@ -215,12 +252,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             <DrawerDescription>Review the extracted data before populating the form.</DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-2 overflow-y-auto space-y-4">
-            {sharedContent}
+            {body}
           </div>
-          <DrawerFooter>
-            <Button onClick={handleApply}>Apply</Button>
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-          </DrawerFooter>
+          <DrawerFooter>{footerButtons}</DrawerFooter>
         </DrawerContent>
       </Drawer>
     )
@@ -236,12 +270,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             Review the extracted data before populating the form.
           </Dialog.Description>
 
-          {sharedContent}
+          {body}
 
-          <div className="flex gap-3 justify-end">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleApply}>Apply</Button>
-          </div>
+          <div className="flex gap-3 justify-end">{footerButtons}</div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

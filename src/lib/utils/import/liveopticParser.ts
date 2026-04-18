@@ -1,4 +1,4 @@
-import type { ClusterImportResult, ScopeData } from './index'
+import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
 import {
   LIVEOPTICS_ALIASES,
   LIVEOPTICS_ESX_HOSTS_ALIASES,
@@ -8,40 +8,11 @@ import {
   resolveColumns,
 } from './columnResolver'
 import { ImportError } from './fileValidation'
+import { parsePowerState, num, isTruthy, str, buildScopeLabel, appendToMap, type ParsedRow } from './parserHelpers'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
-interface VmRow {
-  [key: string]: unknown
-}
-
-function num(row: VmRow, col: string | undefined): number {
-  if (!col) return 0
-  const v = row[col]
-  return typeof v === 'number' ? v : parseFloat(String(v ?? '0')) || 0
-}
-
-function isTruthy(row: VmRow, col: string | undefined): boolean {
-  if (!col) return false
-  const v = row[col]
-  return v === true || v === 'TRUE' || v === 'true' || v === 1
-}
-
-function str(row: VmRow, col: string | undefined): string {
-  if (!col) return ''
-  const v = row[col]
-  return v == null ? '' : String(v).trim()
-}
-
-function buildScopeLabel(scopeKey: string): string {
-  if (scopeKey === '__all__') return 'All'
-  if (scopeKey.includes('||')) {
-    const [dc, cluster] = scopeKey.split('||')
-    if (cluster === '__standalone__') return `Standalone (${dc})`
-    return `${cluster} (${dc})`
-  }
-  return scopeKey
-}
+type VmRow = ParsedRow
 
 interface ScopeAccum {
   totalVcpus: number
@@ -143,9 +114,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
             usedFallback = true
           }
 
-          const existing = hostsByScopeKey.get(scopeKey) ?? []
-          existing.push(host)
-          hostsByScopeKey.set(scopeKey, existing)
+          appendToMap(hostsByScopeKey, scopeKey, host)
         }
 
         if (usedFallback && base.rawByScope && !base.rawByScope.has('__all__')) {
@@ -214,9 +183,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
           for (const row of valid) {
             const hostName = str(row, cols['host_name'])
             const scopeKey = hostScopeMap.get(hostName) ?? '__all__'
-            const existing = perfByScopeKey.get(scopeKey) ?? []
-            existing.push(row)
-            perfByScopeKey.set(scopeKey, existing)
+            appendToMap(perfByScopeKey, scopeKey, row)
           }
 
           for (const [scopeKey, scopePerfRows] of perfByScopeKey.entries()) {
@@ -257,6 +224,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
     result: {
       totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0, warnings: [],
       detectedScopes: ['__all__'], scopeLabels: { __all__: 'All' }, rawByScope: new Map(),
+      vmRowsByScope: new Map(),
     },
     hostToCluster: new Map(),
   }
@@ -277,6 +245,8 @@ function aggregate(rows: VmRow[]): AggregateOutput {
 
   const scopeMap = new Map<string, ScopeAccum>()
   const hostToCluster = new Map<string, string>()
+  const vmRowsByScope = new Map<string, ScopedVmRow[]>()
+  const hasPowerStateCol = colMap['power_state'] !== undefined
 
   for (const row of rows) {
     if (isTruthy(row, colMap['is_template'])) continue
@@ -297,6 +267,19 @@ function aggregate(rows: VmRow[]): AggregateOutput {
     if (vmHost && scopeKey !== '__all__') {
       hostToCluster.set(vmHost, scopeKey)
     }
+
+    const vmName = str(row, colMap['vm_name'])
+    const powerStateRaw = hasPowerStateCol ? str(row, colMap['power_state']) : ''
+    const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined
+    const vmRow: ScopedVmRow = {
+      name: vmName,
+      scopeKey,
+      vcpus: cpus,
+      ramMib: mem,
+      diskMib: disk,
+      ...(powerState !== undefined && { powerState }),
+    }
+    appendToMap(vmRowsByScope, scopeKey, vmRow)
 
     const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
     scopeMap.set(scopeKey, {
@@ -336,6 +319,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
       detectedScopes,
       scopeLabels,
       rawByScope,
+      vmRowsByScope,
     },
     hostToCluster,
   }

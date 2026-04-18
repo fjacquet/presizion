@@ -265,7 +265,8 @@ describe('ImportPreviewModal', () => {
       expect(mockSetImportBuffer).toHaveBeenCalledWith(
         rawByScope,
         MULTI_SCOPE_RESULT.scopeLabels,
-        expect.arrayContaining(['DC1||CL-A', 'DC1||CL-B'])
+        expect.arrayContaining(['DC1||CL-A', 'DC1||CL-B']),
+        undefined,
       )
     })
   })
@@ -282,6 +283,34 @@ describe('ImportPreviewModal', () => {
       fireEvent.click(applyBtn)
 
       expect(mockSetImportBuffer).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Task 17: 2-step exclusions flow', () => {
+    it('shows a second step with VmExclusionPanel after clicking Next in multi-VM imports', () => {
+      const result: ClusterImportResult = {
+        sourceFormat: 'liveoptics-csv',
+        totalVcpus: 4,
+        totalVms: 2,
+        totalDiskGb: 10,
+        avgRamPerVmGb: 4,
+        vmCount: 2,
+        warnings: [],
+        detectedScopes: ['s1'],
+        scopeLabels: { s1: 'S1' },
+        rawByScope: new Map([['s1', {
+          totalVcpus: 4, totalVms: 2, totalDiskGb: 10, avgRamPerVmGb: 4, vmCount: 2, warnings: [],
+        }]]),
+        vmRowsByScope: new Map([['s1', [
+          { name: 'a', scopeKey: 's1', vcpus: 2, ramMib: 2048, diskMib: 5120 },
+          { name: 'b', scopeKey: 's1', vcpus: 2, ramMib: 2048, diskMib: 5120 },
+        ]]]),
+      }
+      render(<ImportPreviewModal result={result} {...defaultProps} />)
+      fireEvent.click(screen.getByRole('button', { name: /Next/i }))
+      expect(screen.getByText(/VM Exclusions/)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Apply/i })).toBeInTheDocument()
     })
   })
 

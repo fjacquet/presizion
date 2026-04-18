@@ -26,6 +26,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useWizardStore } from '@/store/useWizardStore'
+import { useExclusionsStore } from '@/store/useExclusionsStore'
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
 import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
 import { encodeSessionToHash } from '@/lib/utils/persistence'
@@ -40,6 +41,7 @@ export function Step3ReviewExport() {
   const results = useScenariosResults()
   const sizingMode = useWizardStore((state) => state.sizingMode)
   const layoutMode = useWizardStore((state) => state.layoutMode)
+  const exclusions = useExclusionsStore((state) => state.rules)
   const breakdowns = useVsanBreakdowns()
   const isMobile = useIsMobile()
   const [copied, setCopied] = useState(false)
@@ -82,12 +84,12 @@ export function Step3ReviewExport() {
   }
 
   const handleDownloadJson = (): void => {
-    const json = buildJsonContent(currentCluster, scenarios, results)
+    const json = buildJsonContent(currentCluster, scenarios, results, exclusions)
     downloadJson('cluster-sizing.json', json)
   }
 
   const handleShare = async (): Promise<void> => {
-    const hash = encodeSessionToHash({ cluster: currentCluster, scenarios, sizingMode, layoutMode })
+    const hash = encodeSessionToHash({ cluster: currentCluster, scenarios, sizingMode, layoutMode, exclusions })
     const url = `${window.location.origin}${window.location.pathname}#${hash}`
     await copyToClipboard(url)
     setShared(true)

@@ -306,3 +306,13 @@ All export functions receive cluster, scenarios, and results as parameters. CSV 
 7. **Fail-safe persistence**: All localStorage and URL hash operations are wrapped in try/catch. Corrupted or incompatible sessions are silently discarded rather than crashing the application.
 
 8. **Single responsibility stores**: Each Zustand store owns one concern (cluster data, scenarios, wizard navigation, theme, import buffer). Stores are composed at the hook/component level, not nested.
+
+## 12. Per-VM Exclusions (v2.7)
+
+**Pure engine** — `src/lib/utils/import/exclusions.ts` exports `compileNamePattern` (glob→regex, ReDoS-safe), `isExcluded` (short-circuits on overrides → power state → exact name → glob), and `applyExclusions(grouped, rules)` returning `{ filtered, stats }`. All functions are pure; no store access.
+
+**Aggregation** — `aggregateVmRows` recomputes `totalVcpus`, `totalVms`, `totalDiskGb`, and `avgRamPerVmGb` from the kept subset. `recomputeCluster` in `useImportStore` re-aggregates on rules changes while preserving ESX-derived fields (pCores, server config, utilization percentages) that do not belong to VM rows.
+
+**Store split** — `useExclusionsStore` (persisted to localStorage) holds only the `ExclusionRules` object. `useImportStore.vmRowsByScope` (session-only) holds the raw `VmRow[]` per scope. This split is mandated by ADR-021: rules are small and re-applicable to fresher imports; raw rows would blow the ~8 KB URL-hash ceiling.
+
+**UI placements** — inline step 2 of the Import Preview modal (`VmExclusionPanel` with virtualized per-row list), and a summary card at the top of Step 1 with an Edit dialog.
