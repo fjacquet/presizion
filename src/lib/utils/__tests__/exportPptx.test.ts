@@ -73,6 +73,7 @@ const result: ScenarioResult = {
   limitingResource: 'cpu',
   haReserveCount: 0,
   haReserveApplied: false,
+  stretchApplied: false,
   achievedVcpuToPCoreRatio: 2.98,
   vmsPerServer: 21.43,
   cpuUtilizationPercent: 74.4,

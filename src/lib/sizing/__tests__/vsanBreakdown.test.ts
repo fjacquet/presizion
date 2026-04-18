@@ -74,6 +74,7 @@ function makeResult(overrides: Partial<ScenarioResult> = {}): ScenarioResult {
     limitingResource: 'cpu',
     haReserveCount: 0,
     haReserveApplied: false,
+    stretchApplied: false,
     achievedVcpuToPCoreRatio: 1.04,
     vmsPerServer: 25,
     cpuUtilizationPercent: 50,

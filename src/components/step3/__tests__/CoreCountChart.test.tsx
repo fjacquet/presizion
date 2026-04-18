@@ -49,6 +49,7 @@ const baseResult = {
   limitingResource: 'cpu' as const,
   haReserveCount: 0,
   haReserveApplied: false,
+  stretchApplied: false,
   achievedVcpuToPCoreRatio: 4,
   vmsPerServer: 20,
   cpuUtilizationPercent: 80,
