@@ -147,10 +147,10 @@ describe('buildJsonContent', () => {
     expect(parsed.currentCluster).toHaveProperty('existingServerCount', null)
   })
 
-  it('includes schemaVersion: "1.1" at top level', () => {
+  it('includes schemaVersion: "2" at top level', () => {
     const json = buildJsonContent(cluster, [scenario], [result])
     const parsed = JSON.parse(json) as { schemaVersion: string }
-    expect(parsed.schemaVersion).toBe('1.1')
+    expect(parsed.schemaVersion).toBe('2')
   })
 })
 

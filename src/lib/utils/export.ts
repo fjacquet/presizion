@@ -1,5 +1,7 @@
 import type { OldCluster, Scenario } from '@/types/cluster'
 import type { ScenarioResult } from '@/types/results'
+import type { ExclusionRules } from '@/types/exclusions'
+import { EMPTY_RULES } from '@/types/exclusions'
 
 /**
  * RFC 4180-compliant CSV field escape.
@@ -148,12 +150,21 @@ export function buildJsonContent(
   cluster: OldCluster,
   scenarios: readonly Scenario[],
   results: readonly ScenarioResult[],
+  exclusions: ExclusionRules = EMPTY_RULES,
 ): string {
+  const isEmpty =
+    exclusions.namePattern === '' &&
+    exclusions.exactNames.length === 0 &&
+    !exclusions.excludePoweredOff &&
+    exclusions.manuallyExcluded.length === 0 &&
+    exclusions.manuallyIncluded.length === 0
+
   const payload = {
-    schemaVersion: '1.1',
+    schemaVersion: '2',
     generatedAt: new Date().toISOString(),
     currentCluster: normaliseCluster(cluster),
     scenarios: scenarios.map((s, i) => ({ ...s, result: results[i] ?? null })),
+    ...(isEmpty ? {} : { exclusions }),
   }
   return JSON.stringify(payload, null, 2)
 }
