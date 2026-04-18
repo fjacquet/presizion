@@ -8,8 +8,9 @@ export type LimitingResource = 'cpu' | 'ram' | 'disk' | 'specint' | 'ghz';
  * The computed output from a sizing calculation for a given OldCluster + Scenario pair.
  * All fields are readonly — this object is never mutated after creation (Object.freeze).
  *
- * CALC-05: finalCount = max(cpuLimitedCount, ramLimitedCount, diskLimitedCount)
- * CALC-04: finalCount = rawCount + haReserveCount (0, 1, or 2)
+ * CALC-05: rawCount = max(cpuLimitedCount, ramLimitedCount, diskLimitedCount)
+ * CALC-STRETCH: when isStretchCluster, effectiveRaw = rawCount * 2 (site symmetry)
+ * CALC-04: finalCount = max(effectiveRaw + haReserveCount, minServerCount ?? 0)
  * CALC-06: utilization metrics derived from finalCount
  */
 export interface ScenarioResult {
@@ -30,4 +31,8 @@ export interface ScenarioResult {
   readonly cpuUtilizationPercent: number;
   readonly ramUtilizationPercent: number;
   readonly diskUtilizationPercent: number;
+  /** True when stretch-cluster doubling was applied (cluster.isStretchCluster === true) */
+  readonly stretchApplied: boolean;
+  /** Server count after stretch doubling + even-rounding, before HA reserve. Undefined when not applied. */
+  readonly stretchPairedCount?: number;
 }

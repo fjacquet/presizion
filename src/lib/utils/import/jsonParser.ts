@@ -47,6 +47,7 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
     ...(c.specintPerServer != null && { specintPerServer: num(c.specintPerServer, 'specintPerServer') }),
     ...(c.cpuUtilizationPercent != null && { cpuUtilizationPercent: num(c.cpuUtilizationPercent, 'cpuUtilizationPercent') }),
     ...(c.ramUtilizationPercent != null && { ramUtilizationPercent: num(c.ramUtilizationPercent, 'ramUtilizationPercent') }),
+    ...(typeof c.isStretchCluster === 'boolean' && { isStretchCluster: c.isStretchCluster }),
   }
 
   if (!Array.isArray(scenarios)) {

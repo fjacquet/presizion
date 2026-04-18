@@ -78,6 +78,7 @@ export const useImportStore = create<ImportState>((set, get) => ({
       ...(aggregate.avgRamPerVmGb != null && { avgRamPerVmGb: aggregate.avgRamPerVmGb }),
       ...(aggregate.cpuModel != null && { cpuModel: aggregate.cpuModel }),
       ...(aggregate.cpuFrequencyGhz != null && { cpuFrequencyGhz: aggregate.cpuFrequencyGhz }),
+      ...(aggregate.isStretchCluster != null && { isStretchCluster: aggregate.isStretchCluster }),
     }
     useClusterStore.getState().setCurrentCluster(cluster)
   },

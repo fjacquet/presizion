@@ -143,6 +143,7 @@ function normaliseCluster(
     specintPerServer: cluster.specintPerServer ?? null,
     cpuUtilizationPercent: cluster.cpuUtilizationPercent ?? null,
     ramUtilizationPercent: cluster.ramUtilizationPercent ?? null,
+    isStretchCluster: cluster.isStretchCluster ?? null,
   }
 }
 

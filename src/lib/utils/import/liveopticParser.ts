@@ -9,6 +9,7 @@ import {
 } from './columnResolver'
 import { ImportError } from './fileValidation'
 import { parsePowerState, num, isTruthy, str, buildScopeLabel, appendToMap, type ParsedRow } from './parserHelpers'
+import { analyzeStretchCluster } from './stretchClusterDetector'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
@@ -325,10 +326,66 @@ function aggregate(rows: VmRow[]): AggregateOutput {
   }
 }
 
+/**
+ * LiveOptics has no vSAN sheet — run the heuristic-only detector per scope.
+ * For each cluster name appearing in ≥2 datacenters, build hostCountByDc and
+ * let the analyzer decide. Scope-label keyword matches also fire.
+ */
+function applyStretchHeuristics(result: AggregateResult): void {
+  if (!result.rawByScope) return
+
+  const dcSetByClusterName = new Map<string, Set<string>>()
+  for (const key of result.rawByScope.keys()) {
+    const parts = key.split('||')
+    if (parts.length === 2) {
+      const [dc, cluster] = parts as [string, string]
+      if (cluster && cluster !== '__standalone__') {
+        const set = dcSetByClusterName.get(cluster) ?? new Set<string>()
+        set.add(dc)
+        dcSetByClusterName.set(cluster, set)
+      }
+    }
+  }
+
+  const globalSignals: string[] = []
+  let anyStretch = false
+  for (const [scopeKey, scope] of result.rawByScope.entries()) {
+    const parts = scopeKey.split('||')
+    const clusterName = parts.length === 2 ? parts[1]! : scopeKey
+    const dcSet = dcSetByClusterName.get(clusterName)
+
+    const hostCountByDc = dcSet && dcSet.size === 2
+      ? new Map(Array.from(dcSet).map((dc) => [dc, result.rawByScope!.get(`${dc}||${clusterName}`)?.existingServerCount ?? 0]))
+      : undefined
+
+    const analysis = analyzeStretchCluster({
+      scopeKey,
+      scopeLabel: result.scopeLabels?.[scopeKey] ?? scopeKey,
+      ...(hostCountByDc && { hostCountByDc }),
+    })
+
+    if (analysis.isStretchCluster) {
+      result.rawByScope.set(scopeKey, {
+        ...scope,
+        isStretchCluster: true,
+        stretchSignals: [...analysis.signals],
+      })
+      anyStretch = true
+      for (const s of analysis.signals) if (!globalSignals.includes(s)) globalSignals.push(s)
+    }
+  }
+
+  if (anyStretch) {
+    result.isStretchCluster = true
+    result.stretchSignals = globalSignals
+  }
+}
+
 export async function parseLiveoptics(
   buffer: ArrayBuffer,
   format: 'liveoptics-xlsx' | 'liveoptics-csv',
 ): Promise<Omit<ClusterImportResult, 'sourceFormat'>> {
-  if (format === 'liveoptics-xlsx') return parseXlsx(buffer)
-  return parseCsvBuffer(buffer)
+  const result = format === 'liveoptics-xlsx' ? await parseXlsx(buffer) : parseCsvBuffer(buffer)
+  applyStretchHeuristics(result)
+  return result
 }

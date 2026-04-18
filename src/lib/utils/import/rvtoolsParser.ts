@@ -1,6 +1,7 @@
 import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
-import { RVTOOLS_ALIASES, RVTOOLS_VHOST_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
+import { RVTOOLS_ALIASES, RVTOOLS_VHOST_ALIASES, RVTOOLS_VSAN_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
 import { parsePowerState, num, isTruthy, str, buildScopeLabel, appendToMap, type ParsedRow } from './parserHelpers'
+import { analyzeStretchCluster } from './stretchClusterDetector'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
@@ -214,6 +215,81 @@ export async function parseRvtools(
         }
       }
     }
+  }
+
+  // vSAN sheet — explicit stretch signals (optional sheet)
+  const vSanSheet = wb.Sheets['vSAN']
+  const vsanByCluster = new Map<string, { stretched?: boolean; faultDomains: Set<string> }>()
+  if (vSanSheet) {
+    const vsanRows = XLSX.utils.sheet_to_json<VInfoRow>(vSanSheet, { defval: '' })
+    const firstVsan = vsanRows[0]
+    if (firstVsan) {
+      const vsanCols = resolveColumns(Object.keys(firstVsan), RVTOOLS_VSAN_ALIASES, new Set())
+      for (const row of vsanRows) {
+        const cluster = str(row, vsanCols['cluster_name'])
+        if (!cluster) continue
+        const entry = vsanByCluster.get(cluster) ?? { faultDomains: new Set<string>() }
+        const stretchedRaw = vsanCols['stretched'] ? str(row, vsanCols['stretched']) : ''
+        if (stretchedRaw && /^(true|yes|1|enabled)$/i.test(stretchedRaw.trim())) {
+          entry.stretched = true
+        }
+        const fd = vsanCols['fault_domain'] ? str(row, vsanCols['fault_domain']) : ''
+        if (fd) entry.faultDomains.add(fd)
+        vsanByCluster.set(cluster, entry)
+      }
+    }
+  }
+
+  // Build datacenter distribution per cluster name (heuristic fallback)
+  // Same cluster name seen in ≥2 DCs → candidate for stretched
+  const dcSetByClusterName = new Map<string, Set<string>>()
+  for (const key of scopeMap.keys()) {
+    const parts = key.split('||')
+    if (parts.length === 2) {
+      const [dc, cluster] = parts as [string, string]
+      if (cluster && cluster !== '__standalone__') {
+        const set = dcSetByClusterName.get(cluster) ?? new Set<string>()
+        set.add(dc)
+        dcSetByClusterName.set(cluster, set)
+      }
+    }
+  }
+
+  // Run detector per scope and write isStretchCluster / stretchSignals into rawByScope
+  const globalSignals: string[] = []
+  let anyStretch = false
+  for (const [scopeKey, scope] of rawByScope.entries()) {
+    const parts = scopeKey.split('||')
+    const clusterName = parts.length === 2 ? parts[1]! : scopeKey
+    const vsanEntry = vsanByCluster.get(clusterName)
+    const dcSet = dcSetByClusterName.get(clusterName)
+
+    const hostCountByDc = dcSet && dcSet.size === 2
+      ? new Map(Array.from(dcSet).map((dc) => [dc, rawByScope.get(`${dc}||${clusterName}`)?.existingServerCount ?? 0]))
+      : undefined
+
+    const analysis = analyzeStretchCluster({
+      scopeKey,
+      scopeLabel: scopeLabels[scopeKey] ?? scopeKey,
+      ...(vsanEntry?.stretched !== undefined && { explicitStretchFromVsan: vsanEntry.stretched }),
+      ...(vsanEntry && vsanEntry.faultDomains.size > 0 && { faultDomainCount: vsanEntry.faultDomains.size }),
+      ...(hostCountByDc && { hostCountByDc }),
+    })
+
+    if (analysis.isStretchCluster) {
+      rawByScope.set(scopeKey, {
+        ...scope,
+        isStretchCluster: true,
+        stretchSignals: [...analysis.signals],
+      })
+      anyStretch = true
+      for (const s of analysis.signals) if (!globalSignals.includes(s)) globalSignals.push(s)
+    }
+  }
+
+  if (anyStretch) {
+    result.isStretchCluster = true
+    result.stretchSignals = globalSignals
   }
 
   return result

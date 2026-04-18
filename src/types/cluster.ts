@@ -19,6 +19,7 @@ export interface OldCluster {
   readonly avgRamPerVmGb?: number;          // average RAM per VM (GB) — seeds Step 2 scenario defaults
   readonly cpuFrequencyGhz?: number;        // avg CPU clock frequency in GHz — required for GHz sizing mode
   readonly cpuModel?: string;               // display-only CPU model string extracted from import (e.g. "Xeon Gold 6526Y")
+  readonly isStretchCluster?: boolean;      // stretched topology — each site must carry the full workload on failure
 }
 
 /**
