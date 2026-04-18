@@ -1,10 +1,17 @@
 import { z } from 'zod';
 import type { OldCluster, Scenario } from '../../types/cluster';
 import type { SizingMode, LayoutMode } from '../../store/useWizardStore';
+import type { ExclusionRules } from '../../types/exclusions';
 import { currentClusterSchema } from '../../schemas/currentClusterSchema';
 import { scenarioSchema } from '../../schemas/scenarioSchema';
 
 const STORAGE_KEY = 'presizion-session';
+
+/**
+ * Maximum allowed character length of an encoded URL hash payload.
+ * Approximate proxy for byte size since base64url output is ASCII-only.
+ */
+const HASH_MAX_BYTES = 8192;
 
 /**
  * The full application session that is persisted to localStorage.
@@ -15,7 +22,20 @@ export interface SessionData {
   scenarios: Scenario[];
   sizingMode: SizingMode;
   layoutMode: LayoutMode;
+  exclusions?: ExclusionRules;
+  /** Set by encodeSessionToHash when hash-size truncation dropped rules. */
+  truncated?: boolean;
 }
+
+const exclusionsSchema = z
+  .object({
+    namePattern: z.string().default(''),
+    exactNames: z.array(z.string()).default([]),
+    excludePoweredOff: z.boolean().default(false),
+    manuallyExcluded: z.array(z.string()).default([]),
+    manuallyIncluded: z.array(z.string()).default([]),
+  })
+  .optional();
 
 /**
  * Zod schema for parsing a stored session.
@@ -28,6 +48,8 @@ const sessionSchema = z.object({
   scenarios: z.array(scenarioSchema),
   sizingMode: z.enum(['vcpu', 'specint', 'aggressive', 'ghz']).default('vcpu'),
   layoutMode: z.enum(['hci', 'disaggregated']).default('hci'),
+  exclusions: exclusionsSchema,
+  truncated: z.boolean().optional(),
 });
 
 /**
@@ -83,31 +105,67 @@ export function loadFromLocalStorage(): SessionData | null {
   }
 }
 
+function encodeInner(data: SessionData): string {
+  const json = serializeSession(data);
+  return btoa(json).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
 /**
  * Encode a session to a URL-safe base64 string (no padding) for use as a URL hash.
  * Uses base64url encoding: '+' → '-', '/' → '_', '=' stripped.
+ *
+ * Graceful degradation ladder (stops at first attempt under HASH_MAX_BYTES):
+ *   0. Full payload (no truncation).
+ *   1. Drop `exclusions.manuallyExcluded`.
+ *   2. Drop `exclusions.manuallyExcluded` + `exclusions.exactNames`.
+ *   3. Drop `exclusions` entirely.
+ *
+ * Attempts ≥ 1 mark the serialized payload with `truncated: true` so decoders
+ * can surface a toast to the user.
  */
 export function encodeSessionToHash(data: SessionData): string {
-  const json = serializeSession(data);
-  return btoa(json)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+  const attempts: Array<(d: SessionData) => SessionData> = [
+    (d) => d,
+    (d) =>
+      d.exclusions
+        ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [] } }
+        : d,
+    (d) =>
+      d.exclusions
+        ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [], exactNames: [] } }
+        : d,
+    (d) => {
+      const { exclusions: _exclusions, ...rest } = d;
+      return rest as SessionData;
+    },
+  ];
+
+  let lastEncoded = '';
+  for (let i = 0; i < attempts.length; i++) {
+    const transform = attempts[i]!;
+    const trimmed = transform(data);
+    const payload: SessionData = i === 0 ? trimmed : { ...trimmed, truncated: true };
+    const encoded = encodeInner(payload);
+    if (encoded.length <= HASH_MAX_BYTES) return encoded;
+    lastEncoded = encoded;
+  }
+  // Last resort: return whatever the most-trimmed attempt produced.
+  return lastEncoded;
 }
 
 /**
  * Decode a URL hash string back to SessionData.
  * - Accepts hash with or without a leading '#'.
  * - Returns null for empty string, '#', malformed base64, or invalid schema.
+ * - The `truncated` flag (if any) was set by the encoder and is already in the
+ *   deserialized payload, so no extra handling is required here.
  */
 export function decodeSessionFromHash(hash: string): SessionData | null {
   try {
     const stripped = hash.startsWith('#') ? hash.slice(1) : hash;
     if (!stripped) return null;
     // Restore standard base64 from URL-safe base64
-    const base64 = stripped
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
+    const base64 = stripped.replace(/-/g, '+').replace(/_/g, '/');
     // Add padding if needed
     const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
     const json = atob(padded);
