@@ -46,10 +46,9 @@ describe('VmExclusionPanel', () => {
   })
 
   it('disables power-state toggle when no row has powerState', () => {
-    const rowsNoPower = rows.map((r) => {
-      const { powerState: _p, ...rest } = r
-      return rest
-    })
+    const rowsNoPower: VmRow[] = rows.map(({ name, scopeKey, vcpus, ramMib, diskMib }) => ({
+      name, scopeKey, vcpus, ramMib, diskMib,
+    }))
     render(<VmExclusionPanel rows={rowsNoPower} />)
     const cb = screen.getByRole('checkbox', { name: /Exclude powered-off/i })
     expect(cb).toHaveAttribute('aria-disabled', 'true')
