@@ -709,4 +709,85 @@ describe('Growth factor wiring (Phase 19)', () => {
   });
 });
 
+// =====================================================================
+// Stretch cluster: topology-aware sizing (CALC-STRETCH)
+// =====================================================================
+
+describe('computeScenarioResult — stretch cluster', () => {
+  it('isStretchCluster=true doubles finalCount and sets stretchApplied', () => {
+    // CPU_LIMITED rawCount = 24. Stretched → pairedCount = 48, finalCount = 48 (no HA).
+    const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
+    const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
+    expect(result.rawCount).toBe(24);
+    expect(result.stretchApplied).toBe(true);
+    expect(result.stretchPairedCount).toBe(48);
+    expect(result.finalCount).toBe(48);
+  });
+
+  it('isStretchCluster=true preserves requiredCount (pre-stretch demand)', () => {
+    const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
+    const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
+    expect(result.requiredCount).toBe(24); // capacity-actual demand; site symmetry is on top
+  });
+
+  it('stretch + haReserveCount=1 adds the reserve on top of the paired count', () => {
+    const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
+    const stretchedScenario = { ...CPU_LIMITED_SCENARIO, haReserveCount: 1 as const };
+    const result = computeScenarioResult(stretchedCluster, stretchedScenario);
+    expect(result.stretchPairedCount).toBe(48);
+    expect(result.finalCount).toBe(49); // 48 paired + 1 reserve
+    expect(result.haReserveApplied).toBe(true);
+  });
+
+  it('stretch + haReserveCount=0 gives paired count exactly (stretch IS the HA mechanism)', () => {
+    const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
+    const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
+    expect(result.finalCount).toBe(48);
+    expect(result.haReserveApplied).toBe(false);
+  });
+
+  it('stretch respects minServerCount floor when paired count is smaller', () => {
+    const stretchedCluster = { ...RAM_LIMITED_CLUSTER, isStretchCluster: true };
+    const pinnedScenario = { ...RAM_LIMITED_SCENARIO, minServerCount: 100 };
+    const result = computeScenarioResult(stretchedCluster, pinnedScenario);
+    // RAM_LIMITED rawCount = 19, paired = 38, floor = 100 → finalCount = 100
+    expect(result.stretchPairedCount).toBe(38);
+    expect(result.finalCount).toBe(100);
+  });
+
+  it('stretch odd rawCount still produces even pairedCount (rawCount*2 is always even)', () => {
+    // RAM_LIMITED rawCount = 19 (odd). 19*2 = 38, already even.
+    const stretchedCluster = { ...RAM_LIMITED_CLUSTER, isStretchCluster: true };
+    const result = computeScenarioResult(stretchedCluster, RAM_LIMITED_SCENARIO);
+    expect(result.rawCount).toBe(19);
+    expect(result.stretchPairedCount).toBe(38);
+    expect(result.stretchPairedCount! % 2).toBe(0);
+  });
+
+  it('cluster without isStretchCluster: stretchApplied=false, no doubling (regression)', () => {
+    const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+    expect(result.stretchApplied).toBe(false);
+    expect(result.stretchPairedCount).toBeUndefined();
+    expect(result.finalCount).toBe(24);
+  });
+
+  it('isStretchCluster=false explicitly: same as absent (regression)', () => {
+    const notStretched = { ...CPU_LIMITED_CLUSTER, isStretchCluster: false };
+    const result = computeScenarioResult(notStretched, CPU_LIMITED_SCENARIO);
+    expect(result.stretchApplied).toBe(false);
+    expect(result.finalCount).toBe(24);
+  });
+
+  it('stretch + SPECint mode: pre-stretch count from specint formula, then doubled', () => {
+    // SPECint: cpuLimitedCount=6, ram=1, disk=1 → rawCount=6; stretched → 12.
+    const stretchedSpecintCluster = { ...SPECINT_CLUSTER, isStretchCluster: true };
+    const result = computeScenarioResult(stretchedSpecintCluster, SPECINT_SCENARIO, 'specint');
+    expect(result.cpuLimitedCount).toBe(6);
+    expect(result.rawCount).toBe(6);
+    expect(result.stretchPairedCount).toBe(12);
+    expect(result.finalCount).toBe(12);
+    expect(result.limitingResource).toBe('specint');
+  });
+});
+
 export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };

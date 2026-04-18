@@ -42,6 +42,7 @@ const result: ScenarioResult = {
   cpuUtilizationPercent: 85.0,
   ramUtilizationPercent: 60.0,
   diskUtilizationPercent: 35.0,
+  stretchApplied: false,
 }
 
 beforeEach(() => {
@@ -151,6 +152,19 @@ describe('buildJsonContent', () => {
     const json = buildJsonContent(cluster, [scenario], [result])
     const parsed = JSON.parse(json) as { schemaVersion: string }
     expect(parsed.schemaVersion).toBe('2')
+  })
+
+  it('includes isStretchCluster (true) when set on the cluster', () => {
+    const stretched: OldCluster = { ...cluster, isStretchCluster: true }
+    const json = buildJsonContent(stretched, [scenario], [result])
+    const parsed = JSON.parse(json) as { currentCluster: Record<string, unknown> }
+    expect(parsed.currentCluster).toHaveProperty('isStretchCluster', true)
+  })
+
+  it('writes isStretchCluster as null when absent', () => {
+    const json = buildJsonContent(cluster, [scenario], [result])
+    const parsed = JSON.parse(json) as { currentCluster: Record<string, unknown> }
+    expect(parsed.currentCluster).toHaveProperty('isStretchCluster', null)
   })
 })
 

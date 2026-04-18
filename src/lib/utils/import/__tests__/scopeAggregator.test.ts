@@ -204,4 +204,23 @@ describe('aggregateScopes', () => {
     expect(result.warnings).toContain('Warning B1')
     expect(result.warnings).toHaveLength(3)
   })
+
+  it('stretched flag on any selected scope poisons the aggregate', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 1, isStretchCluster: true, stretchSignals: ['vSAN says stretched'] })],
+      ['CL-B', makeScope({ vmCount: 1 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.isStretchCluster).toBe(true)
+    expect(result.stretchSignals).toContain('vSAN says stretched')
+  })
+
+  it('no stretched scope → no stretch flag on aggregate', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ vmCount: 1 })],
+      ['CL-B', makeScope({ vmCount: 1 })],
+    ])
+    const result = aggregateScopes(map, ['CL-A', 'CL-B'])
+    expect(result.isStretchCluster).toBeUndefined()
+  })
 })

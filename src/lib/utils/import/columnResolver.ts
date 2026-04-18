@@ -50,6 +50,13 @@ export const CLUSTER_ALIASES: ColumnAliasMap = {
   cluster_name: ['Cluster', 'cluster', 'ClusterName', 'cluster_name', 'Cluster Name'],
 }
 
+export const RVTOOLS_VSAN_ALIASES: ColumnAliasMap = {
+  cluster_name: ['Cluster', 'Cluster Name'],
+  fault_domain: ['Fault Domain', 'FaultDomain', 'Fault-Domain'],
+  stretched:    ['Stretched Cluster', 'Stretched', 'IsStretched', 'Is Stretched'],
+  witness:      ['Witness Host', 'Witness', 'Witness Node'],
+}
+
 export const DATACENTER_ALIASES: ColumnAliasMap = {
   datacenter_name: ['Datacenter', 'datacenter', 'DC', 'DataCenter', 'data_center'],
 }

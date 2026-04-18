@@ -56,6 +56,10 @@ export function aggregateScopes(
   let cpuUtilServerCount = 0
   let ramUtilServerCount = 0
 
+  // Stretch: any selected scope being stretched poisons the aggregate (conservative).
+  let anyStretch = false
+  const stretchSignalsAcc: string[] = []
+
   for (const scope of selected) {
     totalVcpus += scope.totalVcpus
     totalVms += scope.totalVms
@@ -102,6 +106,15 @@ export function aggregateScopes(
       weightedRamUtilSum += scope.ramUtilizationPercent * scope.existingServerCount
       ramUtilServerCount += scope.existingServerCount
     }
+
+    if (scope.isStretchCluster === true) {
+      anyStretch = true
+      if (scope.stretchSignals) {
+        for (const s of scope.stretchSignals) {
+          if (!stretchSignalsAcc.includes(s)) stretchSignalsAcc.push(s)
+        }
+      }
+    }
   }
 
   const avgRamPerVmGb = totalVmCount > 0 ? weightedRamSum / totalVmCount : 0
@@ -144,5 +157,6 @@ export function aggregateScopes(
     vmCount: totalVmCount,
     warnings: allWarnings,
     ...esxFields,
+    ...(anyStretch && { isStretchCluster: true, stretchSignals: stretchSignalsAcc }),
   }
 }

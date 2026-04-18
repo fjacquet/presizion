@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
   TooltipContent,
@@ -45,6 +46,7 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
   cpuUtilizationPercent: 'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
   ramUtilizationPercent: 'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
   cpuFrequencyGhz: 'Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.',
+  isStretchCluster: 'Stretched cluster: each site must carry the full workload on failure. Sizing doubles the server count and rounds up to an even number.',
 }
 
 interface NumericFieldProps {
@@ -53,6 +55,13 @@ interface NumericFieldProps {
   label: string
   testId: string
   optional?: boolean
+}
+
+/** Coerce form field values (which may include boolean for isStretchCluster) to a number-input-safe string. */
+function toInputValue(val: unknown, optional: boolean): string | number {
+  if (typeof val === 'boolean') return ''
+  if (val == null) return optional ? '' : 0
+  return val as string | number
 }
 
 function NumericFormField({ control, name, label, testId, optional }: NumericFieldProps) {
@@ -84,7 +93,7 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
               min={0}
               data-testid={testId}
               {...field}
-              value={optional ? (field.value ?? '') : field.value}
+              value={toInputValue(field.value, optional ?? false)}
               onChange={(e) => field.onChange(e.target.value)}
             />
           </FormControl>
@@ -138,7 +147,7 @@ function CheckboxNumericField({
               data-testid={testId}
               disabled={!enabled}
               {...field}
-              value={enabled ? (field.value ?? '') : ''}
+              value={enabled ? toInputValue(field.value, true) : ''}
               onChange={(e) => field.onChange(e.target.value)}
             />
           </FormControl>
@@ -181,6 +190,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       ramUtilizationPercent: undefined,
       existingServerCount: undefined,
       cpuFrequencyGhz: undefined,
+      isStretchCluster: undefined,
     },
   })
 
@@ -199,7 +209,8 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
       formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent ||
       formVals.specintPerServer !== currentCluster.specintPerServer ||
-      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz
+      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz ||
+      formVals.isStretchCluster !== currentCluster.isStretchCluster
     if (changed) {
       form.reset({
         ...formVals,
@@ -215,6 +226,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         ramUtilizationPercent: currentCluster.ramUtilizationPercent,
         specintPerServer: currentCluster.specintPerServer,
         cpuFrequencyGhz: currentCluster.cpuFrequencyGhz,
+        isStretchCluster: currentCluster.isStretchCluster,
       })
       // Sync checkbox enabled state when cluster is imported
       if (currentCluster.cpuUtilizationPercent !== undefined) setCpuUtilEnabled(true)
@@ -360,6 +372,35 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             <NumericFormField control={form.control} name="coresPerSocket" label="Cores/Socket (physical)" testId="input-coresPerSocket" optional />
             <NumericFormField control={form.control} name="ramPerServerGb" label="RAM/Server GB" testId="input-ramPerServerGb" optional />
           </div>
+          <FormField
+            control={form.control}
+            name="isStretchCluster"
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-3 mt-4">
+                <FormControl>
+                  <Switch
+                    checked={field.value === true}
+                    onCheckedChange={(v) => field.onChange(v)}
+                    aria-label="Stretch cluster"
+                    data-testid="input-isStretchCluster"
+                  />
+                </FormControl>
+                <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
+                  Stretch cluster
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" aria-label="Info: Stretch cluster" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs text-sm">{TOOLTIPS.isStretchCluster}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </FormLabel>
+              </FormItem>
+            )}
+          />
         </section>
 
         <section>

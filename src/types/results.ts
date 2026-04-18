@@ -30,4 +30,8 @@ export interface ScenarioResult {
   readonly cpuUtilizationPercent: number;
   readonly ramUtilizationPercent: number;
   readonly diskUtilizationPercent: number;
+  /** True when stretch-cluster doubling was applied (cluster.isStretchCluster === true) */
+  readonly stretchApplied: boolean;
+  /** Server count after stretch doubling + even-rounding, before HA reserve. Undefined when not applied. */
+  readonly stretchPairedCount?: number;
 }

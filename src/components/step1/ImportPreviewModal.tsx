@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
+import { Badge } from '@/components/ui/badge'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useImportStore } from '@/store/useImportStore'
@@ -87,11 +89,14 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
   const [prevResult, setPrevResult] = useState<AnyImportResult>(result)
   const [selectedScopes, setSelectedScopes] = useState<string[]>(scopesFromResult)
   const [step, setStep] = useState<'scope' | 'exclusions'>('scope')
+  const initialStretch = !isJson && result.isStretchCluster === true
+  const [stretchConfirmed, setStretchConfirmed] = useState<boolean>(initialStretch)
 
   if (prevResult !== result) {
     setPrevResult(result)
     setSelectedScopes(scopesFromResult)
     setStep('scope')
+    setStretchConfirmed(initialStretch)
   }
 
   const canShowExclusions =
@@ -125,6 +130,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         ...(previewCluster.ramUtilizationPercent != null && { ramUtilizationPercent: previewCluster.ramUtilizationPercent }),
         ...(previewCluster.cpuModel != null && { cpuModel: previewCluster.cpuModel }),
         ...(previewCluster.cpuFrequencyGhz != null && { cpuFrequencyGhz: previewCluster.cpuFrequencyGhz }),
+        ...(stretchConfirmed && { isStretchCluster: true }),
       }
       setCurrentCluster(cluster)
       seedFromCluster(cluster)
@@ -160,6 +166,29 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
           onToggle={handleToggle}
           rawByScope={'rawByScope' in result ? result.rawByScope ?? undefined : undefined}
         />
+      )}
+
+      {!isJson && (result.isStretchCluster === true || stretchConfirmed) && (
+        <div className="flex items-start gap-2 p-2 rounded border border-amber-400/40 bg-amber-50/60 dark:bg-amber-950/20">
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">Stretch cluster detected</Badge>
+              <Switch
+                checked={stretchConfirmed}
+                onCheckedChange={setStretchConfirmed}
+                aria-label="Confirm stretch cluster topology"
+              />
+            </div>
+            {result.stretchSignals && result.stretchSignals.length > 0 && (
+              <ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
+                {result.stretchSignals.map((s, i) => <li key={i}>{s}</li>)}
+              </ul>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Sizing will double the server count for site symmetry.
+            </p>
+          </div>
+        </div>
       )}
 
       <div className="space-y-1 text-sm">
