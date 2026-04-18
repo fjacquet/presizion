@@ -6,7 +6,8 @@ import { EMPTY_RULES } from '@/types/exclusions'
 interface ExclusionsState {
   rules: ExclusionRules
   setRules: (partial: Partial<ExclusionRules>) => void
-  toggleManual: (vmName: string, kind: 'excluded' | 'included') => void
+  /** vmKey is `${scopeKey}::${name}` so overrides target one row even with duplicate VM names across scopes. */
+  toggleManual: (vmKey: string, kind: 'excluded' | 'included') => void
   reset: () => void
 }
 
@@ -17,18 +18,18 @@ export const useExclusionsStore = create<ExclusionsState>()(
       setRules: (partial) => {
         set({ rules: { ...get().rules, ...partial } })
       },
-      toggleManual: (vmName, kind) => {
+      toggleManual: (vmKey, kind) => {
         const rules = get().rules
         const listKey = kind === 'excluded' ? 'manuallyExcluded' : 'manuallyIncluded'
         const otherKey = kind === 'excluded' ? 'manuallyIncluded' : 'manuallyExcluded'
         const list = rules[listKey]
         const other = rules[otherKey]
-        const isOn = list.includes(vmName)
+        const isOn = list.includes(vmKey)
         set({
           rules: {
             ...rules,
-            [listKey]: isOn ? list.filter((n) => n !== vmName) : [...list, vmName],
-            [otherKey]: other.filter((n) => n !== vmName),
+            [listKey]: isOn ? list.filter((k) => k !== vmKey) : [...list, vmKey],
+            [otherKey]: other.filter((k) => k !== vmKey),
           },
         })
       },
@@ -36,11 +37,25 @@ export const useExclusionsStore = create<ExclusionsState>()(
     }),
     {
       name: 'presizion-exclusions-v1',
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => globalThis.localStorage),
       migrate: (persistedState, version) => {
-        if (version !== 1) return { rules: EMPTY_RULES }
-        return persistedState as ExclusionsState
+        if (version === 2) return persistedState as ExclusionsState
+        // v1 → v2: manual lists held bare VM names; we can't retroactively map
+        // them to `${scopeKey}::${name}` without the original import context,
+        // so drop the manual lists but preserve the rule-based fields.
+        if (version === 1 && persistedState != null && typeof persistedState === 'object') {
+          const prior = (persistedState as { rules?: Partial<ExclusionRules> }).rules ?? {}
+          return {
+            rules: {
+              ...EMPTY_RULES,
+              namePattern: prior.namePattern ?? '',
+              exactNames: prior.exactNames ?? [],
+              excludePoweredOff: prior.excludePoweredOff ?? false,
+            },
+          } as ExclusionsState
+        }
+        return { rules: EMPTY_RULES } as ExclusionsState
       },
     },
   ),

@@ -19,6 +19,17 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
   const [reviewOpen, setReviewOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [showOnlyExcluded, setShowOnlyExcluded] = useState(false)
+  const [exactNamesText, setExactNamesText] = useState(() => rules.exactNames.join('\n'))
+  const [lastSyncedNames, setLastSyncedNames] = useState(rules.exactNames)
+  if (rules.exactNames !== lastSyncedNames) {
+    setLastSyncedNames(rules.exactNames)
+    setExactNamesText(rules.exactNames.join('\n'))
+  }
+
+  const commitExactNames = (): void => {
+    const parsed = exactNamesText.split('\n').map((s) => s.trim()).filter(Boolean)
+    setRules({ exactNames: parsed })
+  }
 
   const hasPowerState = rows.some((r) => r.powerState !== undefined)
 
@@ -28,9 +39,11 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
     return { filtered: filteredByScope.get('__all__') ?? [], stats }
   }, [rows, rules])
 
-  const excludedNames = useMemo(() => {
-    const keep = new Set(filtered.map((r) => r.name))
-    return new Set(rows.filter((r) => !keep.has(r.name)).map((r) => r.name))
+  const excludedKeys = useMemo(() => {
+    const keep = new Set(filtered.map((r) => `${r.scopeKey}::${r.name}`))
+    return new Set(
+      rows.filter((r) => !keep.has(`${r.scopeKey}::${r.name}`)).map((r) => `${r.scopeKey}::${r.name}`),
+    )
   }, [rows, filtered])
 
   const listedRows = useMemo(() => {
@@ -39,13 +52,13 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
       const q = search.toLowerCase()
       list = list.filter((r) => r.name.toLowerCase().includes(q))
     }
-    if (showOnlyExcluded) list = list.filter((r) => excludedNames.has(r.name))
+    if (showOnlyExcluded) list = list.filter((r) => excludedKeys.has(`${r.scopeKey}::${r.name}`))
     return list
-  }, [rows, search, showOnlyExcluded, excludedNames])
+  }, [rows, search, showOnlyExcluded, excludedKeys])
 
-  const handleRowToggle = (name: string): void => {
-    const kind = excludedNames.has(name) ? 'included' : 'excluded'
-    toggleManual(name, kind)
+  const handleRowToggle = (vmKey: string): void => {
+    const kind = excludedKeys.has(vmKey) ? 'included' : 'excluded'
+    toggleManual(vmKey, kind)
   }
 
   return (
@@ -66,10 +79,9 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
           Exact names
           <Textarea
             aria-label="Exact names"
-            value={rules.exactNames.join('\n')}
-            onChange={(e) => setRules({
-              exactNames: e.target.value.split('\n').map((s) => s.trim()).filter(Boolean),
-            })}
+            value={exactNamesText}
+            onChange={(e) => setExactNamesText(e.target.value)}
+            onBlur={commitExactNames}
             rows={3}
           />
         </label>
@@ -116,7 +128,7 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
           </div>
           <VirtualizedVmList
             rows={listedRows}
-            excludedNames={excludedNames}
+            excludedKeys={excludedKeys}
             onToggle={handleRowToggle}
             height={240}
             rowHeight={32}
@@ -128,6 +140,7 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
         <p>Excluded: {stats.excludedCount} of {stats.totalVms} VMs</p>
         <ul className="list-disc pl-5">
           <li>{stats.excludedByRule.namePattern} by name pattern</li>
+          <li>{stats.excludedByRule.exactNames} by exact name</li>
           <li>{stats.excludedByRule.powerState} powered-off</li>
           <li>{stats.excludedByRule.manual} manual</li>
         </ul>

@@ -432,8 +432,9 @@ Used for persistence and shareable URLs. Defined in `src/lib/utils/persistence.t
 
 ```json
 {
-  "version": "2",
-  "cluster": { ... },
+  "schemaVersion": "2",
+  "generatedAt": "2026-04-18T10:00:00.000Z",
+  "currentCluster": { ... },
   "scenarios": [ ... ],
   "exclusions": {
     "namePattern": "test-*",
@@ -446,7 +447,8 @@ Used for persistence and shareable URLs. Defined in `src/lib/utils/persistence.t
 ```
 
 - `exclusions` is optional. V1 files (no `exclusions` block) load with `EMPTY_RULES` injected — fully backward-compatible.
-- Schema version bumped from `"1.1"` to `"2"` when exclusions are present.
+- `schemaVersion` bumps from `"1.1"` to `"2"` whenever exclusions are emitted. Earlier `schemaVersion: "1.1"` examples in this document describe the legacy format and are kept for reference.
+- `manuallyExcluded` / `manuallyIncluded` entries are stored as `${scopeKey}::${vmName}` composite keys so that duplicate VM names across scopes can be targeted individually.
 
 ### URL hash v2 with truncation
 

@@ -281,12 +281,12 @@ UI components are tested for behavior (rendering, interactions, conditional visi
 
 ## VM Exclusions Coverage (v2.7)
 
-The exclusions feature introduces ~60 new tests across 11 files, bringing the suite to ≈720 tests.
+The exclusions feature introduces ~60 new tests across 12 files, bringing the suite to ≈720 tests.
 
 | File | Focus |
 |---|---|
 | `src/lib/utils/import/__tests__/exclusions.compilePattern.test.ts` | glob→regex compilation, ReDoS safety, case-insensitive matching |
-| `src/lib/utils/import/__tests__/exclusions.isExcluded.test.ts` | short-circuit order (overrides → power → exact → glob) |
+| `src/lib/utils/import/__tests__/exclusions.isExcluded.test.ts` | short-circuit order (manual overrides → name pattern → exact names → power state); composite `${scopeKey}::${name}` targeting |
 | `src/lib/utils/import/__tests__/exclusions.apply.test.ts` | `applyExclusions` with stats breakdown |
 | `src/lib/utils/import/__tests__/exclusions.aggregate.test.ts` | `aggregateVmRows` aggregation correctness |
 | `src/lib/utils/import/__tests__/liveopticParser.vmRows.test.ts` | `vmRowsByScope` emission from LiveOptics |

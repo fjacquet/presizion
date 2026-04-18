@@ -36,22 +36,32 @@ describe('useExclusionsStore', () => {
     expect(useExclusionsStore.getState().rules.excludePoweredOff).toBe(false)
   })
 
-  it('toggleManual adds a name to manuallyExcluded and removes from manuallyIncluded', () => {
-    useExclusionsStore.getState().setRules({ manuallyIncluded: ['vm-a'] })
-    useExclusionsStore.getState().toggleManual('vm-a', 'excluded')
+  it('toggleManual adds a composite key to manuallyExcluded and removes from manuallyIncluded', () => {
+    useExclusionsStore.getState().setRules({ manuallyIncluded: ['s1::vm-a'] })
+    useExclusionsStore.getState().toggleManual('s1::vm-a', 'excluded')
     const rules = useExclusionsStore.getState().rules
-    expect(rules.manuallyExcluded).toContain('vm-a')
-    expect(rules.manuallyIncluded).not.toContain('vm-a')
+    expect(rules.manuallyExcluded).toContain('s1::vm-a')
+    expect(rules.manuallyIncluded).not.toContain('s1::vm-a')
   })
 
   it('toggleManual removes the entry when it already matches the target state', () => {
-    useExclusionsStore.getState().setRules({ manuallyExcluded: ['vm-a'] })
-    useExclusionsStore.getState().toggleManual('vm-a', 'excluded')
-    expect(useExclusionsStore.getState().rules.manuallyExcluded).not.toContain('vm-a')
+    useExclusionsStore.getState().setRules({ manuallyExcluded: ['s1::vm-a'] })
+    useExclusionsStore.getState().toggleManual('s1::vm-a', 'excluded')
+    expect(useExclusionsStore.getState().rules.manuallyExcluded).not.toContain('s1::vm-a')
+  })
+
+  it('toggleManual scopes are independent across scopeKey prefixes', () => {
+    useExclusionsStore.getState().toggleManual('dcA::dup', 'excluded')
+    useExclusionsStore.getState().toggleManual('dcB::dup', 'excluded')
+    const rules = useExclusionsStore.getState().rules
+    expect(rules.manuallyExcluded).toContain('dcA::dup')
+    expect(rules.manuallyExcluded).toContain('dcB::dup')
+    useExclusionsStore.getState().toggleManual('dcA::dup', 'excluded')
+    expect(useExclusionsStore.getState().rules.manuallyExcluded).toEqual(['dcB::dup'])
   })
 
   it('reset restores EMPTY_RULES', () => {
-    useExclusionsStore.getState().setRules({ namePattern: 'test-*', manuallyExcluded: ['x'] })
+    useExclusionsStore.getState().setRules({ namePattern: 'test-*', manuallyExcluded: ['s1::x'] })
     useExclusionsStore.getState().reset()
     expect(useExclusionsStore.getState().rules).toEqual(EMPTY_RULES)
   })

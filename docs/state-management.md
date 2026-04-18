@@ -292,4 +292,4 @@ There is no explicit cleanup. Zustand stores persist for the lifetime of the pag
 
 ### Recompute Hook
 
-`useRecomputeCluster()` subscribes to both `useExclusionsStore.rules` and `useImportStore.vmRowsByScope`. On change it calls `applyExclusions` + `aggregateVmRows` and writes the kept aggregates back into `useClusterStore`, preserving ESX-derived fields (server config, utilization %).
+`useRecomputeCluster()` subscribes to `useExclusionsStore` changes. When exclusion rules change, it calls `useImportStore.recomputeCluster()`, which re-applies exclusions via `applyExclusions` + `aggregateVmRows` against the session-only `vmRowsByScope` and writes the kept VM aggregates back into `useClusterStore` while preserving ESX-derived fields (server config, utilization %).

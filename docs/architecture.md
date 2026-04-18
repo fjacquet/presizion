@@ -309,7 +309,7 @@ All export functions receive cluster, scenarios, and results as parameters. CSV 
 
 ## 12. Per-VM Exclusions (v2.7)
 
-**Pure engine** — `src/lib/utils/import/exclusions.ts` exports `compileNamePattern` (glob→regex, ReDoS-safe), `isExcluded` (short-circuits on overrides → power state → exact name → glob), and `applyExclusions(grouped, rules)` returning `{ filtered, stats }`. All functions are pure; no store access.
+**Pure engine** — `src/lib/utils/import/exclusions.ts` exports `compileNamePattern` (glob→regex, ReDoS-safe), `isExcluded` (short-circuits on manual overrides → name pattern → exact names → power state), and `applyExclusions(grouped, rules)` returning `{ filteredByScope, stats }`. Manual override lists hold `${scopeKey}::${name}` composite keys so duplicate VM names across clusters can be targeted individually. All functions are pure; no store access.
 
 **Aggregation** — `aggregateVmRows` recomputes `totalVcpus`, `totalVms`, `totalDiskGb`, and `avgRamPerVmGb` from the kept subset. `recomputeCluster` in `useImportStore` re-aggregates on rules changes while preserving ESX-derived fields (pCores, server config, utilization percentages) that do not belong to VM rows.
 
