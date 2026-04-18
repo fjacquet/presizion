@@ -5,13 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased]
+## [2.7.0] -- 2026-04-18
 
 ### Added
 
 - **Per-VM exclusions (issue #13)**: drop individual VMs from sizing via glob name patterns, exact-name lists, power-state toggle, and per-row overrides. Rules persist in localStorage, JSON exports, and shareable URL hashes; raw VM rows stay session-only (see [ADR-021](docs/adr/ADR-021-vm-exclusion-rules-persistence.md)).
 - **JSON export schema v2**: adds optional `exclusions` block. Backward-compatible — v1 files load with empty rules injected.
 - **URL hash v2 with rule truncation**: 4-attempt graceful-degradation ladder keeps shareable links under the ~8 KB ceiling; decoders surface a toast when truncation drops per-row overrides.
+- **Scope-aware manual overrides**: per-row include/exclude toggles use composite `${scopeKey}::${name}` keys so duplicate VM names across clusters/datacenters target independently. `useExclusionsStore` persist version bumped 1 → 2 with migration dropping v1 manual lists.
 
 ---
 
