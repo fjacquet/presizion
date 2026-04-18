@@ -423,3 +423,42 @@ Used for persistence and shareable URLs. Defined in `src/lib/utils/persistence.t
 | `src/types/results.ts` | `ScenarioResult` interface |
 | `src/schemas/currentClusterSchema.ts` | Zod schema for cluster validation |
 | `src/schemas/scenarioSchema.ts` | Zod schema for scenario validation |
+| `src/lib/utils/import/exclusions.ts` | Pure exclusion engine (glob compile, `isExcluded`, `applyExclusions`) |
+| `src/types/exclusions.ts` | `ExclusionRules` interface and `EMPTY_RULES` constant |
+
+## VM Exclusions (v2.7)
+
+### JSON export schema v2
+
+```json
+{
+  "version": "2",
+  "cluster": { ... },
+  "scenarios": [ ... ],
+  "exclusions": {
+    "namePattern": "test-*",
+    "exactNames": ["legacy-db-01"],
+    "excludePoweredOff": true,
+    "manuallyExcluded": [],
+    "manuallyIncluded": []
+  }
+}
+```
+
+- `exclusions` is optional. V1 files (no `exclusions` block) load with `EMPTY_RULES` injected — fully backward-compatible.
+- Schema version bumped from `"1.1"` to `"2"` when exclusions are present.
+
+### URL hash v2 with truncation
+
+Hash payload is capped at ~8 KB (base64url budget). When the session exceeds the ceiling, the encoder runs a 4-attempt degradation ladder:
+
+1. Full payload.
+2. Drop `manuallyExcluded`.
+3. Drop `manuallyExcluded` + `exactNames`.
+4. Drop `exclusions` entirely.
+
+When truncation occurs, the serialized payload is marked `truncated: true` so the decoder can surface a toast alerting the user that per-row overrides were dropped.
+
+### Parser changes — `power_state` column
+
+Both RVTools and LiveOptics parsers now emit `vmRowsByScope: Map<string, VmRow[]>` alongside the aggregate counters. The `power_state` column is resolved via aliases (`Powerstate`, `Power State`, `PowerState`, `power_state`) and normalized to `"poweredOn" | "poweredOff" | undefined`. When the column is absent, the `Exclude powered-off` toggle is disabled.

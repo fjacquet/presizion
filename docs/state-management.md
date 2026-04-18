@@ -274,3 +274,22 @@ There is no explicit cleanup. Zustand stores persist for the lifetime of the pag
 
 - `useClusterStore.resetCluster()` sets the cluster back to all-zero defaults.
 - There is no global "reset all" action. A full reset requires calling reset/set on each store individually or clearing `presizion-session` from localStorage and reloading the page.
+
+## Store Inventory (v2.7)
+
+| Store | Persistence | Purpose |
+| --- | --- | --- |
+| `useClusterStore` | localStorage | current `OldCluster` |
+| `useScenariosStore` | localStorage | scenario list |
+| `useWizardStore` | localStorage | current step, sizing mode, layout mode |
+| `useThemeStore` | localStorage | light/dark/system |
+| `useImportStore` | **session-only** | `rawByScope`, `scopeLabels`, `activeScope`, `vmRowsByScope` |
+| `useExclusionsStore` | localStorage (zustand `persist`) | `ExclusionRules` (globs + exact names + flags + manual overrides) |
+
+### Exclusions Split (ADR-021)
+
+`useExclusionsStore` persists only the *intent* (rules). `useImportStore.vmRowsByScope` holds the raw VM rows needed to re-aggregate, but is discarded on reload — the per-row review UI becomes read-only until the user re-imports. This keeps URL hashes under ~8 KB and lets rules be reapplied to a fresher source file.
+
+### Recompute Hook
+
+`useRecomputeCluster()` subscribes to both `useExclusionsStore.rules` and `useImportStore.vmRowsByScope`. On change it calls `applyExclusions` + `aggregateVmRows` and writes the kept aggregates back into `useClusterStore`, preserving ESX-derived fields (server config, utilization %).

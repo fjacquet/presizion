@@ -29,6 +29,7 @@ npm run test      # run all tests (596 tests)
 - **Stacked capacity bar charts**: normalized horizontal bars with per-segment percentage labels
 - **Growth projections**: per-resource compound growth rates (CPU %, Memory %, Storage %)
 - **Import from file**: RVTools (.xlsx), LiveOptics (.zip/.xlsx/.csv), or Presizion JSON session restore -- with multi-cluster scope filter
+- **Per-VM exclusions**: drop decommissioned or test VMs from sizing via glob patterns, exact names, power-state toggle, or per-row overrides (rules persist; rows stay session-only — see [ADR-021](docs/adr/ADR-021-vm-exclusion-rules-persistence.md))
 - **Side-by-side comparison**: servers required, total pCores, vCPU:pCore ratio, utilization percentages
 - **Multiple sizing modes**: vCPU:pCore ratio or SPECrate2017 Int Base with auto-derive and SPEC lookup link
 - **Export**: clipboard copy, CSV, JSON, PNG (charts with legend), PDF report (jsPDF), PPTX presentation (pptxgenjs), print layout, shareable URL

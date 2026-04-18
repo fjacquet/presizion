@@ -278,3 +278,24 @@ Coverage collection is scoped to the three directories that contain business log
 - `src/hooks/**` -- custom React hooks
 
 UI components are tested for behavior (rendering, interactions, conditional visibility) but are not included in the coverage target. The rationale is that sizing correctness is the critical invariant -- if formulas produce wrong numbers, the tool is useless. Component tests verify that the correct data reaches the screen, but pixel-level coverage is not tracked.
+
+## VM Exclusions Coverage (v2.7)
+
+The exclusions feature introduces ~60 new tests across 11 files, bringing the suite to ≈720 tests.
+
+| File | Focus |
+|---|---|
+| `src/lib/utils/import/__tests__/exclusions.compilePattern.test.ts` | glob→regex compilation, ReDoS safety, case-insensitive matching |
+| `src/lib/utils/import/__tests__/exclusions.isExcluded.test.ts` | short-circuit order (overrides → power → exact → glob) |
+| `src/lib/utils/import/__tests__/exclusions.apply.test.ts` | `applyExclusions` with stats breakdown |
+| `src/lib/utils/import/__tests__/exclusions.aggregate.test.ts` | `aggregateVmRows` aggregation correctness |
+| `src/lib/utils/import/__tests__/liveopticParser.vmRows.test.ts` | `vmRowsByScope` emission from LiveOptics |
+| `src/lib/utils/import/__tests__/rvtoolsParser.vmRows.test.ts` | `vmRowsByScope` emission from RVTools |
+| `src/store/__tests__/useExclusionsStore.test.ts` | persist middleware, reset, actions |
+| `src/lib/utils/__tests__/persistence.jsonV2.test.ts` | JSON schema v2 read/write, v1 backcompat |
+| `src/lib/utils/__tests__/persistence.hashV2.test.ts` | URL hash truncation ladder |
+| `src/components/exclusions/__tests__/VmExclusionPanel.test.tsx` | panel form wiring, live counts, per-row override round-trip |
+| `src/components/exclusions/__tests__/ExclusionSummaryCard.test.tsx` | null render, badge stack, edit-dialog trigger |
+| `src/components/step1/__tests__/ImportPreviewModal.test.tsx` | 2-step nav (scope → exclusions → Apply) |
+
+**Test patterns:** base-ui `Checkbox` renders as `<span role="checkbox">` with `aria-checked`/`aria-disabled`; prefer `toHaveAttribute('aria-disabled', 'true')` over `toBeDisabled()`. Use `vi.hoisted()` to stub `localStorage` before `useExclusionsStore` imports (zustand persist middleware reads storage at module load).
