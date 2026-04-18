@@ -32,22 +32,30 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
         <TableCell className={ASIS}>
           {cluster.existingServerCount ?? '—'}
         </TableCell>
-        {results.map((result, i) => (
-          <TableCell key={scenarios[i]?.id ?? i} className="text-center">
-            {result.haReserveApplied ? (
-              <span>
-                {result.requiredCount}
-                <span className="text-xs text-muted-foreground ml-1">
-                  + {result.haReserveCount} (N+{result.haReserveCount})
+        {results.map((result, i) => {
+          const base = result.stretchApplied && result.stretchPairedCount != null
+            ? result.stretchPairedCount
+            : result.requiredCount
+          const baseLabel = result.stretchApplied
+            ? `${result.requiredCount}×2`
+            : `${result.requiredCount}`
+          return (
+            <TableCell key={scenarios[i]?.id ?? i} className="text-center">
+              {result.haReserveApplied ? (
+                <span>
+                  {result.stretchApplied ? `${baseLabel}=${base}` : base}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    + {result.haReserveCount} (N+{result.haReserveCount})
+                  </span>
+                  {' = '}
+                  <span className="font-semibold">{result.finalCount}</span>
                 </span>
-                {' = '}
-                <span className="font-semibold">{result.finalCount}</span>
-              </span>
-            ) : (
-              result.finalCount
-            )}
-          </TableCell>
-        ))}
+              ) : (
+                result.finalCount
+              )}
+            </TableCell>
+          )
+        })}
       </TableRow>
 
       {/* Server Config */}
