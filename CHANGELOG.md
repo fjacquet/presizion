@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.8.0] -- 2026-04-18
+
+### Added
+
+- **Stretch cluster detection (#16)**: RVTools and LiveOptics imports now infer stretched/metro topology from scope labels (`stretch`, `stretched`, `metro`), vSAN fault domains, symmetric multi-DC host distribution, and explicit vSAN stretch markers. Detection signals surface in the import preview modal with an amber banner and a user-toggleable confirm switch.
+- **`isStretchCluster` cluster field** (schema, store, JSON export/import round-trip, manual toggle in the current cluster form). Sizing doubles the server count when the flag is set, reflecting the second-site requirement; HA reserve still adds on top when enabled.
+- **`ScenarioResult.stretchApplied` / `stretchPairedCount`** (internal): the `Servers Required` row in Step 3 now renders `{required}×2={paired} + HA = final` so the arithmetic reads correctly for stretched clusters with reserve.
+
+### Fixed
+
+- **Scope-aware stretch flag in import preview**: deselecting the stretched scope in a multi-scope import now correctly hides the banner and omits `isStretchCluster` from the applied cluster (previously sticky across scope toggles).
+
+---
+
 ## [2.7.0] -- 2026-04-18
 
 ### Added
