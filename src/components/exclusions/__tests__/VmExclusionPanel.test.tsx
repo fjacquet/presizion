@@ -60,8 +60,20 @@ describe('VmExclusionPanel', () => {
     const webCb = screen.getByRole('checkbox', { name: /^web01/ })
     expect(webCb).toHaveAttribute('aria-checked', 'false')
     fireEvent.click(webCb)
-    expect(useExclusionsStore.getState().rules.manuallyExcluded).toContain('web01')
+    expect(useExclusionsStore.getState().rules.manuallyExcluded).toContain('s1::web01')
     fireEvent.click(webCb)
-    expect(useExclusionsStore.getState().rules.manuallyExcluded).not.toContain('web01')
+    expect(useExclusionsStore.getState().rules.manuallyExcluded).not.toContain('s1::web01')
+  })
+
+  it('commits exactNames only on blur, preserving newlines mid-edit', () => {
+    render(<VmExclusionPanel rows={rows} />)
+    const ta = screen.getByLabelText(/Exact names/i) as HTMLTextAreaElement
+    fireEvent.change(ta, { target: { value: 'lab-a\nlab-b\n' } })
+    // Not committed yet — store still has empty exactNames
+    expect(useExclusionsStore.getState().rules.exactNames).toEqual([])
+    // Newline preserved in local text state
+    expect(ta.value).toBe('lab-a\nlab-b\n')
+    fireEvent.blur(ta)
+    expect(useExclusionsStore.getState().rules.exactNames).toEqual(['lab-a', 'lab-b'])
   })
 })

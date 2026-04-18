@@ -97,24 +97,30 @@ describe('isExcluded', () => {
 
   it('manuallyIncluded overrides a pattern match', () => {
     const re = compileNamePattern('test-*')
-    const rules = { ...EMPTY_RULES, namePattern: 'test-*', manuallyIncluded: ['test-keep'] }
+    const rules = { ...EMPTY_RULES, namePattern: 'test-*', manuallyIncluded: ['s1::test-keep'] }
     expect(isExcluded(row('test-keep'), rules, re)).toBe(false)
     expect(isExcluded(row('test-other'), rules, re)).toBe(true)
   })
 
   it('manuallyIncluded overrides powered-off exclusion', () => {
-    const rules = { ...EMPTY_RULES, excludePoweredOff: true, manuallyIncluded: ['keep'] }
+    const rules = { ...EMPTY_RULES, excludePoweredOff: true, manuallyIncluded: ['s1::keep'] }
     expect(isExcluded(row('keep', { powerState: 'poweredOff' }), rules, null)).toBe(false)
   })
 
   it('manuallyExcluded wins over no-rule match', () => {
-    const rules = { ...EMPTY_RULES, manuallyExcluded: ['drop'] }
+    const rules = { ...EMPTY_RULES, manuallyExcluded: ['s1::drop'] }
     expect(isExcluded(row('drop'), rules, null)).toBe(true)
   })
 
   it('manuallyIncluded beats manuallyExcluded when both listed', () => {
-    const rules = { ...EMPTY_RULES, manuallyExcluded: ['x'], manuallyIncluded: ['x'] }
+    const rules = { ...EMPTY_RULES, manuallyExcluded: ['s1::x'], manuallyIncluded: ['s1::x'] }
     expect(isExcluded(row('x'), rules, null)).toBe(false)
+  })
+
+  it('manual override targets only the matching scope', () => {
+    const rules = { ...EMPTY_RULES, manuallyExcluded: ['dcA::dup'] }
+    expect(isExcluded(row('dup', { scopeKey: 'dcA' }), rules, null)).toBe(true)
+    expect(isExcluded(row('dup', { scopeKey: 'dcB' }), rules, null)).toBe(false)
   })
 })
 
@@ -132,7 +138,7 @@ describe('applyExclusions', () => {
     expect([...filteredByScope.get('s2')!].map((r) => r.name)).toEqual(['c'])
     expect(stats.totalVms).toBe(3)
     expect(stats.excludedCount).toBe(0)
-    expect(stats.excludedByRule).toEqual({ namePattern: 0, powerState: 0, manual: 0 })
+    expect(stats.excludedByRule).toEqual({ namePattern: 0, exactNames: 0, powerState: 0, manual: 0 })
   })
 
   it('preserves scope structure when all rows in a scope are excluded', () => {
@@ -156,10 +162,20 @@ describe('applyExclusions', () => {
     const rules = {
       ...EMPTY_RULES,
       namePattern: 'test-*',
-      manuallyExcluded: ['test-a'],
+      manuallyExcluded: ['s1::test-a'],
     }
     const { stats } = applyExclusions(input, rules)
     expect(stats.excludedByRule.manual).toBe(1)
+    expect(stats.excludedByRule.namePattern).toBe(1)
+  })
+
+  it('counts exact-name exclusions separately from name pattern', () => {
+    const input = new Map<string, VmRow[]>([
+      ['s1', rows(['lab-vm', 'test-a'])],
+    ])
+    const rules = { ...EMPTY_RULES, namePattern: 'test-*', exactNames: ['lab-vm'] }
+    const { stats } = applyExclusions(input, rules)
+    expect(stats.excludedByRule.exactNames).toBe(1)
     expect(stats.excludedByRule.namePattern).toBe(1)
   })
 
@@ -170,6 +186,18 @@ describe('applyExclusions', () => {
     const rules = { ...EMPTY_RULES, excludePoweredOff: true }
     const { stats } = applyExclusions(input, rules)
     expect(stats.excludedByRule.powerState).toBe(1)
+  })
+
+  it('manual override keyed by scope::name only hits the matching row', () => {
+    const input = new Map<string, VmRow[]>([
+      ['dcA', [row('dup', { scopeKey: 'dcA' })]],
+      ['dcB', [row('dup', { scopeKey: 'dcB' })]],
+    ])
+    const rules = { ...EMPTY_RULES, manuallyExcluded: ['dcA::dup'] }
+    const { filteredByScope, stats } = applyExclusions(input, rules)
+    expect(filteredByScope.get('dcA')).toEqual([])
+    expect(filteredByScope.get('dcB')!.map((r) => r.name)).toEqual(['dup'])
+    expect(stats.excludedByRule.manual).toBe(1)
   })
 })
 

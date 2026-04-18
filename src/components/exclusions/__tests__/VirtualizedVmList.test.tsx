@@ -16,7 +16,7 @@ describe('VirtualizedVmList', () => {
     render(
       <VirtualizedVmList
         rows={rows}
-        excludedNames={new Set()}
+        excludedKeys={new Set()}
         onToggle={() => {}}
         height={400}
         rowHeight={32}
@@ -27,11 +27,11 @@ describe('VirtualizedVmList', () => {
     expect(rendered.length).toBeGreaterThan(0)
   })
 
-  it('marks row as excluded when the name is in excludedNames', () => {
+  it('marks row as excluded when its composite key is in excludedKeys', () => {
     render(
       <VirtualizedVmList
         rows={rows.slice(0, 10)}
-        excludedNames={new Set(['vm-3'])}
+        excludedKeys={new Set(['s1::vm-3'])}
         onToggle={() => {}}
         height={400}
         rowHeight={32}
@@ -42,12 +42,12 @@ describe('VirtualizedVmList', () => {
     expect(cb.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('calls onToggle with the row name when a checkbox is clicked', () => {
+  it('calls onToggle with the composite scopeKey::name when a checkbox is clicked', () => {
     const onToggle = vi.fn()
     render(
       <VirtualizedVmList
         rows={rows.slice(0, 5)}
-        excludedNames={new Set()}
+        excludedKeys={new Set()}
         onToggle={onToggle}
         height={400}
         rowHeight={32}
@@ -55,14 +55,14 @@ describe('VirtualizedVmList', () => {
     )
     const cb = screen.getByRole('checkbox', { name: /vm-2/ })
     fireEvent.click(cb)
-    expect(onToggle).toHaveBeenCalledWith('vm-2')
+    expect(onToggle).toHaveBeenCalledWith('s1::vm-2')
   })
 
   it('updates the visible window when the container is scrolled', () => {
     const { container } = render(
       <VirtualizedVmList
         rows={rows}
-        excludedNames={new Set()}
+        excludedKeys={new Set()}
         onToggle={() => {}}
         height={400}
         rowHeight={32}

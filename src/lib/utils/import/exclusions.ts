@@ -34,6 +34,10 @@ function escapeRegex(ch: string): string {
 
 /**
  * Decide whether a VM row is excluded.
+ *
+ * Manual overrides are keyed by `${row.scopeKey}::${row.name}` so that
+ * duplicate VM names across clusters/datacenters can be targeted individually.
+ *
  * Short-circuit order (first match wins):
  *   1. manuallyIncluded → false (override wins over every rule)
  *   2. manuallyExcluded → true
@@ -47,8 +51,9 @@ export function isExcluded(
   rules: ExclusionRules,
   compiled: RegExp | null,
 ): boolean {
-  if (rules.manuallyIncluded.includes(row.name)) return false
-  if (rules.manuallyExcluded.includes(row.name)) return true
+  const vmKey = `${row.scopeKey}::${row.name}`
+  if (rules.manuallyIncluded.includes(vmKey)) return false
+  if (rules.manuallyExcluded.includes(vmKey)) return true
   if (compiled !== null && compiled.test(row.name)) return true
   if (rules.exactNames.includes(row.name)) return true
   if (rules.excludePoweredOff && row.powerState === 'poweredOff') return true
@@ -60,6 +65,7 @@ export interface ExclusionStats {
   readonly excludedCount: number
   readonly excludedByRule: {
     readonly namePattern: number
+    readonly exactNames: number
     readonly powerState: number
     readonly manual: number
   }
@@ -81,6 +87,7 @@ export function applyExclusions(
 
   let totalVms = 0
   let byPattern = 0
+  let byExact = 0
   let byPower = 0
   let byManual = 0
 
@@ -88,11 +95,12 @@ export function applyExclusions(
     const kept: VmRow[] = []
     for (const row of rows) {
       totalVms++
-      if (includedSet.has(row.name)) {
+      const vmKey = `${row.scopeKey}::${row.name}`
+      if (includedSet.has(vmKey)) {
         kept.push(row)
         continue
       }
-      if (excludedSet.has(row.name)) {
+      if (excludedSet.has(vmKey)) {
         byManual++
         continue
       }
@@ -101,7 +109,7 @@ export function applyExclusions(
         continue
       }
       if (exactSet.has(row.name)) {
-        byPattern++
+        byExact++
         continue
       }
       if (rules.excludePoweredOff && row.powerState === 'poweredOff') {
@@ -117,8 +125,13 @@ export function applyExclusions(
     filteredByScope,
     stats: {
       totalVms,
-      excludedCount: byPattern + byPower + byManual,
-      excludedByRule: { namePattern: byPattern, powerState: byPower, manual: byManual },
+      excludedCount: byPattern + byExact + byPower + byManual,
+      excludedByRule: {
+        namePattern: byPattern,
+        exactNames: byExact,
+        powerState: byPower,
+        manual: byManual,
+      },
     },
   }
 }

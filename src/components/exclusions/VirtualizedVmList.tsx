@@ -4,8 +4,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 interface VirtualizedVmListProps {
   readonly rows: readonly VmRow[]
-  readonly excludedNames: ReadonlySet<string>
-  readonly onToggle: (name: string) => void
+  readonly excludedKeys: ReadonlySet<string>
+  readonly onToggle: (vmKey: string) => void
   readonly height: number
   readonly rowHeight: number
   readonly overscan?: number
@@ -13,7 +13,7 @@ interface VirtualizedVmListProps {
 
 export function VirtualizedVmList({
   rows,
-  excludedNames,
+  excludedKeys,
   onToggle,
   height,
   rowHeight,
@@ -46,30 +46,32 @@ export function VirtualizedVmList({
     >
       <div style={{ height: padTop }} aria-hidden />
       {slice.map((row) => {
-        const checked = excludedNames.has(row.name)
+        const vmKey = `${row.scopeKey}::${row.name}`
+        const checked = excludedKeys.has(vmKey)
         const ramGb = Math.round(row.ramMib / 1024)
         const diskGb = Math.round(row.diskMib / 1024)
         return (
-          <label
-            key={row.name}
-            className="flex items-center gap-2 px-2 text-sm"
-            style={{ height: rowHeight }}
+          <div
+            key={vmKey}
             role="listitem"
+            style={{ height: rowHeight }}
           >
-            <Checkbox
-              checked={checked}
-              onCheckedChange={() => onToggle(row.name)}
-            />
-            <span className="truncate flex-1 min-w-0" title={row.name}>
-              {row.name}
-            </span>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              {row.vcpus} vCPU / {ramGb} GiB / {diskGb} GiB
-            </span>
-            {row.powerState === 'poweredOff' && (
-              <span className="text-xs text-muted-foreground whitespace-nowrap">(off)</span>
-            )}
-          </label>
+            <label className="flex items-center gap-2 px-2 text-sm h-full">
+              <Checkbox
+                checked={checked}
+                onCheckedChange={() => onToggle(vmKey)}
+              />
+              <span className="truncate flex-1 min-w-0" title={row.name}>
+                {row.name}
+              </span>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                {row.vcpus} vCPU / {ramGb} GiB / {diskGb} GiB
+              </span>
+              {row.powerState === 'poweredOff' && (
+                <span className="text-xs text-muted-foreground whitespace-nowrap">(off)</span>
+              )}
+            </label>
+          </div>
         )
       })}
       <div style={{ height: padBottom }} aria-hidden />

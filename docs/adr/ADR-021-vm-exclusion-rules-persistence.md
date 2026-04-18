@@ -1,20 +1,28 @@
 # ADR-021: VM exclusion rules persist, raw rows do not
 
 ## Status
+
 Accepted — 2026-04-17
 
 ## Context
+
 Issue #13 requires letting users exclude individual VMs from the sizing
 calculation. Possible approaches ranged from storing filtered aggregates
 (no round-trip) to persisting every VM row (no URL-hash support at scale).
 
 ## Decision
+
 Persist only the `ExclusionRules` object (globs + exact names + flags +
 manual overrides) in localStorage, JSON exports, and URL hashes.
 Raw per-VM rows stay session-only on `useImportStore`, discarded on
 reload. Post-reload the rules UI is read-only; users re-import to edit.
 
+Manual override entries (`manuallyExcluded`, `manuallyIncluded`) are
+stored as `${scopeKey}::${name}` composite keys so that duplicate VM
+names across clusters can be targeted individually.
+
 ## Rationale
+
 - URL hashes have an ~8 KB ceiling; VM rows at enterprise scale exceed it
   by orders of magnitude.
 - Rules express intent and are forward-compatible with re-imports of a
@@ -24,6 +32,7 @@ reload. Post-reload the rules UI is read-only; users re-import to edit.
   reload still reproduces the sizing numbers.
 
 ## Consequences
+
 - (+) Small persisted payload; scales to clusters of any size.
 - (+) Rules can be shared and re-applied to a newer source file.
 - (-) Users who reload mid-session cannot tweak per-row overrides
@@ -32,6 +41,11 @@ reload. Post-reload the rules UI is read-only; users re-import to edit.
       input; URL hash encoder truncates them when over budget.
 
 ## Related decisions
+
 - Glob-over-regex for `namePattern` — ReDoS-safe by construction.
 - JSON schema v2 adds an optional `exclusions` block; v1 files migrate
   in by injecting `EMPTY_RULES`.
+- `useExclusionsStore` persist version bumped from 1 → 2 when manual
+  overrides changed from bare names to composite keys; v1 migrations
+  drop the manual lists because bare names cannot be remapped to scopes
+  without the original import context.
