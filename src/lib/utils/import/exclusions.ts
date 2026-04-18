@@ -74,6 +74,9 @@ export function applyExclusions(
   rules: ExclusionRules,
 ): { filteredByScope: Map<string, VmRow[]>; stats: ExclusionStats } {
   const compiled = compileNamePattern(rules.namePattern)
+  const includedSet = new Set(rules.manuallyIncluded)
+  const excludedSet = new Set(rules.manuallyExcluded)
+  const exactSet = new Set(rules.exactNames)
   const filteredByScope = new Map<string, VmRow[]>()
 
   let totalVms = 0
@@ -85,11 +88,11 @@ export function applyExclusions(
     const kept: VmRow[] = []
     for (const row of rows) {
       totalVms++
-      if (rules.manuallyIncluded.includes(row.name)) {
+      if (includedSet.has(row.name)) {
         kept.push(row)
         continue
       }
-      if (rules.manuallyExcluded.includes(row.name)) {
+      if (excludedSet.has(row.name)) {
         byManual++
         continue
       }
@@ -97,7 +100,7 @@ export function applyExclusions(
         byPattern++
         continue
       }
-      if (rules.exactNames.includes(row.name)) {
+      if (exactSet.has(row.name)) {
         byPattern++
         continue
       }

@@ -84,7 +84,7 @@ export function Step3ReviewExport() {
   }
 
   const handleDownloadJson = (): void => {
-    const json = buildJsonContent(currentCluster, scenarios, results)
+    const json = buildJsonContent(currentCluster, scenarios, results, exclusions)
     downloadJson('cluster-sizing.json', json)
   }
 

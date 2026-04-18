@@ -135,9 +135,9 @@ export function encodeSessionToHash(data: SessionData): string {
         ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [], exactNames: [] } }
         : d,
     (d) => {
-      const rest: SessionData = { ...d };
-      delete rest.exclusions;
-      return rest;
+      const { exclusions: _dropped, ...rest } = d;
+      void _dropped;
+      return rest as SessionData;
     },
   ];
 

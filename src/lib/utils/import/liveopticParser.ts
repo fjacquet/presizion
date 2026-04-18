@@ -1,5 +1,4 @@
 import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
-import type { PowerState } from '@/types/exclusions'
 import {
   LIVEOPTICS_ALIASES,
   LIVEOPTICS_ESX_HOSTS_ALIASES,
@@ -9,49 +8,11 @@ import {
   resolveColumns,
 } from './columnResolver'
 import { ImportError } from './fileValidation'
+import { parsePowerState, num, isTruthy, str, buildScopeLabel, appendToMap, type ParsedRow } from './parserHelpers'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
 
-interface VmRow {
-  [key: string]: unknown
-}
-
-function parsePowerState(raw: string): PowerState | undefined {
-  const s = raw.toLowerCase().replace(/\s+/g, '')
-  if (s === 'poweredon' || s === 'on') return 'poweredOn'
-  if (s === 'poweredoff' || s === 'off') return 'poweredOff'
-  if (s === 'suspended') return 'suspended'
-  if (s === '') return undefined
-  return 'unknown'
-}
-
-function num(row: VmRow, col: string | undefined): number {
-  if (!col) return 0
-  const v = row[col]
-  return typeof v === 'number' ? v : parseFloat(String(v ?? '0')) || 0
-}
-
-function isTruthy(row: VmRow, col: string | undefined): boolean {
-  if (!col) return false
-  const v = row[col]
-  return v === true || v === 'TRUE' || v === 'true' || v === 1
-}
-
-function str(row: VmRow, col: string | undefined): string {
-  if (!col) return ''
-  const v = row[col]
-  return v == null ? '' : String(v).trim()
-}
-
-function buildScopeLabel(scopeKey: string): string {
-  if (scopeKey === '__all__') return 'All'
-  if (scopeKey.includes('||')) {
-    const [dc, cluster] = scopeKey.split('||')
-    if (cluster === '__standalone__') return `Standalone (${dc})`
-    return `${cluster} (${dc})`
-  }
-  return scopeKey
-}
+type VmRow = ParsedRow
 
 interface ScopeAccum {
   totalVcpus: number
@@ -153,9 +114,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
             usedFallback = true
           }
 
-          const existing = hostsByScopeKey.get(scopeKey) ?? []
-          existing.push(host)
-          hostsByScopeKey.set(scopeKey, existing)
+          appendToMap(hostsByScopeKey, scopeKey, host)
         }
 
         if (usedFallback && base.rawByScope && !base.rawByScope.has('__all__')) {
@@ -224,9 +183,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
           for (const row of valid) {
             const hostName = str(row, cols['host_name'])
             const scopeKey = hostScopeMap.get(hostName) ?? '__all__'
-            const existing = perfByScopeKey.get(scopeKey) ?? []
-            existing.push(row)
-            perfByScopeKey.set(scopeKey, existing)
+            appendToMap(perfByScopeKey, scopeKey, row)
           }
 
           for (const [scopeKey, scopePerfRows] of perfByScopeKey.entries()) {
@@ -322,9 +279,7 @@ function aggregate(rows: VmRow[]): AggregateOutput {
       diskMib: disk,
       ...(powerState !== undefined && { powerState }),
     }
-    const existingRows = vmRowsByScope.get(scopeKey) ?? []
-    existingRows.push(vmRow)
-    vmRowsByScope.set(scopeKey, existingRows)
+    appendToMap(vmRowsByScope, scopeKey, vmRow)
 
     const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
     scopeMap.set(scopeKey, {

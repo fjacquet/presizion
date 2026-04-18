@@ -1,54 +1,15 @@
 import type { ClusterImportResult, ScopeData, VmRow as ScopedVmRow } from './index'
-import type { PowerState } from '@/types/exclusions'
 import { RVTOOLS_ALIASES, RVTOOLS_VHOST_ALIASES, CLUSTER_ALIASES, DATACENTER_ALIASES, resolveColumns } from './columnResolver'
+import { parsePowerState, num, isTruthy, str, buildScopeLabel, appendToMap, type ParsedRow } from './parserHelpers'
 
 const REQUIRED = new Set(['vm_name', 'num_cpus'])
-
-function parsePowerState(raw: string): PowerState | undefined {
-  const s = raw.toLowerCase().replace(/\s+/g, '')
-  if (s === 'poweredon' || s === 'on') return 'poweredOn'
-  if (s === 'poweredoff' || s === 'off') return 'poweredOff'
-  if (s === 'suspended') return 'suspended'
-  if (s === '') return undefined
-  return 'unknown'
-}
 
 /** Host column aliases on vInfo sheet for host-to-cluster mapping */
 const VINFO_HOST_ALIASES: Record<string, string[]> = {
   host_name: ['Host', 'Host Name', 'ESX Host'],
 }
 
-interface VInfoRow {
-  [key: string]: unknown
-}
-
-function num(row: VInfoRow, col: string | undefined): number {
-  if (!col) return 0
-  const v = row[col]
-  return typeof v === 'number' ? v : parseFloat(String(v ?? '0')) || 0
-}
-
-function isTruthy(row: VInfoRow, col: string | undefined): boolean {
-  if (!col) return false
-  const v = row[col]
-  return v === true || v === 'TRUE' || v === 'true' || v === 1
-}
-
-function str(row: VInfoRow, col: string | undefined): string {
-  if (!col) return ''
-  const v = row[col]
-  return v == null ? '' : String(v).trim()
-}
-
-function buildScopeLabel(scopeKey: string): string {
-  if (scopeKey === '__all__') return 'All'
-  if (scopeKey.includes('||')) {
-    const [dc, cluster] = scopeKey.split('||')
-    if (cluster === '__standalone__') return `Standalone (${dc})`
-    return `${cluster} (${dc})`
-  }
-  return scopeKey
-}
+type VInfoRow = ParsedRow
 
 interface ScopeAccum {
   totalVcpus: number
@@ -144,9 +105,7 @@ export async function parseRvtools(
       diskMib: disk,
       ...(powerState !== undefined && { powerState }),
     }
-    const existingRows = vmRowsByScope.get(scopeKey) ?? []
-    existingRows.push(vmRow)
-    vmRowsByScope.set(scopeKey, existingRows)
+    appendToMap(vmRowsByScope, scopeKey, vmRow)
 
     const existing = scopeMap.get(scopeKey) ?? { totalVcpus: 0, totalMemMib: 0, totalDiskMib: 0, vmCount: 0 }
     scopeMap.set(scopeKey, {
@@ -233,9 +192,7 @@ export async function parseRvtools(
             scopeKey = '__all__'
           }
 
-          const existing = hostsByScopeKey.get(scopeKey) ?? []
-          existing.push(host)
-          hostsByScopeKey.set(scopeKey, existing)
+          appendToMap(hostsByScopeKey, scopeKey, host)
         }
 
         // Check if we have cpu_sockets or cpu_cores_total columns -- only then compute per-scope ESX
