@@ -156,6 +156,7 @@ export async function parseRvtools(
     if (firstRow) {
       const cols = resolveColumns(Object.keys(firstRow), RVTOOLS_VHOST_ALIASES, new Set())
       const vHostClusterCols = resolveColumns(Object.keys(firstRow), CLUSTER_ALIASES, new Set())
+      const vHostDcCols = resolveColumns(Object.keys(firstRow), DATACENTER_ALIASES, new Set())
 
       // Global cpuModel and cpuFrequencyGhz for backward compat
       const firstHost = hostRows.find((r) => str(r, cols['host_name']) !== '') ?? firstRow
@@ -172,15 +173,18 @@ export async function parseRvtools(
       if (validHosts.length > 0) {
         const hostsByScopeKey = new Map<string, VInfoRow[]>()
         const vHostClusterCol = vHostClusterCols['cluster_name']
+        const vHostDcCol = vHostDcCols['datacenter_name']
 
         for (const host of validHosts) {
           const hostName = str(host, cols['host_name'])
           let scopeKey: string | undefined
 
-          // Priority 1: Cluster column on vHost
+          // Priority 1: Datacenter+Cluster columns on vHost (must match the
+          // composite key produced by vInfo when both DC and Cluster exist)
           if (vHostClusterCol) {
             const cluster = str(host, vHostClusterCol)
-            if (cluster) scopeKey = cluster
+            const dc = vHostDcCol ? str(host, vHostDcCol) : ''
+            if (cluster) scopeKey = dc ? `${dc}||${cluster}` : cluster
           }
 
           // Priority 2: hostToCluster map from vInfo
