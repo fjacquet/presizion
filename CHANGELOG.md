@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.8.1] -- 2026-05-01
+
+### Fixed
+
+- **RVTools per-scope ESX fields on multi-DC files**: when both `Datacenter` and `Cluster` columns exist in `vInfo`, scopes are keyed `DC||Cluster`, but the `vHost` rollup was keyed by bare cluster name and silently dropped on lookup. Selecting a scope yielded `totalPcores: 0`, blanking the vCPU:pCore ratio plus host count, sockets, cores/socket, RAM/server, and CPU frequency. The `vHost` grouping now resolves the `Datacenter` column too and rebuilds the matching composite key.
+- **Missing `vHost` column aliases for some RVTools versions**: added `Speed` to `cpu_speed_mhz` and `# Memory` to `memory_mb` so CPU frequency (GHz mode) and RAM/server populate on exports that use the bare-word headers.
+
+---
+
 ## [2.8.0] -- 2026-04-18
 
 ### Added
