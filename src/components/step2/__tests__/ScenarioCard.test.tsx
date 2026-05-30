@@ -311,6 +311,40 @@ describe('Step2Scenarios / ScenarioCard', () => {
         expect(updated?.targetSpecint).toBeUndefined()
       })
     })
+
+    it('switching away from performance mode clears targetSpecint (no stale SPEC re-activation)', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+
+      // Enable SPEC and set a score
+      act(() => {
+        fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
+      })
+      await waitFor(() => {
+        expect(screen.getByTestId(`input-targetSpecint-${scenario.id}`)).toBeInTheDocument()
+      })
+      act(() => {
+        fireEvent.change(screen.getByTestId(`input-targetSpecint-${scenario.id}`), {
+          target: { value: '500' },
+        })
+      })
+      await waitFor(() => {
+        expect(useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)?.targetSpecint).toBe(500)
+      })
+
+      // Switch to vcpu mode WITHOUT unchecking — the effect must clear targetSpecint,
+      // otherwise constraints.ts (targetSpecint > 0 → SPEC) would silently re-activate
+      // SPEC sizing on re-entry to performance mode.
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'vcpu' })
+      })
+      await waitFor(() => {
+        expect(useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)?.targetSpecint).toBeUndefined()
+      })
+    })
   })
 })
 

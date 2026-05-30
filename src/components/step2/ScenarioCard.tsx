@@ -111,11 +111,14 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     defaultValues: scenario as ScenarioInput,
   })
 
-  // Fix I-1: reset stale SPEC state when leaving performance mode
+  // Fix I-1: clear stale SPEC state when leaving performance mode.
+  // Must clear to undefined (not resetField, which restores the mount default
+  // e.g. 337) because constraints.ts routes to SPEC whenever targetSpecint > 0,
+  // regardless of the specEnabled checkbox. Matches the uncheck handler below.
   useEffect(() => {
     if (sizingMode !== 'performance') {
       setSpecEnabled(false)
-      form.resetField('targetSpecint')
+      form.setValue('targetSpecint', undefined)
     }
   }, [sizingMode, form])
 
