@@ -36,15 +36,15 @@ export interface Scenario {
   readonly targetVcpuToPCoreRatio: number;
   readonly ramPerVmGb: number;
   readonly diskPerVmGb: number;
-  readonly headroomPercent: number;
+  /** Future workload growth %, scales all demand. Default 0. */
+  readonly growthPercent: number;
+  /** Operational safety buffer % ("don't run hot"). Default 20. Replaces headroomPercent. */
+  readonly safetyPercent: number;
   /** 0 = no HA reserve, 1 = N+1 (one extra server), 2 = N+2 (two extra servers) */
   readonly haReserveCount: 0 | 1 | 2;
-  readonly targetSpecint?: number;                // SPECint benchmark score for target server (SPECint mode)
-  readonly targetCpuUtilizationPercent?: number;  // 1–100; display target (vCPU) or sizing driver (GHz mode)
-  readonly targetRamUtilizationPercent?: number;  // 1–100; design target RAM util for new cluster
-  readonly targetVmCount?: number;                // growth override: size for this VM count (scales vCPUs proportionally)
-  readonly minServerCount?: number;               // pin floor: finalCount is never less than this value
-  readonly targetCpuFrequencyGhz?: number;        // target server CPU clock frequency in GHz (GHz mode)
+  readonly targetSpecint?: number;           // SPECint benchmark score for target server (SPECint mode)
+  readonly minServerCount?: number;          // pin floor: finalCount is never less than this value
+  readonly targetCpuFrequencyGhz?: number;   // target server CPU clock frequency in GHz (GHz mode)
 
   // --- vSAN settings (Phase 18; all optional — absent = legacy sizing path, VSAN-12) ---
   readonly vsanFttPolicy?: VsanFttPolicy;              // VSAN-01 — triggers vSAN storage path when present
@@ -53,9 +53,4 @@ export interface Scenario {
   readonly vsanCpuOverheadPercent?: number;            // VSAN-06 — default 10%
   readonly vsanMemoryPerHostGb?: number;               // VSAN-07 — default 6 GB
   readonly vsanVmSwapEnabled?: boolean;                // VSAN-04 — default false (sparse swap)
-
-  // --- Growth projections (Phase 19; all optional — default 0%, GROW-03) ---
-  readonly cpuGrowthPercent?: number;        // GROW-01 — scales CPU demand by (1 + pct/100)
-  readonly memoryGrowthPercent?: number;     // GROW-01 — scales memory demand by (1 + pct/100)
-  readonly storageGrowthPercent?: number;    // GROW-01 — scales storage demand by (1 + pct/100)
 }

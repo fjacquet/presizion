@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createDefaultScenario } from '../defaults';
+import { createDefaultScenario, DEFAULT_GROWTH_PERCENT, DEFAULT_SAFETY_PERCENT } from '../defaults';
 
 describe('createDefaultScenario', () => {
   it('returns name "To-Be"', () => {
@@ -23,7 +23,8 @@ describe('createDefaultScenario', () => {
     expect(scenario).toHaveProperty('targetVcpuToPCoreRatio');
     expect(scenario).toHaveProperty('ramPerVmGb');
     expect(scenario).toHaveProperty('diskPerVmGb');
-    expect(scenario).toHaveProperty('headroomPercent');
+    expect(scenario).toHaveProperty('growthPercent');
+    expect(scenario).toHaveProperty('safetyPercent');
     expect(scenario).toHaveProperty('haReserveCount');
     expect(scenario).toHaveProperty('targetSpecint');
   });
@@ -33,4 +34,16 @@ describe('createDefaultScenario', () => {
     const b = createDefaultScenario();
     expect(a.id).not.toBe(b.id);
   });
+});
+
+it('seeds new buffer model defaults', () => {
+  expect(DEFAULT_GROWTH_PERCENT).toBe(0);
+  expect(DEFAULT_SAFETY_PERCENT).toBe(20);
+  const s = createDefaultScenario();
+  expect(s.growthPercent).toBe(0);
+  expect(s.safetyPercent).toBe(20);
+  expect('headroomPercent' in s).toBe(false);
+  expect('targetCpuUtilizationPercent' in s).toBe(false);
+  expect('cpuGrowthPercent' in s).toBe(false);
+  expect('targetVmCount' in s).toBe(false);
 });

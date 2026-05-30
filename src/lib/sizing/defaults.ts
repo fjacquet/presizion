@@ -15,12 +15,11 @@ export { VSAN_DEFAULT_SLACK_PERCENT, VSAN_DEFAULT_CPU_OVERHEAD_PCT, VSAN_DEFAULT
  */
 export const DEFAULT_VCPU_TO_PCORE_RATIO = 4;
 
-/**
- * 20% headroom means the cluster runs at approximately 80% utilisation under
- * normal load, leaving capacity for spikes and maintenance.
- * Industry-standard starting point; project owner should validate for target workload.
- */
-export const DEFAULT_HEADROOM_PERCENT = 20;
+/** Future-growth buffer. 0 = size for today's workload only. */
+export const DEFAULT_GROWTH_PERCENT = 0;
+
+/** Operational safety buffer. 20 → cluster sized to run ~83% under current load. */
+export const DEFAULT_SAFETY_PERCENT = 20;
 
 /**
  * Headroom percentage already provides a sufficient capacity buffer.
@@ -29,17 +28,6 @@ export const DEFAULT_HEADROOM_PERCENT = 20;
  * CALC-04.
  */
 export const DEFAULT_HA_RESERVE_COUNT: 0 | 1 | 2 = 0;
-
-/**
- * Default target CPU utilization for the new cluster (100 = fill to capacity).
- * Set lower (e.g. 80) to leave steady-state headroom above the headroom growth buffer.
- */
-export const DEFAULT_TARGET_CPU_UTILIZATION_PERCENT = 100;
-
-/**
- * Default target RAM utilization for the new cluster (100 = fill to capacity).
- */
-export const DEFAULT_TARGET_RAM_UTILIZATION_PERCENT = 100;
 
 /**
  * SPECrate2017_int_base score for a Dell PowerEdge R660 with 2× Intel Xeon Gold 6526Y
@@ -64,7 +52,8 @@ export function createDefaultScenario(): Scenario {
     targetVcpuToPCoreRatio: DEFAULT_VCPU_TO_PCORE_RATIO,
     ramPerVmGb: 4,
     diskPerVmGb: 50,
-    headroomPercent: DEFAULT_HEADROOM_PERCENT,
+    growthPercent: DEFAULT_GROWTH_PERCENT,
+    safetyPercent: DEFAULT_SAFETY_PERCENT,
     haReserveCount: DEFAULT_HA_RESERVE_COUNT,
     targetSpecint: DEFAULT_TARGET_SPECINT,
   };
