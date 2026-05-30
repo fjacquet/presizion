@@ -1,6 +1,7 @@
 /** As-Is vs To-Be Comparison slide — full metric table (ported verbatim). */
-import { FTT_POLICY_MAP } from '@/lib/sizing/vsanConstants';
+
 import type PptxGenJS from 'pptxgenjs';
+import { FTT_POLICY_MAP } from '@/lib/sizing/vsanConstants';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
@@ -156,7 +157,9 @@ export function addComparisonSlide(
       asIs: asIsTotalDisk,
       scenarioValues: results.map((r, idx) => {
         const scenario = scenarios[idx];
-        return scenario ? `${((r.finalCount * scenario.diskPerServerGb) / 1024).toFixed(1)} TiB` : '--';
+        return scenario
+          ? `${((r.finalCount * scenario.diskPerServerGb) / 1024).toFixed(1)} TiB`
+          : '--';
       }),
     },
     // --- Server configuration section ---
@@ -235,7 +238,9 @@ export function addComparisonSlide(
         label: 'Compression Factor',
         asIs: 'N/A',
         scenarioValues: scenarios.map((scenario) =>
-          scenario.vsanCompressionFactor !== undefined ? `${scenario.vsanCompressionFactor}x` : '1.0x',
+          scenario.vsanCompressionFactor !== undefined
+            ? `${scenario.vsanCompressionFactor}x`
+            : '1.0x',
         ),
       },
       {

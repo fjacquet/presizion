@@ -70,7 +70,10 @@ export function addSummarySlide(
       s,
       [
         { value: String(cluster.existingServerCount ?? '?'), label: 'As-Is Servers' },
-        { value: String(bestResult.finalCount), label: `${scenarios[0]?.name ?? 'Target'} Servers` },
+        {
+          value: String(bestResult.finalCount),
+          label: `${scenarios[0]?.name ?? 'Target'} Servers`,
+        },
         { value: `${bestResult.cpuUtilizationPercent.toFixed(0)}%`, label: 'CPU Utilization' },
         { value: `${bestResult.ramUtilizationPercent.toFixed(0)}%`, label: 'RAM Utilization' },
       ],
