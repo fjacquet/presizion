@@ -57,11 +57,13 @@ export function VirtualizedVmList({
               <span className="truncate flex-1 min-w-0" title={row.name}>
                 {row.name}
               </span>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
+              <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                 {row.vcpus} vCPU / {ramGb} GiB / {diskGb} GiB
               </span>
               {row.powerState === 'poweredOff' && (
-                <span className="text-xs text-muted-foreground whitespace-nowrap">(off)</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  (off)
+                </span>
               )}
             </label>
           </div>

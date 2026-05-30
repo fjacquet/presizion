@@ -36,7 +36,9 @@ export function ExclusionSummaryCard() {
             Edit exclusions
           </Button>
         ) : (
-          <span className="text-xs text-muted-foreground">Re-import source file to edit</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            Re-import source file to edit
+          </span>
         )}
       </div>
       <div className="flex flex-wrap gap-1">
@@ -61,7 +63,7 @@ export function ExclusionSummaryCard() {
         >
           <Dialog.Portal>
             <Dialog.Backdrop className="fixed inset-0 bg-black/40 z-40" />
-            <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border rounded-lg shadow-lg p-6 w-full max-w-lg">
+            <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-lg shadow-lg p-6 w-full max-w-lg">
               <Dialog.Title className="text-lg font-semibold mb-2">Edit VM Exclusions</Dialog.Title>
               <VmExclusionPanel rows={activeRows} />
               <div className="flex justify-end mt-3">

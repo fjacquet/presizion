@@ -185,7 +185,7 @@ describe('ComparisonTable', () => {
   describe('FIX-ASIS: As-Is column data rendering', () => {
     /**
      * Helper: get the As-Is cell (second cell in row, index 1) for a given row label.
-     * Row structure: <td>label</td> <td class="bg-muted/30">As-Is</td> <td>scenario...</td>
+     * Row structure: <td>label</td> <td class="bg-slate-100/30">As-Is</td> <td>scenario...</td>
      */
     function getAsIsCell(rowLabel: RegExp): HTMLElement | undefined {
       const row = screen.getByText(rowLabel).closest('tr');
@@ -328,7 +328,7 @@ describe('ComparisonTable', () => {
       const metricHeader = screen.getByRole('columnheader', { name: 'Metric' });
       expect(metricHeader.className).toContain('sticky');
       expect(metricHeader.className).toContain('left-0');
-      expect(metricHeader.className).toContain('bg-background');
+      expect(metricHeader.className).toContain('bg-white');
       expect(metricHeader.className).toContain('z-10');
     });
 
@@ -337,7 +337,7 @@ describe('ComparisonTable', () => {
       const serversCell = screen.getByText('Servers Required');
       expect(serversCell.className).toContain('sticky');
       expect(serversCell.className).toContain('left-0');
-      expect(serversCell.className).toContain('bg-background');
+      expect(serversCell.className).toContain('bg-white');
       expect(serversCell.className).toContain('z-10');
     });
   });

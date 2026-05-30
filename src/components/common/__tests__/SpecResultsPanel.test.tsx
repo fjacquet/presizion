@@ -104,7 +104,7 @@ describe('SpecResultsPanel', () => {
 
     // The row with Dell (baseResult=337) should have the highlight class
     const dellRow = screen.getByText('Dell').closest('tr');
-    expect(dellRow?.className).toContain('bg-primary/10');
+    expect(dellRow?.className).toContain('bg-primary-600/10');
   });
 
   it('shows "No SPECrate2017 results found" when status is no-results', () => {

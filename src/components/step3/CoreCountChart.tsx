@@ -39,7 +39,7 @@ export function CoreCountChart() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">
+        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
           Total Physical Cores per Scenario
         </h3>
         <Button

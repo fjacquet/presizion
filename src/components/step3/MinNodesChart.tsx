@@ -72,7 +72,7 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
         return (
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Min Nodes by Constraint -- {scenarioName}
               </h3>
               <Button

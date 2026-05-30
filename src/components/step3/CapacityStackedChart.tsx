@@ -173,7 +173,7 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
         return (
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Capacity Breakdown -- {scenarioName}
               </h3>
               <Button
@@ -263,7 +263,7 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className="flex justify-center gap-6 text-xs text-muted-foreground pb-2">
+            <div className="flex justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 pb-2">
               <span className="flex items-center gap-1.5">
                 <span
                   className="inline-block w-3 h-3 rounded-sm"

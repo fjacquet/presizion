@@ -60,7 +60,10 @@ export function WizardShell() {
   }
 
   return (
-    <div className="bg-background overflow-x-hidden" style={{ minHeight: '100dvh' }}>
+    <div
+      className="bg-white dark:bg-surface-900 overflow-x-hidden"
+      style={{ minHeight: '100dvh' }}
+    >
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="relative mb-6 text-center print:hidden">
           <div className="absolute left-0 top-0 flex items-center gap-1">
@@ -78,7 +81,7 @@ export function WizardShell() {
               target="_blank"
               rel="noopener noreferrer"
               title="Storage Calculator (Store-Predict)"
-              className="inline-flex items-center justify-center rounded-md h-11 w-11 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              className="inline-flex items-center justify-center rounded-md h-11 w-11 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700 transition-colors"
             >
               <Database className="h-4 w-4" />
             </a>
@@ -88,7 +91,7 @@ export function WizardShell() {
           </div>
           <img src="/presizion/logo.svg" alt="Presizion" className="mx-auto mb-3 h-8 w-auto" />
           <h1 className="text-2xl font-bold tracking-tight">Cluster Refresh Sizing</h1>
-          <p className="hidden sm:block text-sm text-muted-foreground mt-1">
+          <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 mt-1">
             Size your refreshed cluster based on existing metrics
           </p>
           <SizingModeToggle />
@@ -106,7 +109,7 @@ export function WizardShell() {
 
         {currentStep > 1 && (
           <div
-            className="sticky bottom-0 z-10 bg-background/95 backdrop-blur border-t px-4 py-3 flex justify-between print:hidden sm:static sm:bg-transparent sm:backdrop-blur-none sm:mt-8 sm:pt-4 sm:z-auto"
+            className="sticky bottom-0 z-10 bg-white/95 dark:bg-surface-900/95 backdrop-blur border-t border-slate-200 dark:border-surface-700 px-4 py-3 flex justify-between print:hidden sm:static sm:bg-transparent sm:backdrop-blur-none sm:mt-8 sm:pt-4 sm:z-auto"
             style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
           >
             <Button type="button" variant="outline" onClick={prevStep} className="min-h-[44px]">
@@ -126,7 +129,7 @@ export function WizardShell() {
           <DialogHeader>
             <DialogTitle>Reset all data?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             All cluster data and scenarios will be cleared. This cannot be undone.
           </p>
           <DialogFooter>

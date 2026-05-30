@@ -63,7 +63,9 @@ export function SizingChart() {
       {/* Final server count comparison — x-axis labels identify bars, no legend needed */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">Server Count Comparison</h3>
+          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            Server Count Comparison
+          </h3>
           <Button
             variant="outline"
             size="sm"
@@ -109,7 +111,7 @@ export function SizingChart() {
       {/* Per-constraint breakdown */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">
+          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
             Constraint Breakdown per Scenario
           </h3>
           <Button

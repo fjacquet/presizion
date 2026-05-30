@@ -99,7 +99,7 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
           />
           Exclude powered-off VMs
           {!hasPowerState && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               (power state not available in source file)
             </span>
           )}
@@ -136,7 +136,7 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
         </div>
       )}
 
-      <div className="text-xs text-muted-foreground">
+      <div className="text-xs text-slate-500 dark:text-slate-400">
         <p>
           Excluded: {stats.excludedCount} of {stats.totalVms} VMs
         </p>

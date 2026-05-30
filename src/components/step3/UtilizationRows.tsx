@@ -4,8 +4,8 @@ import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
 import { UtilizationCell } from './UtilizationCell';
 
-const STICKY = 'font-medium sticky left-0 bg-background z-10';
-const ASIS = 'text-center bg-muted/30';
+const STICKY = 'font-medium sticky left-0 bg-white dark:bg-surface-900 z-10';
+const ASIS = 'text-center bg-slate-100/30 dark:bg-surface-700/30';
 
 interface UtilizationRowsProps {
   readonly cluster: OldCluster;

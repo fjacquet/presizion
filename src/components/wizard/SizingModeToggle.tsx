@@ -2,8 +2,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { LayoutMode } from '@/store/useWizardStore';
 import { useWizardStore } from '@/store/useWizardStore';
 
-const ACTIVE = 'bg-primary text-primary-foreground font-semibold';
-const INACTIVE = 'bg-transparent text-foreground hover:bg-muted';
+const ACTIVE = 'bg-primary-600 text-white dark:bg-primary-500 font-semibold';
+const INACTIVE =
+  'bg-transparent text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700';
 
 function ModeBtn({
   label,
@@ -52,7 +53,7 @@ export function SizingModeToggle() {
       <div
         role="group"
         aria-label="Sizing mode"
-        className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40"
+        className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
       >
         <ModeBtn
           label="vCPU"
@@ -84,7 +85,7 @@ export function SizingModeToggle() {
       <div
         role="group"
         aria-label="Layout mode"
-        className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40"
+        className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
       >
         {(['hci', 'disaggregated'] as LayoutMode[]).map((lm) => (
           <ModeBtn

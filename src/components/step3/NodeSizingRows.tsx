@@ -11,8 +11,8 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   ghz: 'GHz-limited',
 };
 
-const STICKY = 'font-medium sticky left-0 bg-background z-10';
-const ASIS = 'text-center bg-muted/30';
+const STICKY = 'font-medium sticky left-0 bg-white dark:bg-surface-900 z-10';
+const ASIS = 'text-center bg-slate-100/30 dark:bg-surface-700/30';
 
 interface NodeSizingRowsProps {
   readonly cluster: OldCluster;
@@ -43,7 +43,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
               {result.haReserveApplied ? (
                 <span>
                   {result.stretchApplied ? `${baseLabel}=${base}` : base}
-                  <span className="text-xs text-muted-foreground ml-1">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
                     + {result.haReserveCount} (N+{result.haReserveCount})
                   </span>
                   {' = '}
@@ -103,7 +103,9 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
               >
                 {exceeds ? `⚠ ${achieved.toFixed(1)}:1` : `${achieved.toFixed(1)}:1`}
                 {exceeds && (
-                  <span className="text-xs text-muted-foreground ml-1">(target: {target})</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+                    (target: {target})
+                  </span>
                 )}
               </TableCell>
             );

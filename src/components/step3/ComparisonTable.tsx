@@ -33,9 +33,9 @@ export function ComparisonTable() {
     <div className="space-y-3">
       {/* Metadata chips */}
       <div className="flex flex-wrap gap-2 text-sm">
-        <span className="text-muted-foreground">Mode:</span>
+        <span className="text-slate-500 dark:text-slate-400">Mode:</span>
         <Badge variant="outline">{MODE_LABELS[sizingMode]}</Badge>
-        <span className="text-muted-foreground ml-2">Layout:</span>
+        <span className="text-slate-500 dark:text-slate-400 ml-2">Layout:</span>
         <Badge variant="outline">{layoutMode === 'hci' ? 'HCI' : 'Disaggregated'}</Badge>
       </div>
 
@@ -43,10 +43,12 @@ export function ComparisonTable() {
         <Table className="min-w-max">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-48 font-semibold sticky left-0 bg-background z-10">
+              <TableHead className="w-48 font-semibold sticky left-0 bg-white dark:bg-surface-900 z-10">
                 Metric
               </TableHead>
-              <TableHead className="font-semibold text-center bg-muted/30">As-Is</TableHead>
+              <TableHead className="font-semibold text-center bg-slate-100/30 dark:bg-surface-700/30">
+                As-Is
+              </TableHead>
               {scenarios.map((scenario) => (
                 <TableHead key={scenario.id} className="font-semibold text-center">
                   {scenario.name}

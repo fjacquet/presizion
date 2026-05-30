@@ -153,7 +153,7 @@ export function Step3ReviewExport() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Review &amp; Export</h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-slate-500 dark:text-slate-400 mt-1">
           Compare your target scenarios side-by-side, then export the results.
         </p>
       </div>

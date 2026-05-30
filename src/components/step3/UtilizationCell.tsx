@@ -10,7 +10,9 @@ export function UtilizationCell({ pct, target = 100 }: UtilizationCellProps) {
   return (
     <TableCell className={`text-center ${utilizationClass(pct)}`}>
       {pct > 100 ? `⚠ ${pct.toFixed(1)}%` : `${pct.toFixed(1)}%`}
-      {target < 100 && <span className="text-xs text-muted-foreground ml-1">/ {target}%</span>}
+      {target < 100 && (
+        <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">/ {target}%</span>
+      )}
     </TableCell>
   );
 }
