@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { analyzeStretchCluster } from '../stretchClusterDetector';
 
 describe('analyzeStretchCluster', () => {
@@ -141,10 +141,14 @@ describe('analyzeStretchCluster', () => {
     const positives = ['Stretch', 'STRETCHED', 'Metro'];
     const negatives = ['production', 'dev-stretcher', 'metropark'];
     for (const label of positives) {
-      expect(analyzeStretchCluster({ scopeKey: 'k', scopeLabel: label }).isStretchCluster).toBe(true);
+      expect(analyzeStretchCluster({ scopeKey: 'k', scopeLabel: label }).isStretchCluster).toBe(
+        true,
+      );
     }
     for (const label of negatives) {
-      expect(analyzeStretchCluster({ scopeKey: 'k', scopeLabel: label }).isStretchCluster).toBe(false);
+      expect(analyzeStretchCluster({ scopeKey: 'k', scopeLabel: label }).isStretchCluster).toBe(
+        false,
+      );
     }
   });
 });

@@ -1,35 +1,29 @@
-import { Controller, type UseFormReturn } from 'react-hook-form'
+import { Controller, type UseFormReturn } from 'react-hook-form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import type { ScenarioInput } from '@/schemas/scenarioSchema'
-import type { LayoutMode } from '@/store/useWizardStore'
-import {
-  FTT_POLICY_MAP,
-  COMPRESSION_FACTOR_LABELS,
-  type VsanFttPolicy,
-} from '@/lib/sizing/vsanConstants'
-import {
-  VSAN_DEFAULT_SLACK_PERCENT,
   VSAN_DEFAULT_CPU_OVERHEAD_PCT,
   VSAN_DEFAULT_MEMORY_PER_HOST_GB,
-} from '@/lib/sizing/defaults'
+  VSAN_DEFAULT_SLACK_PERCENT,
+} from '@/lib/sizing/defaults';
+import {
+  COMPRESSION_FACTOR_LABELS,
+  FTT_POLICY_MAP,
+  type VsanFttPolicy,
+} from '@/lib/sizing/vsanConstants';
+import type { ScenarioInput } from '@/schemas/scenarioSchema';
+import type { LayoutMode } from '@/store/useWizardStore';
 
 interface VsanSectionProps {
-  form: UseFormReturn<ScenarioInput>
-  scenarioId: string
-  layoutMode: LayoutMode
+  form: UseFormReturn<ScenarioInput>;
+  scenarioId: string;
+  layoutMode: LayoutMode;
 }
 
 const selectClasses =
-  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
 
 /**
  * vSAN settings sub-section. HCI-only (VSAN-12 / FORM-04): when layoutMode is
@@ -37,7 +31,7 @@ const selectClasses =
  * disclosure of ScenarioCard.
  */
 export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) {
-  if (layoutMode !== 'hci') return null
+  if (layoutMode !== 'hci') return null;
 
   return (
     <div className="space-y-4">
@@ -84,13 +78,13 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
                   onChange={(e) => field.onChange(e.target.value)}
                 >
                   <option value="">None (1.0x)</option>
-                  {(
-                    Object.entries(COMPRESSION_FACTOR_LABELS) as [string, string][]
-                  ).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
-                  ))}
+                  {(Object.entries(COMPRESSION_FACTOR_LABELS) as [string, string][]).map(
+                    ([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
+                      </option>
+                    ),
+                  )}
                 </select>
               </FormControl>
             </FormItem>
@@ -184,5 +178,5 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
         )}
       />
     </div>
-  )
+  );
 }

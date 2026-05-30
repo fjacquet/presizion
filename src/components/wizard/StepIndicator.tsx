@@ -1,24 +1,29 @@
 interface StepIndicatorProps {
-  currentStep: 1 | 2 | 3
-  totalSteps: 3
-  labels?: [string, string, string]
-  onStepClick?: (step: 1 | 2 | 3) => void
+  currentStep: 1 | 2 | 3;
+  totalSteps: 3;
+  labels?: [string, string, string];
+  onStepClick?: (step: 1 | 2 | 3) => void;
 }
 
 const DEFAULT_LABELS: [string, string, string] = [
   'Current Cluster',
   'Define Scenarios',
   'Review & Export',
-]
+];
 
-export function StepIndicator({ currentStep, totalSteps, labels = DEFAULT_LABELS, onStepClick }: StepIndicatorProps) {
+export function StepIndicator({
+  currentStep,
+  totalSteps,
+  labels = DEFAULT_LABELS,
+  onStepClick,
+}: StepIndicatorProps) {
   return (
     <nav aria-label="Wizard steps" className="flex items-center justify-center gap-0 mb-8">
       {Array.from({ length: totalSteps }, (_, i) => {
-        const step = (i + 1) as 1 | 2 | 3
-        const isActive = step === currentStep
-        const isCompleted = step < currentStep
-        const isClickable = onStepClick && (isCompleted || isActive)
+        const step = (i + 1) as 1 | 2 | 3;
+        const isActive = step === currentStep;
+        const isCompleted = step < currentStep;
+        const isClickable = onStepClick && (isCompleted || isActive);
 
         return (
           <div key={step} className="flex items-center">
@@ -32,8 +37,8 @@ export function StepIndicator({ currentStep, totalSteps, labels = DEFAULT_LABELS
                   isActive
                     ? 'border-primary bg-primary text-primary-foreground'
                     : isCompleted
-                    ? 'border-primary bg-primary/20 text-primary cursor-pointer hover:bg-primary/30'
-                    : 'border-muted-foreground/30 bg-background text-muted-foreground cursor-default',
+                      ? 'border-primary bg-primary/20 text-primary cursor-pointer hover:bg-primary/30'
+                      : 'border-muted-foreground/30 bg-background text-muted-foreground cursor-default',
                 ].join(' ')}
                 aria-current={isActive ? 'step' : undefined}
                 aria-label={`Step ${step}: ${labels[i]}`}
@@ -54,14 +59,16 @@ export function StepIndicator({ currentStep, totalSteps, labels = DEFAULT_LABELS
               </span>
             </div>
             {step < totalSteps && (
-              <div className={[
-                'h-px w-12 sm:w-24 mx-2',
-                isCompleted ? 'bg-primary' : 'bg-muted-foreground/30',
-              ].join(' ')} />
+              <div
+                className={[
+                  'h-px w-12 sm:w-24 mx-2',
+                  isCompleted ? 'bg-primary' : 'bg-muted-foreground/30',
+                ].join(' ')}
+              />
             )}
           </div>
-        )
+        );
       })}
     </nav>
-  )
+  );
 }

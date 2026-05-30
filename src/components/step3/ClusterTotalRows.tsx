@@ -1,29 +1,34 @@
-import { TableCell, TableRow } from '@/components/ui/table'
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ScenarioResult } from '@/types/results'
-import type { LayoutMode } from '@/lib/sizing/constraints'
+import { TableCell, TableRow } from '@/components/ui/table';
 import {
-  toBeVcpus,
-  toBePcores,
-  toBeVms,
-  toBeRamGb,
-  toBeDiskGb,
-  toBeDisaggregatedDiskGb,
   asIsRamGb,
-} from '@/lib/sizing/clusterTotals'
+  toBeDisaggregatedDiskGb,
+  toBeDiskGb,
+  toBePcores,
+  toBeRamGb,
+  toBeVcpus,
+  toBeVms,
+} from '@/lib/sizing/clusterTotals';
+import type { LayoutMode } from '@/lib/sizing/constraints';
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { ScenarioResult } from '@/types/results';
 
-const STICKY = 'font-medium sticky left-0 bg-background z-10'
-const ASIS = 'text-center bg-muted/30'
+const STICKY = 'font-medium sticky left-0 bg-background z-10';
+const ASIS = 'text-center bg-muted/30';
 
 interface ClusterTotalRowsProps {
-  readonly cluster: OldCluster
-  readonly scenarios: readonly Scenario[]
-  readonly results: readonly ScenarioResult[]
-  readonly layoutMode: LayoutMode
+  readonly cluster: OldCluster;
+  readonly scenarios: readonly Scenario[];
+  readonly results: readonly ScenarioResult[];
+  readonly layoutMode: LayoutMode;
 }
 
-export function ClusterTotalRows({ cluster, scenarios, results, layoutMode }: ClusterTotalRowsProps) {
-  const asIsTotalRam = asIsRamGb(cluster)
+export function ClusterTotalRows({
+  cluster,
+  scenarios,
+  results,
+  layoutMode,
+}: ClusterTotalRowsProps) {
+  const asIsTotalRam = asIsRamGb(cluster);
 
   return (
     <>
@@ -78,9 +83,7 @@ export function ClusterTotalRows({ cluster, scenarios, results, layoutMode }: Cl
         <TableRow>
           <TableCell className={STICKY}>Total Disk (GB)</TableCell>
           <TableCell className={ASIS}>
-            {cluster.totalDiskGb
-              ? Math.round(cluster.totalDiskGb).toLocaleString()
-              : '\u2014'}
+            {cluster.totalDiskGb ? Math.round(cluster.totalDiskGb).toLocaleString() : '\u2014'}
           </TableCell>
           {results.map((result, i) => (
             <TableCell key={scenarios[i]?.id ?? i} className="text-center">
@@ -107,5 +110,5 @@ export function ClusterTotalRows({ cluster, scenarios, results, layoutMode }: Cl
         </TableRow>
       )}
     </>
-  )
+  );
 }

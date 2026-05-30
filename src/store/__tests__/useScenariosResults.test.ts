@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useWizardStore } from '../useWizardStore';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { computeScenarioResult } from '../../lib/sizing/constraints';
+import { useWizardStore } from '../useWizardStore';
 
 const SPECINT_CLUSTER = {
   totalVcpus: 400,
@@ -20,7 +20,8 @@ const SPECINT_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 2,
   diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20,
+  growthPercent: 0,
+  safetyPercent: 20,
   haReserveCount: 0 as const,
   targetSpecint: 2400,
 };
@@ -48,7 +49,8 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
       targetVcpuToPCoreRatio: 4,
       ramPerVmGb: 2,
       diskPerVmGb: 10,
-      growthPercent: 0, safetyPercent: 20,
+      growthPercent: 0,
+      safetyPercent: 20,
       haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, 'vcpu');

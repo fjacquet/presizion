@@ -13,14 +13,14 @@
  * @module vsanFormulas
  */
 
+import type { VsanFttPolicy } from './vsanConstants';
 import {
   FTT_POLICY_MAP,
-  VSAN_METADATA_OVERHEAD_RATIO,
-  VSAN_DEFAULT_SLACK_PERCENT,
   VSAN_DEFAULT_CPU_OVERHEAD_PCT,
   VSAN_DEFAULT_MEMORY_PER_HOST_GB,
+  VSAN_DEFAULT_SLACK_PERCENT,
+  VSAN_METADATA_OVERHEAD_RATIO,
 } from './vsanConstants';
-import type { VsanFttPolicy } from './vsanConstants';
 
 // =====================================================================
 // Storage Pipeline

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createDefaultScenario, DEFAULT_GROWTH_PERCENT, DEFAULT_SAFETY_PERCENT } from '../defaults';
 
 describe('createDefaultScenario', () => {
@@ -9,9 +9,7 @@ describe('createDefaultScenario', () => {
 
   it('returns a valid non-empty UUID for id', () => {
     const scenario = createDefaultScenario();
-    expect(scenario.id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-    );
+    expect(scenario.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
   });
 
   it('returns an object with all required Scenario fields', () => {

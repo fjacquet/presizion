@@ -1,11 +1,12 @@
 // VALIDATION.md: cross-cutting — useScenariosResults returns correct ScenarioResult[]
 // Uses @testing-library/react renderHook
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useScenariosResults } from '../useScenariosResults';
+
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { computeScenarioResult } from '../../lib/sizing/constraints';
 import { useClusterStore } from '../../store/useClusterStore';
 import { useScenariosStore } from '../../store/useScenariosStore';
-import { computeScenarioResult } from '../../lib/sizing/constraints';
+import { useScenariosResults } from '../useScenariosResults';
 
 // CPU-limited fixture (from Plan 02 constraints.test.ts)
 // totalVcpus=3200, totalVms=100, totalPcores=800
@@ -23,7 +24,8 @@ const CPU_LIMITED_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 2,
   diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20,
+  growthPercent: 0,
+  safetyPercent: 20,
   haReserveCount: 0 as const,
 };
 

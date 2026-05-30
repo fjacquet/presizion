@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Set up localStorage mock BEFORE importing the module under test.
 const localStorageStore: Record<string, string> = {};
@@ -22,16 +22,16 @@ const localStorageMock = {
 
 vi.stubGlobal('localStorage', localStorageMock);
 
+import type { SessionData } from '../persistence';
 // Import module AFTER globals are set up.
 import {
-  serializeSession,
-  deserializeSession,
-  saveToLocalStorage,
-  loadFromLocalStorage,
-  encodeSessionToHash,
   decodeSessionFromHash,
+  deserializeSession,
+  encodeSessionToHash,
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  serializeSession,
 } from '../persistence';
-import type { SessionData } from '../persistence';
 
 const STORAGE_KEY = 'presizion-session';
 
@@ -167,10 +167,7 @@ describe('saveToLocalStorage', () => {
 
   it('calls localStorage.setItem with the correct STORAGE_KEY', () => {
     saveToLocalStorage(validSession);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      STORAGE_KEY,
-      expect.any(String),
-    );
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(STORAGE_KEY, expect.any(String));
   });
 
   it('stores a JSON string that round-trips back to the session data', () => {
@@ -264,12 +261,24 @@ describe('migrateLegacySession (via deserializeSession)', () => {
   it('migrates legacy headroomPercent → safetyPercent and old modes', () => {
     const legacy = JSON.stringify({
       cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
-      scenarios: [{
-        id: crypto.randomUUID(), name: 'Old', socketsPerServer: 2, coresPerSocket: 16,
-        ramPerServerGb: 512, diskPerServerGb: 10000, ramPerVmGb: 4, diskPerVmGb: 50,
-        growthPercent: 0, safetyPercent: 30, targetCpuUtilizationPercent: 80, cpuGrowthPercent: 15,
-      }],
-      sizingMode: 'specint', layoutMode: 'hci',
+      scenarios: [
+        {
+          id: crypto.randomUUID(),
+          name: 'Old',
+          socketsPerServer: 2,
+          coresPerSocket: 16,
+          ramPerServerGb: 512,
+          diskPerServerGb: 10000,
+          ramPerVmGb: 4,
+          diskPerVmGb: 50,
+          growthPercent: 0,
+          safetyPercent: 30,
+          targetCpuUtilizationPercent: 80,
+          cpuGrowthPercent: 15,
+        },
+      ],
+      sizingMode: 'specint',
+      layoutMode: 'hci',
     });
     const out = deserializeSession(legacy);
     expect(out).not.toBeNull();
@@ -284,7 +293,9 @@ describe('migrateLegacySession (via deserializeSession)', () => {
   it('maps aggressive → vcpu', () => {
     const legacy = JSON.stringify({
       cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
-      scenarios: [], sizingMode: 'aggressive', layoutMode: 'hci',
+      scenarios: [],
+      sizingMode: 'aggressive',
+      layoutMode: 'hci',
     });
     expect(deserializeSession(legacy)!.sizingMode).toBe('vcpu');
   });

@@ -33,19 +33,13 @@ const optionalNonNegativeNumber = z.preprocess(
  * Optional percentage field (0–100).
  * Absent or empty string → undefined (no error); provided value must be in range [0, 100].
  */
-const optionalPercent = z.preprocess(
-  numericPreprocess,
-  z.number().min(0).max(100).optional(),
-);
+const optionalPercent = z.preprocess(numericPreprocess, z.number().min(0).max(100).optional());
 
 /**
  * Optional positive number field.
  * Absent or empty string → undefined (no error); provided value must be > 0.
  */
-const optionalPositiveNumber = z.preprocess(
-  numericPreprocess,
-  z.number().positive().optional(),
-);
+const optionalPositiveNumber = z.preprocess(numericPreprocess, z.number().positive().optional());
 
 /**
  * Zod schema for OldCluster form input.

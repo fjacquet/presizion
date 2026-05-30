@@ -14,14 +14,14 @@
  * where spare = reservedMaxUtil + haReserve
  */
 export interface ResourceBreakdown {
-  readonly vmsRequired: number;       // demand from VMs (after growth, before overhead)
-  readonly vsanConsumption: number;   // vSAN overhead contribution (0 when no vSAN)
-  readonly required: number;          // vmsRequired + vsanConsumption
-  readonly reservedMaxUtil: number;   // required / maxUtilPct * (1 - maxUtilPct) (CAP-05)
-  readonly haReserve: number;         // one host worth of capacity (CAP-04)
-  readonly spare: number;             // reservedMaxUtil + haReserve
-  readonly excess: number;            // total - required - spare (can be negative)
-  readonly total: number;             // finalCount * capacityPerNode
+  readonly vmsRequired: number; // demand from VMs (after growth, before overhead)
+  readonly vsanConsumption: number; // vSAN overhead contribution (0 when no vSAN)
+  readonly required: number; // vmsRequired + vsanConsumption
+  readonly reservedMaxUtil: number; // required / maxUtilPct * (1 - maxUtilPct) (CAP-05)
+  readonly haReserve: number; // one host worth of capacity (CAP-04)
+  readonly spare: number; // reservedMaxUtil + haReserve
+  readonly excess: number; // total - required - spare (can be negative)
+  readonly total: number; // finalCount * capacityPerNode
 }
 
 /**
@@ -32,12 +32,12 @@ export interface ResourceBreakdown {
  * where required = rawBeforeSlack, spare = slackSpace + haReserve
  */
 export interface StorageBreakdown extends ResourceBreakdown {
-  readonly usableRequired: number;    // VM usable storage demand in GiB
-  readonly swapOverhead: number;      // VM swap space in GiB (0 when disabled)
-  readonly metadataOverhead: number;  // vSAN metadata in GiB
-  readonly fttOverhead: number;       // extra copies due to FTT multiplier
-  readonly rawRequired: number;       // total raw storage after full pipeline (includes slack)
-  readonly slackSpace: number;        // vSAN slack reserve in GiB
+  readonly usableRequired: number; // VM usable storage demand in GiB
+  readonly swapOverhead: number; // VM swap space in GiB (0 when disabled)
+  readonly metadataOverhead: number; // vSAN metadata in GiB
+  readonly fttOverhead: number; // extra copies due to FTT multiplier
+  readonly rawRequired: number; // total raw storage after full pipeline (includes slack)
+  readonly slackSpace: number; // vSAN slack reserve in GiB
 }
 
 /**

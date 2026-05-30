@@ -1,5 +1,5 @@
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ScenarioResult } from '@/types/results'
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { ScenarioResult } from '@/types/results';
 
 /**
  * Builds a human-readable plain-text summary of the cluster sizing results.
@@ -22,15 +22,15 @@ export function buildSummaryText(
     `  Total vCPUs:  ${cluster.totalVcpus}`,
     `  Total pCores: ${cluster.totalPcores}`,
     `  Total VMs:    ${cluster.totalVms}`,
-  ]
+  ];
 
   if (cluster.totalDiskGb !== undefined) {
-    lines.push(`  Total Disk:   ${cluster.totalDiskGb} GB`)
+    lines.push(`  Total Disk:   ${cluster.totalDiskGb} GB`);
   }
 
   scenarios.forEach((scenario, i) => {
-    const result = results[i]
-    if (!result) return
+    const result = results[i];
+    if (!result) return;
     lines.push(
       '',
       `Scenario: ${scenario.name}`,
@@ -43,10 +43,10 @@ export function buildSummaryText(
       `    Disk-limited: ${result.diskLimitedCount} servers`,
       `    → Required:   ${result.finalCount} servers (${result.limitingResource}-limited)`,
       `    CPU util: ${result.cpuUtilizationPercent.toFixed(1)}% | RAM util: ${result.ramUtilizationPercent.toFixed(1)}% | Disk util: ${result.diskUtilizationPercent.toFixed(1)}%`,
-    )
-  })
+    );
+  });
 
-  return lines.join('\n')
+  return lines.join('\n');
 }
 
 /**
@@ -56,5 +56,5 @@ export function buildSummaryText(
  * @returns Promise that resolves when the text has been copied
  */
 export async function copyToClipboard(text: string): Promise<void> {
-  await navigator.clipboard.writeText(text)
+  await navigator.clipboard.writeText(text);
 }

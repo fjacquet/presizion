@@ -1,5 +1,5 @@
-import type { ExclusionRules } from '@/types/exclusions'
-import type { VmRow, ScopeData } from './index'
+import type { ExclusionRules } from '@/types/exclusions';
+import type { ScopeData, VmRow } from './index';
 
 /**
  * Compile a comma-separated glob list to a single anchored, case-insensitive RegExp.
@@ -11,25 +11,25 @@ export function compileNamePattern(pattern: string): RegExp | null {
   const globs = pattern
     .split(',')
     .map((g) => g.trim())
-    .filter((g) => g.length > 0)
-  if (globs.length === 0) return null
+    .filter((g) => g.length > 0);
+  if (globs.length === 0) return null;
 
-  const alternatives = globs.map(globToRegexSource)
-  return new RegExp(`^(?:${alternatives.join('|')})$`, 'i')
+  const alternatives = globs.map(globToRegexSource);
+  return new RegExp(`^(?:${alternatives.join('|')})$`, 'i');
 }
 
 function globToRegexSource(glob: string): string {
-  let out = ''
+  let out = '';
   for (const ch of glob) {
-    if (ch === '*') out += '.*'
-    else if (ch === '?') out += '.'
-    else out += escapeRegex(ch)
+    if (ch === '*') out += '.*';
+    else if (ch === '?') out += '.';
+    else out += escapeRegex(ch);
   }
-  return out
+  return out;
 }
 
 function escapeRegex(ch: string): string {
-  return /[.\\+^$()|[\]{}]/.test(ch) ? `\\${ch}` : ch
+  return /[.\\+^$()|[\]{}]/.test(ch) ? `\\${ch}` : ch;
 }
 
 /**
@@ -46,29 +46,25 @@ function escapeRegex(ch: string): string {
  *   5. excludePoweredOff && row.powerState === 'poweredOff' → true
  *   else false
  */
-export function isExcluded(
-  row: VmRow,
-  rules: ExclusionRules,
-  compiled: RegExp | null,
-): boolean {
-  const vmKey = `${row.scopeKey}::${row.name}`
-  if (rules.manuallyIncluded.includes(vmKey)) return false
-  if (rules.manuallyExcluded.includes(vmKey)) return true
-  if (compiled !== null && compiled.test(row.name)) return true
-  if (rules.exactNames.includes(row.name)) return true
-  if (rules.excludePoweredOff && row.powerState === 'poweredOff') return true
-  return false
+export function isExcluded(row: VmRow, rules: ExclusionRules, compiled: RegExp | null): boolean {
+  const vmKey = `${row.scopeKey}::${row.name}`;
+  if (rules.manuallyIncluded.includes(vmKey)) return false;
+  if (rules.manuallyExcluded.includes(vmKey)) return true;
+  if (compiled !== null && compiled.test(row.name)) return true;
+  if (rules.exactNames.includes(row.name)) return true;
+  if (rules.excludePoweredOff && row.powerState === 'poweredOff') return true;
+  return false;
 }
 
 export interface ExclusionStats {
-  readonly totalVms: number
-  readonly excludedCount: number
+  readonly totalVms: number;
+  readonly excludedCount: number;
   readonly excludedByRule: {
-    readonly namePattern: number
-    readonly exactNames: number
-    readonly powerState: number
-    readonly manual: number
-  }
+    readonly namePattern: number;
+    readonly exactNames: number;
+    readonly powerState: number;
+    readonly manual: number;
+  };
 }
 
 /**
@@ -79,46 +75,46 @@ export function applyExclusions(
   vmRowsByScope: Map<string, VmRow[]>,
   rules: ExclusionRules,
 ): { filteredByScope: Map<string, VmRow[]>; stats: ExclusionStats } {
-  const compiled = compileNamePattern(rules.namePattern)
-  const includedSet = new Set(rules.manuallyIncluded)
-  const excludedSet = new Set(rules.manuallyExcluded)
-  const exactSet = new Set(rules.exactNames)
-  const filteredByScope = new Map<string, VmRow[]>()
+  const compiled = compileNamePattern(rules.namePattern);
+  const includedSet = new Set(rules.manuallyIncluded);
+  const excludedSet = new Set(rules.manuallyExcluded);
+  const exactSet = new Set(rules.exactNames);
+  const filteredByScope = new Map<string, VmRow[]>();
 
-  let totalVms = 0
-  let byPattern = 0
-  let byExact = 0
-  let byPower = 0
-  let byManual = 0
+  let totalVms = 0;
+  let byPattern = 0;
+  let byExact = 0;
+  let byPower = 0;
+  let byManual = 0;
 
   for (const [scopeKey, rows] of vmRowsByScope) {
-    const kept: VmRow[] = []
+    const kept: VmRow[] = [];
     for (const row of rows) {
-      totalVms++
-      const vmKey = `${row.scopeKey}::${row.name}`
+      totalVms++;
+      const vmKey = `${row.scopeKey}::${row.name}`;
       if (includedSet.has(vmKey)) {
-        kept.push(row)
-        continue
+        kept.push(row);
+        continue;
       }
       if (excludedSet.has(vmKey)) {
-        byManual++
-        continue
+        byManual++;
+        continue;
       }
       if (compiled !== null && compiled.test(row.name)) {
-        byPattern++
-        continue
+        byPattern++;
+        continue;
       }
       if (exactSet.has(row.name)) {
-        byExact++
-        continue
+        byExact++;
+        continue;
       }
       if (rules.excludePoweredOff && row.powerState === 'poweredOff') {
-        byPower++
-        continue
+        byPower++;
+        continue;
       }
-      kept.push(row)
+      kept.push(row);
     }
-    filteredByScope.set(scopeKey, kept)
+    filteredByScope.set(scopeKey, kept);
   }
 
   return {
@@ -133,7 +129,7 @@ export function applyExclusions(
         manual: byManual,
       },
     },
-  }
+  };
 }
 
 /**
@@ -144,22 +140,22 @@ export function aggregateVmRows(
   rows: readonly VmRow[],
 ): Pick<ScopeData, 'totalVcpus' | 'totalVms' | 'totalDiskGb' | 'avgRamPerVmGb' | 'vmCount'> {
   if (rows.length === 0) {
-    return { totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0 }
+    return { totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0 };
   }
-  let totalVcpus = 0
-  let totalMemMib = 0
-  let totalDiskMib = 0
+  let totalVcpus = 0;
+  let totalMemMib = 0;
+  let totalDiskMib = 0;
   for (const r of rows) {
-    totalVcpus += r.vcpus
-    totalMemMib += r.ramMib
-    totalDiskMib += r.diskMib
+    totalVcpus += r.vcpus;
+    totalMemMib += r.ramMib;
+    totalDiskMib += r.diskMib;
   }
-  const vmCount = rows.length
+  const vmCount = rows.length;
   return {
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
     avgRamPerVmGb: Math.round((totalMemMib / vmCount / 1024) * 10) / 10,
     vmCount,
-  }
+  };
 }

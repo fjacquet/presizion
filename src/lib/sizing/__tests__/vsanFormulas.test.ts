@@ -1,14 +1,13 @@
 // VSAN-01 through VSAN-11: vSAN formula engine unit tests
 // All reference values are manually verified step-by-step in comments.
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { FTT_POLICY_MAP } from '../vsanConstants';
 import {
-  computeVsanStorageRaw,
   computeVsanEffectiveGhzPerNode,
   computeVsanEffectiveRamPerNode,
+  computeVsanStorageRaw,
   serverCountByVsanStorage,
 } from '../vsanFormulas';
-import { FTT_POLICY_MAP } from '../vsanConstants';
-
 
 // =====================================================================
 // computeVsanStorageRaw

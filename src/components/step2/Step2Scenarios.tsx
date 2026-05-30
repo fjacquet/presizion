@@ -1,17 +1,17 @@
-import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { ScenarioCard } from './ScenarioCard'
-import { ScenarioResults } from './ScenarioResults'
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { ScenarioCard } from './ScenarioCard';
+import { ScenarioResults } from './ScenarioResults';
 
 export function Step2Scenarios() {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const addScenario = useScenariosStore((s) => s.addScenario)
-  const currentCluster = useClusterStore((s) => s.currentCluster)
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const addScenario = useScenariosStore((s) => s.addScenario);
+  const currentCluster = useClusterStore((s) => s.currentCluster);
 
-  const firstScenarioId = scenarios[0]?.id ?? ''
+  const firstScenarioId = scenarios[0]?.id ?? '';
 
   return (
     <div className="space-y-4">
@@ -26,16 +26,19 @@ export function Step2Scenarios() {
           type="button"
           variant="outline"
           onClick={() => {
-            const ramPerVmGb = currentCluster.avgRamPerVmGb
+            const ramPerVmGb = currentCluster.avgRamPerVmGb;
             const diskPerVmGb =
               currentCluster.totalDiskGb && currentCluster.totalVms
                 ? Math.round((currentCluster.totalDiskGb / currentCluster.totalVms) * 10) / 10
-                : undefined
+                : undefined;
             addScenario(
               ramPerVmGb != null || diskPerVmGb != null
-                ? { ...(ramPerVmGb != null && { ramPerVmGb }), ...(diskPerVmGb != null && { diskPerVmGb }) }
-                : undefined
-            )
+                ? {
+                    ...(ramPerVmGb != null && { ramPerVmGb }),
+                    ...(diskPerVmGb != null && { diskPerVmGb }),
+                  }
+                : undefined,
+            );
           }}
           aria-label="Add Scenario"
         >
@@ -61,5 +64,5 @@ export function Step2Scenarios() {
         ))}
       </Tabs>
     </div>
-  )
+  );
 }

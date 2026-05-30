@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import type { OldCluster, Scenario } from '../../types/cluster';
-import type { SizingMode, LayoutMode } from '../../store/useWizardStore';
-import type { ExclusionRules } from '../../types/exclusions';
 import { currentClusterSchema } from '../../schemas/currentClusterSchema';
 import { scenarioSchema } from '../../schemas/scenarioSchema';
+import type { LayoutMode, SizingMode } from '../../store/useWizardStore';
+import type { OldCluster, Scenario } from '../../types/cluster';
+import type { ExclusionRules } from '../../types/exclusions';
 
 const STORAGE_KEY = 'presizion-session';
 
@@ -61,8 +61,11 @@ export function serializeSession(data: SessionData): string {
 }
 
 const LEGACY_MODE_MAP: Record<string, 'vcpu' | 'performance'> = {
-  vcpu: 'vcpu', performance: 'performance',
-  specint: 'performance', ghz: 'performance', aggressive: 'vcpu',
+  vcpu: 'vcpu',
+  performance: 'performance',
+  specint: 'performance',
+  ghz: 'performance',
+  aggressive: 'vcpu',
 };
 
 /** Map a pre-2-knob persisted payload forward before schema validation. */
@@ -75,8 +78,13 @@ export function migrateLegacySession(raw: unknown): unknown {
   }
   if (Array.isArray(r.scenarios)) {
     const DROP = new Set([
-      'headroomPercent', 'targetCpuUtilizationPercent', 'targetRamUtilizationPercent',
-      'targetVmCount', 'cpuGrowthPercent', 'memoryGrowthPercent', 'storageGrowthPercent',
+      'headroomPercent',
+      'targetCpuUtilizationPercent',
+      'targetRamUtilizationPercent',
+      'targetVmCount',
+      'cpuGrowthPercent',
+      'memoryGrowthPercent',
+      'storageGrowthPercent',
     ]);
     next.scenarios = r.scenarios.map((s) => {
       if (typeof s !== 'object' || s === null) return s;
@@ -160,10 +168,7 @@ function encodeInner(data: SessionData): string {
 export function encodeSessionToHash(data: SessionData): string {
   const attempts: Array<(d: SessionData) => SessionData> = [
     (d) => d,
-    (d) =>
-      d.exclusions
-        ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [] } }
-        : d,
+    (d) => (d.exclusions ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [] } } : d),
     (d) =>
       d.exclusions
         ? { ...d, exclusions: { ...d.exclusions, manuallyExcluded: [], exactNames: [] } }

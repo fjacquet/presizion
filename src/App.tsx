@@ -1,5 +1,5 @@
-import { WizardShell } from '@/components/wizard/WizardShell'
-import { Toaster } from 'sonner'
+import { Toaster } from 'sonner';
+import { WizardShell } from '@/components/wizard/WizardShell';
 
 export default function App() {
   return (
@@ -7,5 +7,5 @@ export default function App() {
       <WizardShell />
       <Toaster />
     </>
-  )
+  );
 }
