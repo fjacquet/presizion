@@ -5,9 +5,8 @@ import { FTT_POLICY_MAP } from '@/lib/sizing/vsanConstants';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
-import { utilBandColor } from '../format';
 import { PPTX_COLORS } from '../primitives/colors';
-import { PPTX_THEME } from '../theme';
+import { headerCell, plainCell, utilCell } from './_cells';
 import { addFooter, addHeader, M } from './_layout';
 
 interface ComparisonSlideData {
@@ -26,27 +25,6 @@ interface CompMetric {
   readonly label: string;
   readonly asIs: string | TableCellObj;
   readonly scenarioValues: readonly (string | TableCellObj)[];
-}
-
-/** Util cell with a colored band dot prefix (Consolas value). */
-function utilCell(pct: number, fillColor: string): TableCellObj {
-  return {
-    text: [
-      { text: '● ', options: { color: utilBandColor(pct), fontSize: 10, fontFace: 'Arial' } },
-      {
-        text: `${pct.toFixed(1)}%`,
-        options: { color: PPTX_COLORS.ink, fontSize: 10, fontFace: 'Consolas' },
-      },
-    ],
-    options: { fill: { color: fillColor } },
-  };
-}
-
-function plainCell(text: string, fillColor: string): TableCellObj {
-  return {
-    text,
-    options: { fill: { color: fillColor }, fontSize: 10, fontFace: 'Arial' },
-  };
 }
 
 export function addComparisonSlide(
@@ -82,36 +60,9 @@ export function addComparisonSlide(
       : '--';
 
   const compHeaderRow = [
-    {
-      text: 'Metric',
-      options: {
-        bold: true,
-        fill: { color: PPTX_THEME.tableHeader.fill },
-        color: PPTX_THEME.tableHeader.color,
-        fontSize: 10,
-        fontFace: 'Arial',
-      },
-    },
-    {
-      text: 'As-Is',
-      options: {
-        bold: true,
-        fill: { color: PPTX_THEME.tableHeader.fill },
-        color: PPTX_THEME.tableHeader.color,
-        fontSize: 10,
-        fontFace: 'Arial',
-      },
-    },
-    ...scenarios.map((scenario) => ({
-      text: scenario.name,
-      options: {
-        bold: true,
-        fill: { color: PPTX_THEME.tableHeader.fill },
-        color: PPTX_THEME.tableHeader.color,
-        fontSize: 10,
-        fontFace: 'Arial',
-      },
-    })),
+    headerCell('Metric'),
+    headerCell('As-Is'),
+    ...scenarios.map((scenario) => headerCell(scenario.name)),
   ];
 
   // --- Sizing results section ---
@@ -137,20 +88,22 @@ export function addComparisonSlide(
       scenarioValues: results.map((r) => `${r.achievedVcpuToPCoreRatio.toFixed(1)}:1`),
     },
     {
+      // Row index 4 in this metric list → even → page-bg fill.
       label: 'CPU Util %',
       asIs:
         cluster.cpuUtilizationPercent !== undefined
-          ? utilCell(cluster.cpuUtilizationPercent, PPTX_COLORS.pageBg)
-          : plainCell('--', PPTX_COLORS.pageBg),
-      scenarioValues: results.map((r) => utilCell(r.cpuUtilizationPercent, PPTX_COLORS.pageBg)),
+          ? utilCell(cluster.cpuUtilizationPercent, 4)
+          : plainCell('--', 4),
+      scenarioValues: results.map((r) => utilCell(r.cpuUtilizationPercent, 4)),
     },
     {
+      // Row index 5 in this metric list → odd → paper fill.
       label: 'RAM Util %',
       asIs:
         cluster.ramUtilizationPercent !== undefined
-          ? utilCell(cluster.ramUtilizationPercent, PPTX_COLORS.paper)
-          : plainCell('--', PPTX_COLORS.paper),
-      scenarioValues: results.map((r) => utilCell(r.ramUtilizationPercent, PPTX_COLORS.paper)),
+          ? utilCell(cluster.ramUtilizationPercent, 5)
+          : plainCell('--', 5),
+      scenarioValues: results.map((r) => utilCell(r.ramUtilizationPercent, 5)),
     },
     {
       label: 'Total Disk',

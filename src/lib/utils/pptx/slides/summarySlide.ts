@@ -2,53 +2,14 @@
 import type PptxGenJS from 'pptxgenjs';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
-import { utilBandColor } from '../format';
 import { PPTX_COLORS } from '../primitives/colors';
-import { PPTX_THEME } from '../theme';
+import { headerCell, plainCell, utilCell } from './_cells';
 import { addFooter, addHeader, addKpiRow, M } from './_layout';
 
 interface SummarySlideData {
   cluster: OldCluster;
   scenarios: readonly Scenario[];
   results: readonly ScenarioResult[];
-}
-
-function headerCell(text: string) {
-  return {
-    text,
-    options: {
-      bold: true,
-      fill: { color: PPTX_THEME.tableHeader.fill },
-      color: PPTX_THEME.tableHeader.color,
-      fontSize: 11,
-      fontFace: 'Arial',
-    },
-  };
-}
-
-/** Util cell with a colored band dot prefix (Consolas value). */
-function utilCell(pct: number, fillColor: string) {
-  return {
-    text: [
-      { text: '● ', options: { color: utilBandColor(pct), fontSize: 10, fontFace: 'Arial' } },
-      {
-        text: `${pct.toFixed(1)}%`,
-        options: { color: PPTX_COLORS.ink, fontSize: 10, fontFace: 'Consolas' },
-      },
-    ],
-    options: { fill: { color: fillColor } },
-  };
-}
-
-function plainCell(text: string, fillColor: string, mono = false) {
-  return {
-    text,
-    options: {
-      fill: { color: fillColor },
-      fontSize: 10,
-      fontFace: mono ? 'Consolas' : 'Arial',
-    },
-  };
 }
 
 export function addSummarySlide(
@@ -83,22 +44,21 @@ export function addSummarySlide(
   }
 
   const headerRow = [
-    headerCell('Scenario'),
-    headerCell('Servers'),
-    headerCell('Limiting Resource'),
-    headerCell('CPU Util %'),
-    headerCell('RAM Util %'),
+    headerCell('Scenario', 11),
+    headerCell('Servers', 11),
+    headerCell('Limiting Resource', 11),
+    headerCell('CPU Util %', 11),
+    headerCell('RAM Util %', 11),
   ];
 
   const dataRows = scenarios.map((scenario, i) => {
     const r = results[i];
-    const fillColor = i % 2 === 0 ? PPTX_COLORS.pageBg : PPTX_COLORS.paper;
     return [
-      plainCell(scenario.name, fillColor),
-      plainCell(r ? String(r.finalCount) : '-', fillColor, true),
-      plainCell(r ? r.limitingResource : '-', fillColor),
-      r ? utilCell(r.cpuUtilizationPercent, fillColor) : plainCell('-', fillColor, true),
-      r ? utilCell(r.ramUtilizationPercent, fillColor) : plainCell('-', fillColor, true),
+      plainCell(scenario.name, i),
+      plainCell(r ? String(r.finalCount) : '-', i, true),
+      plainCell(r ? r.limitingResource : '-', i),
+      r ? utilCell(r.cpuUtilizationPercent, i) : plainCell('-', i, true),
+      r ? utilCell(r.ramUtilizationPercent, i) : plainCell('-', i, true),
     ];
   });
 

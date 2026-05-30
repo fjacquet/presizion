@@ -6,7 +6,7 @@ import type { ScenarioResult } from '@/types/results';
 import type { ScenarioCharts } from '../chartTypes';
 import { f1 } from '../format';
 import { PPTX_COLORS } from '../primitives/colors';
-import { PPTX_THEME } from '../theme';
+import { dataCell, headerCell } from './_cells';
 import { addFooter, addHeader, M } from './_layout';
 
 interface ScenarioChartSlidesData {
@@ -19,31 +19,6 @@ interface ScenarioChartSlidesData {
 /** Strip `data:` prefix so pptxgenjs accepts it as `data`. */
 function toPptxData(dataUrl: string): string {
   return dataUrl.replace(/^data:/, '');
-}
-
-function headerCell(text: string) {
-  return {
-    text,
-    options: {
-      bold: true,
-      fill: { color: PPTX_THEME.tableHeader.fill },
-      color: PPTX_THEME.tableHeader.color,
-      fontSize: 10,
-      fontFace: 'Arial',
-    },
-  };
-}
-
-function dataCell(text: string, rowIdx: number, label = false) {
-  return {
-    text,
-    options: {
-      fill: { color: rowIdx % 2 === 0 ? PPTX_COLORS.pageBg : PPTX_COLORS.paper },
-      fontSize: 10,
-      fontFace: label ? 'Arial' : 'Consolas',
-      bold: label,
-    },
-  };
 }
 
 /**
