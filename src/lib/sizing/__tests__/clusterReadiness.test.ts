@@ -10,7 +10,9 @@ const ready: OldCluster = {
 it('is ready only when both utilizations are present', () => {
   expect(isClusterSizingReady(ready)).toBe(true)
   const { cpuUtilizationPercent: _c, ...noCpu } = ready
+  void _c
   expect(isClusterSizingReady(noCpu)).toBe(false)
   const { ramUtilizationPercent: _r, ...noRam } = ready
+  void _r
   expect(isClusterSizingReady(noRam)).toBe(false)
 })

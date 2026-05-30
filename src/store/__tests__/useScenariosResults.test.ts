@@ -20,7 +20,7 @@ const SPECINT_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 2,
   diskPerVmGb: 10,
-  headroomPercent: 20,
+  growthPercent: 0, safetyPercent: 20,
   haReserveCount: 0 as const,
   targetSpecint: 2400,
 };
@@ -31,7 +31,7 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
   });
 
   it('returns SPECint-limited result when sizingMode is specint and specint constraint drives count', () => {
-    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'specint');
+    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'performance');
     expect(result.limitingResource).toBe('specint');
     expect(result.cpuLimitedCount).toBe(6);
   });
@@ -48,7 +48,7 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
       targetVcpuToPCoreRatio: 4,
       ramPerVmGb: 2,
       diskPerVmGb: 10,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, 'vcpu');
@@ -57,7 +57,7 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
   });
 
   it('limitingResource is specint when specint mode and specint count is highest', () => {
-    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'specint');
+    const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'performance');
     expect(result.limitingResource).toBe('specint');
   });
 });

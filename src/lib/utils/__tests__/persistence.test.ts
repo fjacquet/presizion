@@ -267,7 +267,7 @@ describe('migrateLegacySession (via deserializeSession)', () => {
       scenarios: [{
         id: crypto.randomUUID(), name: 'Old', socketsPerServer: 2, coresPerSocket: 16,
         ramPerServerGb: 512, diskPerServerGb: 10000, ramPerVmGb: 4, diskPerVmGb: 50,
-        headroomPercent: 30, targetCpuUtilizationPercent: 80, cpuGrowthPercent: 15,
+        growthPercent: 0, safetyPercent: 30, targetCpuUtilizationPercent: 80, cpuGrowthPercent: 15,
       }],
       sizingMode: 'specint', layoutMode: 'hci',
     });

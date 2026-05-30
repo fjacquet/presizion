@@ -22,7 +22,7 @@ const CPU_LIMITED_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 2,
   diskPerVmGb: 10,
-  headroomPercent: 20,
+  growthPercent: 0, safetyPercent: 20,
   haReserveCount: 0 as const,
 };
 
