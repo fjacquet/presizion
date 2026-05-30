@@ -30,7 +30,7 @@ import { useWizardStore } from '@/store/useWizardStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import type { Scenario } from '@/types/cluster'
 import type { SpecResult } from '@/lib/utils/specLookup'
-import { VsanGrowthSection } from './VsanGrowthSection'
+import { VsanSection } from './VsanSection'
 
 const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
   socketsPerServer:               'Physical CPU sockets per target server. Check the vendor spec sheet.',
@@ -40,11 +40,9 @@ const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
   targetVcpuToPCoreRatio:         'Hard assignment-density cap: no more than N vCPUs per physical core. VMware recommends 4:1 for mixed workloads; use 2:1 for databases.',
   ramPerVmGb:                     'Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.',
   diskPerVmGb:                    'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
-  headroomPercent:                '20% means the sized cluster runs at 80% utilization, leaving buffer for spikes and growth.',
+  growthPercent:                  'Future workload growth. 0% = size for today only. Scales all demand (CPU, RAM, disk).',
+  safetyPercent:                  "Operational buffer so the cluster never runs hot. 20% → sized to run ~83% under current load.",
   targetSpecint:                  'SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).',
-  targetCpuUtilizationPercent:    'Display reference only: the CPU utilization % you are designing for. Does not affect server count (the vCPU:pCore ratio is the hard cap).',
-  targetRamUtilizationPercent:    'Design target: size the cluster so RAM runs at this utilization. E.g. 80% means current RAM demand fills 80% of new capacity (with headroom on top).',
-  targetVmCount:                  'Growth override: size the cluster for this future VM count. vCPUs are scaled proportionally from the current cluster.',
   targetCpuFrequencyGhz:          'Target server CPU clock frequency in GHz. Used with current frequency to compute GHz demand ratio.',
   minServerCount:                 'Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing.',
 }
@@ -82,7 +80,8 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const currentCluster = useClusterStore((s) => s.currentCluster)
 
   const [pinEnabled, setPinEnabled] = useState(() => !!scenario?.minServerCount)
-  const [vsanGrowthOpen, setVsanGrowthOpen] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [specEnabled, setSpecEnabled] = useState(() => !!scenario?.targetSpecint)
 
   // SPEC lookup: local UI state for target CPU model search (not persisted)
   const [targetCpuModel, setTargetCpuModel] = useState('')
@@ -101,9 +100,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     return () => clearTimeout(timer)
   }, [targetCpuModel])
 
-  const specLookup = useSpecLookup(
-    sizingMode === 'specint' || sizingMode === 'vcpu' ? debouncedCpuModel : undefined,
-  )
+  const specActive =
+    (sizingMode === 'performance' && specEnabled) || sizingMode === 'vcpu'
+  const specLookup = useSpecLookup(specActive ? debouncedCpuModel : undefined)
 
   const form = useForm<ScenarioInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,8 +161,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     form,
   ])
 
-  // SPEC-06..08: In specint mode, auto-derive socket/core from cluster metadata (read-only)
-  const hasMetadata = sizingMode === 'specint' &&
+  // SPEC-06..08: In performance mode with SPEC scores, auto-derive socket/core
+  // from cluster metadata (read-only)
+  const hasMetadata = sizingMode === 'performance' && specEnabled &&
     currentCluster.socketsPerServer != null &&
     currentCluster.coresPerSocket != null
 
@@ -182,11 +182,6 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   }
 
   if (!scenario) return null
-
-  const cpuUtilLabel = sizingMode === 'ghz' ? 'Target CPU Load %' : 'Target CPU Util %'
-  const cpuUtilTip = sizingMode === 'ghz'
-    ? 'Design target: new servers will run at this CPU load at steady state.'
-    : TOOLTIPS.targetCpuUtilizationPercent
 
   return (
     <Card className="w-full">
@@ -236,6 +231,12 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {currentCluster.totalVms > 0 && (
+              <p className="text-xs text-muted-foreground border-l-2 border-primary/40 pl-2">
+                Seeded from your import: {scenario.targetVcpuToPCoreRatio}:1 ratio, {scenario.growthPercent}% growth, {scenario.safetyPercent}% safety — adjust as needed.
+              </p>
+            )}
+
             {/* Server Configuration */}
             <section>
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
@@ -278,7 +279,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   Total cores/server: <span className="font-semibold tabular-nums">{totalCores}</span>
                 </p>
               )}
-              {sizingMode === 'specint' &&
+              {sizingMode === 'performance' && specEnabled &&
                 (currentCluster.socketsPerServer == null || currentCluster.coresPerSocket == null) && (
                 <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
                   No socket/core data from import — enter manually.
@@ -322,14 +323,6 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 Sizing Assumptions
               </h4>
 
-              {/* Aggressive mode info banner */}
-              {sizingMode === 'aggressive' && (
-                <div className="flex items-center gap-2 p-3 mb-4 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
-                  <Info className="h-4 w-4 shrink-0" />
-                  Server count driven by CPU Util % from Step 1 — vCPU:pCore ratio cap bypassed
-                </div>
-              )}
-
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {sizingMode === 'vcpu' && (
                   <FormField control={form.control} name="targetVcpuToPCoreRatio" render={({ field }) => (
@@ -354,38 +347,17 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     <FormMessage />
                   </FormItem>
                 )} />
-                <FormField control={form.control} name="headroomPercent" render={({ field }) => (
+                <FormField control={form.control} name="growthPercent" render={({ field }) => (
                   <FormItem>
-                    <FieldLabel name="headroomPercent">Headroom %</FieldLabel>
-                    <FormControl><Input type="number" min={0} max={100} {...numericField(field)} /></FormControl>
+                    <FieldLabel name="growthPercent">Growth %</FieldLabel>
+                    <FormControl><Input type="number" min={0} max={200} {...numericField(field)} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
-                {sizingMode !== 'specint' && (
-                  <FormField control={form.control} name="targetCpuUtilizationPercent" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-1">
-                        {cpuUtilLabel}
-                        {cpuUtilTip && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent><p className="max-w-xs text-sm">{cpuUtilTip}</p></TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
-                      </FormLabel>
-                      <FormControl><Input type="number" min={1} max={100} {...numericField(field)} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                )}
-                <FormField control={form.control} name="targetRamUtilizationPercent" render={({ field }) => (
+                <FormField control={form.control} name="safetyPercent" render={({ field }) => (
                   <FormItem>
-                    <FieldLabel name="targetRamUtilizationPercent">Target RAM Util %</FieldLabel>
-                    <FormControl><Input type="number" min={1} max={100} {...numericField(field)} /></FormControl>
+                    <FieldLabel name="safetyPercent">Safety buffer %</FieldLabel>
+                    <FormControl><Input type="number" min={0} max={100} {...numericField(field)} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -423,16 +395,16 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               </div>
             </section>
 
-            {/* GHz mode — target CPU frequency */}
-            {sizingMode === 'ghz' && (
+            {/* Performance mode — GHz primary, SPEC optional */}
+            {sizingMode === 'performance' && (
               <div className="border-t pt-4">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  GHz Mode (required)
+                  Performance Target (required)
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   <FormField control={form.control} name="targetCpuFrequencyGhz" render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="targetCpuFrequencyGhz">Target CPU Frequency (GHz)</FieldLabel>
+                      <FieldLabel name="targetCpuFrequencyGhz">New CPU Frequency (GHz)</FieldLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -447,96 +419,90 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                       <FormMessage />
                     </FormItem>
                   )} />
-                </div>
-              </div>
-            )}
 
-            {/* SPECrate2017 mode */}
-            {sizingMode === 'specint' && (
-              <div className="border-t pt-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  SPECrate2017 Target (required in SPECrate mode)
-                </p>
-                <div className="space-y-3">
-                  {/* Target CPU Model search input */}
-                  <div className="space-y-1">
-                    <Label htmlFor={`${scenarioId}-targetCpuModel`}>Target CPU Model</Label>
-                    <Input
-                      id={`${scenarioId}-targetCpuModel`}
-                      type="text"
-                      placeholder="e.g. Xeon Gold 6526Y"
-                      value={targetCpuModel}
-                      onChange={(e) => setTargetCpuModel(e.target.value)}
+                  {/* SPEC opt-in */}
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id={`${scenarioId}-spec-enabled`}
+                      checked={specEnabled}
+                      onCheckedChange={(checked) => {
+                        setSpecEnabled(checked)
+                        if (!checked) form.setValue('targetSpecint', undefined)
+                      }}
                     />
+                    <Label htmlFor={`${scenarioId}-spec-enabled`} className="cursor-pointer text-sm">
+                      I have SPEC scores (more precise)
+                    </Label>
                   </div>
 
-                  {/* SPEC results panel */}
-                  {(debouncedCpuModel || specLookup.isLoading) && (
-                    <SpecResultsPanel
-                      results={specLookup.results}
-                      status={specLookup.status}
-                      isLoading={specLookup.isLoading}
-                      onSelect={handleSpecSelect}
-                      selectedScore={selectedTargetScore}
-                    />
-                  )}
-
-                  {/* Manual targetSpecint input */}
-                  <Controller
-                    control={form.control}
-                    name="targetSpecint"
-                    render={({ field, fieldState }) => (
+                  {specEnabled && (
+                    <div className="space-y-3">
+                      {/* Target CPU Model search input */}
                       <div className="space-y-1">
-                        <Label htmlFor={`${scenarioId}-targetSpecint`}>SPECrate2017_int_base / Server (target)</Label>
+                        <Label htmlFor={`${scenarioId}-targetCpuModel`}>Target CPU Model</Label>
                         <Input
-                          id={`${scenarioId}-targetSpecint`}
-                          type="number"
-                          min={1}
-                          data-testid={`input-targetSpecint-${scenarioId}`}
-                          {...field}
-                          value={field.value ?? ''}
-                          onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                          id={`${scenarioId}-targetCpuModel`}
+                          type="text"
+                          placeholder="e.g. Xeon Gold 6526Y"
+                          value={targetCpuModel}
+                          onChange={(e) => setTargetCpuModel(e.target.value)}
                         />
-                        {fieldState.error && (
-                          <p className="text-sm text-destructive">{fieldState.error.message}</p>
-                        )}
                       </div>
-                    )}
-                  />
+
+                      {/* SPEC results panel */}
+                      {(debouncedCpuModel || specLookup.isLoading) && (
+                        <SpecResultsPanel
+                          results={specLookup.results}
+                          status={specLookup.status}
+                          isLoading={specLookup.isLoading}
+                          onSelect={handleSpecSelect}
+                          selectedScore={selectedTargetScore}
+                        />
+                      )}
+
+                      {/* Manual targetSpecint input */}
+                      <Controller
+                        control={form.control}
+                        name="targetSpecint"
+                        render={({ field, fieldState }) => (
+                          <div className="space-y-1">
+                            <Label htmlFor={`${scenarioId}-targetSpecint`}>SPECrate2017_int_base / Server (target)</Label>
+                            <Input
+                              id={`${scenarioId}-targetSpecint`}
+                              type="number"
+                              min={1}
+                              data-testid={`input-targetSpecint-${scenarioId}`}
+                              {...field}
+                              value={field.value ?? ''}
+                              onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                            />
+                            {fieldState.error && (
+                              <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                            )}
+                          </div>
+                        )}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Optional advanced fields */}
+            {/* Advanced disclosure */}
             <div className="border-t pt-4 space-y-4">
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                Advanced (optional)
-              </p>
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((o) => !o)}
+                aria-expanded={advancedOpen}
+                aria-controls={`${scenarioId}-advanced`}
+                className="flex w-full items-center gap-1 text-sm font-semibold text-muted-foreground uppercase tracking-wide"
+              >
+                Advanced
+                <span aria-hidden="true">{advancedOpen ? '▾' : '▸'}</span>
+              </button>
 
-              {/* VM Count growth override */}
-              <FormField control={form.control} name="targetVmCount" render={({ field }) => (
-                <FormItem>
-                  <FieldLabel name="targetVmCount">Target VM Count</FieldLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      step={1}
-                      data-testid={`input-targetVmCount-${scenarioId}`}
-                      {...field}
-                      value={field.value ?? ''}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  {currentCluster.totalVms > 0 && (
-                    <p className="text-xs text-muted-foreground">
-                      Current: {currentCluster.totalVms.toLocaleString()} VMs → vCPUs scaled proportionally
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )} />
-
+              {advancedOpen && (
+                <div id={`${scenarioId}-advanced`} className="space-y-4">
               {/* Minimum server floor (pin) */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -582,15 +548,15 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   )} />
                 )}
               </div>
-            </div>
 
-            <VsanGrowthSection
-              form={form}
-              scenarioId={scenarioId}
-              layoutMode={layoutMode}
-              open={vsanGrowthOpen}
-              onToggle={() => setVsanGrowthOpen((o) => !o)}
-            />
+                  <VsanSection
+                    form={form}
+                    scenarioId={scenarioId}
+                    layoutMode={layoutMode}
+                  />
+                </div>
+              )}
+            </div>
           </CardContent>
         </form>
       </Form>
