@@ -273,9 +273,11 @@ describe('migrateLegacySession (via deserializeSession)', () => {
     });
     const out = deserializeSession(legacy);
     expect(out).not.toBeNull();
-    expect(out!.scenarios[0].safetyPercent).toBe(30);
-    expect(out!.scenarios[0].growthPercent).toBe(0); // dropped per-resource growth → default
-    expect('headroomPercent' in out!.scenarios[0]).toBe(false);
+    const sc0 = out!.scenarios[0];
+    expect(sc0).toBeDefined();
+    expect(sc0!.safetyPercent).toBe(30);
+    expect(sc0!.growthPercent).toBe(0); // dropped per-resource growth → default
+    expect('headroomPercent' in sc0!).toBe(false);
     expect(out!.sizingMode).toBe('performance'); // specint → performance
   });
 

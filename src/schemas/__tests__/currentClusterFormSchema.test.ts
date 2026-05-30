@@ -1,3 +1,4 @@
+import { it, expect } from 'vitest'
 import { currentClusterFormSchema } from '../currentClusterFormSchema'
 
 it('rejects missing utilization', () => {

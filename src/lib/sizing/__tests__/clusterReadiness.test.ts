@@ -1,3 +1,4 @@
+import { it, expect } from 'vitest'
 import { isClusterSizingReady } from '../clusterReadiness'
 import type { OldCluster } from '../../../types/cluster'
 
