@@ -11,14 +11,11 @@ describe('useWizardStore — sizingMode (PERF-01)', () => {
     expect(state.sizingMode).toBe('vcpu');
   });
 
-  it('setSizingMode("specint") updates sizingMode to specint', () => {
-    useWizardStore.getState().setSizingMode('specint');
-    expect(useWizardStore.getState().sizingMode).toBe('specint');
-  });
-
-  it('setSizingMode("vcpu") switches back to vcpu from specint', () => {
-    useWizardStore.setState({ sizingMode: 'specint' });
-    useWizardStore.getState().setSizingMode('vcpu');
+  it('only allows vcpu and performance modes', () => {
+    const { setSizingMode } = useWizardStore.getState();
+    setSizingMode('performance');
+    expect(useWizardStore.getState().sizingMode).toBe('performance');
+    setSizingMode('vcpu');
     expect(useWizardStore.getState().sizingMode).toBe('vcpu');
   });
 });

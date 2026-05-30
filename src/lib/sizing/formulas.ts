@@ -117,32 +117,6 @@ export function serverCountBySpecint(
 }
 
 /**
- * Computes the number of servers required in Aggressive mode.
- *
- * The vCPU:pCore ratio cap is intentionally bypassed. The observed CPU
- * utilization drives density directly — the user explicitly accepts the risk
- * of overcommit beyond the standard ratio.
- *
- * Formula (CALC-01-AGG):
- *   ceil( totalVcpus * (cpuUtilPct/100) * growthHeadroomFactor / coresPerServer )
- *
- * @param totalVcpus          Total vCPUs assigned in the cluster
- * @param cpuUtilPct          Observed average CPU utilization (0–100)
- * @param growthHeadroomFactor  1 + headroomPercent/100 (e.g. 1.20 for 20% headroom)
- * @param coresPerServer      Physical cores per new target server
- */
-export function serverCountByCpuAggressive(
-  totalVcpus: number,
-  cpuUtilPct: number,
-  growthHeadroomFactor: number,
-  coresPerServer: number,
-): number {
-  return Math.ceil(
-    (totalVcpus * (cpuUtilPct / 100) * growthHeadroomFactor) / coresPerServer,
-  );
-}
-
-/**
  * Computes the number of servers required in GHz mode.
  *
  * Demand is measured in GHz: pCores × existingFreq × observedUtil.
