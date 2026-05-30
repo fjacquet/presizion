@@ -42,13 +42,13 @@ export function computeVsanBreakdown(
   const freqGhz = scenario.targetCpuFrequencyGhz ?? 1;
   const isVsan = scenario.vsanFttPolicy !== undefined;
 
-  // Effective VM count (with targetVmCount override)
-  const effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms;
+  const effectiveVmCount = cluster.totalVms;
 
-  // Growth factors (compound, applied to demand — matches constraints.ts pipeline)
-  const cpuGrowthFactor = 1 + (scenario.cpuGrowthPercent ?? 0) / 100;
-  const memGrowthFactor = 1 + (scenario.memoryGrowthPercent ?? 0) / 100;
-  const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100;
+  // Single growth factor applied to demand (matches constraints.ts pipeline).
+  const growthFactor = 1 + (scenario.growthPercent ?? 0) / 100;
+  const cpuGrowthFactor = growthFactor;
+  const memGrowthFactor = growthFactor;
+  const storageGrowthFactor = growthFactor;
 
   // =====================================================================
   // CPU Breakdown (CAP-01)
@@ -124,7 +124,8 @@ function computeCpuBreakdown(
   cpuGrowthFactor: number = 1,
 ): ResourceBreakdown {
   const { finalCount } = result;
-  const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
+  // Target-util removed from the model; the safety buffer now provides headroom.
+  const targetCpuUtilPct = 100;
 
   // Demand: in GHz mode, use vCPU * freq; in vCPU mode, normalize by ratio so required <= total
   const ratio = scenario.targetVcpuToPCoreRatio > 0 ? scenario.targetVcpuToPCoreRatio : 1;
@@ -181,7 +182,8 @@ function computeMemoryBreakdown(
   memGrowthFactor: number = 1,
 ): ResourceBreakdown {
   const { finalCount } = result;
-  const targetRamUtilPct = scenario.targetRamUtilizationPercent ?? 100;
+  // Target-util removed from the model; the safety buffer now provides headroom.
+  const targetRamUtilPct = 100;
 
   // Demand: VM count * RAM per VM * growth factor
   const vmsRequired = effectiveVmCount * scenario.ramPerVmGb * memGrowthFactor;

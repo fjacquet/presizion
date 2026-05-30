@@ -9,6 +9,7 @@ import { useScenariosResults } from '@/hooks/useScenariosResults'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useWizardStore } from '@/store/useWizardStore'
+import type { SizingMode } from '@/store/useWizardStore'
 import {
   Table,
   TableBody,
@@ -21,11 +22,9 @@ import { NodeSizingRows } from './NodeSizingRows'
 import { UtilizationRows } from './UtilizationRows'
 import { ClusterTotalRows } from './ClusterTotalRows'
 
-const MODE_LABELS = {
+const MODE_LABELS: Record<SizingMode, string> = {
   vcpu: 'vCPU',
-  specint: 'SPECrate2017',
-  aggressive: 'Aggressive',
-  ghz: 'GHz',
+  performance: 'Performance',
 }
 
 export function ComparisonTable() {

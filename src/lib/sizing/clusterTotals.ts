@@ -2,14 +2,12 @@ import type { OldCluster, Scenario } from '../../types/cluster'
 import type { ScenarioResult } from '../../types/results'
 
 /**
- * Computes the effective (grown) vCPU count for a To-Be scenario.
- * Mirrors the effectiveVcpus + cpuGrowthFactor logic in constraints.ts.
+ * Computes the projected vCPU demand for a To-Be scenario.
+ * Applies the growth buffer (the safety buffer is reflected in the server
+ * count, not in projected demand). Mirrors effectiveVcpus in constraints.ts.
  */
 export function toBeVcpus(cluster: OldCluster, scenario: Scenario): number {
-  const effective = scenario.targetVmCount && cluster.totalVms > 0
-    ? Math.round(cluster.totalVcpus * (scenario.targetVmCount / cluster.totalVms))
-    : cluster.totalVcpus
-  return Math.round(effective * (1 + (scenario.cpuGrowthPercent ?? 0) / 100))
+  return Math.round(cluster.totalVcpus * (1 + (scenario.growthPercent ?? 0) / 100))
 }
 
 /** Total physical cores for a To-Be scenario. */
@@ -18,8 +16,9 @@ export function toBePcores(scenario: Scenario, result: ScenarioResult): number {
 }
 
 /** Effective VM count for a To-Be scenario. */
-export function toBeVms(cluster: OldCluster, scenario: Scenario): number {
-  return scenario.targetVmCount ?? cluster.totalVms
+export function toBeVms(cluster: OldCluster, _scenario?: Scenario): number {
+  void _scenario
+  return cluster.totalVms
 }
 
 /** Total cluster RAM (GB) for a To-Be scenario. */
@@ -34,10 +33,10 @@ export function toBeDiskGb(scenario: Scenario, result: ScenarioResult): number {
 
 /** Total disk required (GB) for a disaggregated scenario. */
 export function toBeDisaggregatedDiskGb(cluster: OldCluster, scenario: Scenario): number {
-  const effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms
-  const headroomFactor = 1 + scenario.headroomPercent / 100
-  const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100
-  return Math.round(effectiveVmCount * scenario.diskPerVmGb * storageGrowthFactor * headroomFactor)
+  const effectiveVmCount = cluster.totalVms
+  const demandFactor =
+    (1 + (scenario.growthPercent ?? 0) / 100) * (1 + (scenario.safetyPercent ?? 0) / 100)
+  return Math.round(effectiveVmCount * scenario.diskPerVmGb * demandFactor)
 }
 
 /** As-Is total RAM (GB), derived from server count × RAM per server. */

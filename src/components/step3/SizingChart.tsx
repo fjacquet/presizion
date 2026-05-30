@@ -35,8 +35,7 @@ export function SizingChart() {
   const showDisk = layoutMode !== 'disaggregated'
 
   const cpuBarName =
-    sizingMode === 'specint' ? 'SPECint-limited' :
-    sizingMode === 'ghz' ? 'GHz-limited' :
+    sizingMode === 'performance' ? 'Performance-limited' :
     'CPU-limited'
 
   // Per-constraint breakdown data (grouped bars per scenario)
