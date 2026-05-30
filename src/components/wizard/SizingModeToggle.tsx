@@ -36,11 +36,9 @@ function ModeBtn({
 /**
  * Global mode controls rendered in the WizardShell header.
  *
- * Row 1 — Sizing mode (2 options):
- *   vCPU | Performance
- *
- * Row 2 — Layout mode:
- *   HCI | Disaggregated
+ * Both groups sit on the same level (side by side), wrapping to two rows
+ * only when the viewport is too narrow:
+ *   [ vCPU | Performance ]   [ HCI | Disaggregated ]
  */
 export function SizingModeToggle() {
   const sizingMode = useWizardStore((s) => s.sizingMode);
@@ -49,8 +47,8 @@ export function SizingModeToggle() {
   const setLayoutMode = useWizardStore((s) => s.setLayoutMode);
 
   return (
-    <div className="flex flex-col items-center gap-1.5 mt-2">
-      {/* Row 1 — Sizing mode */}
+    <div className="flex flex-row flex-wrap items-center justify-center gap-2 mt-2">
+      {/* Sizing mode */}
       <div
         role="group"
         aria-label="Sizing mode"
@@ -82,7 +80,7 @@ export function SizingModeToggle() {
         </TooltipProvider>
       </div>
 
-      {/* Row 2 — Layout mode */}
+      {/* Layout mode */}
       <div
         role="group"
         aria-label="Layout mode"
