@@ -1,8 +1,13 @@
 # Presizion -- Cluster Refresh Sizing Tool
 
-![Build](https://github.com/fjacquet/cluster-sizer/actions/workflows/ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-596%20passing-brightgreen)
+![Deploy](https://github.com/fjacquet/presizion/actions/workflows/deploy.yml/badge.svg)
+![Tests](https://img.shields.io/badge/tests-760%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4-38BDF8?logo=tailwindcss&logoColor=white)
+![Biome](https://img.shields.io/badge/code%20style-Biome-60A5FA?logo=biome&logoColor=white)
 
 Presizion is a client-side web application for presales engineers to size a refreshed compute cluster based on existing cluster metrics. Enter your current environment, define target server scenarios, and instantly compare how many servers you need -- with vSAN-aware storage sizing, capacity breakdown charts, and growth projections. No backend, no API; all calculations run in the browser.
 
