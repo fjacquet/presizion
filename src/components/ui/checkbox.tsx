@@ -18,10 +18,10 @@ function Checkbox({ id, checked, onCheckedChange, className, disabled }: Checkbo
       disabled={disabled}
       data-slot="checkbox"
       className={cn(
-        'peer size-4 shrink-0 rounded border border-input bg-background shadow-sm transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'peer size-4 shrink-0 rounded border border-slate-300 bg-white shadow-sm transition-colors dark:border-surface-700 dark:bg-surface-800',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        'data-checked:bg-primary data-checked:border-primary data-checked:text-primary-foreground',
+        'data-checked:bg-primary-600 data-checked:border-primary-600 data-checked:text-white dark:data-checked:bg-primary-500 dark:data-checked:border-primary-500',
         className,
       )}
     >
