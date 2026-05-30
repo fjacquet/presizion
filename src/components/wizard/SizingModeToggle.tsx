@@ -1,6 +1,5 @@
 import { useWizardStore } from '@/store/useWizardStore'
-import type { SizingMode, LayoutMode } from '@/store/useWizardStore'
-import { useClusterStore } from '@/store/useClusterStore'
+import type { LayoutMode } from '@/store/useWizardStore'
 import {
   Tooltip,
   TooltipContent,
@@ -10,20 +9,17 @@ import {
 
 const ACTIVE = 'bg-primary text-primary-foreground font-semibold'
 const INACTIVE = 'bg-transparent text-foreground hover:bg-muted'
-const AMBER_ACTIVE = 'bg-amber-500 text-white font-semibold'
 
 function ModeBtn({
   label,
   isActive,
   onClick,
   disabled,
-  amber,
 }: {
   label: string
   isActive: boolean
   onClick: () => void
   disabled?: boolean
-  amber?: boolean
 }) {
   return (
     <button
@@ -33,7 +29,7 @@ function ModeBtn({
       onClick={onClick}
       className={[
         'px-3 py-2 text-sm rounded-sm transition-colors min-h-[44px]',
-        isActive ? (amber ? AMBER_ACTIVE : ACTIVE) : INACTIVE,
+        isActive ? ACTIVE : INACTIVE,
         disabled ? 'opacity-40 cursor-not-allowed' : '',
       ].join(' ')}
     >
@@ -45,8 +41,8 @@ function ModeBtn({
 /**
  * Global mode controls rendered in the WizardShell header.
  *
- * Row 1 — Sizing mode (4 options):
- *   vCPU | SPECrate2017 | Aggressive (amber; requires CPU util%) | GHz (requires CPU freq)
+ * Row 1 — Sizing mode (2 options):
+ *   vCPU | Performance
  *
  * Row 2 — Layout mode:
  *   HCI | Disaggregated
@@ -56,59 +52,21 @@ export function SizingModeToggle() {
   const setSizingMode = useWizardStore((s) => s.setSizingMode)
   const layoutMode = useWizardStore((s) => s.layoutMode)
   const setLayoutMode = useWizardStore((s) => s.setLayoutMode)
-  const cluster = useClusterStore((s) => s.currentCluster)
-
-  const hasCpuUtil = cluster.cpuUtilizationPercent !== undefined
-  const hasCpuFreq = cluster.cpuFrequencyGhz !== undefined
 
   return (
     <div className="flex flex-col items-center gap-1.5 mt-2">
       {/* Row 1 — Sizing mode */}
       <div role="group" aria-label="Sizing mode" className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40">
-        <ModeBtn label="vCPU" isActive={sizingMode === 'vcpu'} onClick={() => setSizingMode('vcpu' as SizingMode)} />
-        <ModeBtn label="SPECrate2017" isActive={sizingMode === 'specint'} onClick={() => setSizingMode('specint' as SizingMode)} />
-
+        <ModeBtn label="vCPU" isActive={sizingMode === 'vcpu'} onClick={() => setSizingMode('vcpu')} />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <span>
-                <ModeBtn
-                  label="Aggressive"
-                  isActive={sizingMode === 'aggressive'}
-                  onClick={() => hasCpuUtil && setSizingMode('aggressive' as SizingMode)}
-                  disabled={!hasCpuUtil}
-                  amber
-                />
+                <ModeBtn label="Performance" isActive={sizingMode === 'performance'} onClick={() => setSizingMode('performance')} />
               </span>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="max-w-xs text-sm">
-                {hasCpuUtil
-                  ? 'CPU util drives density — vCPU:pCore ratio cap bypassed'
-                  : 'Enter CPU Utilization % in Step 1 to enable'}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <span>
-                <ModeBtn
-                  label="GHz"
-                  isActive={sizingMode === 'ghz'}
-                  onClick={() => hasCpuFreq && setSizingMode('ghz' as SizingMode)}
-                  disabled={!hasCpuFreq}
-                />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs text-sm">
-                {hasCpuFreq
-                  ? 'GHz demand drives server count based on frequency × utilization'
-                  : 'Enter CPU Frequency (GHz) in Step 1 to enable'}
-              </p>
+              <p className="max-w-xs text-sm">Sizes on new-vs-old per-core performance (GHz by default; add SPEC scores in the scenario for precision).</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
