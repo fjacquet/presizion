@@ -2,7 +2,11 @@
 import { describe, it, expect } from 'vitest';
 import { currentClusterSchema } from '../currentClusterSchema';
 import { scenarioSchema } from '../scenarioSchema';
-import { DEFAULT_VCPU_TO_PCORE_RATIO, DEFAULT_HEADROOM_PERCENT } from '../../lib/sizing/defaults';
+import {
+  DEFAULT_VCPU_TO_PCORE_RATIO,
+  DEFAULT_GROWTH_PERCENT,
+  DEFAULT_SAFETY_PERCENT,
+} from '../../lib/sizing/defaults';
 
 describe('currentClusterSchema', () => {
   it('throws ZodError when required numeric field is empty string', () => {
@@ -86,9 +90,25 @@ describe('scenarioSchema', () => {
     expect(result.targetVcpuToPCoreRatio).toBe(DEFAULT_VCPU_TO_PCORE_RATIO);
   });
 
-  it('applies DEFAULT_HEADROOM_PERCENT as default for headroomPercent', () => {
+  it('applies DEFAULT_GROWTH_PERCENT as default for growthPercent', () => {
     const result = scenarioSchema.parse(SCENARIO_BASE);
-    expect(result.headroomPercent).toBe(DEFAULT_HEADROOM_PERCENT);
+    expect(result.growthPercent).toBe(DEFAULT_GROWTH_PERCENT);
+  });
+
+  it('applies DEFAULT_SAFETY_PERCENT as default for safetyPercent', () => {
+    const result = scenarioSchema.parse(SCENARIO_BASE);
+    expect(result.safetyPercent).toBe(DEFAULT_SAFETY_PERCENT);
+  });
+
+  it('accepts growth/safety and defaults them', () => {
+    const parsed = scenarioSchema.parse({
+      id: crypto.randomUUID(), name: 'X',
+      socketsPerServer: 2, coresPerSocket: 16, ramPerServerGb: 512, diskPerServerGb: 10000,
+      ramPerVmGb: 4, diskPerVmGb: 50,
+    })
+    expect(parsed.growthPercent).toBe(0)
+    expect(parsed.safetyPercent).toBe(20)
+    expect('headroomPercent' in parsed).toBe(false)
   });
 
   it('throws ZodError when socketsPerServer is negative', () => {
@@ -108,7 +128,8 @@ describe('scenarioSchema', () => {
       ...SCENARIO_BASE,
       name: 'Valid Scenario',
       targetVcpuToPCoreRatio: 4,
-      headroomPercent: 20,
+      growthPercent: 10,
+      safetyPercent: 20,
       haReserveCount: 0 as const,
     });
     expect(result.name).toBe('Valid Scenario');

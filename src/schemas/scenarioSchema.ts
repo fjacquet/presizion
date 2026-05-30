@@ -1,10 +1,9 @@
 import { z } from 'zod';
 import {
   DEFAULT_VCPU_TO_PCORE_RATIO,
-  DEFAULT_HEADROOM_PERCENT,
+  DEFAULT_GROWTH_PERCENT,
+  DEFAULT_SAFETY_PERCENT,
   DEFAULT_HA_RESERVE_COUNT,
-  DEFAULT_TARGET_CPU_UTILIZATION_PERCENT,
-  DEFAULT_TARGET_RAM_UTILIZATION_PERCENT,
 } from '../lib/sizing/defaults';
 
 /**
@@ -57,20 +56,16 @@ export const scenarioSchema = z.object({
     .default(DEFAULT_VCPU_TO_PCORE_RATIO),
   ramPerVmGb: requiredPositiveNumber,
   diskPerVmGb: requiredPositiveNumber,
-  headroomPercent: z
+  growthPercent: z
+    .preprocess(numericPreprocess, z.number().min(0).max(200).optional())
+    .default(DEFAULT_GROWTH_PERCENT),
+  safetyPercent: z
     .preprocess(numericPreprocess, z.number().min(0).max(100).optional())
-    .default(DEFAULT_HEADROOM_PERCENT),
+    .default(DEFAULT_SAFETY_PERCENT),
   haReserveCount: z
     .union([z.literal(0), z.literal(1), z.literal(2)])
     .default(DEFAULT_HA_RESERVE_COUNT),
   targetSpecint: optionalPositiveNumber,
-  targetCpuUtilizationPercent: z
-    .preprocess(numericPreprocess, z.number().min(1).max(100).optional())
-    .default(DEFAULT_TARGET_CPU_UTILIZATION_PERCENT),
-  targetRamUtilizationPercent: z
-    .preprocess(numericPreprocess, z.number().min(1).max(100).optional())
-    .default(DEFAULT_TARGET_RAM_UTILIZATION_PERCENT),
-  targetVmCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
   minServerCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
   targetCpuFrequencyGhz: optionalPositiveNumber,
 
@@ -87,11 +82,6 @@ export const scenarioSchema = z.object({
   vsanCpuOverheadPercent: z.preprocess(numericPreprocess, z.number().min(0).max(100).optional()),
   vsanMemoryPerHostGb: z.preprocess(numericPreprocess, z.number().min(0).optional()),
   vsanVmSwapEnabled: z.boolean().optional().default(false),
-
-  // Growth projections (Phase 20 — all optional; absent = 0% growth)
-  cpuGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
-  memoryGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
-  storageGrowthPercent: z.preprocess(numericPreprocess, z.number().min(0).max(200).optional()),
 });
 
 export type ScenarioInput = z.infer<typeof scenarioSchema>;
