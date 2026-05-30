@@ -34,6 +34,7 @@ spec → plan → build cycle. Only **A** is fully designed here.
 | **E** | i18n scaffold | i18next, locales **en/fr/de/it** (Swiss market), externalize strings | **Last** — stabilize string surface first |
 
 ### Cross-cutting principles (apply to B–E when reached)
+
 - **Trust Tailwind fully:** design tokens via `@theme`, utility-first markup, shared
   patterns as `@layer components`, Tailwind's `@custom-variant dark` for theming. No
   parallel theming system, no scattered hex values, no magic numbers.
@@ -69,6 +70,7 @@ spec → plan → build cycle. Only **A** is fully designed here.
 `cpuGrowthPercent`, `memoryGrowthPercent`, `storageGrowthPercent`, `targetVmCount`.
 
 **New two-knob model:**
+
 - `growthPercent` — future workload growth (default `0`).
 - `safetyPercent` — operational buffer, "don't run hot" (default `20`; replaces
   `headroomPercent`).
