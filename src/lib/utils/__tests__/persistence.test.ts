@@ -52,10 +52,9 @@ const validSession: SessionData = {
       targetVcpuToPCoreRatio: 4,
       ramPerVmGb: 8,
       diskPerVmGb: 50,
-      headroomPercent: 20,
+      safetyPercent: 20,
+      growthPercent: 0,
       haReserveCount: 1,
-      targetCpuUtilizationPercent: 70,
-      targetRamUtilizationPercent: 80,
     },
   ],
   sizingMode: 'vcpu',
@@ -152,7 +151,7 @@ describe('deserializeSession', () => {
     const withoutLayout = JSON.stringify({
       cluster: { totalVcpus: 100, totalPcores: 50, totalVms: 40 },
       scenarios: [],
-      sizingMode: 'specint',
+      sizingMode: 'vcpu',
     });
     const result = deserializeSession(withoutLayout);
     expect(result).not.toBeNull();
@@ -258,5 +257,33 @@ describe('encodeSessionToHash / decodeSessionFromHash', () => {
       .replace(/\//g, '_')
       .replace(/=/g, '');
     expect(decodeSessionFromHash('#' + invalidJson)).toBeNull();
+  });
+});
+
+describe('migrateLegacySession (via deserializeSession)', () => {
+  it('migrates legacy headroomPercent → safetyPercent and old modes', () => {
+    const legacy = JSON.stringify({
+      cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
+      scenarios: [{
+        id: crypto.randomUUID(), name: 'Old', socketsPerServer: 2, coresPerSocket: 16,
+        ramPerServerGb: 512, diskPerServerGb: 10000, ramPerVmGb: 4, diskPerVmGb: 50,
+        headroomPercent: 30, targetCpuUtilizationPercent: 80, cpuGrowthPercent: 15,
+      }],
+      sizingMode: 'specint', layoutMode: 'hci',
+    });
+    const out = deserializeSession(legacy);
+    expect(out).not.toBeNull();
+    expect(out!.scenarios[0].safetyPercent).toBe(30);
+    expect(out!.scenarios[0].growthPercent).toBe(0); // dropped per-resource growth → default
+    expect('headroomPercent' in out!.scenarios[0]).toBe(false);
+    expect(out!.sizingMode).toBe('performance'); // specint → performance
+  });
+
+  it('maps aggressive → vcpu', () => {
+    const legacy = JSON.stringify({
+      cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
+      scenarios: [], sizingMode: 'aggressive', layoutMode: 'hci',
+    });
+    expect(deserializeSession(legacy)!.sizingMode).toBe('vcpu');
   });
 });
