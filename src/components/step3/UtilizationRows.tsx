@@ -16,9 +16,8 @@ interface UtilizationRowsProps {
 }
 
 export function UtilizationRows({ cluster, scenarios, results, sizingMode, layoutMode }: UtilizationRowsProps) {
-  const showCpuUtilRow = sizingMode !== 'specint' &&
-    (sizingMode !== 'vcpu' || cluster.cpuUtilizationPercent !== undefined)
-  const cpuUtilIsSizingDriver = sizingMode === 'aggressive' || sizingMode === 'ghz'
+  const showCpuUtilRow = cluster.cpuUtilizationPercent !== undefined
+  const cpuUtilIsSizingDriver = sizingMode === 'performance'
 
   return (
     <>
@@ -42,7 +41,6 @@ export function UtilizationRows({ cluster, scenarios, results, sizingMode, layou
             <UtilizationCell
               key={scenarios[i]?.id ?? i}
               pct={result.cpuUtilizationPercent}
-              target={scenarios[i]?.targetCpuUtilizationPercent}
             />
           ))}
         </TableRow>
@@ -60,7 +58,6 @@ export function UtilizationRows({ cluster, scenarios, results, sizingMode, layou
           <UtilizationCell
             key={scenarios[i]?.id ?? i}
             pct={result.ramUtilizationPercent}
-            target={scenarios[i]?.targetRamUtilizationPercent}
           />
         ))}
       </TableRow>

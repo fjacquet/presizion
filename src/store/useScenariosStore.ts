@@ -87,6 +87,9 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
           ...(socketsPerServer != null && { socketsPerServer }),
           ...(coresPerSocket != null && { coresPerSocket }),
           ...(ramPerServerGb != null && { ramPerServerGb }),
+          targetVcpuToPCoreRatio: s.targetVcpuToPCoreRatio ?? 4,
+          growthPercent: s.growthPercent ?? 0,
+          safetyPercent: s.safetyPercent ?? 20,
         })),
       }
     }),

@@ -59,7 +59,7 @@ const scenario: Scenario = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 16,
   diskPerVmGb: 100,
-  headroomPercent: 20,
+  growthPercent: 0, safetyPercent: 20,
   haReserveCount: 0 as const,
 }
 

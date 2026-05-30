@@ -2,7 +2,6 @@ import type { OldCluster, Scenario } from '../../types/cluster';
 import type { ScenarioResult, LimitingResource } from '../../types/results';
 import {
   serverCountByCpu,
-  serverCountByCpuAggressive,
   serverCountByGhz,
   serverCountByRam,
   serverCountByDisk,
@@ -18,12 +17,12 @@ import { VSAN_DEFAULT_SLACK_PERCENT } from './vsanConstants';
 /**
  * Sizing mode — determines which CPU/performance formula drives CALC-01.
  *
- * - 'vcpu':       vCPU:pCore ratio hard cap (default).
- * - 'specint':    SPECrate2017 benchmark score comparison.
- * - 'aggressive': Observed CPU utilization drives density; ratio cap bypassed.
- * - 'ghz':        Clock-frequency × utilization drives demand and capacity.
+ * - 'vcpu':        vCPU:pCore ratio hard cap (default).
+ * - 'performance': performance-headroom sizing. Uses SPECrate2017 when a SPEC
+ *                  override is present (target SPEC + existing-cluster SPEC),
+ *                  otherwise falls back to clock-frequency (GHz × utilization).
  */
-export type SizingMode = 'vcpu' | 'specint' | 'aggressive' | 'ghz';
+export type SizingMode = 'vcpu' | 'performance';
 
 /**
  * Layout mode — determines whether disk is a server-level constraint.
@@ -37,19 +36,16 @@ export type LayoutMode = 'hci' | 'disaggregated';
  * Determines which resource constraint drove the final (maximum) server count.
  *
  * Tie-breaking priority when counts are equal: cpu/specint/ghz > ram > disk.
- * The cpu slot returns 'specint' or 'ghz' when the respective mode is active.
+ * The cpu slot carries the label the active CPU formula produced
+ * ('cpu' | 'specint' | 'ghz').
  */
 function determineLimitingResource(
   cpu: number,
   ram: number,
   disk: number,
-  sizingMode: SizingMode = 'vcpu',
+  cpuLabel: 'cpu' | 'specint' | 'ghz',
 ): LimitingResource {
-  if (cpu >= ram && cpu >= disk) {
-    if (sizingMode === 'specint') return 'specint';
-    if (sizingMode === 'ghz') return 'ghz';
-    return 'cpu';
-  }
+  if (cpu >= ram && cpu >= disk) return cpuLabel;
   if (ram > cpu && ram >= disk) return 'ram';
   return 'disk';
 }
@@ -57,22 +53,30 @@ function determineLimitingResource(
 /**
  * Public API: computes the full ScenarioResult for a given cluster + scenario pair.
  *
+ * Demand model: a single unified demand factor scales all resource demand:
+ *   demandFactor = (1 + growthPercent/100) × (1 + safetyPercent/100)
+ * growthPercent captures expected future workload growth; safetyPercent is the
+ * operational "don't run hot" buffer. There is no separate target-utilization
+ * division and no per-VM target-count override — observed cluster metrics are
+ * used directly.
+ *
+ * Two sizing modes drive the CPU/performance constraint (CALC-01):
+ *   - 'vcpu':        ceil(totalVcpus × demandFactor / ratio / coresPerServer)
+ *   - 'performance': SPECrate when a SPEC override is present, else GHz mode.
+ *
  * Applies CALC-01 through CALC-06:
- *   CALC-01: CPU-limited count (formula depends on sizingMode)
+ *   CALC-01: CPU/performance-limited count (formula depends on sizingMode)
  *   CALC-02: RAM-limited count
  *   CALC-03: Disk-limited count (0 in disaggregated layout mode)
  *   CALC-04: HA reserve (adds haReserveCount servers after the max)
  *   CALC-05: Max constraint selection + limiting resource identification
  *   CALC-06: Utilization metrics
  *
- * When scenario.targetVmCount is set, RAM/disk formulas use the target count and
- * vCPUs are scaled proportionally (effectiveVcpus = totalVcpus × targetVmCount / totalVms).
- *
  * The returned object is frozen — it is never mutated after creation.
  *
  * @param cluster      Current environment metrics (OldCluster)
  * @param scenario     Target server configuration and sizing assumptions (Scenario)
- * @param sizingMode   CPU formula selection (default 'vcpu')
+ * @param sizingMode   CPU formula selection: 'vcpu' (default) or 'performance'
  * @param layoutMode   Disk constraint inclusion (default 'hci')
  */
 export function computeScenarioResult(
@@ -81,85 +85,69 @@ export function computeScenarioResult(
   sizingMode: SizingMode = 'vcpu',
   layoutMode: LayoutMode = 'hci',
 ): ScenarioResult {
-  const headroomFactor = 1 + scenario.headroomPercent / 100;
+  const demandFactor =
+    (1 + (scenario.growthPercent ?? 0) / 100) *
+    (1 + (scenario.safetyPercent ?? 0) / 100);
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
-  // Effective VM and vCPU counts — scaled when targetVmCount overrides cluster.totalVms
-  const effectiveVmCount = scenario.targetVmCount ?? cluster.totalVms;
-  const effectiveVcpus =
-    scenario.targetVmCount && cluster.totalVms > 0
-      ? Math.round(cluster.totalVcpus * (scenario.targetVmCount / cluster.totalVms))
-      : cluster.totalVcpus;
-
+  const effectiveVmCount = cluster.totalVms;
+  const effectiveVcpus = cluster.totalVcpus;
   const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
-  const targetCpuUtilPct = scenario.targetCpuUtilizationPercent ?? 100;
 
-  // Growth factor pre-multiply (GROW-02): applied BEFORE headroom and overhead
-  const cpuGrowthFactor     = 1 + (scenario.cpuGrowthPercent     ?? 0) / 100;
-  const memGrowthFactor     = 1 + (scenario.memoryGrowthPercent  ?? 0) / 100;
-  const storageGrowthFactor = 1 + (scenario.storageGrowthPercent ?? 0) / 100;
-
-  const grownVcpus       = effectiveVcpus * cpuGrowthFactor;
-  const grownRamPerVmGb  = scenario.ramPerVmGb * memGrowthFactor;
-  const grownDiskPerVmGb = scenario.diskPerVmGb * storageGrowthFactor;
-
-  // CALC-01: CPU/performance-limited count (formula depends on sizingMode)
+  // CALC-01: CPU/performance-limited count + which resource label it carries
   let cpuLimitedCount: number;
-  if (sizingMode === 'specint') {
-    // SPECint is a benchmark comparison, not demand-driven — growth does not apply
-    cpuLimitedCount = serverCountBySpecint(
-      cluster.existingServerCount ?? 0,
-      cluster.specintPerServer ?? 0,
-      headroomFactor,
-      scenario.targetSpecint ?? 0,
-    );
-  } else if (sizingMode === 'aggressive') {
-    // Ratio cap bypassed: observed utilization drives density
-    cpuLimitedCount = serverCountByCpuAggressive(
-      grownVcpus,
-      cpuUtilPct,
-      headroomFactor,
-      coresPerServer,
-    );
-  } else if (sizingMode === 'ghz') {
-    // CALC-01-GHZ: GHz mode uses pCores, not vCPUs — apply growth to pCores
-    const grownPcores = cluster.totalPcores * cpuGrowthFactor;
-    const rawTargetFreqGhz = scenario.targetCpuFrequencyGhz ?? 1;
-    const effectiveTargetFreqGhz = scenario.vsanFttPolicy
-      ? computeVsanEffectiveGhzPerNode(rawTargetFreqGhz, scenario.vsanCpuOverheadPercent)
-      : rawTargetFreqGhz;
-    cpuLimitedCount = serverCountByGhz(
-      grownPcores,
-      cluster.cpuFrequencyGhz ?? 1,
-      cpuUtilPct,
-      headroomFactor,
-      effectiveTargetFreqGhz,
-      coresPerServer,
-      targetCpuUtilPct,
-    );
+  let cpuResourceLabel: 'cpu' | 'specint' | 'ghz' = 'cpu';
+  if (sizingMode === 'performance') {
+    const hasSpec =
+      (scenario.targetSpecint ?? 0) > 0 &&
+      (cluster.existingServerCount ?? 0) > 0 &&
+      (cluster.specintPerServer ?? 0) > 0;
+    if (hasSpec) {
+      cpuResourceLabel = 'specint';
+      cpuLimitedCount = serverCountBySpecint(
+        cluster.existingServerCount ?? 0,
+        cluster.specintPerServer ?? 0,
+        demandFactor,
+        scenario.targetSpecint ?? 0,
+      );
+    } else {
+      cpuResourceLabel = 'ghz';
+      const rawTargetFreqGhz = scenario.targetCpuFrequencyGhz ?? 1;
+      const effectiveTargetFreqGhz = scenario.vsanFttPolicy
+        ? computeVsanEffectiveGhzPerNode(rawTargetFreqGhz, scenario.vsanCpuOverheadPercent)
+        : rawTargetFreqGhz;
+      cpuLimitedCount = serverCountByGhz(
+        cluster.totalPcores,
+        cluster.cpuFrequencyGhz ?? 1,
+        cpuUtilPct,
+        demandFactor,
+        effectiveTargetFreqGhz,
+        coresPerServer,
+        100, // target util folded into the safety buffer
+      );
+    }
   } else {
     // 'vcpu': ratio is a hard assignment-density cap; cpuUtilPct not used here
     cpuLimitedCount = serverCountByCpu(
-      grownVcpus,
-      headroomFactor,
+      effectiveVcpus,
+      demandFactor,
       scenario.targetVcpuToPCoreRatio,
       coresPerServer,
     );
   }
 
-  // CALC-02: RAM-limited count
+  // CALC-02: RAM-limited count — observed util scales demand, no target-util division
   const ramUtilPct = cluster.ramUtilizationPercent ?? 100;
-  const targetRamUtilPct = scenario.targetRamUtilizationPercent ?? 100;
   const effectiveRamPerServerGb = scenario.vsanFttPolicy
     ? computeVsanEffectiveRamPerNode(scenario.ramPerServerGb, scenario.vsanMemoryPerHostGb)
     : scenario.ramPerServerGb;
   const ramLimitedCount = serverCountByRam(
     effectiveVmCount,
-    grownRamPerVmGb,
-    headroomFactor,
+    scenario.ramPerVmGb,
+    demandFactor,
     effectiveRamPerServerGb,
     ramUtilPct,
-    targetRamUtilPct,
+    100, // no target-util division anymore
   );
 
   // CALC-03: Disk/Storage-limited count
@@ -167,8 +155,8 @@ export function computeScenarioResult(
   if (layoutMode === 'disaggregated') {
     diskLimitedCount = 0;
   } else if (scenario.vsanFttPolicy) {
-    // vSAN-aware path (VSAN-02, VSAN-11) — use grown demand values
-    const usableGib = effectiveVmCount * grownDiskPerVmGb;
+    // vSAN-aware path (VSAN-02, VSAN-11)
+    const usableGib = effectiveVmCount * scenario.diskPerVmGb;
     diskLimitedCount = serverCountByVsanStorage(
       usableGib,
       scenario.diskPerServerGb,
@@ -176,16 +164,16 @@ export function computeScenarioResult(
       {
         compressionFactor: scenario.vsanCompressionFactor ?? 1.0,
         vmSwapEnabled: scenario.vsanVmSwapEnabled ?? false,
-        totalVmRamGib: effectiveVmCount * grownRamPerVmGb,
+        totalVmRamGib: effectiveVmCount * scenario.ramPerVmGb,
         slackPercent: scenario.vsanSlackPercent ?? VSAN_DEFAULT_SLACK_PERCENT,
       },
     );
   } else {
-    // Legacy path — unchanged pattern (VSAN-12), now with grown demand
+    // Legacy path (VSAN-12)
     diskLimitedCount = serverCountByDisk(
       effectiveVmCount,
-      grownDiskPerVmGb,
-      headroomFactor,
+      scenario.diskPerVmGb,
+      demandFactor,
       scenario.diskPerServerGb,
     );
   }
@@ -195,7 +183,7 @@ export function computeScenarioResult(
     cpuLimitedCount,
     ramLimitedCount,
     diskLimitedCount,
-    sizingMode,
+    cpuResourceLabel,
   );
 
   // CALC-05: Raw count is the maximum of all active constraints
@@ -224,16 +212,15 @@ export function computeScenarioResult(
   const requiredCount = rawCount;
   const haReserveApplied = haReserveCount > 0;
 
-  // CALC-06: Utilization metrics (use finalCount as denominator, grown demand values)
+  // CALC-06: Utilization metrics (use finalCount as denominator, observed demand)
   const achievedVcpuToPCoreRatio =
-    finalCount > 0 ? grownVcpus / (finalCount * coresPerServer) : 0;
+    finalCount > 0 ? effectiveVcpus / (finalCount * coresPerServer) : 0;
 
   const vmsPerServer = finalCount > 0 ? effectiveVmCount / finalCount : 0;
 
-  // CPU util % applies the same factor used in CALC-01 display
   const cpuUtilizationPercent =
     finalCount > 0
-      ? (grownVcpus * (cpuUtilPct / 100) /
+      ? (effectiveVcpus * (cpuUtilPct / 100) /
           scenario.targetVcpuToPCoreRatio /
           (finalCount * coresPerServer)) *
         100
@@ -241,14 +228,14 @@ export function computeScenarioResult(
 
   const ramUtilizationPercent =
     finalCount > 0
-      ? ((effectiveVmCount * grownRamPerVmGb * (ramUtilPct / 100)) /
+      ? ((effectiveVmCount * scenario.ramPerVmGb * (ramUtilPct / 100)) /
           (finalCount * scenario.ramPerServerGb)) *
         100
       : 0;
 
   const diskUtilizationPercent =
     finalCount > 0
-      ? ((effectiveVmCount * grownDiskPerVmGb) /
+      ? ((effectiveVmCount * scenario.diskPerVmGb) /
           (finalCount * scenario.diskPerServerGb)) *
         100
       : 0;

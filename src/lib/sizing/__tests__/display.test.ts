@@ -13,7 +13,7 @@ describe('display: formula string generators', () => {
     it('returns a human-readable formula string with substituted values for CPU constraint', () => {
       const result = cpuFormulaString({
         totalVcpus: 2000,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         targetVcpuToPCoreRatio: 4,
         coresPerServer: 48,
       })
@@ -24,7 +24,7 @@ describe('display: formula string generators', () => {
     it('includes ceil(), totalVcpus, headroomPercent, targetVcpuToPCoreRatio, and coresPerServer in the string', () => {
       const result = cpuFormulaString({
         totalVcpus: 2000,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         targetVcpuToPCoreRatio: 4,
         coresPerServer: 48,
       })
@@ -41,7 +41,7 @@ describe('display: formula string generators', () => {
       const result = ramFormulaString({
         totalVms: 300,
         ramPerVmGb: 16,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         ramPerServerGb: 512,
       })
       expect(typeof result).toBe('string')
@@ -52,7 +52,7 @@ describe('display: formula string generators', () => {
       const result = ramFormulaString({
         totalVms: 300,
         ramPerVmGb: 16,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         ramPerServerGb: 512,
       })
       expect(result).toContain('ceil')
@@ -68,7 +68,7 @@ describe('display: formula string generators', () => {
       const result = diskFormulaString({
         totalVms: 300,
         diskPerVmGb: 100,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         diskPerServerGb: 20000,
       })
       expect(typeof result).toBe('string')
@@ -79,7 +79,7 @@ describe('display: formula string generators', () => {
       const result = diskFormulaString({
         totalVms: 300,
         diskPerVmGb: 100,
-        headroomPercent: 20,
+        growthPercent: 0, safetyPercent: 20,
         diskPerServerGb: 20000,
       })
       expect(result).toContain('ceil')
@@ -96,7 +96,7 @@ describe('specintFormulaString (PERF-04 display)', () => {
     const result = specintFormulaString({
       existingServers: 10,
       specintPerServer: 1200,
-      headroomPercent: 20,
+      safetyPercent: 20,
       targetSpecint: 2400,
     });
     expect(result).toBe('ceil(10 servers × 1200 SPECrate2017_int_base × 1.20 / 2400 SPECrate2017_int_base)');
@@ -108,7 +108,7 @@ describe('ramFormulaString with utilization (TD-04)', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       ramPerServerGb: 512,
       ramUtilizationPercent: 80,
     });
@@ -123,7 +123,7 @@ describe('ramFormulaString with utilization (TD-04)', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       ramPerServerGb: 512,
       ramUtilizationPercent: 80,
     });
@@ -134,7 +134,7 @@ describe('ramFormulaString with utilization (TD-04)', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       ramPerServerGb: 512,
       ramUtilizationPercent: 100,
     });
@@ -145,7 +145,7 @@ describe('ramFormulaString with utilization (TD-04)', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       ramPerServerGb: 512,
     });
     expect(result).toBe('ceil(300 × 16 GB × 120% / 512 GB)');
@@ -153,78 +153,78 @@ describe('ramFormulaString with utilization (TD-04)', () => {
 });
 
 describe('Growth annotations (GROW-04)', () => {
-  it('cpuFormulaString with cpuGrowthPercent=20: output contains growth annotation', () => {
+  it('cpuFormulaString with growthPercent=20: output contains growth annotation', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
-      headroomPercent: 20,
+      safetyPercent: 20,
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
-      cpuGrowthPercent: 20,
+      growthPercent: 20,
     });
     expect(result).toBe('ceil(2000 × 120% × +20% growth / 4 / 48)');
   });
 
-  it('cpuFormulaString with cpuGrowthPercent=0: output unchanged (no growth annotation)', () => {
+  it('cpuFormulaString with growthPercent=0: output unchanged (no growth annotation)', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
-      headroomPercent: 20,
+      safetyPercent: 20,
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
-      cpuGrowthPercent: 0,
+      growthPercent: 0,
     });
     expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
   });
 
-  it('cpuFormulaString without cpuGrowthPercent: output unchanged (no growth annotation)', () => {
+  it('cpuFormulaString without growthPercent: output unchanged (no growth annotation)', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
-      headroomPercent: 20,
+      safetyPercent: 20,
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
     });
     expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
   });
 
-  it('ramFormulaString with memoryGrowthPercent=30: output contains growth annotation', () => {
+  it('ramFormulaString with growthPercent=30: output contains growth annotation', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      safetyPercent: 20,
       ramPerServerGb: 512,
-      memoryGrowthPercent: 30,
+      growthPercent: 30,
     });
     expect(result).toBe('ceil(300 × 16 GB × 120% × +30% growth / 512 GB)');
   });
 
-  it('ramFormulaString with memoryGrowthPercent=0: output unchanged', () => {
+  it('ramFormulaString with growthPercent=0: output unchanged', () => {
     const result = ramFormulaString({
       totalVms: 300,
       ramPerVmGb: 16,
-      headroomPercent: 20,
+      safetyPercent: 20,
       ramPerServerGb: 512,
-      memoryGrowthPercent: 0,
+      growthPercent: 0,
     });
     expect(result).toBe('ceil(300 × 16 GB × 120% / 512 GB)');
   });
 
-  it('diskFormulaString with storageGrowthPercent=50: output contains growth annotation', () => {
+  it('diskFormulaString with growthPercent=50: output contains growth annotation', () => {
     const result = diskFormulaString({
       totalVms: 300,
       diskPerVmGb: 100,
-      headroomPercent: 20,
+      safetyPercent: 20,
       diskPerServerGb: 20000,
-      storageGrowthPercent: 50,
+      growthPercent: 50,
     });
     expect(result).toBe('ceil(300 × 100 GB × 120% × +50% growth / 20000 GB)');
   });
 
-  it('diskFormulaString with storageGrowthPercent=0: output unchanged', () => {
+  it('diskFormulaString with growthPercent=0: output unchanged', () => {
     const result = diskFormulaString({
       totalVms: 300,
       diskPerVmGb: 100,
-      headroomPercent: 20,
+      safetyPercent: 20,
       diskPerServerGb: 20000,
-      storageGrowthPercent: 0,
+      growthPercent: 0,
     });
     expect(result).toBe('ceil(300 × 100 GB × 120% / 20000 GB)');
   });
@@ -234,7 +234,7 @@ describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
   it('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
       cpuUtilizationPercent: 70,
@@ -246,7 +246,7 @@ describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
   it('omits utilization factor when cpuUtilizationPercent is absent', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
-      headroomPercent: 20,
+      growthPercent: 0, safetyPercent: 20,
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
     });

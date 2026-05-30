@@ -310,9 +310,9 @@ export async function exportPdf(
       ...scenarios.map((s) => s.diskPerVmGb.toFixed(1)),
     ],
     [
-      'Headroom %',
+      'Safety %',
       'N/A',
-      ...scenarios.map((s) => `${s.headroomPercent}%`),
+      ...scenarios.map((s) => `${s.safetyPercent}%`),
     ],
     [
       'CPU Util %',
@@ -370,8 +370,8 @@ export async function exportPdf(
       ...scenarios.map((s) => `${s.targetVcpuToPCoreRatio.toFixed(1)}:1`),
     ],
     [
-      'Headroom %',
-      ...scenarios.map((s) => `${s.headroomPercent}%`),
+      'Safety %',
+      ...scenarios.map((s) => `${s.safetyPercent}%`),
     ],
     [
       'HA Reserve',
@@ -466,41 +466,24 @@ export async function exportPdf(
     y = getLastAutoTableY(y + 20) + 10
   }
 
-  // Growth projections (only if at least one scenario has growth enabled)
+  // Growth projection (only if at least one scenario has growth enabled)
   const hasGrowth = scenarios.some(
-    (s) =>
-      (s.cpuGrowthPercent !== undefined && s.cpuGrowthPercent > 0) ||
-      (s.memoryGrowthPercent !== undefined && s.memoryGrowthPercent > 0) ||
-      (s.storageGrowthPercent !== undefined && s.storageGrowthPercent > 0),
+    (s) => s.growthPercent !== undefined && s.growthPercent > 0,
   )
   if (hasGrowth) {
     ensureSpace(40)
 
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)
-    doc.text('Growth Projections', MARGIN, y)
+    doc.text('Growth Projection', MARGIN, y)
     y += 6
 
     const growthHead = ['Parameter', ...scenarios.map((s) => s.name)]
 
     const growthBody: string[][] = [
       [
-        'CPU Growth %',
-        ...scenarios.map((s) =>
-          s.cpuGrowthPercent !== undefined ? `${s.cpuGrowthPercent}%` : '0%',
-        ),
-      ],
-      [
-        'Memory Growth %',
-        ...scenarios.map((s) =>
-          s.memoryGrowthPercent !== undefined ? `${s.memoryGrowthPercent}%` : '0%',
-        ),
-      ],
-      [
-        'Storage Growth %',
-        ...scenarios.map((s) =>
-          s.storageGrowthPercent !== undefined ? `${s.storageGrowthPercent}%` : '0%',
-        ),
+        'Growth %',
+        ...scenarios.map((s) => `${s.growthPercent ?? 0}%`),
       ],
     ]
 

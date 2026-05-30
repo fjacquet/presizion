@@ -2,12 +2,10 @@ import { create } from 'zustand';
 
 /**
  * Controls which CPU/performance formula drives CALC-01.
- * - 'vcpu':       vCPU:pCore ratio hard cap (default)
- * - 'specint':    SPECrate2017 benchmark score comparison
- * - 'aggressive': Observed CPU utilization drives density; ratio cap bypassed
- * - 'ghz':        Clock-frequency × utilization drives demand and capacity
+ * - 'vcpu':        vCPU:pCore ratio hard cap (default)
+ * - 'performance': new-vs-old per-core performance (GHz-primary, SPEC-optional)
  */
-export type SizingMode = 'vcpu' | 'specint' | 'aggressive' | 'ghz';
+export type SizingMode = 'vcpu' | 'performance';
 
 /**
  * Controls whether disk capacity is a per-server sizing constraint.

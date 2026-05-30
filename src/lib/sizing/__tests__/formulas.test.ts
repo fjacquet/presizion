@@ -1,7 +1,7 @@
 // VALIDATION.md: CALC-01 (CPU-limited), CALC-02 (RAM-limited), CALC-03 (disk-limited)
 // Imported functions will come from src/lib/sizing/formulas.ts (Plan 02)
 import { describe, it, expect } from 'vitest';
-import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint, serverCountByCpuAggressive, serverCountByGhz } from '../formulas';
+import { serverCountByCpu, serverCountByRam, serverCountByDisk, serverCountBySpecint, serverCountByGhz } from '../formulas';
 
 // === Fixture constants (manually verified against formula spec) ===
 
@@ -91,18 +91,6 @@ describe('serverCountByRam with ramUtilPct (UTIL-03)', () => {
     expect(serverCountByRam(500, 16, 1.20, 512, 100)).toBe(19);
     // Default (no 5th arg) should also give 19
     expect(serverCountByRam(500, 16, 1.20, 512)).toBe(19);
-  });
-});
-
-describe('serverCountByCpuAggressive (CALC-01-AGG)', () => {
-  it('1000 vCPUs, 60% util, 20% headroom, 40 cores/server = ceil(1000×0.6×1.2/40) = 18', () => {
-    expect(serverCountByCpuAggressive(1000, 60, 1.20, 40)).toBe(18);
-  });
-  it('100% util = same as raw vCPU ceiling without ratio: ceil(1000×1.0×1.2/40) = 30', () => {
-    expect(serverCountByCpuAggressive(1000, 100, 1.20, 40)).toBe(30);
-  });
-  it('50% util: ceil(1000×0.5×1.2/40) = ceil(15) = 15', () => {
-    expect(serverCountByCpuAggressive(1000, 50, 1.20, 40)).toBe(15);
   });
 });
 

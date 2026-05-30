@@ -159,6 +159,9 @@ describe('CurrentClusterForm', () => {
         fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
         fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
         fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+        // Utilization is now required to advance
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
       })
 
       const nextButton = screen.getByRole('button', { name: /next/i })
@@ -192,18 +195,26 @@ describe('CurrentClusterForm', () => {
     })
   })
 
-  describe('PERF-02: SPECint mode conditional fields', () => {
-    it('specintPerServer field is visible when sizingMode is specint', () => {
+  describe('PERF-02: performance mode conditional fields', () => {
+    it('specintPerServer field is visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       render(<CurrentClusterForm onNext={() => {}} />)
       expect(screen.getByTestId('input-specintPerServer')).toBeInTheDocument()
     })
 
-    it('existingServerCount field is visible when sizingMode is specint', () => {
+    it('cpuFrequencyGhz field is visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByTestId('input-cpuFrequencyGhz')).toBeInTheDocument()
+    })
+
+    it('existingServerCount field is visible when sizingMode is performance', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       render(<CurrentClusterForm onNext={() => {}} />)
       expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
@@ -215,31 +226,33 @@ describe('CurrentClusterForm', () => {
       expect(screen.queryByTestId('input-specintPerServer')).not.toBeInTheDocument()
     })
 
-    it('Next is blocked when sizingMode is specint and specintPerServer is empty', async () => {
+    it('Next proceeds in performance mode without specintPerServer (SPEC is optional)', async () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       const onNext = vi.fn()
       render(<CurrentClusterForm onNext={onNext} />)
 
-      // Fill in required base fields but leave specintPerServer empty
+      // Fill required base fields + utilization, leave specintPerServer empty
       act(() => {
         fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
         fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
         fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
       })
 
       const nextButton = screen.getByRole('button', { name: /next/i })
       fireEvent.click(nextButton)
 
       await waitFor(() => {
-        expect(onNext).not.toHaveBeenCalled()
+        expect(onNext).toHaveBeenCalledOnce()
       })
     })
 
-    it('Next proceeds when sizingMode is specint and specintPerServer has a valid value', async () => {
+    it('Next proceeds when sizingMode is performance and specintPerServer has a valid value', async () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       const onNext = vi.fn()
       render(<CurrentClusterForm onNext={onNext} />)
@@ -248,6 +261,8 @@ describe('CurrentClusterForm', () => {
         fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
         fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
         fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
         fireEvent.change(screen.getByTestId('input-specintPerServer'), { target: { value: '1200' } })
       })
 
@@ -272,20 +287,45 @@ describe('CurrentClusterForm', () => {
       expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
     })
 
-    it('cpuUtilizationPercent field is NOT in DOM when sizingMode is specint', () => {
+    it('cpuUtilizationPercent field is always visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.queryByTestId('input-cpuUtilizationPercent')).not.toBeInTheDocument()
+      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
     })
 
-    it('ramUtilizationPercent field is visible when sizingMode is specint', () => {
+    it('ramUtilizationPercent field is always visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       render(<CurrentClusterForm onNext={() => {}} />)
       expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
+    })
+
+    it('shows domain guidance text near the utilization inputs', () => {
+      render(<CurrentClusterForm onNext={() => {}} />)
+      expect(screen.getByText(/Most environments run well below 100%/)).toBeInTheDocument()
+    })
+
+    it('does NOT commit / advance when totals are filled but utilization is empty', async () => {
+      const onNext = vi.fn()
+      render(<CurrentClusterForm onNext={onNext} />)
+
+      // Fill required totals but leave utilization empty
+      act(() => {
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+      })
+
+      const nextButton = screen.getByRole('button', { name: /next/i })
+      fireEvent.click(nextButton)
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/Utilization is required/i).length).toBeGreaterThan(0)
+      })
+      expect(onNext).not.toHaveBeenCalled()
     })
   })
 })
@@ -307,9 +347,9 @@ describe('REPT-02: unconditional existingServerCount and totalPcores auto-derive
     expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
   })
 
-  it('renders existingServerCount field when sizingMode is specint', () => {
+  it('renders existingServerCount field when sizingMode is performance', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
     })
     render(<CurrentClusterForm onNext={() => {}} />)
     expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
@@ -374,7 +414,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
 
   it('clicking the button copies cpuModel to clipboard', async () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
       })
@@ -394,7 +434,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
     vi.stubGlobal('open', openSpy)
 
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz' },
       })
@@ -434,7 +474,7 @@ describe('SPEC-LINK: SPECrate lookup link', () => {
 
   it('in specint mode without cpuModel, the button is NOT rendered', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
       })
@@ -493,7 +533,7 @@ describe('SPEC-LOOKUP: integrated SpecResultsPanel', () => {
 
   it('clicking a result row updates specintPerServer field value', async () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
       })

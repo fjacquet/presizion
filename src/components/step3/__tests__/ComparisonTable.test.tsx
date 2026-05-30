@@ -26,7 +26,7 @@ const baseScenario = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 16,
   diskPerVmGb: 100,
-  headroomPercent: 20,
+  growthPercent: 0, safetyPercent: 20,
   haReserveCount: 0 as const,
 }
 
@@ -76,7 +76,7 @@ describe('ComparisonTable', () => {
       expect(screen.getByText(/limiting resource/i)).toBeTruthy()
       expect(screen.getByText(/vcpu.*pcore/i)).toBeTruthy()
       expect(screen.getByText(/vms\/server/i)).toBeTruthy()
-      expect(screen.getByText(/headroom/i)).toBeTruthy()
+      expect(screen.getByText(/growth \/ safety/i)).toBeTruthy()
       expect(screen.getByText(/cpu util/i)).toBeTruthy()
       expect(screen.getByText(/ram util/i)).toBeTruthy()
       expect(screen.getByText(/disk util/i)).toBeTruthy()
@@ -113,10 +113,10 @@ describe('ComparisonTable', () => {
       expect(vmsRow).toBeTruthy()
     })
 
-    it('displays headroom percent for each scenario', () => {
+    it('displays growth / safety percent for each scenario', () => {
       render(<ComparisonTable />)
-      // headroomPercent is 20, displayed as "20%"
-      expect(screen.getByText('20%')).toBeTruthy()
+      // growthPercent 0, safetyPercent 20 → displayed as "0% / 20%"
+      expect(screen.getByText('0% / 20%')).toBeTruthy()
     })
 
     it('displays CPU, RAM, and disk utilization percentages for each scenario', () => {
@@ -136,7 +136,7 @@ describe('ComparisonTable', () => {
         { ...baseResult, limitingResource: 'specint' as const },
       ])
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint', layoutMode: 'hci' })
+        useWizardStore.setState({ sizingMode: 'performance', layoutMode: 'hci' })
       })
       render(<ComparisonTable />)
       // Should show 'SPECrate2017' — may appear in both mode badge and limiting resource column
@@ -286,9 +286,9 @@ describe('ComparisonTable', () => {
       expect(cell?.textContent).toContain('N/A')
     })
 
-    it('FIX-ASIS-04: Headroom As-Is cell shows N/A', () => {
+    it('FIX-ASIS-04: Growth / Safety As-Is cell shows N/A', () => {
       render(<ComparisonTable />)
-      const cell = getAsIsCell(/headroom/i)
+      const cell = getAsIsCell(/growth \/ safety/i)
       expect(cell?.textContent).toContain('N/A')
     })
   })

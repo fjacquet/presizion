@@ -67,7 +67,13 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
       targetVcpuToPCoreRatio: num(sc.targetVcpuToPCoreRatio, `scenarios[${i}].targetVcpuToPCoreRatio`),
       ramPerVmGb: num(sc.ramPerVmGb, `scenarios[${i}].ramPerVmGb`),
       diskPerVmGb: num(sc.diskPerVmGb, `scenarios[${i}].diskPerVmGb`),
-      headroomPercent: num(sc.headroomPercent, `scenarios[${i}].headroomPercent`),
+      growthPercent: typeof sc.growthPercent === 'number' ? sc.growthPercent : 0,
+      safetyPercent:
+        typeof sc.safetyPercent === 'number'
+          ? sc.safetyPercent
+          : typeof sc.headroomPercent === 'number'
+            ? sc.headroomPercent
+            : 20,
       haReserveCount: (sc.haReserveCount === 1 || sc.haReserveCount === 2 ? sc.haReserveCount : 0) as 0 | 1 | 2,
       ...(sc.targetSpecint != null && { targetSpecint: num(sc.targetSpecint, `scenarios[${i}].targetSpecint`) }),
     }

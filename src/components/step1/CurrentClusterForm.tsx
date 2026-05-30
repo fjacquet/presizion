@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Switch } from '@/components/ui/switch'
 import {
   Tooltip,
@@ -21,7 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { currentClusterSchema, type CurrentClusterInput } from '@/schemas/currentClusterSchema'
+import type { CurrentClusterInput } from '@/schemas/currentClusterSchema'
+import { currentClusterFormSchema } from '@/schemas/currentClusterFormSchema'
 import { useClusterStore } from '@/store/useClusterStore'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useWizardStore } from '@/store/useWizardStore'
@@ -104,60 +104,6 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
   )
 }
 
-/** Numeric field with an activation checkbox — when unchecked, value is cleared to undefined. */
-function CheckboxNumericField({
-  control,
-  name,
-  label,
-  testId,
-  enabled,
-  onToggle,
-}: NumericFieldProps & { enabled: boolean; onToggle: (checked: boolean) => void }) {
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id={`${name}-enabled`}
-              checked={enabled}
-              onCheckedChange={onToggle}
-            />
-            <FormLabel className="flex items-center gap-1 cursor-pointer" htmlFor={`${name}-enabled`}>
-              {label}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" aria-label={`Info: ${label}`} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-sm">{TOOLTIPS[name]}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </FormLabel>
-          </div>
-          <FormControl>
-            <Input
-              type="number"
-              min={0}
-              max={100}
-              data-testid={testId}
-              disabled={!enabled}
-              {...field}
-              value={enabled ? toInputValue(field.value, true) : ''}
-              onChange={(e) => field.onChange(e.target.value)}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
-}
-
 interface CurrentClusterFormProps {
   onNext: () => void
 }
@@ -168,14 +114,12 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
   const sizingMode = useWizardStore((s) => s.sizingMode)
 
-  const [cpuUtilEnabled, setCpuUtilEnabled] = useState(() => currentCluster.cpuUtilizationPercent !== undefined)
-  const [ramUtilEnabled, setRamUtilEnabled] = useState(() => currentCluster.ramUtilizationPercent !== undefined)
   const [selectedSpecScore, setSelectedSpecScore] = useState<number | undefined>(undefined)
   const { results: specResults, status: specStatus, isLoading: specLoading } = useSpecLookup(currentCluster.cpuModel)
 
   const form = useForm<CurrentClusterInput>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(currentClusterSchema) as any,
+    resolver: zodResolver(currentClusterFormSchema) as any,
     mode: 'onBlur',
     defaultValues: {
       totalVcpus: 0,
@@ -228,11 +172,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         cpuFrequencyGhz: currentCluster.cpuFrequencyGhz,
         isStretchCluster: currentCluster.isStretchCluster,
       })
-      // Sync checkbox enabled state when cluster is imported
-      if (currentCluster.cpuUtilizationPercent !== undefined) setCpuUtilEnabled(true)
-      else setCpuUtilEnabled(false)
-      if (currentCluster.ramUtilizationPercent !== undefined) setRamUtilEnabled(true)
-      else setRamUtilEnabled(false)
     }
   }, [currentCluster, form])
 
@@ -249,13 +188,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         const defined = Object.fromEntries(
           Object.entries(formValues).filter(([, v]) => v !== undefined && v !== null),
         )
-        // Utilization fields must propagate undefined to clear store values when unchecked
-        const utilFields = ['cpuUtilizationPercent', 'ramUtilizationPercent'] as const
-        for (const key of utilFields) {
-          if (formValues[key] === undefined) {
-            (defined as Record<string, unknown>)[key] = undefined
-          }
-        }
         setCurrentCluster({ ...existing, ...defined } as OldCluster)
       }
     })
@@ -295,20 +227,20 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   }
 
   async function handleNext() {
-    const alwaysRequired: Array<keyof CurrentClusterInput> = ['totalVcpus', 'totalPcores', 'totalVms']
-    const modeRequired: Array<keyof CurrentClusterInput> =
-      sizingMode === 'specint' ? ['specintPerServer'] :
-      sizingMode === 'ghz' ? ['cpuFrequencyGhz'] : []
-    const isValid = await form.trigger([...alwaysRequired, ...modeRequired])
-    if (isValid && sizingMode === 'specint') {
-      if (!form.getValues('specintPerServer')) return
-    }
-    if (isValid && sizingMode === 'ghz') {
-      if (!form.getValues('cpuFrequencyGhz')) return
-    }
+    // Required for all modes: cluster totals + measured/estimated utilization.
+    // Utilization is enforced as required by currentClusterFormSchema (the form resolver),
+    // so triggering these fields surfaces the validation errors before advancing.
+    const alwaysRequired: Array<keyof CurrentClusterInput> = [
+      'totalVcpus',
+      'totalPcores',
+      'totalVms',
+      'cpuUtilizationPercent',
+      'ramUtilizationPercent',
+    ]
+    const isValid = await form.trigger(alwaysRequired)
     if (isValid) {
-      // Parse through Zod schema to get properly typed numbers (form.getValues returns raw HTML strings)
-      const parseResult = currentClusterSchema.safeParse(form.getValues())
+      // Parse through the strict form schema to get properly typed numbers (form.getValues returns raw HTML strings)
+      const parseResult = currentClusterFormSchema.safeParse(form.getValues())
       const typedValues = parseResult.success ? parseResult.data : form.getValues()
       // Merge over existing cluster to preserve fields not in the form (avgRamPerVmGb, cpuModel)
       const merged: OldCluster = { ...currentCluster, ...(typedValues as Partial<OldCluster>) }
@@ -405,53 +337,26 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
         <section>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Current Utilization (optional)
+            Current Utilization (required)
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {sizingMode !== 'specint' && (
-              <CheckboxNumericField
-                control={form.control}
-                name="cpuUtilizationPercent"
-                label="CPU Utilization %"
-                testId="input-cpuUtilizationPercent"
-                enabled={cpuUtilEnabled}
-                onToggle={(checked) => {
-                  setCpuUtilEnabled(checked)
-                  if (!checked) form.setValue('cpuUtilizationPercent', undefined, { shouldValidate: true })
-                }}
-              />
-            )}
-            <CheckboxNumericField
-              control={form.control}
-              name="ramUtilizationPercent"
-              label="RAM Utilization %"
-              testId="input-ramUtilizationPercent"
-              enabled={ramUtilEnabled}
-              onToggle={(checked) => {
-                setRamUtilEnabled(checked)
-                if (!checked) form.setValue('ramUtilizationPercent', undefined, { shouldValidate: true })
-              }}
-            />
+            <NumericFormField control={form.control} name="cpuUtilizationPercent" label="CPU Utilization %" testId="input-cpuUtilizationPercent" />
+            <NumericFormField control={form.control} name="ramUtilizationPercent" label="RAM Utilization %" testId="input-ramUtilizationPercent" />
           </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Most environments run well below 100%. {currentCluster.isStretchCluster
+              ? 'Stretch clusters often run <50% per site.'
+              : 'Enter measured (LiveOptics) or a careful estimate.'}
+          </p>
         </section>
 
-        {sizingMode === 'specint' && (
+        {sizingMode === 'performance' && (
           <section>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-              SPECrate2017 Mode (required)
+              Performance Mode (optional)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <NumericFormField control={form.control} name="specintPerServer" label="SPECrate2017_int_base / Server (existing)" testId="input-specintPerServer" optional />
-            </div>
-          </section>
-        )}
-
-        {sizingMode === 'ghz' && (
-          <section>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-              GHz Mode (required)
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <NumericFormField control={form.control} name="cpuFrequencyGhz" label="CPU Frequency (GHz)" testId="input-cpuFrequencyGhz" optional />
             </div>
           </section>

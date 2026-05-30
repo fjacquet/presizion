@@ -37,7 +37,7 @@ const baseScenario = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 16,
   diskPerVmGb: 100,
-  headroomPercent: 20,
+  growthPercent: 0, safetyPercent: 20,
   haReserveCount: 0 as const,
 }
 
@@ -90,14 +90,14 @@ describe('SizingChart', () => {
     expect(bars).toHaveLength(4)
   })
 
-  it('shows SPECint bar label when sizingMode is specint', () => {
+  it('shows Performance bar label when sizingMode is performance', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] })
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
     })
     vi.mocked(useScenariosResults).mockReturnValue([baseResult])
     render(<SizingChart />)
-    expect(screen.getByText('SPECint-limited')).toBeInTheDocument()
+    expect(screen.getByText('Performance-limited')).toBeInTheDocument()
   })
 
   it('both charts have download PNG buttons', () => {

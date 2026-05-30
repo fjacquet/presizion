@@ -13,7 +13,7 @@ import { useWizardStore } from '@/store/useWizardStore'
 import { createDefaultScenario } from '@/lib/sizing/defaults'
 import {
   DEFAULT_VCPU_TO_PCORE_RATIO,
-  DEFAULT_HEADROOM_PERCENT,
+  DEFAULT_SAFETY_PERCENT,
 } from '@/lib/sizing/defaults'
 
 // Mock the specLookup module so we control fetch results in tests
@@ -28,10 +28,20 @@ vi.mock('@/lib/utils/specLookup', async (importOriginal) => {
 import { fetchSpecResults } from '@/lib/utils/specLookup'
 const mockFetchSpecResults = vi.mocked(fetchSpecResults)
 
+/**
+ * Default scenario with targetSpecint stripped so the "I have SPEC scores"
+ * opt-in checkbox starts UNCHECKED (deterministic for SPEC tests). Omit the key
+ * entirely (never assign undefined) to satisfy exactOptionalPropertyTypes.
+ */
+function scenarioWithoutSpec() {
+  const { targetSpecint: _omit, ...rest } = createDefaultScenario()
+  void _omit
+  return rest
+}
+
 // Reset stores between tests to avoid cross-test contamination
 beforeEach(() => {
-  const defaultScenario = createDefaultScenario()
-  useScenariosStore.setState({ scenarios: [defaultScenario] })
+  useScenariosStore.setState({ scenarios: [scenarioWithoutSpec()] })
   useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } })
   useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
 })
@@ -72,7 +82,6 @@ describe('Step2Scenarios / ScenarioCard', () => {
     it('renders sockets per server field', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      // FormLabel renders the label text; use getByText to check label presence
       expect(screen.getByText(/sockets\/server/i)).toBeInTheDocument()
     })
 
@@ -99,7 +108,6 @@ describe('Step2Scenarios / ScenarioCard', () => {
       render(<ScenarioCard scenarioId={scenario.id} />)
       // Default scenario: 2 sockets × 20 cores/socket = 40 total cores
       const totalCores = scenario.socketsPerServer * scenario.coresPerSocket
-      // The derived metric text should appear somewhere
       expect(screen.getByText(/total cores\/server/i)).toBeInTheDocument()
       expect(screen.getByText(`${totalCores}`)).toBeInTheDocument()
     })
@@ -124,10 +132,15 @@ describe('Step2Scenarios / ScenarioCard', () => {
       expect(screen.getByText(/disk\/vm gb/i)).toBeInTheDocument()
     })
 
-    it('renders growth headroom % field', () => {
+    it('shows Growth % and Safety % and hides target-util/VM-count', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      expect(screen.getByText(/headroom %/i)).toBeInTheDocument()
+      expect(screen.getByText(/Growth %/)).toBeInTheDocument()
+      expect(screen.getByText(/Safety buffer %/)).toBeInTheDocument()
+      expect(screen.queryByText(/Target CPU Util/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Target RAM Util/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Target VM Count/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Headroom/)).not.toBeInTheDocument()
     })
 
     it('renders HA reserve N/N+1/N+2 toggle buttons', () => {
@@ -158,25 +171,22 @@ describe('Step2Scenarios / ScenarioCard', () => {
     it('new ScenarioCard pre-fills targetVcpuToPCoreRatio with DEFAULT_VCPU_TO_PCORE_RATIO (4)', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      // Find all spinbutton inputs and check the ratio input value
       const inputs = screen.getAllByRole('spinbutton')
-      // targetVcpuToPCoreRatio input should exist with value 4
       const ratioInput = inputs.find((el) => (el as HTMLInputElement).value === String(DEFAULT_VCPU_TO_PCORE_RATIO))
       expect(ratioInput).toBeDefined()
     })
 
-    it('new ScenarioCard pre-fills headroomPercent with DEFAULT_HEADROOM_PERCENT (20)', () => {
+    it('new ScenarioCard pre-fills safetyPercent with DEFAULT_SAFETY_PERCENT (20)', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
       const inputs = screen.getAllByRole('spinbutton')
-      const headroomInput = inputs.find((el) => (el as HTMLInputElement).value === String(DEFAULT_HEADROOM_PERCENT))
-      expect(headroomInput).toBeDefined()
+      const safetyInput = inputs.find((el) => (el as HTMLInputElement).value === String(DEFAULT_SAFETY_PERCENT))
+      expect(safetyInput).toBeDefined()
     })
 
     it('new ScenarioCard pre-fills haReserveCount with 0 (N/None selected)', () => {
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      // N (None) button should be aria-pressed=true by default
       const noneBtn = screen.getByRole('button', { name: 'N (None)' })
       expect(noneBtn).toHaveAttribute('aria-pressed', 'true')
     })
@@ -206,7 +216,6 @@ describe('Step2Scenarios / ScenarioCard', () => {
       const originalScenario = useScenariosStore.getState().scenarios[0]!
       const originalName = originalScenario.name
 
-      // Duplicate the scenario
       act(() => {
         useScenariosStore.getState().duplicateScenario(originalScenario.id)
       })
@@ -214,44 +223,134 @@ describe('Step2Scenarios / ScenarioCard', () => {
       const scenarios = useScenariosStore.getState().scenarios
       expect(scenarios.length).toBe(2)
 
-      // Update the copy's name
       const copyId = scenarios[1]!.id
       act(() => {
         useScenariosStore.getState().updateScenario(copyId, { name: 'Modified Copy Name' })
       })
 
-      // Original should be unchanged
       const originalAfter = useScenariosStore.getState().scenarios.find((s) => s.id === originalScenario.id)
       expect(originalAfter?.name).toBe(originalName)
     })
   })
 
   describe('PERF-03: targetSpecint conditional field', () => {
-    it('targetSpecint input is present when sizingMode is specint', () => {
+    it('targetSpecint input is present when SPEC scores enabled in performance mode', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'specint' })
+        useWizardStore.setState({ sizingMode: 'performance' })
       })
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      const scenario0Id = scenario.id
-      expect(screen.getByTestId(`input-targetSpecint-${scenario0Id}`)).toBeInTheDocument()
+
+      // Opt in to SPEC scores
+      fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
+
+      expect(screen.getByTestId(`input-targetSpecint-${scenario.id}`)).toBeInTheDocument()
     })
 
-    it('targetSpecint input is absent when sizingMode is vcpu', () => {
-      // sizingMode is 'vcpu' by default (set in beforeEach)
+    it('targetSpecint input is absent before opting in to SPEC scores', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
       const scenario = useScenariosStore.getState().scenarios[0]!
       render(<ScenarioCard scenarioId={scenario.id} />)
-      const scenario0Id = scenario.id
-      expect(screen.queryByTestId(`input-targetSpecint-${scenario0Id}`)).not.toBeInTheDocument()
+      expect(screen.queryByTestId(`input-targetSpecint-${scenario.id}`)).not.toBeInTheDocument()
+    })
+
+    it('targetSpecint input is absent in vcpu mode', () => {
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+      expect(screen.queryByTestId(`input-targetSpecint-${scenario.id}`)).not.toBeInTheDocument()
+    })
+
+    it('New CPU Frequency (GHz) input is present in performance mode', () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+      expect(screen.getByTestId(`input-targetCpuFrequencyGhz-${scenario.id}`)).toBeInTheDocument()
+    })
+
+    it('unchecking SPEC scores clears targetSpecint from the store', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+
+      const specCheckbox = screen.getByRole('checkbox', { name: /i have spec scores/i })
+
+      // Check: enable SPEC scores
+      act(() => {
+        fireEvent.click(specCheckbox)
+      })
+
+      // Type a value into targetSpecint
+      await waitFor(() => {
+        expect(screen.getByTestId(`input-targetSpecint-${scenario.id}`)).toBeInTheDocument()
+      })
+
+      act(() => {
+        fireEvent.change(screen.getByTestId(`input-targetSpecint-${scenario.id}`), {
+          target: { value: '250' },
+        })
+      })
+
+      await waitFor(() => {
+        const updated = useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)
+        expect(updated?.targetSpecint).toBe(250)
+      })
+
+      // Uncheck: disable SPEC scores
+      act(() => {
+        fireEvent.click(specCheckbox)
+      })
+
+      await waitFor(() => {
+        const updated = useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)
+        expect(updated?.targetSpecint).toBeUndefined()
+      })
+    })
+
+    it('switching away from performance mode clears targetSpecint (no stale SPEC re-activation)', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+
+      // Enable SPEC and set a score
+      act(() => {
+        fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
+      })
+      await waitFor(() => {
+        expect(screen.getByTestId(`input-targetSpecint-${scenario.id}`)).toBeInTheDocument()
+      })
+      act(() => {
+        fireEvent.change(screen.getByTestId(`input-targetSpecint-${scenario.id}`), {
+          target: { value: '500' },
+        })
+      })
+      await waitFor(() => {
+        expect(useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)?.targetSpecint).toBe(500)
+      })
+
+      // Switch to vcpu mode WITHOUT unchecking — the effect must clear targetSpecint,
+      // otherwise constraints.ts (targetSpecint > 0 → SPEC) would silently re-activate
+      // SPEC sizing on re-entry to performance mode.
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'vcpu' })
+      })
+      await waitFor(() => {
+        expect(useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)?.targetSpecint).toBeUndefined()
+      })
     })
   })
 })
 
-describe('SPEC-06..09: auto-derive and read-only fields', () => {
+describe('SPEC-06..09: auto-derive and read-only fields (performance + SPEC)', () => {
   function getSocketsInput() {
-    // Sockets/Server input: find the label text, then get the adjacent spinbutton
     const labels = screen.getAllByText(/sockets\/server/i)
-    // The label is inside a FormItem; the input is the next spinbutton sibling
     const formItem = labels[0]!.closest('[class*="FormItem"], .space-y-2, [data-slot="form-item"]')!
     return formItem.querySelector('input[type="number"]') as HTMLInputElement
   }
@@ -262,97 +361,93 @@ describe('SPEC-06..09: auto-derive and read-only fields', () => {
     return formItem.querySelector('input[type="number"]') as HTMLInputElement
   }
 
-  it('in specint mode with cluster metadata, sockets/server input is disabled', () => {
+  it('in performance+SPEC mode with cluster metadata, sockets/server input is disabled', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(getSocketsInput()).toBeDisabled()
   })
 
-  it('in specint mode with cluster metadata, cores/socket input is disabled', () => {
+  it('in performance+SPEC mode with cluster metadata, cores/socket input is disabled', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(getCoresInput()).toBeDisabled()
   })
 
   it('in vcpu mode, sockets/server and cores/socket inputs are NOT disabled', () => {
-    // sizingMode is 'vcpu' by default
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
     expect(getSocketsInput()).not.toBeDisabled()
     expect(getCoresInput()).not.toBeDisabled()
   })
 
-  it('switching from specint to vcpu re-enables the inputs', () => {
+  it('in performance mode WITHOUT SPEC opt-in, inputs are NOT disabled', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
-    const { rerender } = render(<ScenarioCard scenarioId={scenario.id} />)
-    expect(getSocketsInput()).toBeDisabled()
-
-    act(() => {
-      useWizardStore.setState({ sizingMode: 'vcpu' })
-    })
-    rerender(<ScenarioCard scenarioId={scenario.id} />)
+    render(<ScenarioCard scenarioId={scenario.id} />)
     expect(getSocketsInput()).not.toBeDisabled()
     expect(getCoresInput()).not.toBeDisabled()
   })
 
-  it('in specint mode WITHOUT cluster metadata, inputs are NOT disabled', () => {
+  it('in performance+SPEC mode WITHOUT cluster metadata, inputs are NOT disabled', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
-      // No socketsPerServer or coresPerSocket
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(getSocketsInput()).not.toBeDisabled()
     expect(getCoresInput()).not.toBeDisabled()
   })
 
-  it('in specint mode WITHOUT cluster metadata, a warning message is visible', () => {
+  it('in performance+SPEC mode WITHOUT cluster metadata, a warning message is visible', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(screen.getByText(/no socket\/core data from import/i)).toBeInTheDocument()
   })
 
-  it('warning message is NOT shown when metadata is present in specint mode', () => {
+  it('warning message is NOT shown when metadata is present in performance+SPEC mode', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, socketsPerServer: 2, coresPerSocket: 16 },
       })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(screen.queryByText(/no socket\/core data from import/i)).not.toBeInTheDocument()
   })
 
   it('warning message is NOT shown in vcpu mode', () => {
-    // sizingMode is 'vcpu' by default, no metadata
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
     expect(screen.queryByText(/no socket\/core data from import/i)).not.toBeInTheDocument()
@@ -365,17 +460,17 @@ describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
     mockFetchSpecResults.mockResolvedValue({ results: [], status: 'no-results' })
   })
 
-  it('in SPECint mode, renders "Target CPU Model" input', () => {
+  it('in performance mode with SPEC enabled, renders "Target CPU Model" input', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
     expect(screen.getByPlaceholderText(/xeon gold 6526y/i)).toBeInTheDocument()
   })
 
   it('in vcpu mode, renders "Look up target CPU" search for auto-filling cores/sockets', () => {
-    // sizingMode is 'vcpu' by default
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
     expect(screen.getByPlaceholderText(/xeon gold 6526y/i)).toBeInTheDocument()
@@ -391,20 +486,19 @@ describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
     })
 
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
 
     const cpuInput = screen.getByPlaceholderText(/xeon gold 6526y/i)
     fireEvent.change(cpuInput, { target: { value: 'Xeon Gold 6526Y' } })
 
-    // Wait for debounce (500ms) + fetch
     await waitFor(() => {
       expect(mockFetchSpecResults).toHaveBeenCalled()
     }, { timeout: 2000 })
 
-    // Results panel should show the result
     await waitFor(() => {
       expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
     })
@@ -419,29 +513,26 @@ describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
     })
 
     act(() => {
-      useWizardStore.setState({ sizingMode: 'specint' })
+      useWizardStore.setState({ sizingMode: 'performance' })
     })
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioCard scenarioId={scenario.id} />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i have spec scores/i }))
 
     const cpuInput = screen.getByPlaceholderText(/xeon gold 6526y/i)
     fireEvent.change(cpuInput, { target: { value: 'Xeon Gold 6526Y' } })
 
-    // Wait for results to appear
     await waitFor(() => {
       expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
     }, { timeout: 2000 })
 
-    // Expand the panel by clicking the toggle
     fireEvent.click(screen.getByText('SPECrate2017 Results'))
 
-    // Click the result row
     await waitFor(() => {
       expect(screen.getByText('337')).toBeInTheDocument()
     })
     fireEvent.click(screen.getByText('337'))
 
-    // targetSpecint field should be updated
     await waitFor(() => {
       const specintInput = screen.getByTestId(`input-targetSpecint-${scenario.id}`) as HTMLInputElement
       expect(specintInput.value).toBe('337')
@@ -451,7 +542,6 @@ describe('SPEC-LOOKUP-04: Target CPU SPEC lookup in ScenarioCard', () => {
 
 describe('ScenarioResults', () => {
   it('renders CPU-limited, RAM-limited, disk-limited, and final server count labels', () => {
-    // Set up cluster data so results can be computed
     act(() => {
       useClusterStore.setState({
         currentCluster: {
@@ -465,7 +555,6 @@ describe('ScenarioResults', () => {
     const scenario = useScenariosStore.getState().scenarios[0]!
     render(<ScenarioResults scenarioId={scenario.id} />)
 
-    // "CPU-limited" appears in the Badge and in the label text; check at least one is present
     expect(screen.getAllByText(/cpu-limited/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/ram-limited/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/disk-limited/i).length).toBeGreaterThan(0)

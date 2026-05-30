@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **State**: Zustand v5 (5 stores) + localStorage persistence + URL hash sharing
 - **Import**: xlsx@0.18.5 (locked MIT — do not upgrade) + jszip
 - **Deployment**: GitHub Pages at `/presizion/` — pure static files, no backend
-- **Testing**: Vitest + React Testing Library (653 tests)
+- **Testing**: Vitest + React Testing Library (757 tests)
 - **Export**: jsPDF + jspdf-autotable + pptxgenjs (all lazy-loaded)
 
 ## Project Structure
@@ -51,27 +51,37 @@ npm run lint        # ESLint check
 Three entities drive all calculations:
 
 1. **OldCluster** — current environment metrics (vCPUs, pCores, VMs, RAM, disk, server config)
-2. **Scenario** — target server config + sizing assumptions (vCPU:pCore ratio, headroom %, utilization targets)
+2. **Scenario** — target server config + sizing assumptions (vCPU:pCore ratio, growth %, safety buffer %)
 3. **ScenarioResult** (derived) — server counts per constraint, limiting resource, per-server utilization
 
 All sizing formulas must live in `src/lib/sizing/` — never inline in components. The UI is purely presentational over these pure functions.
 
 ## 3-Step Wizard Flow
 
-1. **Enter Current Cluster** — file import (RVTools/LiveOptics) or manual input, scope filtering, derived metrics, SPECrate lookup link
-2. **Define Target Scenarios** — scenario cards with server config + sizing assumptions + HA reserve + advanced options (VM override, min servers)
+1. **Enter Current Cluster** — file import (RVTools/LiveOptics) or manual input, scope filtering, derived metrics, **required CPU/RAM utilization**, SPECrate lookup link
+2. **Define Target Scenarios** — scenario cards with server config + sizing assumptions (growth %, safety %) + HA reserve, with vSAN and min-server-pin behind a collapsed "Advanced" disclosure; the first scenario is seeded from imported data
 3. **Review & Export** — As-Is vs scenario comparison table, server count chart, constraint breakdown chart, core count chart, CSV/JSON/PNG/URL/Print export
 
-## Key Sizing Logic (4 modes)
+## Key Sizing Logic (2 modes)
 
-- **vCPU mode**: `ceil(totalVcpus × headroom / ratio / coresPerServer)`
-- **SPECint mode**: `ceil(existingServers × existingSpecint × headroom / targetSpecint)`
-- **Aggressive mode**: `ceil(totalVcpus × cpuUtil% × headroom / coresPerServer)`
-- **GHz mode**: `ceil(totalPcores × oldGhz × cpuUtil% × headroom / (coresPerServer × newGhz × targetUtil%))`
-- **RAM-limited**: `ceil(effectiveVms × ramUtil% × ramPerVm × headroom / ramPerServer)`
-- **Disk-limited**: `ceil(effectiveVms × diskPerVm × headroom / diskPerServer)` (0 in disaggregated mode)
-- **Final server count** = `max(cpuLimited, ramLimited, diskLimited) + haReserveCount`
-- **Limiting resource** = whichever constraint drove the max (cpu/specint/ghz/ram/disk)
+All demand is scaled by a single **demand factor** = `(1 + growth%/100) × (1 + safety%/100)`
+(growth = future workload, safety = "don't run hot"). These two knobs replace the old
+headroom / target-utilization / per-resource-growth fields.
+
+Observed CPU/RAM utilization is a **required Step 1 input** (no 100% default — assuming
+100% over-sizes the cluster). It scales current demand for right-sizing.
+
+- **vcpu mode**: `ceil(totalVcpus × demandFactor / ratio / coresPerServer)`
+- **performance mode** (GHz-primary, SPEC-optional — merges the old SPECint + GHz modes):
+  - default GHz: `ceil(totalPcores × oldGhz × cpuUtil% × demandFactor / (coresPerServer × newGhz))`
+  - SPEC override (when `targetSpecint` + cluster SPEC data present): `ceil(existingServers × existingSpecint × demandFactor / targetSpecint)`
+- **RAM-limited**: `ceil(totalVms × ramUtil% × ramPerVm × demandFactor / ramPerServer)`
+- **Disk-limited**: `ceil(totalVms × diskPerVm × demandFactor / diskPerServer)` (0 in disaggregated mode)
+- **Stretch cluster**: raw count doubled for site symmetry when detected from import.
+- **Final server count** = `max(cpuLimited, ramLimited, diskLimited) [×2 if stretch] + haReserveCount`, floored by `minServerCount`.
+- **Limiting resource** = whichever constraint drove the max (cpu/specint/ghz/ram/disk).
+
+Utilization is an **output** of the result (achieved CPU/RAM/disk %), never a scenario input.
 
 ## Engineering Principles (from constitution)
 

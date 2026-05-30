@@ -40,7 +40,8 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
 
   const cpuFormula = cpuFormulaString({
     totalVcpus: currentCluster.totalVcpus,
-    headroomPercent: scenario.headroomPercent,
+    safetyPercent: scenario.safetyPercent,
+    growthPercent: scenario.growthPercent,
     targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
     coresPerServer,
     ...(currentCluster.cpuUtilizationPercent !== undefined && {
@@ -48,12 +49,13 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     }),
   })
 
-  const effectiveVmCount = scenario.targetVmCount ?? currentCluster.totalVms
+  const effectiveVmCount = currentCluster.totalVms
 
   const ramFormula = ramFormulaString({
     totalVms: effectiveVmCount,
     ramPerVmGb: scenario.ramPerVmGb,
-    headroomPercent: scenario.headroomPercent,
+    safetyPercent: scenario.safetyPercent,
+    growthPercent: scenario.growthPercent,
     ramPerServerGb: scenario.ramPerServerGb,
     ...(currentCluster.ramUtilizationPercent !== undefined && {
       ramUtilizationPercent: currentCluster.ramUtilizationPercent,
@@ -63,7 +65,8 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
   const diskFormula = diskFormulaString({
     totalVms: effectiveVmCount,
     diskPerVmGb: scenario.diskPerVmGb,
-    headroomPercent: scenario.headroomPercent,
+    safetyPercent: scenario.safetyPercent,
+    growthPercent: scenario.growthPercent,
     diskPerServerGb: scenario.diskPerServerGb,
   })
 
@@ -77,18 +80,18 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
         <div>
           <span className="text-muted-foreground">
-            {sizingMode === 'specint' ? 'SPECrate-limited: ' : 'CPU-limited: '}
+            {result.limitingResource === 'specint' ? 'SPECrate-limited: ' : 'CPU-limited: '}
           </span>
           <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
           <div className="text-xs text-muted-foreground font-mono mt-0.5">
-            {sizingMode === 'specint' &&
+            {sizingMode === 'performance' &&
              currentCluster.existingServerCount != null &&
              currentCluster.specintPerServer != null &&
              scenario.targetSpecint != null
               ? specintFormulaString({
                   existingServers: currentCluster.existingServerCount,
                   specintPerServer: currentCluster.specintPerServer,
-                  headroomPercent: scenario.headroomPercent,
+                  safetyPercent: scenario.safetyPercent,
                   targetSpecint: scenario.targetSpecint,
                 })
               : cpuFormula}

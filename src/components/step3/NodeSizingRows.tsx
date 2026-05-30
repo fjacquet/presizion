@@ -22,7 +22,7 @@ interface NodeSizingRowsProps {
 }
 
 export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: NodeSizingRowsProps) {
-  const showRatioRow = sizingMode !== 'specint'
+  const showRatioRow = sizingMode === 'vcpu'
 
   return (
     <>
@@ -89,9 +89,6 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
         <TableRow>
           <TableCell className={STICKY}>
             vCPU:pCore Ratio
-            {(sizingMode === 'aggressive' || sizingMode === 'ghz') && (
-              <span className="text-xs text-muted-foreground ml-1">(not enforced)</span>
-            )}
           </TableCell>
           <TableCell className={ASIS}>
             {cluster.totalPcores > 0
@@ -132,13 +129,13 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
         ))}
       </TableRow>
 
-      {/* Headroom % */}
+      {/* Growth / Safety buffers */}
       <TableRow>
-        <TableCell className={STICKY}>Headroom</TableCell>
+        <TableCell className={STICKY}>Growth / Safety</TableCell>
         <TableCell className={ASIS}>N/A</TableCell>
         {scenarios.map((s) => (
           <TableCell key={s.id} className="text-center">
-            {s.headroomPercent}%
+            {s.growthPercent}% / {s.safetyPercent}%
           </TableCell>
         ))}
       </TableRow>

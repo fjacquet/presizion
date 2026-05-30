@@ -397,9 +397,9 @@ export async function exportPptx(
     },
     // --- Sizing assumptions section ---
     {
-      label: 'Headroom %',
+      label: 'Safety %',
       asIs: 'N/A',
-      scenarioValues: scenarios.map((s) => `${s.headroomPercent}%`),
+      scenarioValues: scenarios.map((s) => `${s.safetyPercent}%`),
     },
     {
       label: 'HA Reserve',
@@ -451,37 +451,16 @@ export async function exportPptx(
     )
   }
 
-  // --- Growth projections (conditional) ---
+  // --- Growth projection (conditional) ---
   const hasGrowth = scenarios.some(
-    (s) =>
-      (s.cpuGrowthPercent !== undefined && s.cpuGrowthPercent > 0) ||
-      (s.memoryGrowthPercent !== undefined && s.memoryGrowthPercent > 0) ||
-      (s.storageGrowthPercent !== undefined && s.storageGrowthPercent > 0),
+    (s) => s.growthPercent !== undefined && s.growthPercent > 0,
   )
   if (hasGrowth) {
-    compMetrics.push(
-      {
-        label: 'CPU Growth %',
-        asIs: 'N/A',
-        scenarioValues: scenarios.map((s) =>
-          s.cpuGrowthPercent !== undefined ? `${s.cpuGrowthPercent}%` : '0%',
-        ),
-      },
-      {
-        label: 'Memory Growth %',
-        asIs: 'N/A',
-        scenarioValues: scenarios.map((s) =>
-          s.memoryGrowthPercent !== undefined ? `${s.memoryGrowthPercent}%` : '0%',
-        ),
-      },
-      {
-        label: 'Storage Growth %',
-        asIs: 'N/A',
-        scenarioValues: scenarios.map((s) =>
-          s.storageGrowthPercent !== undefined ? `${s.storageGrowthPercent}%` : '0%',
-        ),
-      },
-    )
+    compMetrics.push({
+      label: 'Growth %',
+      asIs: 'N/A',
+      scenarioValues: scenarios.map((s) => `${s.growthPercent ?? 0}%`),
+    })
   }
 
   const compDataRows = compMetrics.map((m, rowIdx) => {

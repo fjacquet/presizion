@@ -46,7 +46,7 @@ const exclusionsSchema = z
 const sessionSchema = z.object({
   cluster: currentClusterSchema,
   scenarios: z.array(scenarioSchema),
-  sizingMode: z.enum(['vcpu', 'specint', 'aggressive', 'ghz']).default('vcpu'),
+  sizingMode: z.enum(['vcpu', 'performance']).default('vcpu'),
   layoutMode: z.enum(['hci', 'disaggregated']).default('hci'),
   exclusions: exclusionsSchema,
   truncated: z.boolean().optional(),
@@ -60,15 +60,49 @@ export function serializeSession(data: SessionData): string {
   return JSON.stringify(data);
 }
 
+const LEGACY_MODE_MAP: Record<string, 'vcpu' | 'performance'> = {
+  vcpu: 'vcpu', performance: 'performance',
+  specint: 'performance', ghz: 'performance', aggressive: 'vcpu',
+};
+
+/** Map a pre-2-knob persisted payload forward before schema validation. */
+export function migrateLegacySession(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null) return raw;
+  const r = raw as Record<string, unknown>;
+  const next: Record<string, unknown> = { ...r };
+  if (typeof r.sizingMode === 'string') {
+    next.sizingMode = LEGACY_MODE_MAP[r.sizingMode] ?? 'vcpu';
+  }
+  if (Array.isArray(r.scenarios)) {
+    const DROP = new Set([
+      'headroomPercent', 'targetCpuUtilizationPercent', 'targetRamUtilizationPercent',
+      'targetVmCount', 'cpuGrowthPercent', 'memoryGrowthPercent', 'storageGrowthPercent',
+    ]);
+    next.scenarios = r.scenarios.map((s) => {
+      if (typeof s !== 'object' || s === null) return s;
+      const sc = s as Record<string, unknown>;
+      const rest: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(sc)) if (!DROP.has(k)) rest[k] = v;
+      return {
+        ...rest,
+        safetyPercent: rest.safetyPercent ?? (sc.headroomPercent as number | undefined) ?? 20,
+        growthPercent: rest.growthPercent ?? 0,
+      };
+    });
+  }
+  return next;
+}
+
 /**
  * Deserialize a JSON string back to SessionData.
  * Returns null if the JSON is malformed or fails validation.
  * Unknown fields are stripped (Zod default), not rejected.
+ * Legacy sessions (pre-2-knob) are forward-migrated before validation.
  */
 export function deserializeSession(json: string): SessionData | null {
   try {
     const parsed = JSON.parse(json) as unknown;
-    const result = sessionSchema.safeParse(parsed);
+    const result = sessionSchema.safeParse(migrateLegacySession(parsed));
     if (!result.success) return null;
     return result.data as SessionData;
   } catch {

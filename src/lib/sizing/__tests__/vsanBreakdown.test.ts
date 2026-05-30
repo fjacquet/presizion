@@ -54,11 +54,9 @@ function makeScenario(overrides: Partial<Scenario> = {}): Scenario {
     targetVcpuToPCoreRatio: 4,
     ramPerVmGb: 16,
     diskPerVmGb: 50,
-    headroomPercent: 0,
+    growthPercent: 0, safetyPercent: 0,
     haReserveCount: 0,
     targetCpuFrequencyGhz: 2.5,
-    targetCpuUtilizationPercent: 100,
-    targetRamUtilizationPercent: 100,
     ...overrides,
   };
 }
@@ -190,24 +188,10 @@ describe('computeVsanBreakdown', () => {
   });
 
   // ------------------------------------------------------------------
-  // 5. Max Utilization Reserve (CAP-05)
-  // ------------------------------------------------------------------
-  it('computes reservedMaxUtil correctly (CAP-05)', () => {
-    const cluster = makeCluster();
-    const scenario = makeScenario({ targetCpuUtilizationPercent: 80 });
-    const result = makeResult({ finalCount: 4 });
-
-    const bd = computeVsanBreakdown(cluster, scenario, result);
-
-    // required = 125 (vmsRequired with ratio=4)
-    // reservedMaxUtil = 125 / 0.80 * (1 - 0.80) = 125 / 0.80 * 0.20 = 31.25
-    expect(bd.cpu.reservedMaxUtil).toBeCloseTo(31.25, 2);
-    // spare = 31.25 + 120 = 151.25
-    expect(bd.cpu.spare).toBeCloseTo(151.25, 2);
-
-    assertInvariant(bd.cpu, 'cpu-maxutil');
-  });
-
+  // 5. Max Utilization Reserve (CAP-05) — REMOVED: target-util is no longer a
+  //    scenario knob (the safety buffer replaces it), so reservedMaxUtil is
+  //    always 0. The dedicated CAP-05 target-util tests were dropped with the
+  //    feature.
   // ------------------------------------------------------------------
   // 6. Storage Breakdown non-vSAN (CAP-03)
   // ------------------------------------------------------------------
@@ -362,21 +346,8 @@ describe('computeVsanBreakdown', () => {
   });
 
   // ------------------------------------------------------------------
-  // 12. Memory with max util reserve (CAP-05)
+  // 12. Max util reserve (CAP-05) — REMOVED with the target-util knob.
   // ------------------------------------------------------------------
-  it('computes memory reservedMaxUtil with targetRamUtilizationPercent < 100', () => {
-    const cluster = makeCluster();
-    const scenario = makeScenario({ targetRamUtilizationPercent: 80 });
-    const result = makeResult({ finalCount: 4 });
-
-    const bd = computeVsanBreakdown(cluster, scenario, result);
-
-    // required = 1600
-    // reservedMaxUtil = 1600 / 0.80 * (1 - 0.80) = 1600 / 0.80 * 0.20 = 400
-    expect(bd.memory.reservedMaxUtil).toBeCloseTo(400, 2);
-
-    assertInvariant(bd.memory, 'memory-maxutil');
-  });
 
   // ------------------------------------------------------------------
   // 13. Swap overhead in storage breakdown
