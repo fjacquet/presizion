@@ -1,9 +1,9 @@
 /**
  * Shared brand color palette for all bar charts — the Midnight Executive
- * series (sub-project B). These sRGB-hex values are the single source of
- * truth shared with the PPTX export (`pptx/primitives/colors.ts`, B3) and
- * the ECharts theme (sub-project C): primary ramp first, then status bands
- * and extra series colors.
+ * series (sub-project B). These sRGB-hex values are the brand source of
+ * truth: the primary ramp first, then status bands and extra series colors.
+ * The PPTX export (`pptx/primitives/colors.ts`, added in B3) and the ECharts
+ * theme (sub-project C) will mirror these same values.
  */
 export const CHART_COLORS = [
   '#3245b7', // primary-500 — primary bar / CPU-limited

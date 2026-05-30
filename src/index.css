@@ -25,7 +25,9 @@
   /* Ice blue accent for sub-text on dark */
   --color-ice: oklch(88% 0.04 240);
 
-  /* Gold accent — factual threshold marker only, never a verdict (≈ #f9b935) */
+  /* Gold accent — factual threshold marker only, never a verdict. Brand sRGB
+   * mirror is #f9b935 (the literal hex consumed by charts/PPTX); this oklch is
+   * a close web approximation (renders ~#f2a618), kept for vatlas parity. */
   --color-accent-500: oklch(78% 0.16 75);
 
   /* Semantic utilization status bands (status only, no judgment) */
