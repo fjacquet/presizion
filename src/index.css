@@ -3,7 +3,44 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Presizion — Midnight Executive palette (matches PPTX export theme, sub-project B).
+ * Additive: coexists with the shadcn `--color-*` semantic tokens below until B2
+ * removes them. Tailwind v4 exposes these as `primary-500`, `surface-800`, etc. */
+@theme {
+  /* Navy primary scale (brand primary = primary-500 ≈ #3245b7) */
+  --color-primary-50: oklch(96% 0.02 270);
+  --color-primary-100: oklch(91% 0.04 270);
+  --color-primary-200: oklch(82% 0.08 270);
+  --color-primary-300: oklch(70% 0.12 270);
+  --color-primary-400: oklch(58% 0.16 270);
+  --color-primary-500: oklch(45% 0.18 270);
+  --color-primary-600: oklch(36% 0.16 270);
+  --color-primary-700: oklch(28% 0.14 270);
+  --color-primary-800: oklch(22% 0.12 270);
+  --color-primary-900: oklch(18% 0.08 270);
+  --color-primary-950: oklch(12% 0.05 270);
+
+  /* Ice blue accent for sub-text on dark */
+  --color-ice: oklch(88% 0.04 240);
+
+  /* Gold accent — factual threshold marker only, never a verdict (≈ #f9b935) */
+  --color-accent-500: oklch(78% 0.16 75);
+
+  /* Semantic utilization status bands (status only, no judgment) */
+  --color-util-low: oklch(64% 0.16 142); /* green  ≈ #4aa342 */
+  --color-util-mid: oklch(72% 0.18 65); /* orange ≈ #ef8700 */
+  --color-util-high: oklch(58% 0.22 25); /* red    ≈ #df202e */
+
+  /* Surface scale */
+  --color-surface-50: oklch(98% 0.005 260);
+  --color-surface-100: oklch(95% 0.008 260);
+  --color-surface-200: oklch(88% 0.01 260);
+  --color-surface-700: oklch(28% 0.02 260);
+  --color-surface-800: oklch(20% 0.02 260);
+  --color-surface-900: oklch(15% 0.02 260);
+}
 
 :root {
   --text: #6b6375;
