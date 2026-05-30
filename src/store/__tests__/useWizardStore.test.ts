@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useWizardStore } from '../useWizardStore';
 
 describe('useWizardStore — sizingMode (PERF-01)', () => {

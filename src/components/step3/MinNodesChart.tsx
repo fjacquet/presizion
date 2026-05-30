@@ -1,19 +1,19 @@
-import { useRef } from 'react'
+import { useRef } from 'react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  Cell,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LabelList,
-  Cell,
-} from 'recharts'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
-import { Button } from '@/components/ui/button'
-import { CHART_COLORS } from '@/lib/sizing/chartColors'
-import { downloadChartPng } from '@/lib/utils/downloadChartPng'
+} from 'recharts';
+import { Button } from '@/components/ui/button';
+import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
+import { CHART_COLORS } from '@/lib/sizing/chartColors';
+import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { useScenariosStore } from '@/store/useScenariosStore';
 
 const CONSTRAINT_LABELS: Record<string, string> = {
   cpu: 'CPU',
@@ -21,20 +21,20 @@ const CONSTRAINT_LABELS: Record<string, string> = {
   storage: 'Storage',
   ftha: 'FT & HA',
   vms: 'VM Count',
-}
+};
 
 /** Ordered keys for consistent bar rendering. */
-const CONSTRAINT_KEYS = ['cpu', 'memory', 'storage', 'ftha', 'vms'] as const
+const CONSTRAINT_KEYS = ['cpu', 'memory', 'storage', 'ftha', 'vms'] as const;
 
 interface ConstraintRow {
-  readonly name: string
-  readonly nodes: number
-  readonly isBinding: boolean
+  readonly name: string;
+  readonly nodes: number;
+  readonly isBinding: boolean;
 }
 
 interface MinNodesChartProps {
   /** When provided, chart container refs are written here for PDF/PPTX export capture. */
-  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>;
 }
 
 /**
@@ -44,33 +44,30 @@ interface MinNodesChartProps {
  * One chart per scenario, each with a Download PNG button.
  */
 export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const breakdowns = useVsanBreakdowns()
-  const refs = useRef<Record<string, HTMLDivElement | null>>({})
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const breakdowns = useVsanBreakdowns();
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  if (scenarios.length === 0) return null
+  if (scenarios.length === 0) return null;
 
   return (
     <div className="space-y-6">
       {breakdowns.map((bd, i) => {
-        const scenario = scenarios[i]
-        if (!scenario) return null
-        const scenarioName = scenario.name
-        const scenarioId = scenario.id
+        const scenario = scenarios[i];
+        if (!scenario) return null;
+        const scenarioName = scenario.name;
+        const scenarioId = scenario.id;
 
-        const finalCount = Math.max(
-          ...Object.values(bd.minNodesByConstraint),
-          0,
-        )
+        const finalCount = Math.max(...Object.values(bd.minNodesByConstraint), 0);
 
         const constraintRows: ConstraintRow[] = CONSTRAINT_KEYS.map((key) => {
-          const nodes = bd.minNodesByConstraint[key] ?? 0
+          const nodes = bd.minNodesByConstraint[key] ?? 0;
           return {
             name: CONSTRAINT_LABELS[key] ?? key,
             nodes,
             isBinding: nodes === finalCount && nodes > 0,
-          }
-        })
+          };
+        });
 
         return (
           <div key={scenarioId} className="space-y-3">
@@ -93,39 +90,40 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
               </Button>
             </div>
             <div className="h-[180px] sm:h-[220px]">
-              <div className="h-full" ref={(el) => {
-                refs.current[scenarioId] = el
-                if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el
-              }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={constraintRows}
-                  layout="vertical"
-                  margin={{ top: 8, right: 60, left: 90, bottom: 8 }}
-                >
-                  <XAxis type="number" allowDecimals={false} />
-                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="nodes" name="Min Nodes">
-                    <LabelList
-                      dataKey="nodes"
-                      position="right"
-                      style={{ fontSize: 11, fontWeight: 600 }}
-                    />
-                    {constraintRows.map((row, idx) => (
-                      <Cell
-                        key={idx}
-                        fill={row.isBinding ? CHART_COLORS[0] : '#94a3b8'}
+              <div
+                className="h-full"
+                ref={(el) => {
+                  refs.current[scenarioId] = el;
+                  if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el;
+                }}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={constraintRows}
+                    layout="vertical"
+                    margin={{ top: 8, right: 60, left: 90, bottom: 8 }}
+                  >
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Bar dataKey="nodes" name="Min Nodes">
+                      <LabelList
+                        dataKey="nodes"
+                        position="right"
+                        style={{ fontSize: 11, fontWeight: 600 }}
                       />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                      {constraintRows.map((row, idx) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order constraint bars
+                        <Cell key={idx} fill={row.isBinding ? CHART_COLORS[0] : '#94a3b8'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

@@ -33,9 +33,7 @@ export function serverCountByCpu(
   targetVcpuToPCoreRatio: number,
   coresPerServer: number,
 ): number {
-  return Math.ceil(
-    (totalVcpus * growthHeadroomFactor) / targetVcpuToPCoreRatio / coresPerServer,
-  );
+  return Math.ceil((totalVcpus * growthHeadroomFactor) / targetVcpuToPCoreRatio / coresPerServer);
 }
 
 /**
@@ -86,9 +84,7 @@ export function serverCountByDisk(
   growthHeadroomFactor: number,
   diskPerServerGb: number,
 ): number {
-  return Math.ceil(
-    (totalVms * diskPerVmGb * growthHeadroomFactor) / diskPerServerGb,
-  );
+  return Math.ceil((totalVms * diskPerVmGb * growthHeadroomFactor) / diskPerServerGb);
 }
 
 /**
@@ -111,9 +107,7 @@ export function serverCountBySpecint(
   targetSPECint: number,
 ): number {
   if (targetSPECint <= 0) return 0;
-  return Math.ceil(
-    (existingServers * oldSPECintPerServer * growthHeadroomFactor) / targetSPECint,
-  );
+  return Math.ceil((existingServers * oldSPECintPerServer * growthHeadroomFactor) / targetSPECint);
 }
 
 /**

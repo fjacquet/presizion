@@ -2,561 +2,629 @@
  * CurrentClusterForm — Tests for INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK, SPEC-LOOKUP
  * Requirements: INPUT-01, INPUT-02, INPUT-04, INPUT-05, UX-03, PERF-02, SC-4, SPEC-LINK-01, SPEC-LINK-02, SPEC-LINK-03, SPEC-LOOKUP-02, SPEC-LOOKUP-03
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import { CurrentClusterForm } from '../CurrentClusterForm'
-import { DerivedMetricsPanel } from '../DerivedMetricsPanel'
-import { Step1CurrentCluster } from '../Step1CurrentCluster'
-import { useClusterStore } from '@/store/useClusterStore'
-import { useWizardStore } from '@/store/useWizardStore'
+
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useWizardStore } from '@/store/useWizardStore';
+import { CurrentClusterForm } from '../CurrentClusterForm';
+import { DerivedMetricsPanel } from '../DerivedMetricsPanel';
+import { Step1CurrentCluster } from '../Step1CurrentCluster';
 
 // Mock fetchSpecResults for SPEC-LOOKUP tests
 vi.mock('@/lib/utils/specLookup', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/utils/specLookup')>()
+  const actual = await importOriginal<typeof import('@/lib/utils/specLookup')>();
   return {
     ...actual,
     fetchSpecResults: vi.fn().mockResolvedValue({
       results: [
-        { vendor: 'Dell', system: 'PowerEdge R660', baseResult: 337, peakResult: 400, cores: 32, chips: 2 },
-        { vendor: 'HPE', system: 'ProLiant DL360', baseResult: 320, peakResult: 385, cores: 32, chips: 2 },
+        {
+          vendor: 'Dell',
+          system: 'PowerEdge R660',
+          baseResult: 337,
+          peakResult: 400,
+          cores: 32,
+          chips: 2,
+        },
+        {
+          vendor: 'HPE',
+          system: 'ProLiant DL360',
+          baseResult: 320,
+          peakResult: 385,
+          cores: 32,
+          chips: 2,
+        },
       ],
       status: 'ok',
     }),
-  }
-})
+  };
+});
 
 // Reset Zustand store before each test to prevent cross-test contamination
 beforeEach(() => {
-  useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } })
-  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' })
-})
+  useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } });
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' });
+});
 
 describe('CurrentClusterForm', () => {
   describe('INPUT-01: average VM configuration fields', () => {
     it('renders vCPUs per VM field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalVcpus')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalVcpus')).toBeInTheDocument();
+    });
 
     it('renders RAM GB per VM field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
+      render(<CurrentClusterForm onNext={() => {}} />);
       // RAM is captured via RAM/Server GB in the existing server config section
-      expect(screen.getByTestId('input-ramPerServerGb')).toBeInTheDocument()
-    })
+      expect(screen.getByTestId('input-ramPerServerGb')).toBeInTheDocument();
+    });
 
     it('renders disk GB per VM field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalDiskGb')).toBeInTheDocument()
-    })
-  })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalDiskGb')).toBeInTheDocument();
+    });
+  });
 
   describe('INPUT-02: cluster totals fields', () => {
     it('renders total vCPUs field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalVcpus')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalVcpus')).toBeInTheDocument();
+    });
 
     it('renders total pCores field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalPcores')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalPcores')).toBeInTheDocument();
+    });
 
     it('renders total VMs field', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalVms')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalVms')).toBeInTheDocument();
+    });
 
     it('renders total disk GB field (optional)', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-totalDiskGb')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalDiskGb')).toBeInTheDocument();
+    });
 
     it('shows inline error when required cluster total field is empty on blur', async () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
+      render(<CurrentClusterForm onNext={() => {}} />);
 
-      const vcpuInput = screen.getByTestId('input-totalVcpus')
+      const vcpuInput = screen.getByTestId('input-totalVcpus');
 
       // Blur the field with empty value to trigger validation
       act(() => {
-        fireEvent.focus(vcpuInput)
-        fireEvent.change(vcpuInput, { target: { value: '' } })
-        fireEvent.blur(vcpuInput)
-      })
+        fireEvent.focus(vcpuInput);
+        fireEvent.change(vcpuInput, { target: { value: '' } });
+        fireEvent.blur(vcpuInput);
+      });
 
       await waitFor(() => {
         // FormMessage renders after blur with invalid empty value
-        const errorMessage = screen.queryByText(/required/i)
-        expect(errorMessage).toBeInTheDocument()
-      })
-    })
-  })
+        const errorMessage = screen.queryByText(/required/i);
+        expect(errorMessage).toBeInTheDocument();
+      });
+    });
+  });
 
   describe('INPUT-04: derived metrics panel', () => {
     it('DerivedMetricsPanel renders vCPU:pCore ratio when cluster store has valid values', () => {
       useClusterStore.setState({
         currentCluster: { totalVcpus: 200, totalPcores: 100, totalVms: 50 },
-      })
-      render(<DerivedMetricsPanel />)
-      expect(screen.getByText('2.00')).toBeInTheDocument()
-    })
+      });
+      render(<DerivedMetricsPanel />);
+      expect(screen.getByText('2.00')).toBeInTheDocument();
+    });
 
     it('DerivedMetricsPanel shows em dash when pCores is zero', () => {
       useClusterStore.setState({
         currentCluster: { totalVcpus: 200, totalPcores: 0, totalVms: 50 },
-      })
-      render(<DerivedMetricsPanel />)
+      });
+      render(<DerivedMetricsPanel />);
       // Multiple em-dashes now: ratio + avg RAM + avg Disk (vCPU/VM has a value since totalVms>0)
-      expect(screen.getAllByText('\u2014').length).toBeGreaterThanOrEqual(1)
-    })
+      expect(screen.getAllByText('\u2014').length).toBeGreaterThanOrEqual(1);
+    });
 
     it('DerivedMetricsPanel re-renders when cluster store updates', async () => {
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 100, totalVms: 20 },
-      })
-      render(<DerivedMetricsPanel />)
-      expect(screen.getByText('1.00')).toBeInTheDocument()
+      });
+      render(<DerivedMetricsPanel />);
+      expect(screen.getByText('1.00')).toBeInTheDocument();
 
       act(() => {
         useClusterStore.setState({
           currentCluster: { totalVcpus: 300, totalPcores: 100, totalVms: 20 },
-        })
-      })
+        });
+      });
 
       await waitFor(() => {
-        expect(screen.getByText('3.00')).toBeInTheDocument()
-      })
-    })
-  })
+        expect(screen.getByText('3.00')).toBeInTheDocument();
+      });
+    });
+  });
 
   describe('INPUT-05: validation and navigation guard', () => {
     it('Next button is enabled (not disabled) before interaction', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      expect(nextButton).not.toBeDisabled()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      expect(nextButton).not.toBeDisabled();
+    });
 
     it('clicking Next with empty required fields shows validation errors', async () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
+      render(<CurrentClusterForm onNext={() => {}} />);
 
       // Clear required field value and click Next
       act(() => {
-        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '' } })
-      })
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '' } });
+      });
 
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      fireEvent.click(nextButton)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
-        expect(screen.queryByText(/required/i)).toBeInTheDocument()
-      })
-    })
+        expect(screen.queryByText(/required/i)).toBeInTheDocument();
+      });
+    });
 
     it('clicking Next with all required fields valid advances wizard step', async () => {
-      const onNext = vi.fn()
-      render(<CurrentClusterForm onNext={onNext} />)
+      const onNext = vi.fn();
+      render(<CurrentClusterForm onNext={onNext} />);
 
       act(() => {
-        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
-        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
-        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } });
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } });
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } });
         // Utilization is now required to advance
-        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
-        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
-      })
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), {
+          target: { value: '60' },
+        });
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), {
+          target: { value: '70' },
+        });
+      });
 
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      fireEvent.click(nextButton)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
-        expect(onNext).toHaveBeenCalledOnce()
-      })
-    })
-  })
+        expect(onNext).toHaveBeenCalledOnce();
+      });
+    });
+  });
 
   describe('UX-03: tooltips on key fields', () => {
     it('Info icon is present next to Total vCPUs label', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
+      render(<CurrentClusterForm onNext={() => {}} />);
       // The Info icon has aria-label "Info: Total vCPUs"
-      expect(screen.getByLabelText(/info: total vcpus/i)).toBeInTheDocument()
-    })
+      expect(screen.getByLabelText(/info: total vcpus/i)).toBeInTheDocument();
+    });
 
     it('tooltip content is visible on Info icon focus', async () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      const infoIcon = screen.getByLabelText(/info: total vcpus/i)
+      render(<CurrentClusterForm onNext={() => {}} />);
+      const infoIcon = screen.getByLabelText(/info: total vcpus/i);
 
       // Focus the info icon to trigger tooltip
       act(() => {
-        fireEvent.focus(infoIcon)
-      })
+        fireEvent.focus(infoIcon);
+      });
 
       await waitFor(() => {
-        expect(screen.queryByText(/vcpu reservations/i)).toBeInTheDocument()
-      })
-    })
-  })
+        expect(screen.queryByText(/vcpu reservations/i)).toBeInTheDocument();
+      });
+    });
+  });
 
   describe('PERF-02: performance mode conditional fields', () => {
     it('specintPerServer field is visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-specintPerServer')).toBeInTheDocument()
-    })
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-specintPerServer')).toBeInTheDocument();
+    });
 
     it('cpuFrequencyGhz field is visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-cpuFrequencyGhz')).toBeInTheDocument()
-    })
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-cpuFrequencyGhz')).toBeInTheDocument();
+    });
 
     it('existingServerCount field is visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
-    })
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument();
+    });
 
     it('specintPerServer field is NOT in DOM when sizingMode is vcpu', () => {
       // sizingMode is 'vcpu' by default (set in beforeEach)
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.queryByTestId('input-specintPerServer')).not.toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.queryByTestId('input-specintPerServer')).not.toBeInTheDocument();
+    });
 
     it('Next proceeds in performance mode without specintPerServer (SPEC is optional)', async () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      const onNext = vi.fn()
-      render(<CurrentClusterForm onNext={onNext} />)
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      const onNext = vi.fn();
+      render(<CurrentClusterForm onNext={onNext} />);
 
       // Fill required base fields + utilization, leave specintPerServer empty
       act(() => {
-        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
-        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
-        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
-        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
-        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
-      })
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } });
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } });
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } });
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), {
+          target: { value: '60' },
+        });
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), {
+          target: { value: '70' },
+        });
+      });
 
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      fireEvent.click(nextButton)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
-        expect(onNext).toHaveBeenCalledOnce()
-      })
-    })
+        expect(onNext).toHaveBeenCalledOnce();
+      });
+    });
 
     it('Next proceeds when sizingMode is performance and specintPerServer has a valid value', async () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      const onNext = vi.fn()
-      render(<CurrentClusterForm onNext={onNext} />)
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      const onNext = vi.fn();
+      render(<CurrentClusterForm onNext={onNext} />);
 
       act(() => {
-        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
-        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
-        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
-        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), { target: { value: '60' } })
-        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), { target: { value: '70' } })
-        fireEvent.change(screen.getByTestId('input-specintPerServer'), { target: { value: '1200' } })
-      })
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } });
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } });
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } });
+        fireEvent.change(screen.getByTestId('input-cpuUtilizationPercent'), {
+          target: { value: '60' },
+        });
+        fireEvent.change(screen.getByTestId('input-ramUtilizationPercent'), {
+          target: { value: '70' },
+        });
+        fireEvent.change(screen.getByTestId('input-specintPerServer'), {
+          target: { value: '1200' },
+        });
+      });
 
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      fireEvent.click(nextButton)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
-        expect(onNext).toHaveBeenCalledOnce()
-      })
-    })
-  })
+        expect(onNext).toHaveBeenCalledOnce();
+      });
+    });
+  });
 
   describe('SC-4: utilization percent fields', () => {
     it('cpuUtilizationPercent field is always visible when sizingMode is vcpu', () => {
       // sizingMode is 'vcpu' by default
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument();
+    });
 
     it('ramUtilizationPercent field is always visible when sizingMode is vcpu', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument();
+    });
 
     it('cpuUtilizationPercent field is always visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument()
-    })
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-cpuUtilizationPercent')).toBeInTheDocument();
+    });
 
     it('ramUtilizationPercent field is always visible when sizingMode is performance', () => {
       act(() => {
-        useWizardStore.setState({ sizingMode: 'performance' })
-      })
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument()
-    })
+        useWizardStore.setState({ sizingMode: 'performance' });
+      });
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-ramUtilizationPercent')).toBeInTheDocument();
+    });
 
     it('shows domain guidance text near the utilization inputs', () => {
-      render(<CurrentClusterForm onNext={() => {}} />)
-      expect(screen.getByText(/Most environments run well below 100%/)).toBeInTheDocument()
-    })
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByText(/Most environments run well below 100%/)).toBeInTheDocument();
+    });
 
     it('does NOT commit / advance when totals are filled but utilization is empty', async () => {
-      const onNext = vi.fn()
-      render(<CurrentClusterForm onNext={onNext} />)
+      const onNext = vi.fn();
+      render(<CurrentClusterForm onNext={onNext} />);
 
       // Fill required totals but leave utilization empty
       act(() => {
-        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } })
-        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } })
-        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } })
-      })
+        fireEvent.change(screen.getByTestId('input-totalVcpus'), { target: { value: '100' } });
+        fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '50' } });
+        fireEvent.change(screen.getByTestId('input-totalVms'), { target: { value: '20' } });
+      });
 
-      const nextButton = screen.getByRole('button', { name: /next/i })
-      fireEvent.click(nextButton)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
-        expect(screen.getAllByText(/Utilization is required/i).length).toBeGreaterThan(0)
-      })
-      expect(onNext).not.toHaveBeenCalled()
-    })
-  })
-})
+        expect(screen.getAllByText(/Utilization is required/i).length).toBeGreaterThan(0);
+      });
+      expect(onNext).not.toHaveBeenCalled();
+    });
+  });
+});
 
 describe('Step1CurrentCluster', () => {
   it('renders both CurrentClusterForm and DerivedMetricsPanel', () => {
-    render(<Step1CurrentCluster />)
+    render(<Step1CurrentCluster />);
     // CurrentClusterForm renders the Next button
-    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     // DerivedMetricsPanel renders the label "vCPU:pCore Ratio"
-    expect(screen.getByText(/vcpu:pcore ratio/i)).toBeInTheDocument()
-  })
-})
+    expect(screen.getByText(/vcpu:pcore ratio/i)).toBeInTheDocument();
+  });
+});
 
 describe('REPT-02: unconditional existingServerCount and totalPcores auto-derive', () => {
   it('renders existingServerCount field when sizingMode is vcpu (unconditional)', () => {
     // sizingMode is 'vcpu' by default (set in beforeEach)
-    render(<CurrentClusterForm onNext={() => {}} />)
-    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
-  })
+    render(<CurrentClusterForm onNext={() => {}} />);
+    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument();
+  });
 
   it('renders existingServerCount field when sizingMode is performance', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'performance' })
-    })
-    render(<CurrentClusterForm onNext={() => {}} />)
-    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument()
-  })
+      useWizardStore.setState({ sizingMode: 'performance' });
+    });
+    render(<CurrentClusterForm onNext={() => {}} />);
+    expect(screen.getByTestId('input-existingServerCount')).toBeInTheDocument();
+  });
 
   it('auto-derives totalPcores when existingServerCount, socketsPerServer, and coresPerSocket are all provided', async () => {
-    render(<CurrentClusterForm onNext={() => {}} />)
+    render(<CurrentClusterForm onNext={() => {}} />);
 
     act(() => {
-      fireEvent.change(screen.getByTestId('input-existingServerCount'), { target: { value: '10' } })
-      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } })
-      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } })
-    })
+      fireEvent.change(screen.getByTestId('input-existingServerCount'), {
+        target: { value: '10' },
+      });
+      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } });
+      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } });
+    });
 
     // totalPcores should be auto-derived as 10 * 2 * 24 = 480
     await waitFor(() => {
-      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement
-      expect(totalPcoresInput.value).toBe('480')
-    })
-  })
+      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement;
+      expect(totalPcoresInput.value).toBe('480');
+    });
+  });
 
   it('does not override a manually entered totalPcores value', async () => {
-    render(<CurrentClusterForm onNext={() => {}} />)
+    render(<CurrentClusterForm onNext={() => {}} />);
 
     // Manually set totalPcores to 200
     act(() => {
-      fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '200' } })
-    })
+      fireEvent.change(screen.getByTestId('input-totalPcores'), { target: { value: '200' } });
+    });
 
     // Now set the auto-derive source fields
     act(() => {
-      fireEvent.change(screen.getByTestId('input-existingServerCount'), { target: { value: '10' } })
-      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } })
-      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } })
-    })
+      fireEvent.change(screen.getByTestId('input-existingServerCount'), {
+        target: { value: '10' },
+      });
+      fireEvent.change(screen.getByTestId('input-socketsPerServer'), { target: { value: '2' } });
+      fireEvent.change(screen.getByTestId('input-coresPerSocket'), { target: { value: '24' } });
+    });
 
     // totalPcores should remain 200 (manually entered), not 480 (auto-derived)
     await waitFor(() => {
-      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement
-      expect(totalPcoresInput.value).toBe('200')
-    })
-  })
-})
+      const totalPcoresInput = screen.getByTestId('input-totalPcores') as HTMLInputElement;
+      expect(totalPcoresInput.value).toBe('200');
+    });
+  });
+});
 
 describe('SPEC-LINK: SPECrate lookup link', () => {
   beforeEach(() => {
     Object.assign(navigator, {
       clipboard: { writeText: vi.fn(() => Promise.resolve()) },
-    })
-  })
+    });
+  });
 
   it('with cpuModel, "Look up SPECrate" button is rendered in any sizing mode', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'vcpu' })
+      useWizardStore.setState({ sizingMode: 'vcpu' });
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument()
-  })
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument();
+  });
 
   it('clicking the button copies cpuModel to clipboard', async () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'performance' })
+      useWizardStore.setState({ sizingMode: 'performance' });
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
 
-    const btn = screen.getByRole('button', { name: /look up specrate/i })
-    fireEvent.click(btn)
+    const btn = screen.getByRole('button', { name: /look up specrate/i });
+    fireEvent.click(btn);
 
     await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('6526Y')
-    })
-  })
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('6526Y');
+    });
+  });
 
   it('clicking the button opens spec-search web UI pre-filtered by CPU slug', async () => {
-    const openSpy = vi.fn()
-    vi.stubGlobal('open', openSpy)
+    const openSpy = vi.fn();
+    vi.stubGlobal('open', openSpy);
 
     act(() => {
-      useWizardStore.setState({ sizingMode: 'performance' })
+      useWizardStore.setState({ sizingMode: 'performance' });
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel(R) Xeon(R) Gold 6526Y CPU @ 2.40GHz',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
 
-    const btn = screen.getByRole('button', { name: /look up specrate/i })
-    fireEvent.click(btn)
+    const btn = screen.getByRole('button', { name: /look up specrate/i });
+    fireEvent.click(btn);
 
     await waitFor(() => {
       expect(openSpy).toHaveBeenCalledWith(
         expect.stringContaining('fjacquet.github.io/spec-search'),
         '_blank',
         'noopener,noreferrer',
-      )
+      );
       // URL should contain the CPU slug derived from the model
       expect(openSpy).toHaveBeenCalledWith(
         expect.stringContaining('intel-xeon-gold-6526y'),
         '_blank',
         'noopener,noreferrer',
-      )
-    })
+      );
+    });
 
-    vi.unstubAllGlobals()
-  })
+    vi.unstubAllGlobals();
+  });
 
   it('in vcpu mode with cpuModel, the button IS rendered', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'vcpu' })
+      useWizardStore.setState({ sizingMode: 'vcpu' });
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument()
-  })
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /look up specrate/i })).toBeInTheDocument();
+  });
 
   it('in specint mode without cpuModel, the button is NOT rendered', () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'performance' })
+      useWizardStore.setState({ sizingMode: 'performance' });
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
-    expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument()
-  })
-})
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: /look up specrate/i })).not.toBeInTheDocument();
+  });
+});
 
 describe('SPEC-LOOKUP: integrated SpecResultsPanel', () => {
   it('renders SpecResultsPanel when cpuModel is present', async () => {
     act(() => {
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
 
     // The collapsible heading should be present
     await waitFor(() => {
-      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument();
+    });
+  });
 
   it('does not render SpecResultsPanel when cpuModel is absent', () => {
     act(() => {
       useClusterStore.setState({
         currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10 },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
-    expect(screen.queryByText('SPECrate2017 Results')).not.toBeInTheDocument()
-  })
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
+    expect(screen.queryByText('SPECrate2017 Results')).not.toBeInTheDocument();
+  });
 
   it('shows results table when panel is expanded', async () => {
     act(() => {
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
 
     await waitFor(() => {
-      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
-    })
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument();
+    });
 
     // Expand the panel
-    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+    fireEvent.click(screen.getByText('SPECrate2017 Results'));
 
     await waitFor(() => {
-      expect(screen.getByText('Dell')).toBeInTheDocument()
-      expect(screen.getByText('PowerEdge R660')).toBeInTheDocument()
-      expect(screen.getByText('337')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Dell')).toBeInTheDocument();
+      expect(screen.getByText('PowerEdge R660')).toBeInTheDocument();
+      expect(screen.getByText('337')).toBeInTheDocument();
+    });
+  });
 
   it('clicking a result row updates specintPerServer field value', async () => {
     act(() => {
-      useWizardStore.setState({ sizingMode: 'performance' })
+      useWizardStore.setState({ sizingMode: 'performance' });
       useClusterStore.setState({
-        currentCluster: { totalVcpus: 100, totalPcores: 50, totalVms: 10, cpuModel: 'Intel Xeon Gold 6526Y' },
-      })
-    })
-    render(<CurrentClusterForm onNext={vi.fn()} />)
+        currentCluster: {
+          totalVcpus: 100,
+          totalPcores: 50,
+          totalVms: 10,
+          cpuModel: 'Intel Xeon Gold 6526Y',
+        },
+      });
+    });
+    render(<CurrentClusterForm onNext={vi.fn()} />);
 
     await waitFor(() => {
-      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument()
-    })
+      expect(screen.getByText('SPECrate2017 Results')).toBeInTheDocument();
+    });
 
     // Expand and click a row
-    fireEvent.click(screen.getByText('SPECrate2017 Results'))
+    fireEvent.click(screen.getByText('SPECrate2017 Results'));
 
     await waitFor(() => {
-      expect(screen.getByText('Dell')).toBeInTheDocument()
-    })
+      expect(screen.getByText('Dell')).toBeInTheDocument();
+    });
 
-    fireEvent.click(screen.getByText('Dell'))
+    fireEvent.click(screen.getByText('Dell'));
 
     // The specintPerServer input should now have the value 337
     await waitFor(() => {
-      const specInput = screen.getByTestId('input-specintPerServer') as HTMLInputElement
-      expect(specInput.value).toBe('337')
-    })
-  })
-})
+      const specInput = screen.getByTestId('input-specintPerServer') as HTMLInputElement;
+      expect(specInput.value).toBe('337');
+    });
+  });
+});

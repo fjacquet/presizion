@@ -1,35 +1,35 @@
-import { useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { importFile, ImportError } from '@/lib/utils/import'
-import type { AnyImportResult } from '@/lib/utils/import'
-import { ImportPreviewModal } from './ImportPreviewModal'
+import { useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import type { AnyImportResult } from '@/lib/utils/import';
+import { ImportError, importFile } from '@/lib/utils/import';
+import { ImportPreviewModal } from './ImportPreviewModal';
 
 export function FileImportButton() {
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const [importResult, setImportResult] = useState<AnyImportResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [importResult, setImportResult] = useState<AnyImportResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
     // Reset so same file can be re-imported
-    e.target.value = ''
-    setError(null)
-    setLoading(true)
+    e.target.value = '';
+    setError(null);
+    setLoading(true);
     try {
-      const result = await importFile(file)
-      setImportResult(result)
+      const result = await importFile(file);
+      setImportResult(result);
     } catch (err) {
       if (err instanceof ImportError) {
-        setError(err.message)
+        setError(err.message);
       } else {
-        setError('Failed to read file. Please check the file and try again.')
+        setError('Failed to read file. Please check the file and try again.');
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -38,7 +38,9 @@ export function FileImportButton() {
         type="file"
         accept=".xlsx,.csv,.zip,.json"
         className="hidden"
-        onChange={(e) => { void handleFileChange(e) }}
+        onChange={(e) => {
+          void handleFileChange(e);
+        }}
         aria-label="Upload cluster export file"
       />
       <div className="space-y-1">
@@ -52,7 +54,9 @@ export function FileImportButton() {
           {loading ? 'Importing…' : 'Import from file'}
         </Button>
         {error && (
-          <p className="text-xs text-destructive" role="alert">{error}</p>
+          <p className="text-xs text-destructive" role="alert">
+            {error}
+          </p>
         )}
       </div>
 
@@ -64,5 +68,5 @@ export function FileImportButton() {
         />
       )}
     </>
-  )
+  );
 }

@@ -9,4 +9,4 @@ export const CHART_COLORS = [
   '#8b5cf6', // violet-500 — 4th scenario
   '#ec4899', // pink-500 — 5th scenario
   '#14b8a6', // teal-500 — 6th scenario
-] as const
+] as const;

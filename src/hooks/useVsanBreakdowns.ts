@@ -1,8 +1,8 @@
+import { computeScenarioResult } from '../lib/sizing/constraints';
+import { computeVsanBreakdown } from '../lib/sizing/vsanBreakdown';
 import { useClusterStore } from '../store/useClusterStore';
 import { useScenariosStore } from '../store/useScenariosStore';
 import { useWizardStore } from '../store/useWizardStore';
-import { computeScenarioResult } from '../lib/sizing/constraints';
-import { computeVsanBreakdown } from '../lib/sizing/vsanBreakdown';
 import type { VsanCapacityBreakdown } from '../types/breakdown';
 
 /**

@@ -1,14 +1,14 @@
-import { CurrentClusterForm } from './CurrentClusterForm'
-import { DerivedMetricsPanel } from './DerivedMetricsPanel'
-import { FileImportButton } from './FileImportButton'
-import { ScopeBadge } from './ScopeBadge'
-import { ExclusionSummaryCard } from '@/components/exclusions/ExclusionSummaryCard'
-import { useRecomputeCluster } from '@/hooks/useRecomputeCluster'
-import { useWizardStore } from '@/store/useWizardStore'
+import { ExclusionSummaryCard } from '@/components/exclusions/ExclusionSummaryCard';
+import { useRecomputeCluster } from '@/hooks/useRecomputeCluster';
+import { useWizardStore } from '@/store/useWizardStore';
+import { CurrentClusterForm } from './CurrentClusterForm';
+import { DerivedMetricsPanel } from './DerivedMetricsPanel';
+import { FileImportButton } from './FileImportButton';
+import { ScopeBadge } from './ScopeBadge';
 
 export function Step1CurrentCluster() {
-  const nextStep = useWizardStore((s) => s.nextStep)
-  useRecomputeCluster()
+  const nextStep = useWizardStore((s) => s.nextStep);
+  useRecomputeCluster();
 
   return (
     <div className="space-y-4">
@@ -26,5 +26,5 @@ export function Step1CurrentCluster() {
       <CurrentClusterForm onNext={nextStep} />
       <DerivedMetricsPanel />
     </div>
-  )
+  );
 }

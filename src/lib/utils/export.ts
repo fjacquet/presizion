@@ -1,7 +1,7 @@
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ScenarioResult } from '@/types/results'
-import type { ExclusionRules } from '@/types/exclusions'
-import { EMPTY_RULES } from '@/types/exclusions'
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { ExclusionRules } from '@/types/exclusions';
+import { EMPTY_RULES } from '@/types/exclusions';
+import type { ScenarioResult } from '@/types/results';
 
 /**
  * RFC 4180-compliant CSV field escape.
@@ -11,11 +11,11 @@ import { EMPTY_RULES } from '@/types/exclusions'
  * Exported for unit testing of the escape logic.
  */
 export function csvEscape(value: string | number | boolean): string {
-  const s = String(value)
+  const s = String(value);
   if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-    return `"${s.replace(/"/g, '""')}"`
+    return `"${s.replace(/"/g, '""')}"`;
   }
-  return s
+  return s;
 }
 
 /**
@@ -54,13 +54,13 @@ export function buildCsvContent(
     'CPU util (%)',
     'RAM util (%)',
     'Disk util (%)',
-  ]
+  ];
 
-  const rows: string[] = [headers.map(csvEscape).join(',')]
+  const rows: string[] = [headers.map(csvEscape).join(',')];
 
   scenarios.forEach((scenario, i) => {
-    const result = results[i]
-    if (!result) return
+    const result = results[i];
+    if (!result) return;
 
     const cells = [
       scenario.name,
@@ -84,12 +84,12 @@ export function buildCsvContent(
       result.cpuUtilizationPercent.toFixed(1),
       result.ramUtilizationPercent.toFixed(1),
       result.diskUtilizationPercent.toFixed(1),
-    ]
+    ];
 
-    rows.push(cells.map(csvEscape).join(','))
-  })
+    rows.push(cells.map(csvEscape).join(','));
+  });
 
-  return rows.join('\n')
+  return rows.join('\n');
 }
 
 /**
@@ -100,15 +100,15 @@ export function buildCsvContent(
  * @param csv - The CSV string content to download
  */
 export function downloadCsv(filename: string, csv: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 /**
@@ -130,9 +130,7 @@ export function downloadCsv(filename: string, csv: string): void {
  * Normalise an OldCluster so all optional fields are explicitly present (null if absent).
  * This ensures JSON.stringify produces "existingServerCount": null rather than omitting the key.
  */
-function normaliseCluster(
-  cluster: OldCluster,
-): Record<string, string | number | boolean | null> {
+function normaliseCluster(cluster: OldCluster): Record<string, string | number | boolean | null> {
   return {
     totalVcpus: cluster.totalVcpus,
     totalPcores: cluster.totalPcores,
@@ -146,7 +144,7 @@ function normaliseCluster(
     cpuUtilizationPercent: cluster.cpuUtilizationPercent ?? null,
     ramUtilizationPercent: cluster.ramUtilizationPercent ?? null,
     isStretchCluster: cluster.isStretchCluster ?? null,
-  }
+  };
 }
 
 export function buildJsonContent(
@@ -160,7 +158,7 @@ export function buildJsonContent(
     exclusions.exactNames.length === 0 &&
     !exclusions.excludePoweredOff &&
     exclusions.manuallyExcluded.length === 0 &&
-    exclusions.manuallyIncluded.length === 0
+    exclusions.manuallyIncluded.length === 0;
 
   const payload = {
     schemaVersion: '2',
@@ -168,8 +166,8 @@ export function buildJsonContent(
     currentCluster: normaliseCluster(cluster),
     scenarios: scenarios.map((s, i) => ({ ...s, result: results[i] ?? null })),
     ...(isEmpty ? {} : { exclusions }),
-  }
-  return JSON.stringify(payload, null, 2)
+  };
+  return JSON.stringify(payload, null, 2);
 }
 
 /**
@@ -180,13 +178,13 @@ export function buildJsonContent(
  * @param json - The JSON string content to download
  */
 export function downloadJson(filename: string, json: string): void {
-  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

@@ -5,136 +5,149 @@
  * Container: ComparisonTable + export buttons (Copy, CSV, JSON, Share, PDF, PPTX).
  * All data flows from Zustand stores -- no props.
  */
-import { useState, useRef, useEffect } from 'react'
-import { ComparisonTable } from './ComparisonTable'
-import { SizingChart } from './SizingChart'
-import { CoreCountChart } from './CoreCountChart'
-import { CapacityStackedChart } from './CapacityStackedChart'
-import { MinNodesChart } from './MinNodesChart'
-import { Button } from '@/components/ui/button'
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import {
   Drawer,
-  DrawerTrigger,
+  DrawerClose,
   DrawerContent,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerFooter,
-  DrawerClose,
-} from '@/components/ui/drawer'
-import { useScenariosResults } from '@/hooks/useScenariosResults'
-import { useIsMobile } from '@/hooks/useIsMobile'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { useWizardStore } from '@/store/useWizardStore'
-import { useExclusionsStore } from '@/store/useExclusionsStore'
-import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard'
-import { buildCsvContent, downloadCsv, buildJsonContent, downloadJson } from '@/lib/utils/export'
-import { encodeSessionToHash } from '@/lib/utils/persistence'
-import { exportPdf } from '@/lib/utils/exportPdf'
-import { exportPptx } from '@/lib/utils/exportPptx'
-import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
-import { toast } from 'sonner'
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { useScenariosResults } from '@/hooks/useScenariosResults';
+import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
+import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard';
+import { buildCsvContent, buildJsonContent, downloadCsv, downloadJson } from '@/lib/utils/export';
+import { exportPdf } from '@/lib/utils/exportPdf';
+import { exportPptx } from '@/lib/utils/exportPptx';
+import { encodeSessionToHash } from '@/lib/utils/persistence';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { useWizardStore } from '@/store/useWizardStore';
+import { CapacityStackedChart } from './CapacityStackedChart';
+import { ComparisonTable } from './ComparisonTable';
+import { CoreCountChart } from './CoreCountChart';
+import { MinNodesChart } from './MinNodesChart';
+import { SizingChart } from './SizingChart';
 
 export function Step3ReviewExport() {
-  const currentCluster = useClusterStore((state) => state.currentCluster)
-  const scenarios = useScenariosStore((state) => state.scenarios)
-  const results = useScenariosResults()
-  const sizingMode = useWizardStore((state) => state.sizingMode)
-  const layoutMode = useWizardStore((state) => state.layoutMode)
-  const exclusions = useExclusionsStore((state) => state.rules)
-  const breakdowns = useVsanBreakdowns()
-  const isMobile = useIsMobile()
-  const [copied, setCopied] = useState(false)
-  const [shared, setShared] = useState(false)
-  const [pdfLoading, setPdfLoading] = useState(false)
-  const [pptxLoading, setPptxLoading] = useState(false)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const currentCluster = useClusterStore((state) => state.currentCluster);
+  const scenarios = useScenariosStore((state) => state.scenarios);
+  const results = useScenariosResults();
+  const sizingMode = useWizardStore((state) => state.sizingMode);
+  const layoutMode = useWizardStore((state) => state.layoutMode);
+  const exclusions = useExclusionsStore((state) => state.rules);
+  const breakdowns = useVsanBreakdowns();
+  const isMobile = useIsMobile();
+  const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pptxLoading, setPptxLoading] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Shared chart container refs for PDF/PPTX export (Plans 02 & 03) */
-  const chartRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const chartRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Clear timeouts on unmount to prevent memory leak / setState-after-unmount warning
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current)
+        clearTimeout(timeoutRef.current);
       }
       if (shareTimeoutRef.current !== null) {
-        clearTimeout(shareTimeoutRef.current)
+        clearTimeout(shareTimeoutRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const handleCopy = async (): Promise<void> => {
-    const text = buildSummaryText(currentCluster, scenarios, results)
-    await copyToClipboard(text)
-    setCopied(true)
+    const text = buildSummaryText(currentCluster, scenarios, results);
+    await copyToClipboard(text);
+    setCopied(true);
     if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current)
+      clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      setCopied(false)
-      timeoutRef.current = null
-    }, 2000)
-  }
+      setCopied(false);
+      timeoutRef.current = null;
+    }, 2000);
+  };
 
   const handleDownloadCsv = (): void => {
-    const csv = buildCsvContent(currentCluster, scenarios, results)
-    downloadCsv('cluster-sizing.csv', csv)
-  }
+    const csv = buildCsvContent(currentCluster, scenarios, results);
+    downloadCsv('cluster-sizing.csv', csv);
+  };
 
   const handleDownloadJson = (): void => {
-    const json = buildJsonContent(currentCluster, scenarios, results, exclusions)
-    downloadJson('cluster-sizing.json', json)
-  }
+    const json = buildJsonContent(currentCluster, scenarios, results, exclusions);
+    downloadJson('cluster-sizing.json', json);
+  };
 
   const handleShare = async (): Promise<void> => {
-    const hash = encodeSessionToHash({ cluster: currentCluster, scenarios, sizingMode, layoutMode, exclusions })
-    const url = `${window.location.origin}${window.location.pathname}#${hash}`
-    await copyToClipboard(url)
-    setShared(true)
-    if (shareTimeoutRef.current !== null) clearTimeout(shareTimeoutRef.current)
+    const hash = encodeSessionToHash({
+      cluster: currentCluster,
+      scenarios,
+      sizingMode,
+      layoutMode,
+      exclusions,
+    });
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+    await copyToClipboard(url);
+    setShared(true);
+    if (shareTimeoutRef.current !== null) clearTimeout(shareTimeoutRef.current);
     shareTimeoutRef.current = setTimeout(() => {
-      setShared(false)
-      shareTimeoutRef.current = null
-    }, 2000)
-  }
+      setShared(false);
+      shareTimeoutRef.current = null;
+    }, 2000);
+  };
 
   const handleExportPdf = async (): Promise<void> => {
-    setPdfLoading(true)
+    setPdfLoading(true);
     try {
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
-      const iosWindow = isIOS ? window.open('about:blank', '_blank') : null
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const iosWindow = isIOS ? window.open('about:blank', '_blank') : null;
 
-      const result = await exportPdf(currentCluster, scenarios, results, breakdowns, chartRefs.current, iosWindow)
+      const result = await exportPdf(
+        currentCluster,
+        scenarios,
+        results,
+        breakdowns,
+        chartRefs.current,
+        iosWindow,
+      );
 
       if (result.openedInNewTab) {
-        toast.info('PDF opened in new tab — tap Share then Save to Files.')
+        toast.info('PDF opened in new tab — tap Share then Save to Files.');
       }
     } catch (err) {
-      console.error('PDF export failed:', err)
-      toast.error('PDF export failed. Check browser console for details.')
+      console.error('PDF export failed:', err);
+      toast.error('PDF export failed. Check browser console for details.');
     } finally {
-      setPdfLoading(false)
+      setPdfLoading(false);
     }
-  }
+  };
 
   const handleExportPptx = async (): Promise<void> => {
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (isIOS) {
-      toast.info('PPTX download is not supported in Safari. Use Chrome or a desktop browser.')
-      return
+      toast.info('PPTX download is not supported in Safari. Use Chrome or a desktop browser.');
+      return;
     }
-    setPptxLoading(true)
+    setPptxLoading(true);
     try {
-      await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current)
+      await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current);
     } catch (err) {
-      console.error('PPTX export failed:', err)
-      toast.error('PPTX export failed. Check browser console for details.')
+      console.error('PPTX export failed:', err);
+      toast.error('PPTX export failed. Check browser console for details.');
     } finally {
-      setPptxLoading(false)
+      setPptxLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -149,14 +162,21 @@ export function Step3ReviewExport() {
         <div className="mb-6 print:hidden">
           <Drawer>
             <DrawerTrigger asChild>
-              <Button variant="outline" className="w-full">Export / Share</Button>
+              <Button variant="outline" className="w-full">
+                Export / Share
+              </Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
                 <DrawerTitle>Export Results</DrawerTitle>
               </DrawerHeader>
               <div className="flex flex-col gap-3 p-4 overflow-y-auto">
-                <Button variant="outline" onClick={() => { void handleCopy() }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    void handleCopy();
+                  }}
+                >
                   {copied ? 'Copied!' : 'Copy Summary'}
                 </Button>
                 <Button variant="outline" onClick={handleDownloadCsv}>
@@ -165,13 +185,30 @@ export function Step3ReviewExport() {
                 <Button variant="outline" onClick={handleDownloadJson}>
                   Download JSON
                 </Button>
-                <Button variant="outline" onClick={() => { void handleShare() }}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    void handleShare();
+                  }}
+                >
                   {shared ? 'Link Copied!' : 'Share'}
                 </Button>
-                <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    void handleExportPdf();
+                  }}
+                  disabled={pdfLoading}
+                >
                   {pdfLoading ? 'Generating...' : 'Export PDF'}
                 </Button>
-                <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    void handleExportPptx();
+                  }}
+                  disabled={pptxLoading}
+                >
                   {pptxLoading ? 'Generating...' : 'Export PPTX'}
                 </Button>
               </div>
@@ -185,7 +222,12 @@ export function Step3ReviewExport() {
         </div>
       ) : (
         <div className="flex gap-3 mb-6 print:hidden">
-          <Button variant="outline" onClick={() => { void handleCopy() }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              void handleCopy();
+            }}
+          >
             {copied ? 'Copied!' : 'Copy Summary'}
           </Button>
           <Button variant="outline" onClick={handleDownloadCsv}>
@@ -194,13 +236,30 @@ export function Step3ReviewExport() {
           <Button variant="outline" onClick={handleDownloadJson}>
             Download JSON
           </Button>
-          <Button variant="outline" onClick={() => { void handleShare() }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              void handleShare();
+            }}
+          >
             {shared ? 'Link Copied!' : 'Share'}
           </Button>
-          <Button variant="outline" onClick={() => { void handleExportPdf() }} disabled={pdfLoading}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              void handleExportPdf();
+            }}
+            disabled={pdfLoading}
+          >
             {pdfLoading ? 'Generating...' : 'Export PDF'}
           </Button>
-          <Button variant="outline" onClick={() => { void handleExportPptx() }} disabled={pptxLoading}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              void handleExportPptx();
+            }}
+            disabled={pptxLoading}
+          >
             {pptxLoading ? 'Generating...' : 'Export PPTX'}
           </Button>
         </div>
@@ -215,5 +274,5 @@ export function Step3ReviewExport() {
         <MinNodesChart chartRefs={chartRefs} />
       </div>
     </div>
-  )
+  );
 }

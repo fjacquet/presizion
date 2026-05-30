@@ -1,7 +1,7 @@
+import { computeScenarioResult } from '../lib/sizing/constraints';
 import { useClusterStore } from '../store/useClusterStore';
 import { useScenariosStore } from '../store/useScenariosStore';
 import { useWizardStore } from '../store/useWizardStore';
-import { computeScenarioResult } from '../lib/sizing/constraints';
 import type { ScenarioResult } from '../types/results';
 
 /**

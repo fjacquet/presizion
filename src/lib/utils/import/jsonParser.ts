@@ -1,21 +1,21 @@
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ExclusionRules } from '@/types/exclusions'
-import { ImportError } from './fileValidation'
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { ExclusionRules } from '@/types/exclusions';
+import { ImportError } from './fileValidation';
 
 export interface JsonImportResult {
-  sourceFormat: 'presizion-json'
-  cluster: OldCluster
-  scenarios: Scenario[]
-  exclusions?: ExclusionRules
+  sourceFormat: 'presizion-json';
+  cluster: OldCluster;
+  scenarios: Scenario[];
+  exclusions?: ExclusionRules;
 }
 
 export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
-  const text = new TextDecoder().decode(buffer)
-  let parsed: unknown
+  const text = new TextDecoder().decode(buffer);
+  let parsed: unknown;
   try {
-    parsed = JSON.parse(text)
+    parsed = JSON.parse(text);
   } catch {
-    throw new ImportError('Invalid JSON file.')
+    throw new ImportError('Invalid JSON file.');
   }
 
   if (
@@ -25,38 +25,51 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
     !('currentCluster' in parsed) ||
     !('scenarios' in parsed)
   ) {
-    throw new ImportError('JSON file is not a Presizion export (missing schemaVersion, currentCluster, or scenarios).')
+    throw new ImportError(
+      'JSON file is not a Presizion export (missing schemaVersion, currentCluster, or scenarios).',
+    );
   }
 
-  const { currentCluster, scenarios } = parsed as Record<string, unknown>
+  const { currentCluster, scenarios } = parsed as Record<string, unknown>;
 
   if (typeof currentCluster !== 'object' || currentCluster === null) {
-    throw new ImportError('JSON export has invalid currentCluster field.')
+    throw new ImportError('JSON export has invalid currentCluster field.');
   }
 
-  const c = currentCluster as Record<string, unknown>
+  const c = currentCluster as Record<string, unknown>;
   const cluster: OldCluster = {
     totalVcpus: num(c.totalVcpus, 'totalVcpus'),
     totalPcores: num(c.totalPcores, 'totalPcores'),
     totalVms: num(c.totalVms, 'totalVms'),
     ...(c.totalDiskGb != null && { totalDiskGb: num(c.totalDiskGb, 'totalDiskGb') }),
-    ...(c.socketsPerServer != null && { socketsPerServer: num(c.socketsPerServer, 'socketsPerServer') }),
+    ...(c.socketsPerServer != null && {
+      socketsPerServer: num(c.socketsPerServer, 'socketsPerServer'),
+    }),
     ...(c.coresPerSocket != null && { coresPerSocket: num(c.coresPerSocket, 'coresPerSocket') }),
     ...(c.ramPerServerGb != null && { ramPerServerGb: num(c.ramPerServerGb, 'ramPerServerGb') }),
-    ...(c.existingServerCount != null && { existingServerCount: num(c.existingServerCount, 'existingServerCount') }),
-    ...(c.specintPerServer != null && { specintPerServer: num(c.specintPerServer, 'specintPerServer') }),
-    ...(c.cpuUtilizationPercent != null && { cpuUtilizationPercent: num(c.cpuUtilizationPercent, 'cpuUtilizationPercent') }),
-    ...(c.ramUtilizationPercent != null && { ramUtilizationPercent: num(c.ramUtilizationPercent, 'ramUtilizationPercent') }),
+    ...(c.existingServerCount != null && {
+      existingServerCount: num(c.existingServerCount, 'existingServerCount'),
+    }),
+    ...(c.specintPerServer != null && {
+      specintPerServer: num(c.specintPerServer, 'specintPerServer'),
+    }),
+    ...(c.cpuUtilizationPercent != null && {
+      cpuUtilizationPercent: num(c.cpuUtilizationPercent, 'cpuUtilizationPercent'),
+    }),
+    ...(c.ramUtilizationPercent != null && {
+      ramUtilizationPercent: num(c.ramUtilizationPercent, 'ramUtilizationPercent'),
+    }),
     ...(typeof c.isStretchCluster === 'boolean' && { isStretchCluster: c.isStretchCluster }),
-  }
+  };
 
   if (!Array.isArray(scenarios)) {
-    throw new ImportError('JSON export has invalid scenarios field.')
+    throw new ImportError('JSON export has invalid scenarios field.');
   }
 
   const parsedScenarios: Scenario[] = scenarios.map((s: unknown, i: number) => {
-    if (typeof s !== 'object' || s === null) throw new ImportError(`Scenario ${i} is not an object.`)
-    const sc = s as Record<string, unknown>
+    if (typeof s !== 'object' || s === null)
+      throw new ImportError(`Scenario ${i} is not an object.`);
+    const sc = s as Record<string, unknown>;
     return {
       id: typeof sc.id === 'string' ? sc.id : crypto.randomUUID(),
       name: typeof sc.name === 'string' ? sc.name : `Scenario ${i + 1}`,
@@ -64,7 +77,10 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
       coresPerSocket: num(sc.coresPerSocket, `scenarios[${i}].coresPerSocket`),
       ramPerServerGb: num(sc.ramPerServerGb, `scenarios[${i}].ramPerServerGb`),
       diskPerServerGb: num(sc.diskPerServerGb, `scenarios[${i}].diskPerServerGb`),
-      targetVcpuToPCoreRatio: num(sc.targetVcpuToPCoreRatio, `scenarios[${i}].targetVcpuToPCoreRatio`),
+      targetVcpuToPCoreRatio: num(
+        sc.targetVcpuToPCoreRatio,
+        `scenarios[${i}].targetVcpuToPCoreRatio`,
+      ),
       ramPerVmGb: num(sc.ramPerVmGb, `scenarios[${i}].ramPerVmGb`),
       diskPerVmGb: num(sc.diskPerVmGb, `scenarios[${i}].diskPerVmGb`),
       growthPercent: typeof sc.growthPercent === 'number' ? sc.growthPercent : 0,
@@ -74,37 +90,41 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
           : typeof sc.headroomPercent === 'number'
             ? sc.headroomPercent
             : 20,
-      haReserveCount: (sc.haReserveCount === 1 || sc.haReserveCount === 2 ? sc.haReserveCount : 0) as 0 | 1 | 2,
-      ...(sc.targetSpecint != null && { targetSpecint: num(sc.targetSpecint, `scenarios[${i}].targetSpecint`) }),
-    }
-  })
+      haReserveCount: (sc.haReserveCount === 1 || sc.haReserveCount === 2
+        ? sc.haReserveCount
+        : 0) as 0 | 1 | 2,
+      ...(sc.targetSpecint != null && {
+        targetSpecint: num(sc.targetSpecint, `scenarios[${i}].targetSpecint`),
+      }),
+    };
+  });
 
-  const exclusions = parseExclusionsBlock((parsed as Record<string, unknown>).exclusions)
+  const exclusions = parseExclusionsBlock((parsed as Record<string, unknown>).exclusions);
 
   return {
     sourceFormat: 'presizion-json',
     cluster,
     scenarios: parsedScenarios,
     ...(exclusions !== undefined && { exclusions }),
-  }
+  };
 }
 
 function num(v: unknown, field: string): number {
-  const n = typeof v === 'number' ? v : Number(v)
-  if (!Number.isFinite(n)) throw new ImportError(`JSON field "${field}" is not a valid number.`)
-  return n
+  const n = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(n)) throw new ImportError(`JSON field "${field}" is not a valid number.`);
+  return n;
 }
 
 function parseExclusionsBlock(raw: unknown): ExclusionRules | undefined {
-  if (raw == null || typeof raw !== 'object') return undefined
-  const r = raw as Record<string, unknown>
+  if (raw == null || typeof raw !== 'object') return undefined;
+  const r = raw as Record<string, unknown>;
   const stringArray = (v: unknown): string[] =>
-    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
+    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
   return {
     namePattern: typeof r.namePattern === 'string' ? r.namePattern : '',
     exactNames: stringArray(r.exactNames),
     excludePoweredOff: r.excludePoweredOff === true,
     manuallyExcluded: stringArray(r.manuallyExcluded),
     manuallyIncluded: stringArray(r.manuallyIncluded),
-  }
+  };
 }

@@ -1,42 +1,40 @@
-import { useRef } from 'react'
+import { useRef } from 'react';
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
-  Tooltip,
+  Cell,
+  LabelList,
   Legend,
   ResponsiveContainer,
-  LabelList,
-  Cell,
-} from 'recharts'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useScenariosResults } from '@/hooks/useScenariosResults'
-import { useWizardStore } from '@/store/useWizardStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { Button } from '@/components/ui/button'
-import { CHART_COLORS } from '@/lib/sizing/chartColors'
-import { downloadChartPng } from '@/lib/utils/downloadChartPng'
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { Button } from '@/components/ui/button';
+import { useScenariosResults } from '@/hooks/useScenariosResults';
+import { CHART_COLORS } from '@/lib/sizing/chartColors';
+import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { useWizardStore } from '@/store/useWizardStore';
 
-const AS_IS_COLOR = '#94a3b8' // slate-400
+const AS_IS_COLOR = '#94a3b8'; // slate-400
 
 export function SizingChart() {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const results = useScenariosResults()
-  const sizingMode = useWizardStore((s) => s.sizingMode)
-  const layoutMode = useWizardStore((s) => s.layoutMode)
-  const currentCluster = useClusterStore((s) => s.currentCluster)
-  const comparisonRef = useRef<HTMLDivElement | null>(null)
-  const constraintRef = useRef<HTMLDivElement | null>(null)
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const results = useScenariosResults();
+  const sizingMode = useWizardStore((s) => s.sizingMode);
+  const layoutMode = useWizardStore((s) => s.layoutMode);
+  const currentCluster = useClusterStore((s) => s.currentCluster);
+  const comparisonRef = useRef<HTMLDivElement | null>(null);
+  const constraintRef = useRef<HTMLDivElement | null>(null);
 
-  if (scenarios.length === 0) return null
+  if (scenarios.length === 0) return null;
 
-  const showDisk = layoutMode !== 'disaggregated'
+  const showDisk = layoutMode !== 'disaggregated';
 
-  const cpuBarName =
-    sizingMode === 'performance' ? 'Performance-limited' :
-    'CPU-limited'
+  const cpuBarName = sizingMode === 'performance' ? 'Performance-limited' : 'CPU-limited';
 
   // Per-constraint breakdown data (grouped bars per scenario)
   const constraintData = scenarios.map((s, i) => ({
@@ -44,18 +42,21 @@ export function SizingChart() {
     cpu: results[i]?.cpuLimitedCount ?? 0,
     ram: results[i]?.ramLimitedCount ?? 0,
     ...(showDisk ? { disk: results[i]?.diskLimitedCount ?? 0 } : {}),
-  }))
+  }));
 
   // Final server count comparison with As-Is bar
-  const hasAsIs = currentCluster.existingServerCount !== undefined && currentCluster.existingServerCount > 0
+  const hasAsIs =
+    currentCluster.existingServerCount !== undefined && currentCluster.existingServerCount > 0;
   const comparisonData = [
-    ...(hasAsIs ? [{ name: 'As-Is', servers: currentCluster.existingServerCount!, isAsIs: true }] : []),
+    ...(hasAsIs
+      ? [{ name: 'As-Is', servers: currentCluster.existingServerCount!, isAsIs: true }]
+      : []),
     ...scenarios.map((s, i) => ({
       name: s.name,
       servers: results[i]?.finalCount ?? 0,
       isAsIs: false,
     })),
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -74,23 +75,33 @@ export function SizingChart() {
         </div>
         <div className="h-48 sm:h-72">
           <div ref={comparisonRef} className="h-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={comparisonData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-              <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Bar dataKey="servers" name="Servers Required">
-                <LabelList dataKey="servers" position="top" style={{ fontSize: 12, fontWeight: 600 }} />
-                {comparisonData.map((entry, idx) => (
-                  <Cell
-                    key={idx}
-                    fill={entry.isAsIs ? AS_IS_COLOR : (CHART_COLORS[(idx - (hasAsIs ? 1 : 0)) % CHART_COLORS.length] ?? AS_IS_COLOR)}
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={comparisonData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
+                <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Bar dataKey="servers" name="Servers Required">
+                  <LabelList
+                    dataKey="servers"
+                    position="top"
+                    style={{ fontSize: 12, fontWeight: 600 }}
                   />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                  {comparisonData.map((entry, idx) => (
+                    <Cell
+                      // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order comparison bars
+                      key={idx}
+                      fill={
+                        entry.isAsIs
+                          ? AS_IS_COLOR
+                          : (CHART_COLORS[(idx - (hasAsIs ? 1 : 0)) % CHART_COLORS.length] ??
+                            AS_IS_COLOR)
+                      }
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
@@ -98,7 +109,9 @@ export function SizingChart() {
       {/* Per-constraint breakdown */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">Constraint Breakdown per Scenario</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Constraint Breakdown per Scenario
+          </h3>
           <Button
             variant="outline"
             size="sm"
@@ -110,29 +123,29 @@ export function SizingChart() {
         </div>
         <div className="h-48 sm:h-72">
           <div ref={constraintRef} className="h-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-              <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="cpu" name={cpuBarName} fill={CHART_COLORS[0]}>
-                <LabelList dataKey="cpu" position="top" style={{ fontSize: 11 }} />
-              </Bar>
-              <Bar dataKey="ram" name="RAM-limited" fill={CHART_COLORS[1]}>
-                <LabelList dataKey="ram" position="top" style={{ fontSize: 11 }} />
-              </Bar>
-              {showDisk && (
-                <Bar dataKey="disk" name="Disk-limited" fill={CHART_COLORS[2]}>
-                  <LabelList dataKey="disk" position="top" style={{ fontSize: 11 }} />
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
+                <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="cpu" name={cpuBarName} fill={CHART_COLORS[0]}>
+                  <LabelList dataKey="cpu" position="top" style={{ fontSize: 11 }} />
                 </Bar>
-              )}
-            </BarChart>
-          </ResponsiveContainer>
+                <Bar dataKey="ram" name="RAM-limited" fill={CHART_COLORS[1]}>
+                  <LabelList dataKey="ram" position="top" style={{ fontSize: 11 }} />
+                </Bar>
+                {showDisk && (
+                  <Bar dataKey="disk" name="Disk-limited" fill={CHART_COLORS[2]}>
+                    <LabelList dataKey="disk" position="top" style={{ fontSize: 11 }} />
+                  </Bar>
+                )}
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

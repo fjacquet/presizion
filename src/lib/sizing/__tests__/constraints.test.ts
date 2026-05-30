@@ -1,13 +1,31 @@
 // VALIDATION.md: CALC-04 (N+1 HA), CALC-05 (max constraint + limiting resource), CALC-06 (utilization metrics)
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { OldCluster, Scenario } from '../../../types/cluster';
 import { computeScenarioResult } from '../constraints';
 import { createDefaultScenario } from '../defaults';
 
 /** Strip vSAN props from a scenario to produce a legacy (non-vSAN) scenario for comparison. */
-function stripVsanProps<T extends Partial<Scenario>>(scenario: T): Omit<T, 'vsanFttPolicy' | 'vsanMemoryPerHostGb' | 'vsanCompressionFactor' | 'vsanSlackPercent' | 'vsanCpuOverheadPercent' | 'vsanVmSwapEnabled'> {
+function stripVsanProps<T extends Partial<Scenario>>(
+  scenario: T,
+): Omit<
+  T,
+  | 'vsanFttPolicy'
+  | 'vsanMemoryPerHostGb'
+  | 'vsanCompressionFactor'
+  | 'vsanSlackPercent'
+  | 'vsanCpuOverheadPercent'
+  | 'vsanVmSwapEnabled'
+> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured to exclude from rest
-  const { vsanFttPolicy, vsanMemoryPerHostGb, vsanCompressionFactor, vsanSlackPercent, vsanCpuOverheadPercent, vsanVmSwapEnabled, ...rest } = scenario;
+  const {
+    vsanFttPolicy,
+    vsanMemoryPerHostGb,
+    vsanCompressionFactor,
+    vsanSlackPercent,
+    vsanCpuOverheadPercent,
+    vsanVmSwapEnabled,
+    ...rest
+  } = scenario;
   return rest;
 }
 
@@ -20,10 +38,16 @@ const CPU_LIMITED_CLUSTER = { totalVcpus: 3200, totalVms: 100, totalPcores: 800 
 const CPU_LIMITED_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000001',
   name: 'CPU-Limited',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 1024, diskPerServerGb: 50000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 1024,
+  diskPerServerGb: 50000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 2,
+  diskPerVmGb: 10,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
 };
 
 // RAM-limited scenario fixture
@@ -34,10 +58,16 @@ const RAM_LIMITED_CLUSTER = { totalVcpus: 400, totalVms: 500, totalPcores: 200 }
 const RAM_LIMITED_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000002',
   name: 'RAM-Limited',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 512, diskPerServerGb: 50000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 50000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 16,
+  diskPerVmGb: 10,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
 };
 
 // Disk-limited scenario fixture
@@ -48,10 +78,16 @@ const DISK_LIMITED_CLUSTER = { totalVcpus: 200, totalVms: 200, totalPcores: 100 
 const DISK_LIMITED_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000003',
   name: 'Disk-Limited',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 1024, diskPerServerGb: 10000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 500,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 1024,
+  diskPerServerGb: 10000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 2,
+  diskPerVmGb: 500,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
 };
 
 // =====================================================================
@@ -59,15 +95,27 @@ const DISK_LIMITED_SCENARIO = {
 // =====================================================================
 
 const baseCluster: OldCluster = {
-  totalVcpus: 1000, totalPcores: 200, totalVms: 100,
-  totalDiskGb: 50000, cpuUtilizationPercent: 60, ramUtilizationPercent: 60,
-  cpuFrequencyGhz: 2.5, existingServerCount: 10, specintPerServer: 300,
+  totalVcpus: 1000,
+  totalPcores: 200,
+  totalVms: 100,
+  totalDiskGb: 50000,
+  cpuUtilizationPercent: 60,
+  ramUtilizationPercent: 60,
+  cpuFrequencyGhz: 2.5,
+  existingServerCount: 10,
+  specintPerServer: 300,
 };
 
 describe('computeScenarioResult — unified demand factor + 2-mode dispatch', () => {
   it('applies (1+growth)(1+safety) as a single demand factor', () => {
-    const s = { ...createDefaultScenario(), growthPercent: 10, safetyPercent: 20,
-      targetVcpuToPCoreRatio: 4, socketsPerServer: 2, coresPerSocket: 16 };
+    const s = {
+      ...createDefaultScenario(),
+      growthPercent: 10,
+      safetyPercent: 20,
+      targetVcpuToPCoreRatio: 4,
+      socketsPerServer: 2,
+      coresPerSocket: 16,
+    };
     // vCPU mode: ceil(1000 × 1.10 × 1.20 / 4 / 32) = ceil(10.3125) = 11
     const r = computeScenarioResult(baseCluster, s, 'vcpu', 'hci');
     expect(r.cpuLimitedCount).toBe(11);
@@ -79,8 +127,14 @@ describe('computeScenarioResult — unified demand factor + 2-mode dispatch', ()
     // so the GHz fallback is exercised (see report).
     const { targetSpecint: _omitSpec, ...defaults } = createDefaultScenario();
     void _omitSpec;
-    const s = { ...defaults, growthPercent: 0, safetyPercent: 0,
-      targetCpuFrequencyGhz: 3.0, socketsPerServer: 2, coresPerSocket: 16 };
+    const s = {
+      ...defaults,
+      growthPercent: 0,
+      safetyPercent: 0,
+      targetCpuFrequencyGhz: 3.0,
+      socketsPerServer: 2,
+      coresPerSocket: 16,
+    };
     const r = computeScenarioResult(baseCluster, s, 'performance', 'hci');
     // demandGhz = 200 × 2.5 × 0.60 = 300 ; perServer = 32 × 3.0 × 1.0 = 96 ; ceil(300/96)=4
     expect(r.cpuLimitedCount).toBe(4);
@@ -88,8 +142,12 @@ describe('computeScenarioResult — unified demand factor + 2-mode dispatch', ()
   });
 
   it('performance mode uses SPEC when a SPEC override is present', () => {
-    const s = { ...createDefaultScenario(), growthPercent: 0, safetyPercent: 0,
-      targetSpecint: 600 };
+    const s = {
+      ...createDefaultScenario(),
+      growthPercent: 0,
+      safetyPercent: 0,
+      targetSpecint: 600,
+    };
     const r = computeScenarioResult(baseCluster, s, 'performance', 'hci');
     // ceil(10 × 300 × 1.0 / 600) = 5
     expect(r.cpuLimitedCount).toBe(5);
@@ -192,16 +250,25 @@ describe('computeScenarioResult', () => {
 // RAM count: ceil(50*2*1.20/512) = ceil(0.23) = 1; Disk count: ceil(50*10*1.20/50000) = 1
 // => finalCount=6, limitingResource='specint'
 const SPECINT_CLUSTER = {
-  totalVcpus: 500, totalVms: 50, totalPcores: 100,
-  existingServerCount: 10, specintPerServer: 1200,
+  totalVcpus: 500,
+  totalVms: 50,
+  totalPcores: 100,
+  existingServerCount: 10,
+  specintPerServer: 1200,
 };
 const SPECINT_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000004',
   name: 'SPECint',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 512, diskPerServerGb: 50000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 50000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 2,
+  diskPerVmGb: 10,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
   targetSpecint: 2400,
 };
 
@@ -209,31 +276,47 @@ const SPECINT_SCENARIO = {
 // CPU cluster: totalVcpus=1000, cpuUtilizationPercent=60
 // vcpu mode ratio is a hard cap: ceil(1000 × 1.20 / 4 / 40) = ceil(7.5) = 8 (util ignored)
 const UTIL_CPU_CLUSTER = {
-  totalVcpus: 1000, totalVms: 100, totalPcores: 250,
+  totalVcpus: 1000,
+  totalVms: 100,
+  totalPcores: 250,
   cpuUtilizationPercent: 60,
 };
 const UTIL_CPU_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000005',
   name: 'Util-CPU',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 2048, diskPerServerGb: 100000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 2048,
+  diskPerServerGb: 100000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 2,
+  diskPerVmGb: 10,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
 };
 
 // RAM cluster: totalVms=500, ramUtilizationPercent=80
 // ceil(500 * 16 * (80/100) * 1.20 / 512) = ceil(15) = 15
 const UTIL_RAM_CLUSTER = {
-  totalVcpus: 200, totalVms: 500, totalPcores: 100,
+  totalVcpus: 200,
+  totalVms: 500,
+  totalPcores: 100,
   ramUtilizationPercent: 80,
 };
 const UTIL_RAM_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000006',
   name: 'Util-RAM',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 512, diskPerServerGb: 100000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 100000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 16,
+  diskPerVmGb: 10,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
 };
 
 describe('computeScenarioResult — performance/SPECint mode (PERF-04, PERF-05)', () => {
@@ -285,7 +368,11 @@ describe('computeScenarioResult — utilization scaling (UTIL-03)', () => {
     expect(result.ramUtilizationPercent).toBeCloseTo(83.3, 1);
   });
   it('utilization=100 on both: same result as no utilization fields (regression)', () => {
-    const clusterWith100 = { ...CPU_LIMITED_CLUSTER, cpuUtilizationPercent: 100, ramUtilizationPercent: 100 };
+    const clusterWith100 = {
+      ...CPU_LIMITED_CLUSTER,
+      cpuUtilizationPercent: 100,
+      ramUtilizationPercent: 100,
+    };
     const withUtil = computeScenarioResult(clusterWith100, CPU_LIMITED_SCENARIO);
     const withoutUtil = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
     expect(withUtil.finalCount).toBe(withoutUtil.finalCount);
@@ -297,14 +384,26 @@ describe('computeScenarioResult — GHz mode (performance fallback, CALC-01-GHZ)
   // Cluster: 200 pCores, 2.4GHz, 70% util; Scenario: 40 cores/server, 3.0GHz, safety=20%
   // demandFactor=1.20; ceil(200×2.4×0.70×1.2 / (40×3.0×1.0)) = ceil(403.2/120) = ceil(3.36) = 4
   // No SPEC fields on cluster/scenario → performance mode falls back to GHz.
-  const GHZ_CLUSTER = { totalVcpus: 400, totalVms: 100, totalPcores: 200, cpuUtilizationPercent: 70, cpuFrequencyGhz: 2.4 };
+  const GHZ_CLUSTER = {
+    totalVcpus: 400,
+    totalVms: 100,
+    totalPcores: 200,
+    cpuUtilizationPercent: 70,
+    cpuFrequencyGhz: 2.4,
+  };
   const GHZ_SCENARIO = {
     id: '00000000-0000-0000-0000-000000000011',
     name: 'GHz',
-    socketsPerServer: 2, coresPerSocket: 20,
-    ramPerServerGb: 1024, diskPerServerGb: 100000,
-    targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-    growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+    socketsPerServer: 2,
+    coresPerSocket: 20,
+    ramPerServerGb: 1024,
+    diskPerServerGb: 100000,
+    targetVcpuToPCoreRatio: 4,
+    ramPerVmGb: 2,
+    diskPerVmGb: 10,
+    growthPercent: 0,
+    safetyPercent: 20,
+    haReserveCount: 0 as const,
     targetCpuFrequencyGhz: 3.0,
   };
 
@@ -317,15 +416,30 @@ describe('computeScenarioResult — GHz mode (performance fallback, CALC-01-GHZ)
 
 describe('computeScenarioResult — disaggregated layout', () => {
   it('disaggregated: diskLimitedCount always 0', () => {
-    const result = computeScenarioResult(DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO, 'vcpu', 'disaggregated');
+    const result = computeScenarioResult(
+      DISK_LIMITED_CLUSTER,
+      DISK_LIMITED_SCENARIO,
+      'vcpu',
+      'disaggregated',
+    );
     expect(result.diskLimitedCount).toBe(0);
   });
   it('disaggregated: limitingResource is never disk', () => {
-    const result = computeScenarioResult(DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO, 'vcpu', 'disaggregated');
+    const result = computeScenarioResult(
+      DISK_LIMITED_CLUSTER,
+      DISK_LIMITED_SCENARIO,
+      'vcpu',
+      'disaggregated',
+    );
     expect(result.limitingResource).not.toBe('disk');
   });
   it('hci (default): disk constraint active', () => {
-    const result = computeScenarioResult(DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO, 'vcpu', 'hci');
+    const result = computeScenarioResult(
+      DISK_LIMITED_CLUSTER,
+      DISK_LIMITED_SCENARIO,
+      'vcpu',
+      'hci',
+    );
     expect(result.diskLimitedCount).toBe(12);
     expect(result.limitingResource).toBe('disk');
   });
@@ -336,10 +450,16 @@ const VM_DEMAND_CLUSTER = { totalVcpus: 1000, totalVms: 100, totalPcores: 200 };
 const VM_DEMAND_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000020',
   name: 'VM-Demand',
-  socketsPerServer: 2, coresPerSocket: 20,
-  ramPerServerGb: 512, diskPerServerGb: 5000,
-  targetVcpuToPCoreRatio: 4, ramPerVmGb: 16, diskPerVmGb: 100,
-  growthPercent: 0, safetyPercent: 0, haReserveCount: 0 as const,
+  socketsPerServer: 2,
+  coresPerSocket: 20,
+  ramPerServerGb: 512,
+  diskPerServerGb: 5000,
+  targetVcpuToPCoreRatio: 4,
+  ramPerVmGb: 16,
+  diskPerVmGb: 100,
+  growthPercent: 0,
+  safetyPercent: 0,
+  haReserveCount: 0 as const,
 };
 
 describe('VM count drives RAM and Disk demand from cluster.totalVms', () => {
@@ -374,10 +494,16 @@ describe('demand factor (growth × safety)', () => {
     const scenario = {
       id: '00000000-0000-0000-0000-000000000g01',
       name: 'CPU-Growth',
-      socketsPerServer: 2, coresPerSocket: 20,
-      ramPerServerGb: 10000, diskPerServerGb: 100000,
-      targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-      growthPercent: 20, safetyPercent: 0, haReserveCount: 0 as const,
+      socketsPerServer: 2,
+      coresPerSocket: 20,
+      ramPerServerGb: 10000,
+      diskPerServerGb: 100000,
+      targetVcpuToPCoreRatio: 4,
+      ramPerVmGb: 2,
+      diskPerVmGb: 10,
+      growthPercent: 20,
+      safetyPercent: 0,
+      haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(cluster, scenario);
     expect(result.cpuLimitedCount).toBe(8);
@@ -393,10 +519,16 @@ describe('demand factor (growth × safety)', () => {
     const scenario = {
       id: '00000000-0000-0000-0000-000000000g02',
       name: 'Compound',
-      socketsPerServer: 2, coresPerSocket: 20,
-      ramPerServerGb: 10000, diskPerServerGb: 100000,
-      targetVcpuToPCoreRatio: 4, ramPerVmGb: 2, diskPerVmGb: 10,
-      growthPercent: 20, safetyPercent: 20, haReserveCount: 0 as const,
+      socketsPerServer: 2,
+      coresPerSocket: 20,
+      ramPerServerGb: 10000,
+      diskPerServerGb: 100000,
+      targetVcpuToPCoreRatio: 4,
+      ramPerVmGb: 2,
+      diskPerVmGb: 10,
+      growthPercent: 20,
+      safetyPercent: 20,
+      haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(cluster, scenario);
     expect(result.cpuLimitedCount).toBe(9);
@@ -407,9 +539,13 @@ describe('demand factor (growth × safety)', () => {
     const baseScenario = {
       id: '00000000-0000-0000-0000-000000000g05',
       name: 'No-Demand',
-      socketsPerServer: 2, coresPerSocket: 20,
-      ramPerServerGb: 512, diskPerServerGb: 10000,
-      targetVcpuToPCoreRatio: 4, ramPerVmGb: 8, diskPerVmGb: 50,
+      socketsPerServer: 2,
+      coresPerSocket: 20,
+      ramPerServerGb: 512,
+      diskPerServerGb: 10000,
+      targetVcpuToPCoreRatio: 4,
+      ramPerVmGb: 8,
+      diskPerVmGb: 50,
       haReserveCount: 0 as const,
     } as unknown as Scenario;
     const zeroDemand = { ...baseScenario, growthPercent: 0, safetyPercent: 0 };
@@ -455,7 +591,9 @@ const VSAN_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 8,
   diskPerVmGb: 50, // 50 GiB usable per VM
-  growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+  growthPercent: 0,
+  safetyPercent: 20,
+  haReserveCount: 0 as const,
   vsanFttPolicy: 'mirror-1' as const,
   vsanCompressionFactor: 1.5 as const,
   vsanSlackPercent: 25,
@@ -487,7 +625,9 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
       targetVcpuToPCoreRatio: 4,
       ramPerVmGb: 8,
       diskPerVmGb: 50,
-      growthPercent: 0, safetyPercent: 20, haReserveCount: 0 as const,
+      growthPercent: 0,
+      safetyPercent: 20,
+      haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(VSAN_CLUSTER, legacyScenario);
     // Legacy: ceil(200 × 50 × 1.20 / 10000) = ceil(1.2) = 2
@@ -657,4 +797,11 @@ describe('computeScenarioResult — stretch cluster', () => {
   });
 });
 
-export { CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, RAM_LIMITED_CLUSTER, RAM_LIMITED_SCENARIO, DISK_LIMITED_CLUSTER, DISK_LIMITED_SCENARIO };
+export {
+  CPU_LIMITED_CLUSTER,
+  CPU_LIMITED_SCENARIO,
+  DISK_LIMITED_CLUSTER,
+  DISK_LIMITED_SCENARIO,
+  RAM_LIMITED_CLUSTER,
+  RAM_LIMITED_SCENARIO,
+};

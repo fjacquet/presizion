@@ -1,12 +1,12 @@
 // Tests for Zod validation schemas: currentClusterSchema and scenarioSchema
-import { describe, it, expect } from 'vitest';
-import { currentClusterSchema } from '../currentClusterSchema';
-import { scenarioSchema } from '../scenarioSchema';
+import { describe, expect, it } from 'vitest';
 import {
-  DEFAULT_VCPU_TO_PCORE_RATIO,
   DEFAULT_GROWTH_PERCENT,
   DEFAULT_SAFETY_PERCENT,
+  DEFAULT_VCPU_TO_PCORE_RATIO,
 } from '../../lib/sizing/defaults';
+import { currentClusterSchema } from '../currentClusterSchema';
+import { scenarioSchema } from '../scenarioSchema';
 
 describe('currentClusterSchema', () => {
   it('throws ZodError when required numeric field is empty string', () => {
@@ -16,9 +16,7 @@ describe('currentClusterSchema', () => {
   });
 
   it('throws ZodError when required numeric field is undefined', () => {
-    expect(() =>
-      currentClusterSchema.parse({ totalPcores: 50, totalVms: 20 }),
-    ).toThrow();
+    expect(() => currentClusterSchema.parse({ totalPcores: 50, totalVms: 20 })).toThrow();
   });
 
   it('parses valid required fields successfully', () => {
@@ -102,25 +100,26 @@ describe('scenarioSchema', () => {
 
   it('accepts growth/safety and defaults them', () => {
     const parsed = scenarioSchema.parse({
-      id: crypto.randomUUID(), name: 'X',
-      socketsPerServer: 2, coresPerSocket: 16, ramPerServerGb: 512, diskPerServerGb: 10000,
-      ramPerVmGb: 4, diskPerVmGb: 50,
-    })
-    expect(parsed.growthPercent).toBe(0)
-    expect(parsed.safetyPercent).toBe(20)
-    expect('headroomPercent' in parsed).toBe(false)
+      id: crypto.randomUUID(),
+      name: 'X',
+      socketsPerServer: 2,
+      coresPerSocket: 16,
+      ramPerServerGb: 512,
+      diskPerServerGb: 10000,
+      ramPerVmGb: 4,
+      diskPerVmGb: 50,
+    });
+    expect(parsed.growthPercent).toBe(0);
+    expect(parsed.safetyPercent).toBe(20);
+    expect('headroomPercent' in parsed).toBe(false);
   });
 
   it('throws ZodError when socketsPerServer is negative', () => {
-    expect(() =>
-      scenarioSchema.parse({ ...SCENARIO_BASE, socketsPerServer: -1 }),
-    ).toThrow();
+    expect(() => scenarioSchema.parse({ ...SCENARIO_BASE, socketsPerServer: -1 })).toThrow();
   });
 
   it('throws ZodError when name is empty string', () => {
-    expect(() =>
-      scenarioSchema.parse({ ...SCENARIO_BASE, name: '' }),
-    ).toThrow();
+    expect(() => scenarioSchema.parse({ ...SCENARIO_BASE, name: '' })).toThrow();
   });
 
   it('parses valid scenario with all required fields', () => {

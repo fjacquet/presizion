@@ -5,34 +5,29 @@
  * Orientation: metrics = rows, scenarios = columns.
  * Two logical groups: per-node sizing parameters, then cluster totals.
  */
-import { useScenariosResults } from '@/hooks/useScenariosResults'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { useWizardStore } from '@/store/useWizardStore'
-import type { SizingMode } from '@/store/useWizardStore'
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { NodeSizingRows } from './NodeSizingRows'
-import { UtilizationRows } from './UtilizationRows'
-import { ClusterTotalRows } from './ClusterTotalRows'
+
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useScenariosResults } from '@/hooks/useScenariosResults';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import type { SizingMode } from '@/store/useWizardStore';
+import { useWizardStore } from '@/store/useWizardStore';
+import { ClusterTotalRows } from './ClusterTotalRows';
+import { NodeSizingRows } from './NodeSizingRows';
+import { UtilizationRows } from './UtilizationRows';
 
 const MODE_LABELS: Record<SizingMode, string> = {
   vcpu: 'vCPU',
   performance: 'Performance',
-}
+};
 
 export function ComparisonTable() {
-  const scenarios = useScenariosStore((state) => state.scenarios)
-  const results = useScenariosResults()
-  const currentCluster = useClusterStore((state) => state.currentCluster)
-  const sizingMode = useWizardStore((s) => s.sizingMode)
-  const layoutMode = useWizardStore((s) => s.layoutMode)
+  const scenarios = useScenariosStore((state) => state.scenarios);
+  const results = useScenariosResults();
+  const currentCluster = useClusterStore((state) => state.currentCluster);
+  const sizingMode = useWizardStore((s) => s.sizingMode);
+  const layoutMode = useWizardStore((s) => s.layoutMode);
 
   return (
     <div className="space-y-3">
@@ -48,7 +43,9 @@ export function ComparisonTable() {
         <Table className="min-w-max">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-48 font-semibold sticky left-0 bg-background z-10">Metric</TableHead>
+              <TableHead className="w-48 font-semibold sticky left-0 bg-background z-10">
+                Metric
+              </TableHead>
               <TableHead className="font-semibold text-center bg-muted/30">As-Is</TableHead>
               {scenarios.map((scenario) => (
                 <TableHead key={scenario.id} className="font-semibold text-center">
@@ -81,5 +78,5 @@ export function ComparisonTable() {
         </Table>
       </div>
     </div>
-  )
+  );
 }

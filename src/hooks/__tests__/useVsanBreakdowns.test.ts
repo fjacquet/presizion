@@ -4,11 +4,12 @@
  * Mirrors useScenariosResults.test.ts pattern: renderHook + store setup.
  * Verifies derive-on-read behavior for VsanCapacityBreakdown[].
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useVsanBreakdowns } from '../useVsanBreakdowns';
+
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useClusterStore } from '../../store/useClusterStore';
 import { useScenariosStore } from '../../store/useScenariosStore';
+import { useVsanBreakdowns } from '../useVsanBreakdowns';
 
 // CPU-limited fixture (from useScenariosResults.test.ts)
 const CPU_LIMITED_CLUSTER = { totalVcpus: 3200, totalVms: 100, totalPcores: 800 };
@@ -22,7 +23,8 @@ const CPU_LIMITED_SCENARIO = {
   targetVcpuToPCoreRatio: 4,
   ramPerVmGb: 2,
   diskPerVmGb: 10,
-  growthPercent: 0, safetyPercent: 20,
+  growthPercent: 0,
+  safetyPercent: 20,
   haReserveCount: 0 as const,
 };
 
@@ -85,7 +87,8 @@ describe('useVsanBreakdowns', () => {
     });
 
     const { result } = renderHook(() => useVsanBreakdowns());
-    const cpu = result.current[0]!.cpu;
+    const cpu = result.current[0]?.cpu;
+    if (!cpu) throw new Error('expected a cpu breakdown');
     // CAP-06 invariant: required + spare + excess === total
     expect(cpu.required + cpu.spare + cpu.excess).toBeCloseTo(cpu.total, 5);
   });

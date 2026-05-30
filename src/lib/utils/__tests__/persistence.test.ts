@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Set up localStorage mock BEFORE importing the module under test.
 const localStorageStore: Record<string, string> = {};
@@ -12,7 +12,9 @@ const localStorageMock = {
     delete localStorageStore[key];
   }),
   clear: vi.fn(() => {
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
   }),
   get length() {
     return Object.keys(localStorageStore).length;
@@ -22,16 +24,16 @@ const localStorageMock = {
 
 vi.stubGlobal('localStorage', localStorageMock);
 
+import type { SessionData } from '../persistence';
 // Import module AFTER globals are set up.
 import {
-  serializeSession,
-  deserializeSession,
-  saveToLocalStorage,
-  loadFromLocalStorage,
-  encodeSessionToHash,
   decodeSessionFromHash,
+  deserializeSession,
+  encodeSessionToHash,
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  serializeSession,
 } from '../persistence';
-import type { SessionData } from '../persistence';
 
 const STORAGE_KEY = 'presizion-session';
 
@@ -86,9 +88,9 @@ describe('deserializeSession', () => {
     const json = serializeSession(validSession);
     const result = deserializeSession(json);
     expect(result).not.toBeNull();
-    expect(result!.cluster.totalVcpus).toBe(100);
-    expect(result!.sizingMode).toBe('vcpu');
-    expect(result!.layoutMode).toBe('hci');
+    expect(result?.cluster.totalVcpus).toBe(100);
+    expect(result?.sizingMode).toBe('vcpu');
+    expect(result?.layoutMode).toBe('hci');
   });
 
   it('returns null for malformed JSON', () => {
@@ -133,7 +135,7 @@ describe('deserializeSession', () => {
     });
     const result = deserializeSession(withExtra);
     expect(result).not.toBeNull();
-    expect((result!.cluster as unknown as Record<string, unknown>)['unknownField']).toBeUndefined();
+    expect((result?.cluster as unknown as Record<string, unknown>).unknownField).toBeUndefined();
   });
 
   it('defaults sizingMode to "vcpu" when absent', () => {
@@ -144,7 +146,7 @@ describe('deserializeSession', () => {
     });
     const result = deserializeSession(withoutMode);
     expect(result).not.toBeNull();
-    expect(result!.sizingMode).toBe('vcpu');
+    expect(result?.sizingMode).toBe('vcpu');
   });
 
   it('defaults layoutMode to "hci" when absent', () => {
@@ -155,22 +157,21 @@ describe('deserializeSession', () => {
     });
     const result = deserializeSession(withoutLayout);
     expect(result).not.toBeNull();
-    expect(result!.layoutMode).toBe('hci');
+    expect(result?.layoutMode).toBe('hci');
   });
 });
 
 describe('saveToLocalStorage', () => {
   beforeEach(() => {
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
     vi.clearAllMocks();
   });
 
   it('calls localStorage.setItem with the correct STORAGE_KEY', () => {
     saveToLocalStorage(validSession);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      STORAGE_KEY,
-      expect.any(String),
-    );
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(STORAGE_KEY, expect.any(String));
   });
 
   it('stores a JSON string that round-trips back to the session data', () => {
@@ -179,13 +180,15 @@ describe('saveToLocalStorage', () => {
     expect(stored).toBeDefined();
     const restored = deserializeSession(stored!);
     expect(restored).not.toBeNull();
-    expect(restored!.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
+    expect(restored?.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
   });
 });
 
 describe('loadFromLocalStorage', () => {
   beforeEach(() => {
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
     vi.clearAllMocks();
   });
 
@@ -198,8 +201,8 @@ describe('loadFromLocalStorage', () => {
     vi.clearAllMocks(); // reset call counts, but store remains
     const result = loadFromLocalStorage();
     expect(result).not.toBeNull();
-    expect(result!.cluster.totalVcpus).toBe(100);
-    expect(result!.sizingMode).toBe('vcpu');
+    expect(result?.cluster.totalVcpus).toBe(100);
+    expect(result?.sizingMode).toBe('vcpu');
   });
 
   it('returns null when the stored value is invalid JSON', () => {
@@ -219,23 +222,23 @@ describe('loadFromLocalStorage', () => {
 describe('encodeSessionToHash / decodeSessionFromHash', () => {
   it('round-trips: encode then decode returns data equal to original', () => {
     const encoded = encodeSessionToHash(validSession);
-    const decoded = decodeSessionFromHash('#' + encoded);
+    const decoded = decodeSessionFromHash(`#${encoded}`);
     expect(decoded).not.toBeNull();
-    expect(decoded!.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
-    expect(decoded!.cluster.totalPcores).toBe(validSession.cluster.totalPcores);
-    expect(decoded!.cluster.totalVms).toBe(validSession.cluster.totalVms);
-    expect(decoded!.sizingMode).toBe(validSession.sizingMode);
-    expect(decoded!.layoutMode).toBe(validSession.layoutMode);
-    expect(decoded!.scenarios).toHaveLength(validSession.scenarios.length);
+    expect(decoded?.cluster.totalVcpus).toBe(validSession.cluster.totalVcpus);
+    expect(decoded?.cluster.totalPcores).toBe(validSession.cluster.totalPcores);
+    expect(decoded?.cluster.totalVms).toBe(validSession.cluster.totalVms);
+    expect(decoded?.sizingMode).toBe(validSession.sizingMode);
+    expect(decoded?.layoutMode).toBe(validSession.layoutMode);
+    expect(decoded?.scenarios).toHaveLength(validSession.scenarios.length);
   });
 
   it('decodeSessionFromHash strips leading # before decoding', () => {
     const encoded = encodeSessionToHash(validSession);
-    const withHash = decodeSessionFromHash('#' + encoded);
+    const withHash = decodeSessionFromHash(`#${encoded}`);
     const withoutHash = decodeSessionFromHash(encoded);
     expect(withHash).not.toBeNull();
     expect(withoutHash).not.toBeNull();
-    expect(withHash!.cluster.totalVcpus).toBe(withoutHash!.cluster.totalVcpus);
+    expect(withHash?.cluster.totalVcpus).toBe(withoutHash?.cluster.totalVcpus);
   });
 
   it('decodeSessionFromHash returns null for empty string', () => {
@@ -256,7 +259,7 @@ describe('encodeSessionToHash / decodeSessionFromHash', () => {
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
-    expect(decodeSessionFromHash('#' + invalidJson)).toBeNull();
+    expect(decodeSessionFromHash(`#${invalidJson}`)).toBeNull();
   });
 });
 
@@ -264,28 +267,42 @@ describe('migrateLegacySession (via deserializeSession)', () => {
   it('migrates legacy headroomPercent → safetyPercent and old modes', () => {
     const legacy = JSON.stringify({
       cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
-      scenarios: [{
-        id: crypto.randomUUID(), name: 'Old', socketsPerServer: 2, coresPerSocket: 16,
-        ramPerServerGb: 512, diskPerServerGb: 10000, ramPerVmGb: 4, diskPerVmGb: 50,
-        growthPercent: 0, safetyPercent: 30, targetCpuUtilizationPercent: 80, cpuGrowthPercent: 15,
-      }],
-      sizingMode: 'specint', layoutMode: 'hci',
+      scenarios: [
+        {
+          id: crypto.randomUUID(),
+          name: 'Old',
+          socketsPerServer: 2,
+          coresPerSocket: 16,
+          ramPerServerGb: 512,
+          diskPerServerGb: 10000,
+          ramPerVmGb: 4,
+          diskPerVmGb: 50,
+          growthPercent: 0,
+          safetyPercent: 30,
+          targetCpuUtilizationPercent: 80,
+          cpuGrowthPercent: 15,
+        },
+      ],
+      sizingMode: 'specint',
+      layoutMode: 'hci',
     });
     const out = deserializeSession(legacy);
     expect(out).not.toBeNull();
-    const sc0 = out!.scenarios[0];
+    const sc0 = out?.scenarios[0];
     expect(sc0).toBeDefined();
-    expect(sc0!.safetyPercent).toBe(30);
-    expect(sc0!.growthPercent).toBe(0); // dropped per-resource growth → default
+    expect(sc0?.safetyPercent).toBe(30);
+    expect(sc0?.growthPercent).toBe(0); // dropped per-resource growth → default
     expect('headroomPercent' in sc0!).toBe(false);
-    expect(out!.sizingMode).toBe('performance'); // specint → performance
+    expect(out?.sizingMode).toBe('performance'); // specint → performance
   });
 
   it('maps aggressive → vcpu', () => {
     const legacy = JSON.stringify({
       cluster: { totalVcpus: 10, totalPcores: 4, totalVms: 5 },
-      scenarios: [], sizingMode: 'aggressive', layoutMode: 'hci',
+      scenarios: [],
+      sizingMode: 'aggressive',
+      layoutMode: 'hci',
     });
-    expect(deserializeSession(legacy)!.sizingMode).toBe('vcpu');
+    expect(deserializeSession(legacy)?.sizingMode).toBe('vcpu');
   });
 });

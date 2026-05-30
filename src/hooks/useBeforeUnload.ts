@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
 /**
  * Registers a beforeunload event listener when enabled is true.
@@ -10,12 +10,12 @@ import { useEffect } from 'react'
  */
 export function useBeforeUnload(enabled: boolean): void {
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled) return;
     const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault()
-      e.returnValue = ''
-    }
-    window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
-  }, [enabled])
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [enabled]);
 }

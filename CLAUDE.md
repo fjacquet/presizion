@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Import**: xlsx@0.18.5 (locked MIT — do not upgrade) + jszip
 - **Deployment**: GitHub Pages at `/presizion/` — pure static files, no backend
 - **Testing**: Vitest + React Testing Library (757 tests)
+- **Lint/format**: Biome (`biome.json`) — replaces ESLint. a11y rules are `warn` (pending the sub-project B UI rework). NOTE: run lint as `npx biome check .` — `rtk lint` mis-parses Biome output (its filter expects ESLint JSON).
 - **Export**: jsPDF + jspdf-autotable + pptxgenjs (all lazy-loaded)
 
 ## Project Structure
@@ -43,7 +44,9 @@ src/
 npm run dev         # Start dev server
 npm run build       # Production build (tsc -b && vite build)
 npm run test        # Run Vitest tests
-npm run lint        # ESLint check
+npm run lint        # Biome check (lint + format)
+npm run lint:fix    # Biome auto-fix
+npm run format      # Biome format --write
 ```
 
 ## Architecture: Core Data Flow

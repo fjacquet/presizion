@@ -1,4 +1,4 @@
-import type { VsanFttPolicy, VsanCompressionFactor } from '../lib/sizing/vsanConstants';
+import type { VsanCompressionFactor, VsanFttPolicy } from '../lib/sizing/vsanConstants';
 
 /**
  * Represents the existing cluster being replaced.
@@ -12,14 +12,14 @@ export interface OldCluster {
   readonly socketsPerServer?: number;
   readonly coresPerSocket?: number;
   readonly ramPerServerGb?: number;
-  readonly existingServerCount?: number;   // number of existing servers (SPECint mode)
-  readonly specintPerServer?: number;       // SPECint benchmark score per existing server (SPECint mode)
-  readonly cpuUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
-  readonly ramUtilizationPercent?: number;  // 0–100; absent means 100% (no right-sizing)
-  readonly avgRamPerVmGb?: number;          // average RAM per VM (GB) — seeds Step 2 scenario defaults
-  readonly cpuFrequencyGhz?: number;        // avg CPU clock frequency in GHz — required for GHz sizing mode
-  readonly cpuModel?: string;               // display-only CPU model string extracted from import (e.g. "Xeon Gold 6526Y")
-  readonly isStretchCluster?: boolean;      // stretched topology — each site must carry the full workload on failure
+  readonly existingServerCount?: number; // number of existing servers (SPECint mode)
+  readonly specintPerServer?: number; // SPECint benchmark score per existing server (SPECint mode)
+  readonly cpuUtilizationPercent?: number; // 0–100; absent means 100% (no right-sizing)
+  readonly ramUtilizationPercent?: number; // 0–100; absent means 100% (no right-sizing)
+  readonly avgRamPerVmGb?: number; // average RAM per VM (GB) — seeds Step 2 scenario defaults
+  readonly cpuFrequencyGhz?: number; // avg CPU clock frequency in GHz — required for GHz sizing mode
+  readonly cpuModel?: string; // display-only CPU model string extracted from import (e.g. "Xeon Gold 6526Y")
+  readonly isStretchCluster?: boolean; // stretched topology — each site must carry the full workload on failure
 }
 
 /**
@@ -42,15 +42,15 @@ export interface Scenario {
   readonly safetyPercent: number;
   /** 0 = no HA reserve, 1 = N+1 (one extra server), 2 = N+2 (two extra servers) */
   readonly haReserveCount: 0 | 1 | 2;
-  readonly targetSpecint?: number;           // SPECint benchmark score for target server (SPECint mode)
-  readonly minServerCount?: number;          // pin floor: finalCount is never less than this value
-  readonly targetCpuFrequencyGhz?: number;   // target server CPU clock frequency in GHz (GHz mode)
+  readonly targetSpecint?: number; // SPECint benchmark score for target server (SPECint mode)
+  readonly minServerCount?: number; // pin floor: finalCount is never less than this value
+  readonly targetCpuFrequencyGhz?: number; // target server CPU clock frequency in GHz (GHz mode)
 
   // --- vSAN settings (Phase 18; all optional — absent = legacy sizing path, VSAN-12) ---
-  readonly vsanFttPolicy?: VsanFttPolicy;              // VSAN-01 — triggers vSAN storage path when present
+  readonly vsanFttPolicy?: VsanFttPolicy; // VSAN-01 — triggers vSAN storage path when present
   readonly vsanCompressionFactor?: VsanCompressionFactor; // VSAN-08 — default 1.0 (no compression)
-  readonly vsanSlackPercent?: number;                  // VSAN-05 — default 25%
-  readonly vsanCpuOverheadPercent?: number;            // VSAN-06 — default 10%
-  readonly vsanMemoryPerHostGb?: number;               // VSAN-07 — default 6 GB
-  readonly vsanVmSwapEnabled?: boolean;                // VSAN-04 — default false (sparse swap)
+  readonly vsanSlackPercent?: number; // VSAN-05 — default 25%
+  readonly vsanCpuOverheadPercent?: number; // VSAN-06 — default 10%
+  readonly vsanMemoryPerHostGb?: number; // VSAN-07 — default 6 GB
+  readonly vsanVmSwapEnabled?: boolean; // VSAN-04 — default false (sparse swap)
 }

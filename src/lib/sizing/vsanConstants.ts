@@ -43,8 +43,8 @@ export const FTT_POLICY_MAP: Readonly<Record<VsanFttPolicy, FttPolicySpec>> = {
   'mirror-1': { multiplier: 2.0, minNodes: 3, label: 'RAID-1 (FTT=1, Mirror)' },
   'mirror-2': { multiplier: 3.0, minNodes: 5, label: 'RAID-1 (FTT=2, Mirror)' },
   'mirror-3': { multiplier: 4.0, minNodes: 7, label: 'RAID-1 (FTT=3, Mirror)' },
-  'raid5':    { multiplier: 1 + 1 / 3, minNodes: 4, label: 'RAID-5 (FTT=1, Erasure Coding)' },
-  'raid6':    { multiplier: 1.5, minNodes: 6, label: 'RAID-6 (FTT=2, Erasure Coding)' },
+  raid5: { multiplier: 1 + 1 / 3, minNodes: 4, label: 'RAID-5 (FTT=1, Erasure Coding)' },
+  raid6: { multiplier: 1.5, minNodes: 6, label: 'RAID-6 (FTT=2, Erasure Coding)' },
 } as const;
 
 // =====================================================================

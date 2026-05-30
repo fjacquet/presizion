@@ -1,12 +1,12 @@
-import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
-import { cn } from '@/lib/utils'
+import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
+import { cn } from '@/lib/utils';
 
 interface CheckboxProps {
-  id?: string
-  checked?: boolean
-  onCheckedChange?: (checked: boolean) => void
-  className?: string
-  disabled?: boolean
+  id?: string;
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  className?: string;
+  disabled?: boolean;
 }
 
 function Checkbox({ id, checked, onCheckedChange, className, disabled }: CheckboxProps) {
@@ -22,7 +22,7 @@ function Checkbox({ id, checked, onCheckedChange, className, disabled }: Checkbo
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'data-checked:bg-primary data-checked:border-primary data-checked:text-primary-foreground',
-        className
+        className,
       )}
     >
       <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
@@ -40,7 +40,7 @@ function Checkbox({ id, checked, onCheckedChange, className, disabled }: Checkbo
         </svg>
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
-  )
+  );
 }
 
-export { Checkbox }
+export { Checkbox };

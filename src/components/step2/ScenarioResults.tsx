@@ -1,10 +1,15 @@
-import { useScenariosResults } from '@/hooks/useScenariosResults'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { useWizardStore } from '@/store/useWizardStore'
-import { Badge } from '@/components/ui/badge'
-import { cpuFormulaString, ramFormulaString, diskFormulaString, specintFormulaString } from '@/lib/sizing/display'
-import type { LimitingResource } from '@/types/results'
+import { Badge } from '@/components/ui/badge';
+import { useScenariosResults } from '@/hooks/useScenariosResults';
+import {
+  cpuFormulaString,
+  diskFormulaString,
+  ramFormulaString,
+  specintFormulaString,
+} from '@/lib/sizing/display';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { useWizardStore } from '@/store/useWizardStore';
+import type { LimitingResource } from '@/types/results';
 
 const RESOURCE_LABELS: Record<LimitingResource, string> = {
   cpu: 'CPU-limited',
@@ -12,31 +17,31 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   disk: 'Disk-limited',
   specint: 'SPECrate-limited',
   ghz: 'GHz-limited',
-}
+};
 
 interface ScenarioResultsProps {
-  scenarioId: string
+  scenarioId: string;
 }
 
 export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
-  const results = useScenariosResults()
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const currentCluster = useClusterStore((s) => s.currentCluster)
-  const sizingMode = useWizardStore((s) => s.sizingMode)
+  const results = useScenariosResults();
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const currentCluster = useClusterStore((s) => s.currentCluster);
+  const sizingMode = useWizardStore((s) => s.sizingMode);
 
-  const idx = scenarios.findIndex((s) => s.id === scenarioId)
-  const result = idx >= 0 ? results[idx] : undefined
-  const scenario = idx >= 0 ? scenarios[idx] : undefined
+  const idx = scenarios.findIndex((s) => s.id === scenarioId);
+  const result = idx >= 0 ? results[idx] : undefined;
+  const scenario = idx >= 0 ? scenarios[idx] : undefined;
 
   if (!result || !scenario) {
     return (
       <div className="text-sm text-muted-foreground py-2">
         Enter cluster data in Step 1 to see results.
       </div>
-    )
+    );
   }
 
-  const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket
+  const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
   const cpuFormula = cpuFormulaString({
     totalVcpus: currentCluster.totalVcpus,
@@ -47,9 +52,9 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     ...(currentCluster.cpuUtilizationPercent !== undefined && {
       cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
     }),
-  })
+  });
 
-  const effectiveVmCount = currentCluster.totalVms
+  const effectiveVmCount = currentCluster.totalVms;
 
   const ramFormula = ramFormulaString({
     totalVms: effectiveVmCount,
@@ -60,7 +65,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     ...(currentCluster.ramUtilizationPercent !== undefined && {
       ramUtilizationPercent: currentCluster.ramUtilizationPercent,
     }),
-  })
+  });
 
   const diskFormula = diskFormulaString({
     totalVms: effectiveVmCount,
@@ -68,7 +73,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     safetyPercent: scenario.safetyPercent,
     growthPercent: scenario.growthPercent,
     diskPerServerGb: scenario.diskPerServerGb,
-  })
+  });
 
   return (
     <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-2">
@@ -85,9 +90,9 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
           <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
           <div className="text-xs text-muted-foreground font-mono mt-0.5">
             {sizingMode === 'performance' &&
-             currentCluster.existingServerCount != null &&
-             currentCluster.specintPerServer != null &&
-             scenario.targetSpecint != null
+            currentCluster.existingServerCount != null &&
+            currentCluster.specintPerServer != null &&
+            scenario.targetSpecint != null
               ? specintFormulaString({
                   existingServers: currentCluster.existingServerCount,
                   specintPerServer: currentCluster.specintPerServer,
@@ -109,5 +114,5 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

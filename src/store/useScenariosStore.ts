@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { OldCluster, Scenario } from '../types/cluster';
 import { createDefaultScenario } from '../lib/sizing/defaults';
+import type { OldCluster, Scenario } from '../types/cluster';
 
 /**
  * Scenarios state slice.
@@ -52,32 +52,30 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
 
   updateScenario: (id, partial) =>
     set((state) => ({
-      scenarios: state.scenarios.map((s) =>
-        s.id === id ? { ...s, ...partial } : s,
-      ),
+      scenarios: state.scenarios.map((s) => (s.id === id ? { ...s, ...partial } : s)),
     })),
 
   setScenarios: (scenarios) => set({ scenarios }),
 
   seedFromCluster: (cluster) =>
     set((state) => {
-      const ramPerVmGb = cluster.avgRamPerVmGb
+      const ramPerVmGb = cluster.avgRamPerVmGb;
       const diskPerVmGb =
         cluster.totalDiskGb && cluster.totalVms
           ? Math.round((cluster.totalDiskGb / cluster.totalVms) * 10) / 10
-          : undefined
+          : undefined;
       // Seed target server hardware config from existing cluster when available
-      const socketsPerServer = cluster.socketsPerServer ?? undefined
-      const coresPerSocket = cluster.coresPerSocket ?? undefined
-      const ramPerServerGb = cluster.ramPerServerGb ?? undefined
+      const socketsPerServer = cluster.socketsPerServer ?? undefined;
+      const coresPerSocket = cluster.coresPerSocket ?? undefined;
+      const ramPerServerGb = cluster.ramPerServerGb ?? undefined;
 
       const hasUpdates =
         ramPerVmGb != null ||
         diskPerVmGb != null ||
         socketsPerServer != null ||
         coresPerSocket != null ||
-        ramPerServerGb != null
-      if (!hasUpdates) return state
+        ramPerServerGb != null;
+      if (!hasUpdates) return state;
 
       return {
         scenarios: state.scenarios.map((s) => ({
@@ -91,6 +89,6 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
           growthPercent: s.growthPercent ?? 0,
           safetyPercent: s.safetyPercent ?? 20,
         })),
-      }
+      };
     }),
 }));
