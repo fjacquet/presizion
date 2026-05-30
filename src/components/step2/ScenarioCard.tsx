@@ -111,6 +111,14 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     defaultValues: scenario as ScenarioInput,
   })
 
+  // Fix I-1: reset stale SPEC state when leaving performance mode
+  useEffect(() => {
+    if (sizingMode !== 'performance') {
+      setSpecEnabled(false)
+      form.resetField('targetSpecint')
+    }
+  }, [sizingMode, form])
+
   const handleSpecSelect = useCallback((result: SpecResult) => {
     setSelectedTargetScore(result.baseResult)
     form.setValue('targetSpecint', result.baseResult, { shouldValidate: true })
@@ -503,51 +511,51 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
 
               {advancedOpen && (
                 <div id={`${scenarioId}-advanced`} className="space-y-4">
-              {/* Minimum server floor (pin) */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id={`${scenarioId}-pin-enabled`}
-                    checked={pinEnabled}
-                    onCheckedChange={(checked) => {
-                      setPinEnabled(checked)
-                      if (!checked) form.setValue('minServerCount', undefined)
-                    }}
-                  />
-                  <Label htmlFor={`${scenarioId}-pin-enabled`} className="flex items-center gap-1 cursor-pointer text-sm">
-                    Pin minimum servers
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="max-w-xs text-sm">{TOOLTIPS.minServerCount}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </Label>
-                </div>
-                {pinEnabled && (
-                  <FormField control={form.control} name="minServerCount" render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          step={1}
-                          placeholder="Minimum server count"
-                          data-testid={`input-minServerCount-${scenarioId}`}
-                          {...field}
-                          value={field.value ?? ''}
-                          onChange={(e) => field.onChange(e.target.value)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                )}
-              </div>
+                  {/* Minimum server floor (pin) */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`${scenarioId}-pin-enabled`}
+                        checked={pinEnabled}
+                        onCheckedChange={(checked) => {
+                          setPinEnabled(checked)
+                          if (!checked) form.setValue('minServerCount', undefined)
+                        }}
+                      />
+                      <Label htmlFor={`${scenarioId}-pin-enabled`} className="flex items-center gap-1 cursor-pointer text-sm">
+                        Pin minimum servers
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="max-w-xs text-sm">{TOOLTIPS.minServerCount}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </Label>
+                    </div>
+                    {pinEnabled && (
+                      <FormField control={form.control} name="minServerCount" render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={1}
+                              step={1}
+                              placeholder="Minimum server count"
+                              data-testid={`input-minServerCount-${scenarioId}`}
+                              {...field}
+                              value={field.value ?? ''}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    )}
+                  </div>
 
                   <VsanSection
                     form={form}

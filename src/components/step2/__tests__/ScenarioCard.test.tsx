@@ -270,6 +270,47 @@ describe('Step2Scenarios / ScenarioCard', () => {
       render(<ScenarioCard scenarioId={scenario.id} />)
       expect(screen.getByTestId(`input-targetCpuFrequencyGhz-${scenario.id}`)).toBeInTheDocument()
     })
+
+    it('unchecking SPEC scores clears targetSpecint from the store', async () => {
+      act(() => {
+        useWizardStore.setState({ sizingMode: 'performance' })
+      })
+      const scenario = useScenariosStore.getState().scenarios[0]!
+      render(<ScenarioCard scenarioId={scenario.id} />)
+
+      const specCheckbox = screen.getByRole('checkbox', { name: /i have spec scores/i })
+
+      // Check: enable SPEC scores
+      act(() => {
+        fireEvent.click(specCheckbox)
+      })
+
+      // Type a value into targetSpecint
+      await waitFor(() => {
+        expect(screen.getByTestId(`input-targetSpecint-${scenario.id}`)).toBeInTheDocument()
+      })
+
+      act(() => {
+        fireEvent.change(screen.getByTestId(`input-targetSpecint-${scenario.id}`), {
+          target: { value: '250' },
+        })
+      })
+
+      await waitFor(() => {
+        const updated = useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)
+        expect(updated?.targetSpecint).toBe(250)
+      })
+
+      // Uncheck: disable SPEC scores
+      act(() => {
+        fireEvent.click(specCheckbox)
+      })
+
+      await waitFor(() => {
+        const updated = useScenariosStore.getState().scenarios.find((s) => s.id === scenario.id)
+        expect(updated?.targetSpecint).toBeUndefined()
+      })
+    })
   })
 })
 
