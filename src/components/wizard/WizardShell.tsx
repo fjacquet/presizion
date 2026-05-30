@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RotateCcw, Database } from 'lucide-react'
 import { STORE_PREDICT_URL } from '@/lib/config'
 import { useWizardStore } from '@/store/useWizardStore'
 import { useClusterStore } from '@/store/useClusterStore'
+import { isClusterSizingReady } from '@/lib/sizing/clusterReadiness'
 import { useScenariosStore } from '@/store/useScenariosStore'
 import { useImportStore } from '@/store/useImportStore'
 import { createDefaultScenario } from '@/lib/sizing/defaults'
@@ -29,10 +30,19 @@ export function WizardShell() {
   const goToStep = useWizardStore((s) => s.goToStep)
   const setSizingMode = useWizardStore((s) => s.setSizingMode)
   const setLayoutMode = useWizardStore((s) => s.setLayoutMode)
+  const currentCluster = useClusterStore((s) => s.currentCluster)
 
   const [resetOpen, setResetOpen] = useState(false)
 
   useBeforeUnload(currentStep > 1)
+
+  // Sizing must never run without observed utilization (assuming 100% over-sizes
+  // the cluster). If we are somehow past Step 1 without it, fall back to Step 1.
+  useEffect(() => {
+    if (currentStep > 1 && !isClusterSizingReady(currentCluster)) {
+      goToStep(1)
+    }
+  }, [currentStep, currentCluster, goToStep])
 
   function handleConfirmReset() {
     useClusterStore.getState().resetCluster()

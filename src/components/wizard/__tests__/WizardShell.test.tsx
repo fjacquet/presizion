@@ -44,6 +44,15 @@ import { WizardShell } from '../WizardShell'
 import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 
 beforeEach(() => {
+  // Seed a sizing-ready cluster (utilization present) so step 2/3 routing tests
+  // are not redirected by the readiness guard. Tests that need an unready cluster
+  // override this explicitly.
+  useClusterStore.setState({
+    currentCluster: {
+      totalVcpus: 100, totalPcores: 40, totalVms: 50,
+      cpuUtilizationPercent: 60, ramUtilizationPercent: 60,
+    },
+  })
   useWizardStore.setState({ currentStep: 1 })
   vi.mocked(useBeforeUnload).mockClear()
 })
@@ -94,6 +103,17 @@ describe('WizardShell', () => {
   })
 
   describe('UX-02: navigation guard', () => {
+    it('redirects to Step 1 when on a later step without utilization (sizing not ready)', () => {
+      // Defense-in-depth: sizing must never run without observed utilization.
+      useClusterStore.setState({
+        currentCluster: { totalVcpus: 100, totalPcores: 40, totalVms: 50 }, // no utilization
+      })
+      useWizardStore.setState({ currentStep: 2 })
+      render(<WizardShell />)
+      expect(useWizardStore.getState().currentStep).toBe(1)
+      expect(screen.getByTestId('step1-current-cluster')).toBeInTheDocument()
+    })
+
     it('Next button does not advance step when Step 1 required fields are empty', async () => {
       // WizardShell delegates the Next button to Step1CurrentCluster (CurrentClusterForm).
       // This test verifies WizardShell stays on Step 1 when the step component's
