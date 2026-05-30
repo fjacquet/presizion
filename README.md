@@ -1,7 +1,7 @@
 # Presizion -- Cluster Refresh Sizing Tool
 
 ![Deploy](https://github.com/fjacquet/presizion/actions/workflows/deploy.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-760%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-757%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
