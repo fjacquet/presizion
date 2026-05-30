@@ -35,7 +35,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
 
   if (!result || !scenario) {
     return (
-      <div className="text-sm text-muted-foreground py-2">
+      <div className="text-sm text-slate-500 dark:text-slate-400 py-2">
         Enter cluster data in Step 1 to see results.
       </div>
     );
@@ -76,19 +76,19 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
   });
 
   return (
-    <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-2">
+    <div className="mt-4 p-4 bg-slate-100/50 dark:bg-surface-700/50 rounded-lg space-y-2">
       <div className="flex items-center gap-2">
         <span className="text-2xl font-bold tabular-nums">{result.finalCount}</span>
-        <span className="text-sm text-muted-foreground">servers required</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400">servers required</span>
         <Badge variant="secondary">{RESOURCE_LABELS[result.limitingResource]}</Badge>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
         <div>
-          <span className="text-muted-foreground">
+          <span className="text-slate-500 dark:text-slate-400">
             {result.limitingResource === 'specint' ? 'SPECrate-limited: ' : 'CPU-limited: '}
           </span>
           <span className="font-medium tabular-nums">{result.cpuLimitedCount}</span>
-          <div className="text-xs text-muted-foreground font-mono mt-0.5">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
             {sizingMode === 'performance' &&
             currentCluster.existingServerCount != null &&
             currentCluster.specintPerServer != null &&
@@ -103,14 +103,14 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
           </div>
         </div>
         <div>
-          <span className="text-muted-foreground">RAM-limited: </span>
+          <span className="text-slate-500 dark:text-slate-400">RAM-limited: </span>
           <span className="font-medium tabular-nums">{result.ramLimitedCount}</span>
-          <div className="text-xs text-muted-foreground font-mono mt-0.5">{ramFormula}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{ramFormula}</div>
         </div>
         <div>
-          <span className="text-muted-foreground">Disk-limited: </span>
+          <span className="text-slate-500 dark:text-slate-400">Disk-limited: </span>
           <span className="font-medium tabular-nums">{result.diskLimitedCount}</span>
-          <div className="text-xs text-muted-foreground font-mono mt-0.5">{diskFormula}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{diskFormula}</div>
         </div>
       </div>
     </div>

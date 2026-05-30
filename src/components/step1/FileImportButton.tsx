@@ -54,7 +54,7 @@ export function FileImportButton() {
           {loading ? 'Importing…' : 'Import from file'}
         </Button>
         {error && (
-          <p className="text-xs text-destructive" role="alert">
+          <p className="text-xs text-util-high" role="alert">
             {error}
           </p>
         )}

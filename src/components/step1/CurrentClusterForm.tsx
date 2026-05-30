@@ -81,7 +81,7 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
               <Tooltip>
                 <TooltipTrigger>
                   <Info
-                    className="h-3.5 w-3.5 text-muted-foreground cursor-help"
+                    className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
                     aria-label={`Info: ${label}`}
                   />
                 </TooltipTrigger>
@@ -262,7 +262,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
     <Form {...form}>
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <section>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
             Cluster Totals
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -297,12 +297,12 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
             Existing Server Config (optional)
           </h3>
           {currentCluster.cpuModel && (
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm text-muted-foreground">Detected CPU:</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">Detected CPU:</span>
               <Badge variant="secondary">{currentCluster.cpuModel}</Badge>
             </div>
           )}
@@ -310,7 +310,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
             <button
               type="button"
               onClick={handleSpecLookup}
-              className="inline-flex items-center gap-1 text-sm text-primary underline-offset-3 hover:underline mb-3"
+              className="inline-flex items-center gap-1 text-sm text-primary-600 dark:text-primary-300 underline-offset-3 hover:underline mb-3"
             >
               Look up SPECrate <ExternalLink className="h-3 w-3" />
             </button>
@@ -376,7 +376,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
                     <Tooltip>
                       <TooltipTrigger>
                         <Info
-                          className="h-3.5 w-3.5 text-muted-foreground cursor-help"
+                          className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
                           aria-label="Info: Stretch cluster"
                         />
                       </TooltipTrigger>
@@ -392,7 +392,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         </section>
 
         <section>
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
             Current Utilization (required)
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -409,7 +409,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               testId="input-ramUtilizationPercent"
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Most environments run well below 100%.{' '}
             {currentCluster.isStretchCluster
               ? 'Stretch clusters often run <50% per site.'
@@ -419,7 +419,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
         {sizingMode === 'performance' && (
           <section>
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
               Performance Mode (optional)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

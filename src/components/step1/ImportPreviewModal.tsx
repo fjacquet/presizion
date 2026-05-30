@@ -204,13 +204,13 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               />
             </div>
             {previewCluster.stretchSignals && previewCluster.stretchSignals.length > 0 && (
-              <ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
+              <ul className="text-xs text-slate-500 dark:text-slate-400 list-disc list-inside space-y-0.5">
                 {previewCluster.stretchSignals.map((s) => (
                   <li key={s}>{s}</li>
                 ))}
               </ul>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Sizing will double the server count for site symmetry.
             </p>
           </div>
@@ -256,8 +256,10 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             <p>
               <span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB
             </p>
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
+            <p className="text-slate-500 dark:text-slate-400">
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                Avg RAM/VM (informational):
+              </span>{' '}
               {previewCluster.avgRamPerVmGb} GB
             </p>
             {result.totalPcores != null && (
@@ -309,7 +311,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       )}
 
       {!isJson && !pcoresKnown && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           <strong>Note:</strong> Total pCores could not be read from this file and must be entered
           manually before advancing to Step 2.
         </p>
@@ -370,9 +372,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
     >
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 bg-black/40 z-40" />
-        <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
+        <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
           <Dialog.Title className="text-lg font-semibold">Import Preview</Dialog.Title>
-          <Dialog.Description className="text-sm text-muted-foreground">
+          <Dialog.Description className="text-sm text-slate-500 dark:text-slate-400">
             Review the extracted data before populating the form.
           </Dialog.Description>
 

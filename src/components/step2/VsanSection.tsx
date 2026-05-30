@@ -23,7 +23,7 @@ interface VsanSectionProps {
 }
 
 const selectClasses =
-  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
+  'flex h-9 w-full rounded-md border border-slate-300 dark:border-surface-700 bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500/50';
 
 /**
  * vSAN settings sub-section. HCI-only (VSAN-12 / FORM-04): when layoutMode is
@@ -35,7 +35,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-medium text-muted-foreground">vSAN Settings</p>
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">vSAN Settings</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* FTT Policy dropdown */}
         <Controller

@@ -60,7 +60,7 @@ function FieldLabel({ name, children }: { name: keyof ScenarioInput; children: R
           <Tooltip>
             <TooltipTrigger>
               <Info
-                className="h-3.5 w-3.5 text-muted-foreground cursor-help"
+                className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
                 aria-label={`Info: ${String(children)}`}
               />
             </TooltipTrigger>
@@ -257,7 +257,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
 
           <CardContent className="space-y-6">
             {currentCluster.totalVms > 0 && (
-              <p className="text-xs text-muted-foreground border-l-2 border-primary/40 pl-2">
+              <p className="text-xs text-slate-500 dark:text-slate-400 border-l-2 border-primary-600/40 dark:border-primary-500/40 pl-2">
                 Seeded from your import: {scenario.targetVcpuToPCoreRatio}:1 ratio,{' '}
                 {scenario.growthPercent}% growth, {scenario.safetyPercent}% safety — adjust as
                 needed.
@@ -266,7 +266,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
 
             {/* Server Configuration */}
             <section>
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
                 Target Server Config
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -336,7 +336,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 )}
               </div>
               {totalCores !== null && (
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                   Total cores/server:{' '}
                   <span className="font-semibold tabular-nums">{totalCores}</span>
                 </p>
@@ -385,7 +385,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
 
             {/* Sizing Assumptions */}
             <section>
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
                 Sizing Assumptions
               </h4>
 
@@ -467,7 +467,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>HA Reserve</FormLabel>
-                      <div className="flex gap-0.5 border rounded-md p-0.5 bg-muted/40 w-fit">
+                      <div className="flex gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40 w-fit">
                         {([0, 1, 2] as const).map((n) => (
                           <button
                             key={n}
@@ -477,8 +477,8 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                             className={[
                               'px-3 py-1 text-sm rounded-sm transition-colors',
                               field.value === n
-                                ? 'bg-primary text-primary-foreground font-semibold'
-                                : 'bg-transparent hover:bg-muted',
+                                ? 'bg-primary-600 text-white dark:bg-primary-500 font-semibold'
+                                : 'bg-transparent hover:bg-slate-100 dark:hover:bg-surface-700',
                             ].join(' ')}
                           >
                             {n === 0 ? 'N (None)' : `N+${n}`}
@@ -494,7 +494,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
             {/* Performance mode — GHz primary, SPEC optional */}
             {sizingMode === 'performance' && (
               <div className="border-t pt-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
                   Performance Target (required)
                 </p>
                 <div className="space-y-3">
@@ -586,7 +586,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                               }
                             />
                             {fieldState.error && (
-                              <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                              <p className="text-sm text-util-high">{fieldState.error.message}</p>
                             )}
                           </div>
                         )}
@@ -604,7 +604,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 onClick={() => setAdvancedOpen((o) => !o)}
                 aria-expanded={advancedOpen}
                 aria-controls={`${scenarioId}-advanced`}
-                className="flex w-full items-center gap-1 text-sm font-semibold text-muted-foreground uppercase tracking-wide"
+                className="flex w-full items-center gap-1 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
               >
                 Advanced
                 <span aria-hidden="true">{advancedOpen ? '▾' : '▸'}</span>
@@ -636,7 +636,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                                 e.stopPropagation();
                               }}
                             >
-                              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              <Info className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="max-w-xs text-sm">{TOOLTIPS.minServerCount}</p>

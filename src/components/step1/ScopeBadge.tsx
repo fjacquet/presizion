@@ -47,9 +47,10 @@ export function ScopeBadge() {
   };
 
   return (
-    <div className="flex items-center gap-2 min-w-0 text-sm text-muted-foreground">
+    <div className="flex items-center gap-2 min-w-0 text-sm text-slate-500 dark:text-slate-400">
       <span className="truncate max-w-[200px] sm:max-w-none">
-        <span className="font-medium text-foreground">Scope:</span> {activeLabels}
+        <span className="font-medium text-slate-900 dark:text-slate-100">Scope:</span>{' '}
+        {activeLabels}
       </span>
       <Button
         variant="ghost"

@@ -11,11 +11,11 @@ interface MetricItemProps {
 function MetricItem({ label, value, unit }: MetricItemProps) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
       <span className="text-lg font-semibold tabular-nums">
         {value}
         {unit ? (
-          <span className="text-sm font-normal text-muted-foreground ml-1">{unit}</span>
+          <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{unit}</span>
         ) : null}
       </span>
     </div>
@@ -55,7 +55,7 @@ export function DerivedMetricsPanel() {
           <MetricItem label="Avg RAM/VM" value={avgRamPerVm} unit="GiB" />
           <MetricItem label="Avg Disk/VM" value={avgDiskPerVm} unit="GiB" />
         </div>
-        <p className="text-xs text-muted-foreground mt-3">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
           Updates live as you enter values. VMs/Server is based on first scenario defaults. Avg
           metrics from import data.
         </p>

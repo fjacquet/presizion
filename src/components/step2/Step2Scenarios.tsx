@@ -18,7 +18,7 @@ export function Step2Scenarios() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Step 2: Define Target Scenarios</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Configure one or more target server specs and sizing assumptions.
           </p>
         </div>

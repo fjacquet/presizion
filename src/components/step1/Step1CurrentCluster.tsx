@@ -15,7 +15,7 @@ export function Step1CurrentCluster() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Step 1: Enter Current Cluster</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Enter your existing cluster metrics. Required fields are marked.
           </p>
         </div>
