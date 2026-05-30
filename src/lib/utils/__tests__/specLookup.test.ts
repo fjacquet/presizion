@@ -95,7 +95,7 @@ describe('fetchSpecResults', () => {
 
     expect(result.status).toBe('ok');
     expect(result.results).toHaveLength(1);
-    expect(result.results[0]!.vendor).toBe('Dell Inc.');
+    expect(result.results[0]?.vendor).toBe('Dell Inc.');
   });
 
   it('returns no-results when network fails for both slug and facets', async () => {

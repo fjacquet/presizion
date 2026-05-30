@@ -87,7 +87,8 @@ describe('useVsanBreakdowns', () => {
     });
 
     const { result } = renderHook(() => useVsanBreakdowns());
-    const cpu = result.current[0]!.cpu;
+    const cpu = result.current[0]?.cpu;
+    if (!cpu) throw new Error('expected a cpu breakdown');
     // CAP-06 invariant: required + spare + excess === total
     expect(cpu.required + cpu.spare + cpu.excess).toBeCloseTo(cpu.total, 5);
   });

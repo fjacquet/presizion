@@ -56,7 +56,7 @@ import { parseRvtools } from './rvtoolsParser';
 export type AnyImportResult = ClusterImportResult | JsonImportResult;
 
 export async function importFile(file: File): Promise<AnyImportResult> {
-  const ext = '.' + (file.name.split('.').pop() ?? '').toLowerCase();
+  const ext = `.${(file.name.split('.').pop() ?? '').toLowerCase()}`;
 
   if (ext === '.json') {
     const buffer = await file.arrayBuffer();

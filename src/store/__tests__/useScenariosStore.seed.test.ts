@@ -81,10 +81,10 @@ describe('useScenariosStore.seedFromCluster', () => {
     });
     const s = useScenariosStore.getState().scenarios[0];
     expect(s).toBeDefined();
-    expect(s!.ramPerVmGb).toBe(6);
-    expect(s!.targetVcpuToPCoreRatio).toBe(4);
-    expect(s!.growthPercent).toBe(0);
-    expect(s!.safetyPercent).toBe(20);
+    expect(s?.ramPerVmGb).toBe(6);
+    expect(s?.targetVcpuToPCoreRatio).toBe(4);
+    expect(s?.growthPercent).toBe(0);
+    expect(s?.safetyPercent).toBe(20);
   });
 
   it('Test 4: addScenario with overrides seeds ramPerVmGb and diskPerVmGb from import data', () => {

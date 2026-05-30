@@ -302,6 +302,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       {'warnings' in result && result.warnings.length > 0 && (
         <div className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
           {result.warnings.map((w, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static warning list, never reordered
             <p key={i}>&#x26A0; {w}</p>
           ))}
         </div>

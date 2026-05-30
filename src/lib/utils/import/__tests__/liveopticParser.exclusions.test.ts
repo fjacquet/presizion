@@ -16,19 +16,19 @@ describe('parseLiveoptics — vmRowsByScope', () => {
     ].join('\n');
     const result = await parseLiveoptics(csvBuffer(csv), 'liveoptics-csv');
     expect(result.vmRowsByScope).toBeDefined();
-    const prod = result.vmRowsByScope!.get('dc1||prod-cl');
+    const prod = result.vmRowsByScope?.get('dc1||prod-cl');
     expect(prod).toBeDefined();
-    expect(prod!.map((r) => r.name)).toEqual(['web01', 'db01']);
-    expect(prod![0]).toMatchObject({
+    expect(prod?.map((r) => r.name)).toEqual(['web01', 'db01']);
+    expect(prod?.[0]).toMatchObject({
       name: 'web01',
       vcpus: 4,
       ramMib: 8192,
       diskMib: 102400,
       powerState: 'poweredOn',
     });
-    expect(prod![1]!.powerState).toBe('poweredOff');
-    const lab = result.vmRowsByScope!.get('dc1||lab-cl');
-    expect(lab!.map((r) => r.name)).toEqual(['lab01']);
+    expect(prod?.[1]?.powerState).toBe('poweredOff');
+    const lab = result.vmRowsByScope?.get('dc1||lab-cl');
+    expect(lab?.map((r) => r.name)).toEqual(['lab01']);
   });
 
   it('leaves powerState undefined when the column is missing', async () => {

@@ -8,7 +8,7 @@ export class ImportError extends Error {
 const ALLOWED_EXTENSIONS = new Set(['.xlsx', '.csv', '.zip']);
 
 export function validateFile(file: File): void {
-  const ext = '.' + (file.name.split('.').pop() ?? '').toLowerCase();
+  const ext = `.${(file.name.split('.').pop() ?? '').toLowerCase()}`;
   if (!ALLOWED_EXTENSIONS.has(ext)) {
     throw new ImportError(
       `Unsupported file type "${ext}". Please upload an .xlsx, .csv, or .zip file.`,

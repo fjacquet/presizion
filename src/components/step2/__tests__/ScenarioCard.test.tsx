@@ -229,7 +229,8 @@ describe('Step2Scenarios / ScenarioCard', () => {
       const scenarios = useScenariosStore.getState().scenarios;
       expect(scenarios.length).toBe(2);
 
-      const copyId = scenarios[1]!.id;
+      const copyId = scenarios[1]?.id;
+      if (!copyId) throw new Error('expected a duplicated scenario');
       act(() => {
         useScenariosStore.getState().updateScenario(copyId, { name: 'Modified Copy Name' });
       });

@@ -19,8 +19,8 @@ describe('compileNamePattern', () => {
   it('compiles a single literal glob', () => {
     const re = compileNamePattern('test-*');
     expect(re).not.toBeNull();
-    expect(re!.test('test-web01')).toBe(true);
-    expect(re!.test('prod-web01')).toBe(false);
+    expect(re?.test('test-web01')).toBe(true);
+    expect(re?.test('prod-web01')).toBe(false);
   });
 
   it('expands ? to a single-char wildcard', () => {
@@ -149,7 +149,7 @@ describe('applyExclusions', () => {
     const rules = { ...EMPTY_RULES, namePattern: 'test-*' };
     const { filteredByScope, stats } = applyExclusions(input, rules);
     expect(filteredByScope.get('s1')).toEqual([]);
-    expect(filteredByScope.get('s2')!.map((r) => r.name)).toEqual(['prod-a']);
+    expect(filteredByScope.get('s2')?.map((r) => r.name)).toEqual(['prod-a']);
     expect(stats.totalVms).toBe(3);
     expect(stats.excludedCount).toBe(2);
     expect(stats.excludedByRule.namePattern).toBe(2);
@@ -192,7 +192,7 @@ describe('applyExclusions', () => {
     const rules = { ...EMPTY_RULES, manuallyExcluded: ['dcA::dup'] };
     const { filteredByScope, stats } = applyExclusions(input, rules);
     expect(filteredByScope.get('dcA')).toEqual([]);
-    expect(filteredByScope.get('dcB')!.map((r) => r.name)).toEqual(['dup']);
+    expect(filteredByScope.get('dcB')?.map((r) => r.name)).toEqual(['dup']);
     expect(stats.excludedByRule.manual).toBe(1);
   });
 });

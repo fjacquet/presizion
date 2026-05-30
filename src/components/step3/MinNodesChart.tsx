@@ -113,6 +113,7 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
                         style={{ fontSize: 11, fontWeight: 600 }}
                       />
                       {constraintRows.map((row, idx) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order constraint bars
                         <Cell key={idx} fill={row.isBinding ? CHART_COLORS[0] : '#94a3b8'} />
                       ))}
                     </Bar>

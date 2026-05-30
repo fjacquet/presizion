@@ -39,6 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
               {this.state.error.message}
             </p>
             <button
+              type="button"
               onClick={() => window.location.reload()}
               style={{ padding: '.5rem 1rem', cursor: 'pointer' }}
             >

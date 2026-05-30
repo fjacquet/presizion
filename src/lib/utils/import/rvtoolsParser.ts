@@ -41,22 +41,22 @@ function computeVhostEsxFields(
 ): Partial<ScopeData> {
   if (hosts.length === 0) return {};
   const firstHost = hosts[0]!;
-  const sockets = num(firstHost, cols['cpu_sockets']);
-  const coresTotal = num(firstHost, cols['cpu_cores_total']);
+  const sockets = num(firstHost, cols.cpu_sockets);
+  const coresTotal = num(firstHost, cols.cpu_cores_total);
   const fields: Partial<ScopeData> = {
     existingServerCount: hosts.length,
-    totalPcores: hosts.reduce((s, h) => s + num(h, cols['cpu_cores_total']), 0),
+    totalPcores: hosts.reduce((s, h) => s + num(h, cols.cpu_cores_total), 0),
   };
   if (sockets) fields.socketsPerServer = sockets;
   const derivedCores = sockets > 0 ? Math.round(coresTotal / sockets) : 0;
   if (derivedCores) fields.coresPerSocket = derivedCores;
   // RVTools vHost Memory is in MB -> divide by 1024 to get GB
-  const memMb = num(firstHost, cols['memory_mb']);
+  const memMb = num(firstHost, cols.memory_mb);
   const ramGb = Math.round(memMb / 1024);
   if (ramGb) fields.ramPerServerGb = ramGb;
-  const model = str(firstHost, cols['cpu_model']);
+  const model = str(firstHost, cols.cpu_model);
   if (model) fields.cpuModel = model;
-  const speedMhz = num(firstHost, cols['cpu_speed_mhz']);
+  const speedMhz = num(firstHost, cols.cpu_speed_mhz);
   if (speedMhz > 0) fields.cpuFrequencyGhz = Math.round(speedMhz / 100) / 10;
   return fields;
 }
@@ -66,7 +66,7 @@ export async function parseRvtools(
 ): Promise<Omit<ClusterImportResult, 'sourceFormat'>> {
   const XLSX = await import('@e965/xlsx');
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-  const sheet = wb.Sheets['vInfo'];
+  const sheet = wb.Sheets.vInfo;
   if (!sheet) throw new Error('vInfo sheet not found');
 
   const rows = XLSX.utils.sheet_to_json<VInfoRow>(sheet, { defval: null });
@@ -99,20 +99,20 @@ export async function parseRvtools(
   const scopeMap = new Map<string, ScopeAccum>();
   const hostToCluster = new Map<string, string>();
   const vmRowsByScope = new Map<string, ScopedVmRow[]>();
-  const hasPowerStateCol = colMap['power_state'] !== undefined;
+  const hasPowerStateCol = colMap.power_state !== undefined;
 
   for (const row of rows) {
-    if (isTruthy(row, colMap['is_template'])) continue;
+    if (isTruthy(row, colMap.is_template)) continue;
     vmCount++;
-    const cpus = num(row, colMap['num_cpus']);
-    const mem = num(row, colMap['memory_mib']);
-    const disk = num(row, colMap['provisioned_mib']);
+    const cpus = num(row, colMap.num_cpus);
+    const mem = num(row, colMap.memory_mib);
+    const disk = num(row, colMap.provisioned_mib);
     totalVcpus += cpus;
     totalMemMib += mem;
     totalDiskMib += disk;
 
-    const cluster = str(row, colMapCluster['cluster_name']);
-    const dc = str(row, colMapDc['datacenter_name']);
+    const cluster = str(row, colMapCluster.cluster_name);
+    const dc = str(row, colMapDc.datacenter_name);
     const scopeKey =
       dc && cluster
         ? `${dc}||${cluster}`
@@ -123,13 +123,13 @@ export async function parseRvtools(
             : '__all__';
 
     // Build host-to-cluster mapping from vInfo rows
-    const hostName = str(row, colMapHost['host_name']);
+    const hostName = str(row, colMapHost.host_name);
     if (hostName && scopeKey !== '__all__') {
       hostToCluster.set(hostName, scopeKey);
     }
 
-    const vmName = str(row, colMap['vm_name']);
-    const powerStateRaw = hasPowerStateCol ? str(row, colMap['power_state']) : '';
+    const vmName = str(row, colMap.vm_name);
+    const powerStateRaw = hasPowerStateCol ? str(row, colMap.power_state) : '';
     const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined;
     const vmRow: ScopedVmRow = {
       name: vmName,
@@ -188,7 +188,7 @@ export async function parseRvtools(
   };
 
   // vHost sheet -- extract per-scope host config (sockets, cores, RAM, model, frequency)
-  const vHostSheet = wb.Sheets['vHost'];
+  const vHostSheet = wb.Sheets.vHost;
   if (vHostSheet) {
     const hostRows = XLSX.utils.sheet_to_json<VInfoRow>(vHostSheet, { defval: '' });
     const firstRow = hostRows[0];
@@ -198,25 +198,25 @@ export async function parseRvtools(
       const vHostDcCols = resolveColumns(Object.keys(firstRow), DATACENTER_ALIASES, new Set());
 
       // Global cpuModel and cpuFrequencyGhz for backward compat
-      const firstHost = hostRows.find((r) => str(r, cols['host_name']) !== '') ?? firstRow;
-      const model = str(firstHost, cols['cpu_model']);
+      const firstHost = hostRows.find((r) => str(r, cols.host_name) !== '') ?? firstRow;
+      const model = str(firstHost, cols.cpu_model);
       if (model) result.cpuModel = model;
-      const validSpeeds = hostRows.filter((r) => num(r, cols['cpu_speed_mhz']) > 0);
+      const validSpeeds = hostRows.filter((r) => num(r, cols.cpu_speed_mhz) > 0);
       if (validSpeeds.length > 0) {
         const avgMhz =
-          validSpeeds.reduce((s, r) => s + num(r, cols['cpu_speed_mhz']), 0) / validSpeeds.length;
+          validSpeeds.reduce((s, r) => s + num(r, cols.cpu_speed_mhz), 0) / validSpeeds.length;
         result.cpuFrequencyGhz = Math.round(avgMhz / 100) / 10;
       }
 
       // Group vHost rows by scope key for per-scope ESX fields
-      const validHosts = hostRows.filter((r) => str(r, cols['host_name']) !== '');
+      const validHosts = hostRows.filter((r) => str(r, cols.host_name) !== '');
       if (validHosts.length > 0) {
         const hostsByScopeKey = new Map<string, VInfoRow[]>();
-        const vHostClusterCol = vHostClusterCols['cluster_name'];
-        const vHostDcCol = vHostDcCols['datacenter_name'];
+        const vHostClusterCol = vHostClusterCols.cluster_name;
+        const vHostDcCol = vHostDcCols.datacenter_name;
 
         for (const host of validHosts) {
-          const hostName = str(host, cols['host_name']);
+          const hostName = str(host, cols.host_name);
           let scopeKey: string | undefined;
 
           // Priority 1: Datacenter+Cluster columns on vHost (must match the
@@ -241,8 +241,8 @@ export async function parseRvtools(
         }
 
         // Check if we have cpu_sockets or cpu_cores_total columns -- only then compute per-scope ESX
-        const hasSockets = cols['cpu_sockets'] !== undefined;
-        const hasCores = cols['cpu_cores_total'] !== undefined;
+        const hasSockets = cols.cpu_sockets !== undefined;
+        const hasCores = cols.cpu_cores_total !== undefined;
         if (hasSockets || hasCores) {
           // Global ESX fields on result for backward compat
           const globalEsx = computeVhostEsxFields(validHosts, cols);
@@ -262,7 +262,7 @@ export async function parseRvtools(
   }
 
   // vSAN sheet — explicit stretch signals (optional sheet)
-  const vSanSheet = wb.Sheets['vSAN'];
+  const vSanSheet = wb.Sheets.vSAN;
   const vsanByCluster = new Map<string, { stretched?: boolean; faultDomains: Set<string> }>();
   if (vSanSheet) {
     const vsanRows = XLSX.utils.sheet_to_json<VInfoRow>(vSanSheet, { defval: '' });
@@ -270,14 +270,14 @@ export async function parseRvtools(
     if (firstVsan) {
       const vsanCols = resolveColumns(Object.keys(firstVsan), RVTOOLS_VSAN_ALIASES, new Set());
       for (const row of vsanRows) {
-        const cluster = str(row, vsanCols['cluster_name']);
+        const cluster = str(row, vsanCols.cluster_name);
         if (!cluster) continue;
         const entry = vsanByCluster.get(cluster) ?? { faultDomains: new Set<string>() };
-        const stretchedRaw = vsanCols['stretched'] ? str(row, vsanCols['stretched']) : '';
+        const stretchedRaw = vsanCols.stretched ? str(row, vsanCols.stretched) : '';
         if (stretchedRaw && /^(true|yes|1|enabled)$/i.test(stretchedRaw.trim())) {
           entry.stretched = true;
         }
-        const fd = vsanCols['fault_domain'] ? str(row, vsanCols['fault_domain']) : '';
+        const fd = vsanCols.fault_domain ? str(row, vsanCols.fault_domain) : '';
         if (fd) entry.faultDomains.add(fd);
         vsanByCluster.set(cluster, entry);
       }

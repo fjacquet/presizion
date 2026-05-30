@@ -13,7 +13,9 @@ const localStorageMock = {
     delete localStorageStore[key];
   }),
   clear: vi.fn(() => {
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
   }),
   get length() {
     return Object.keys(localStorageStore).length;
@@ -40,7 +42,9 @@ import { useThemeStore } from '../useThemeStore';
 describe('useThemeStore', () => {
   beforeEach(() => {
     // Clear localStorage mock store
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
     // Reset all mock call records
     vi.clearAllMocks();
     // Remove dark class

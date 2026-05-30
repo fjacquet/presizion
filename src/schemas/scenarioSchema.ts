@@ -14,7 +14,7 @@ import {
 const numericPreprocess = (val: unknown) => {
   if (val === '' || val === null || val === undefined) return undefined;
   const n = Number(val);
-  return isNaN(n) ? undefined : n;
+  return Number.isNaN(n) ? undefined : n;
 };
 
 /**

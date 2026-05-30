@@ -12,7 +12,9 @@ const { localStorageStore, localStorageMock } = vi.hoisted(() => {
       delete store[key];
     },
     clear: () => {
-      Object.keys(store).forEach((k) => delete store[k]);
+      Object.keys(store).forEach((k) => {
+        delete store[k];
+      });
     },
     get length() {
       return Object.keys(store).length;
@@ -56,7 +58,9 @@ const rows: VmRow[] = [
 
 describe('VmExclusionPanel', () => {
   beforeEach(() => {
-    Object.keys(localStorageStore).forEach((k) => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
     vi.stubGlobal('localStorage', localStorageMock);
     useExclusionsStore.getState().reset();
   });

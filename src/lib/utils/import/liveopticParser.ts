@@ -49,21 +49,21 @@ function computeEsxFields(
 ): Partial<ScopeData> {
   if (hosts.length === 0) return {};
   const firstHost = hosts[0]!;
-  const sockets = num(firstHost, cols['cpu_sockets']);
-  const coresFirst = num(firstHost, cols['cpu_cores']);
+  const sockets = num(firstHost, cols.cpu_sockets);
+  const coresFirst = num(firstHost, cols.cpu_cores);
   const fields: Partial<ScopeData> = {
     existingServerCount: hosts.length,
-    totalPcores: hosts.reduce((s, h) => s + num(h, cols['cpu_cores']), 0),
+    totalPcores: hosts.reduce((s, h) => s + num(h, cols.cpu_cores), 0),
   };
   if (sockets) fields.socketsPerServer = sockets;
   const derivedCores = sockets > 0 ? Math.round(coresFirst / sockets) : 0;
   if (derivedCores) fields.coresPerSocket = derivedCores;
-  const ramGb = Math.round(num(firstHost, cols['memory_kib']) / 1024 / 1024);
+  const ramGb = Math.round(num(firstHost, cols.memory_kib) / 1024 / 1024);
   if (ramGb) fields.ramPerServerGb = ramGb;
-  const model = str(firstHost, cols['cpu_model']);
+  const model = str(firstHost, cols.cpu_model);
   if (model) fields.cpuModel = model;
-  const speedGhz = num(firstHost, cols['cpu_speed_ghz']);
-  const speedMhz = num(firstHost, cols['cpu_speed_mhz']);
+  const speedGhz = num(firstHost, cols.cpu_speed_ghz);
+  const speedMhz = num(firstHost, cols.cpu_speed_mhz);
   if (speedGhz > 0) fields.cpuFrequencyGhz = Math.round(speedGhz * 10) / 10;
   else if (speedMhz > 0) fields.cpuFrequencyGhz = Math.round(speedMhz / 100) / 10;
   return fields;
@@ -72,7 +72,7 @@ function computeEsxFields(
 async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
   const XLSX = await import('@e965/xlsx');
   const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-  const sheet = wb.Sheets['VMs'];
+  const sheet = wb.Sheets.VMs;
   if (!sheet) throw new ImportError('VMs sheet not found in LiveOptics xlsx.');
 
   const rows = XLSX.utils.sheet_to_json<VmRow>(sheet, { defval: null });
@@ -85,13 +85,13 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
     const firstRow = hostRows[0];
     if (firstRow) {
       const cols = resolveColumns(Object.keys(firstRow), LIVEOPTICS_ESX_HOSTS_ALIASES, new Set());
-      const hosts = hostRows.filter((r) => String(r[cols['host_name'] ?? ''] ?? '').trim() !== '');
+      const hosts = hostRows.filter((r) => String(r[cols.host_name ?? ''] ?? '').trim() !== '');
 
       if (hosts.length > 0) {
         // Global ESX fields on base for backward compat
         const globalEsx = computeEsxFields(hosts, cols);
         Object.assign(base, globalEsx);
-        const socketCounts = new Set(hosts.map((h) => num(h, cols['cpu_sockets'])));
+        const socketCounts = new Set(hosts.map((h) => num(h, cols.cpu_sockets)));
         if (socketCounts.size > 1)
           base.warnings.push(
             'Mixed CPU socket counts detected \u2014 using first host as representative.',
@@ -99,14 +99,14 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
 
         // Group hosts by scope key
         const hostsByScopeKey = new Map<string, VmRow[]>();
-        const clusterCol = cols['cluster_name'];
+        const clusterCol = cols.cluster_name;
         let usedFallback = false;
 
         // Build datacenter column resolver for ESX Hosts to match dc||cluster scope keys
         const esxDcCols = resolveColumns(Object.keys(firstRow), DATACENTER_ALIASES, new Set());
 
         for (const host of hosts) {
-          const hostName = str(host, cols['host_name']);
+          const hostName = str(host, cols.host_name);
           let scopeKey: string | undefined;
 
           // Priority 1: hostToCluster map from VMs (always has correct dc||cluster format)
@@ -118,7 +118,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
           if (!scopeKey && clusterCol) {
             const cluster = str(host, clusterCol);
             if (cluster) {
-              const dc = str(host, esxDcCols['datacenter_name']);
+              const dc = str(host, esxDcCols.datacenter_name);
               scopeKey = dc ? `${dc}||${cluster}` : cluster;
             }
           }
@@ -160,15 +160,15 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
     const firstRow = perfRows[0];
     if (firstRow) {
       const cols = resolveColumns(Object.keys(firstRow), LIVEOPTICS_ESX_PERF_ALIASES, new Set());
-      const valid = perfRows.filter((r) => String(r[cols['host_name'] ?? ''] ?? '').trim() !== '');
+      const valid = perfRows.filter((r) => String(r[cols.host_name ?? ''] ?? '').trim() !== '');
 
       if (valid.length > 0) {
         // Global averages for backward compat
         base.cpuUtilizationPercent = Math.round(
-          valid.reduce((s, r) => s + num(r, cols['avg_cpu_pct']), 0) / valid.length,
+          valid.reduce((s, r) => s + num(r, cols.avg_cpu_pct), 0) / valid.length,
         );
         base.ramUtilizationPercent = Math.round(
-          valid.reduce((s, r) => s + num(r, cols['avg_mem_pct']), 0) / valid.length,
+          valid.reduce((s, r) => s + num(r, cols.avg_mem_pct), 0) / valid.length,
         );
 
         // Group perf rows by scope key using hostToCluster or Cluster column from ESX Hosts
@@ -190,15 +190,15 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
                 DATACENTER_ALIASES,
                 new Set(),
               );
-              const clusterCol2 = hostCols['cluster_name'];
+              const clusterCol2 = hostCols.cluster_name;
               for (const hr of hostRows2) {
-                const hn = str(hr, hostCols['host_name']);
+                const hn = str(hr, hostCols.host_name);
                 if (!hn || hostScopeMap.has(hn)) continue;
                 // Only use ESX Hosts cluster as fallback when hostToCluster doesn't have this host
                 if (clusterCol2) {
                   const cl = str(hr, clusterCol2);
                   if (cl) {
-                    const dc = str(hr, perfDcCols['datacenter_name']);
+                    const dc = str(hr, perfDcCols.datacenter_name);
                     hostScopeMap.set(hn, dc ? `${dc}||${cl}` : cl);
                   }
                 }
@@ -210,7 +210,7 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
 
           const perfByScopeKey = new Map<string, VmRow[]>();
           for (const row of valid) {
-            const hostName = str(row, cols['host_name']);
+            const hostName = str(row, cols.host_name);
             const scopeKey = hostScopeMap.get(hostName) ?? '__all__';
             appendToMap(perfByScopeKey, scopeKey, row);
           }
@@ -219,11 +219,11 @@ async function parseXlsx(buffer: ArrayBuffer): Promise<AggregateResult> {
             const existing = base.rawByScope.get(scopeKey);
             if (existing && scopePerfRows.length > 0) {
               const avgCpu = Math.round(
-                scopePerfRows.reduce((s, r) => s + num(r, cols['avg_cpu_pct']), 0) /
+                scopePerfRows.reduce((s, r) => s + num(r, cols.avg_cpu_pct), 0) /
                   scopePerfRows.length,
               );
               const avgRam = Math.round(
-                scopePerfRows.reduce((s, r) => s + num(r, cols['avg_mem_pct']), 0) /
+                scopePerfRows.reduce((s, r) => s + num(r, cols.avg_mem_pct), 0) /
                   scopePerfRows.length,
               );
               base.rawByScope.set(scopeKey, {
@@ -291,20 +291,20 @@ function aggregate(rows: VmRow[]): AggregateOutput {
   const scopeMap = new Map<string, ScopeAccum>();
   const hostToCluster = new Map<string, string>();
   const vmRowsByScope = new Map<string, ScopedVmRow[]>();
-  const hasPowerStateCol = colMap['power_state'] !== undefined;
+  const hasPowerStateCol = colMap.power_state !== undefined;
 
   for (const row of rows) {
-    if (isTruthy(row, colMap['is_template'])) continue;
+    if (isTruthy(row, colMap.is_template)) continue;
     vmCount++;
-    const cpus = num(row, colMap['num_cpus']);
-    const mem = num(row, colMap['memory_mib']);
-    const disk = num(row, colMap['provisioned_mib']);
+    const cpus = num(row, colMap.num_cpus);
+    const mem = num(row, colMap.memory_mib);
+    const disk = num(row, colMap.provisioned_mib);
     totalVcpus += cpus;
     totalMemMib += mem;
     totalDiskMib += disk;
 
-    const cluster = str(row, colMapCluster['cluster_name']);
-    const dc = str(row, colMapDc['datacenter_name']);
+    const cluster = str(row, colMapCluster.cluster_name);
+    const dc = str(row, colMapDc.datacenter_name);
     const scopeKey =
       dc && cluster
         ? `${dc}||${cluster}`
@@ -315,13 +315,13 @@ function aggregate(rows: VmRow[]): AggregateOutput {
             : '__all__';
 
     // Build host-to-cluster map from VM rows
-    const vmHost = str(row, colMapVmHost['esx_host']);
+    const vmHost = str(row, colMapVmHost.esx_host);
     if (vmHost && scopeKey !== '__all__') {
       hostToCluster.set(vmHost, scopeKey);
     }
 
-    const vmName = str(row, colMap['vm_name']);
-    const powerStateRaw = hasPowerStateCol ? str(row, colMap['power_state']) : '';
+    const vmName = str(row, colMap.vm_name);
+    const powerStateRaw = hasPowerStateCol ? str(row, colMap.power_state) : '';
     const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined;
     const vmRow: ScopedVmRow = {
       name: vmName,
@@ -416,7 +416,7 @@ function applyStretchHeuristics(result: AggregateResult): void {
         ? new Map(
             Array.from(dcSet).map((dc) => [
               dc,
-              result.rawByScope!.get(`${dc}||${clusterName}`)?.existingServerCount ?? 0,
+              result.rawByScope?.get(`${dc}||${clusterName}`)?.existingServerCount ?? 0,
             ]),
           )
         : undefined;

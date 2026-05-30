@@ -141,7 +141,7 @@ body {
   input[type="email"],
   select,
   textarea {
-    font-size: 16px !important;
+    font-size: 16px;
   }
 }
 
@@ -293,7 +293,7 @@ code {
 
   /* Remove overflow clipping so comparison table columns are not cut off */
   .overflow-x-auto {
-    overflow: visible !important;
+    overflow: visible;
   }
 
   /* Keep table on one page when possible */

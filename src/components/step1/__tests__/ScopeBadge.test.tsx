@@ -73,7 +73,7 @@ function setupStore(
 ) {
   vi.mocked(importStoreModule.useImportStore).mockImplementation(
     (selector: Parameters<typeof importStoreModule.useImportStore>[0]) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: test mock casts store state for the selector
       selector(state as any),
   );
 }

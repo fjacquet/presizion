@@ -70,7 +70,7 @@ export async function detectFormat(
   buffer: ArrayBuffer,
   filename: string,
 ): Promise<DetectionResult> {
-  const ext = '.' + (filename.split('.').pop() ?? '').toLowerCase();
+  const ext = `.${(filename.split('.').pop() ?? '').toLowerCase()}`;
   if (ext === '.zip') return detectZip(buffer);
   if (ext === '.xlsx') return detectXlsx(buffer);
   if (ext === '.csv') return detectCsv(buffer);

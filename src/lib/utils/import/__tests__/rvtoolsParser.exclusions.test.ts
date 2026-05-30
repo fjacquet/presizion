@@ -45,8 +45,8 @@ describe('parseRvtools — vmRowsByScope', () => {
     const result = await parseRvtools(buf);
     const prod = result.vmRowsByScope!.get('dc1||prod-cl')!;
     expect(prod.map((r) => r.name)).toEqual(['web01', 'db01']);
-    expect(prod[0]!.powerState).toBe('poweredOn');
-    expect(prod[1]!.powerState).toBe('poweredOff');
+    expect(prod[0]?.powerState).toBe('poweredOn');
+    expect(prod[1]?.powerState).toBe('poweredOff');
   });
 
   it('leaves powerState undefined when Powerstate column is absent', async () => {

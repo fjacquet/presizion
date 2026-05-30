@@ -24,7 +24,8 @@
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsole": "off"
+            "noConsole": "off",
+            "noExportsInTest": "off"
           }
         }
       }
@@ -40,6 +41,13 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "a11y": {
+        "noSvgWithoutTitle": "warn",
+        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "warn",
+        "noLabelWithoutControl": "warn",
+        "useSemanticElements": "warn"
+      },
       "correctness": {
         "noUnusedImports": "error",
         "noUnusedVariables": "error"

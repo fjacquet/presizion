@@ -89,6 +89,7 @@ export function SizingChart() {
                   />
                   {comparisonData.map((entry, idx) => (
                     <Cell
+                      // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order comparison bars
                       key={idx}
                       fill={
                         entry.isAsIs

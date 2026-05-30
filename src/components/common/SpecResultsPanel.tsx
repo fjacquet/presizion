@@ -65,6 +65,7 @@ export function SpecResultsPanel({
                 <tbody>
                   {results.map((row, i) => (
                     <tr
+                      // biome-ignore lint/suspicious/noArrayIndexKey: vendor+system+index disambiguates duplicate SPEC rows
                       key={`${row.vendor}-${row.system}-${i}`}
                       className={`cursor-pointer hover:bg-muted ${
                         selectedScore === row.baseResult ? 'bg-primary/10' : ''

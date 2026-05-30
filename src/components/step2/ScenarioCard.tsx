@@ -112,7 +112,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
   const specLookup = useSpecLookup(specActive ? debouncedCpuModel : undefined);
 
   const form = useForm<ScenarioInput>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: zodResolver input/output type mismatch needs any
     resolver: zodResolver(scenarioSchema) as any,
     mode: 'onBlur',
     defaultValues: scenario as ScenarioInput,
@@ -184,6 +184,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
     scenario?.ramPerVmGb,
     scenario?.diskPerVmGb,
     form,
+    scenario,
   ]);
 
   // SPEC-06..08: In performance mode with SPEC scores, auto-derive socket/core

@@ -64,7 +64,7 @@ describe('URL hash v2 — exclusions', () => {
   it('round-trips populated exclusions', () => {
     const rules = { ...EMPTY_RULES, namePattern: 'test-*', excludePoweredOff: true };
     const hash = encodeSessionToHash({ ...baseSession, exclusions: rules });
-    expect(decodeSessionFromHash(hash)!.exclusions).toEqual(rules);
+    expect(decodeSessionFromHash(hash)?.exclusions).toEqual(rules);
   });
 
   it('drops manuallyExcluded first when over 8 KB', () => {
@@ -73,8 +73,8 @@ describe('URL hash v2 — exclusions', () => {
     const hash = encodeSessionToHash({ ...baseSession, exclusions: rules });
     expect(hash.length).toBeLessThanOrEqual(8192);
     const decoded = decodeSessionFromHash(hash)!;
-    expect(decoded.exclusions!.manuallyExcluded).toEqual([]);
-    expect(decoded.exclusions!.exactNames).toEqual(['keep']);
+    expect(decoded.exclusions?.manuallyExcluded).toEqual([]);
+    expect(decoded.exclusions?.exactNames).toEqual(['keep']);
     expect(decoded.truncated).toBe(true);
   });
 
@@ -83,8 +83,8 @@ describe('URL hash v2 — exclusions', () => {
     const rules = { ...EMPTY_RULES, exactNames: huge, namePattern: 'test-*' };
     const hash = encodeSessionToHash({ ...baseSession, exclusions: rules });
     const decoded = decodeSessionFromHash(hash)!;
-    expect(decoded.exclusions!.namePattern).toBe('test-*');
-    expect(decoded.exclusions!.exactNames).toEqual([]);
+    expect(decoded.exclusions?.namePattern).toBe('test-*');
+    expect(decoded.exclusions?.exactNames).toEqual([]);
   });
 
   it('does not mark truncated when payload fits under the ceiling', () => {

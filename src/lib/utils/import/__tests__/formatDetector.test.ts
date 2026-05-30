@@ -65,7 +65,7 @@ describe('formatDetector', () => {
       name: 'RVTools_export.xlsx',
       async: vi.fn().mockResolvedValue(innerBuf),
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: partial JSZip mock for the test
     vi.mocked(JSZip.loadAsync).mockResolvedValue({
       files: { 'RVTools_export.xlsx': mockEntry },
     } as any);

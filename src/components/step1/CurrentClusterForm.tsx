@@ -53,7 +53,8 @@ const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
 };
 
 interface NumericFieldProps {
-  control: Control<CurrentClusterInput, any, CurrentClusterInput>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: react-hook-form Control's transform-type generic requires any
+  control: Control<CurrentClusterInput, any, CurrentClusterInput>;
   name: keyof CurrentClusterInput;
   label: string;
   testId: string;
@@ -125,7 +126,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
   } = useSpecLookup(currentCluster.cpuModel);
 
   const form = useForm<CurrentClusterInput>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: zodResolver input/output type mismatch needs any
     resolver: zodResolver(currentClusterFormSchema) as any,
     mode: 'onBlur',
     defaultValues: {

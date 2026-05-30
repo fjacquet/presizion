@@ -212,6 +212,7 @@ describe('rvtoolsParser', () => {
       expect(result.scopeLabels).toEqual({ __all__: 'All' });
     });
 
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: title documents the literal scope-key format
     it("file with both Cluster and Datacenter columns uses '${dc}||${cluster}' scope key", async () => {
       vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
         {

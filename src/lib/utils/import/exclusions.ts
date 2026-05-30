@@ -50,7 +50,7 @@ export function isExcluded(row: VmRow, rules: ExclusionRules, compiled: RegExp |
   const vmKey = `${row.scopeKey}::${row.name}`;
   if (rules.manuallyIncluded.includes(vmKey)) return false;
   if (rules.manuallyExcluded.includes(vmKey)) return true;
-  if (compiled !== null && compiled.test(row.name)) return true;
+  if (compiled?.test(row.name)) return true;
   if (rules.exactNames.includes(row.name)) return true;
   if (rules.excludePoweredOff && row.powerState === 'poweredOff') return true;
   return false;
@@ -100,7 +100,7 @@ export function applyExclusions(
         byManual++;
         continue;
       }
-      if (compiled !== null && compiled.test(row.name)) {
+      if (compiled?.test(row.name)) {
         byPattern++;
         continue;
       }
