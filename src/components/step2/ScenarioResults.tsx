@@ -105,12 +105,16 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
         <div>
           <span className="text-slate-500 dark:text-slate-400">RAM-limited: </span>
           <span className="font-medium tabular-nums">{result.ramLimitedCount}</span>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{ramFormula}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+            {ramFormula}
+          </div>
         </div>
         <div>
           <span className="text-slate-500 dark:text-slate-400">Disk-limited: </span>
           <span className="font-medium tabular-nums">{result.diskLimitedCount}</span>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{diskFormula}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+            {diskFormula}
+          </div>
         </div>
       </div>
     </div>

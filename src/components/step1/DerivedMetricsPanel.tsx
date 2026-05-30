@@ -15,7 +15,9 @@ function MetricItem({ label, value, unit }: MetricItemProps) {
       <span className="text-lg font-semibold tabular-nums">
         {value}
         {unit ? (
-          <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">{unit}</span>
+          <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">
+            {unit}
+          </span>
         ) : null}
       </span>
     </div>

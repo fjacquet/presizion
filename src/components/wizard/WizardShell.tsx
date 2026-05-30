@@ -60,10 +60,7 @@ export function WizardShell() {
   }
 
   return (
-    <div
-      className="bg-white dark:bg-surface-900 overflow-x-hidden"
-      style={{ minHeight: '100dvh' }}
-    >
+    <div className="bg-white dark:bg-surface-900 overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="relative mb-6 text-center print:hidden">
           <div className="absolute left-0 top-0 flex items-center gap-1">
