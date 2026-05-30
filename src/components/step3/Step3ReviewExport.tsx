@@ -1,8 +1,8 @@
 /**
  * Step 3: Review & Export
- * Requirements: EXPO-01, EXPO-02, COMP-01, COMP-02, UX-04, UX-06, PDF-01, PDF-05
+ * Requirements: EXPO-01, EXPO-02, COMP-01, COMP-02, UX-04, UX-06
  *
- * Container: ComparisonTable + export buttons (Copy, CSV, JSON, Share, PDF, PPTX).
+ * Container: ComparisonTable + export buttons (Copy, CSV, JSON, Share, PPTX).
  * All data flows from Zustand stores -- no props.
  */
 import { useEffect, useRef, useState } from 'react';
@@ -22,7 +22,6 @@ import { useScenariosResults } from '@/hooks/useScenariosResults';
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard';
 import { buildCsvContent, buildJsonContent, downloadCsv, downloadJson } from '@/lib/utils/export';
-import { exportPdf } from '@/lib/utils/exportPdf';
 import { exportPptx } from '@/lib/utils/exportPptx';
 import { encodeSessionToHash } from '@/lib/utils/persistence';
 import { useClusterStore } from '@/store/useClusterStore';
@@ -46,11 +45,10 @@ export function Step3ReviewExport() {
   const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
   const [pptxLoading, setPptxLoading] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  /** Shared chart container refs for PDF/PPTX export (Plans 02 & 03) */
+  /** Shared chart container refs for PPTX export */
   const chartRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Clear timeouts on unmount to prevent memory leak / setState-after-unmount warning
@@ -104,32 +102,6 @@ export function Step3ReviewExport() {
       setShared(false);
       shareTimeoutRef.current = null;
     }, 2000);
-  };
-
-  const handleExportPdf = async (): Promise<void> => {
-    setPdfLoading(true);
-    try {
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      const iosWindow = isIOS ? window.open('about:blank', '_blank') : null;
-
-      const result = await exportPdf(
-        currentCluster,
-        scenarios,
-        results,
-        breakdowns,
-        chartRefs.current,
-        iosWindow,
-      );
-
-      if (result.openedInNewTab) {
-        toast.info('PDF opened in new tab — tap Share then Save to Files.');
-      }
-    } catch (err) {
-      console.error('PDF export failed:', err);
-      toast.error('PDF export failed. Check browser console for details.');
-    } finally {
-      setPdfLoading(false);
-    }
   };
 
   const handleExportPptx = async (): Promise<void> => {
@@ -196,15 +168,6 @@ export function Step3ReviewExport() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    void handleExportPdf();
-                  }}
-                  disabled={pdfLoading}
-                >
-                  {pdfLoading ? 'Generating...' : 'Export PDF'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
                     void handleExportPptx();
                   }}
                   disabled={pptxLoading}
@@ -243,15 +206,6 @@ export function Step3ReviewExport() {
             }}
           >
             {shared ? 'Link Copied!' : 'Share'}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              void handleExportPdf();
-            }}
-            disabled={pdfLoading}
-          >
-            {pdfLoading ? 'Generating...' : 'Export PDF'}
           </Button>
           <Button
             variant="outline"

@@ -9,10 +9,7 @@ import { useClusterStore } from '@/store/useClusterStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { Step3ReviewExport } from '../Step3ReviewExport';
 
-// Mock exportPdf and exportPptx for iOS tests
-vi.mock('@/lib/utils/exportPdf', () => ({
-  exportPdf: vi.fn().mockResolvedValue({ openedInNewTab: false }),
-}));
+// Mock exportPptx for iOS tests
 vi.mock('@/lib/utils/exportPptx', () => ({
   exportPptx: vi.fn().mockResolvedValue(undefined),
 }));
@@ -187,31 +184,7 @@ describe('Step3ReviewExport', () => {
     });
   });
 
-  describe('REVIEW-04: iOS Safari PDF/PPTX guards', () => {
-    it('pre-opens window.open on iOS before calling exportPdf', async () => {
-      const { exportPdf } = await import('@/lib/utils/exportPdf');
-      vi.mocked(exportPdf).mockResolvedValue({ openedInNewTab: true });
-
-      Object.defineProperty(navigator, 'userAgent', {
-        writable: true,
-        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
-      });
-
-      const mockWin = { location: { href: '' } } as unknown as Window;
-      const windowOpenSpy = vi.spyOn(window, 'open').mockReturnValue(mockWin);
-
-      render(<Step3ReviewExport />);
-      fireEvent.click(screen.getByRole('button', { name: /export pdf/i }));
-
-      await waitFor(() => {
-        expect(windowOpenSpy).toHaveBeenCalledWith('about:blank', '_blank');
-      });
-
-      // Reset userAgent
-      Object.defineProperty(navigator, 'userAgent', { writable: true, value: '' });
-      windowOpenSpy.mockRestore();
-    });
-
+  describe('REVIEW-04: iOS Safari PPTX guard', () => {
     it('shows toast instead of calling exportPptx on iOS', async () => {
       const { exportPptx } = await import('@/lib/utils/exportPptx');
       const { toast } = await import('sonner');
