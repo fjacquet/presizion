@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
 import { useClusterStore } from '@/store/useClusterStore';
@@ -25,41 +26,41 @@ function MetricItem({ label, value, unit }: MetricItemProps) {
 }
 
 export function DerivedMetricsPanel() {
+  const { t } = useTranslation('step1');
   const cluster = useClusterStore((s) => s.currentCluster);
   const results = useScenariosResults();
 
   const vcpuToPcoreRatio =
-    cluster.totalPcores > 0 ? (cluster.totalVcpus / cluster.totalPcores).toFixed(2) : '\u2014';
+    cluster.totalPcores > 0 ? (cluster.totalVcpus / cluster.totalPcores).toFixed(2) : '—';
 
   const firstResult = results[0];
-  const vmsPerServer = firstResult ? firstResult.vmsPerServer.toFixed(1) : '\u2014';
+  const vmsPerServer = firstResult ? firstResult.vmsPerServer.toFixed(1) : '—';
 
   const avgVcpuPerVm =
-    cluster.totalVms > 0 ? (cluster.totalVcpus / cluster.totalVms).toFixed(1) : '\u2014';
+    cluster.totalVms > 0 ? (cluster.totalVcpus / cluster.totalVms).toFixed(1) : '—';
 
-  const avgRamPerVm = cluster.avgRamPerVmGb != null ? cluster.avgRamPerVmGb.toFixed(1) : '\u2014';
+  const avgRamPerVm = cluster.avgRamPerVmGb != null ? cluster.avgRamPerVmGb.toFixed(1) : '—';
 
   const avgDiskPerVm =
     cluster.totalDiskGb != null && cluster.totalVms > 0
       ? (cluster.totalDiskGb / cluster.totalVms).toFixed(1)
-      : '\u2014';
+      : '—';
 
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Derived Metrics</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('derivedMetrics.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <MetricItem label="vCPU:pCore Ratio" value={vcpuToPcoreRatio} />
-          <MetricItem label="VMs/Server (CPU)" value={vmsPerServer} />
-          <MetricItem label="Avg vCPU/VM" value={avgVcpuPerVm} />
-          <MetricItem label="Avg RAM/VM" value={avgRamPerVm} unit="GiB" />
-          <MetricItem label="Avg Disk/VM" value={avgDiskPerVm} unit="GiB" />
+          <MetricItem label={t('derivedMetrics.vcpuRatio')} value={vcpuToPcoreRatio} />
+          <MetricItem label={t('derivedMetrics.vmsPerServer')} value={vmsPerServer} />
+          <MetricItem label={t('derivedMetrics.avgVcpuPerVm')} value={avgVcpuPerVm} />
+          <MetricItem label={t('derivedMetrics.avgRamPerVm')} value={avgRamPerVm} unit="GiB" />
+          <MetricItem label={t('derivedMetrics.avgDiskPerVm')} value={avgDiskPerVm} unit="GiB" />
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
-          Updates live as you enter values. VMs/Server is based on first scenario defaults. Avg
-          metrics from import data.
+          {t('derivedMetrics.footnote')}
         </p>
       </CardContent>
     </Card>

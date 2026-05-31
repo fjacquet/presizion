@@ -1,3 +1,97 @@
 {
-  "title": "Step 1: Enter Current Cluster"
+  "title": "Step 1: Enter Current Cluster",
+  "subtitle": "Enter your existing cluster metrics. Required fields are marked.",
+  "currentClusterForm": {
+    "sections": {
+      "clusterTotals": "Cluster Totals",
+      "existingServerConfig": "Existing Server Config (optional)",
+      "currentUtilization": "Current Utilization (required)",
+      "performanceMode": "Performance Mode (optional)"
+    },
+    "fields": {
+      "totalVcpus": "Total vCPUs",
+      "totalPcores": "Total pCores",
+      "totalVms": "Total VMs",
+      "totalDiskGb": "Total Disk GB (optional)",
+      "existingServerCount": "Existing Server Count",
+      "socketsPerServer": "Sockets/Server",
+      "coresPerSocket": "Cores/Socket (physical)",
+      "ramPerServerGb": "RAM/Server GB",
+      "stretchCluster": "Stretch cluster",
+      "cpuUtilizationPercent": "CPU Utilization %",
+      "ramUtilizationPercent": "RAM Utilization %",
+      "specintPerServer": "SPECrate2017_int_base / Server (existing)",
+      "cpuFrequencyGhz": "CPU Frequency (GHz)"
+    },
+    "tooltips": {
+      "totalVcpus": "Total vCPU reservations across all VMs. Found in vCenter Summary or cluster overview.",
+      "totalPcores": "Physical CPU cores in the cluster. Use spec sheet cores — NOT hyperthreaded logical CPUs.",
+      "totalVms": "Total number of powered-on VMs in the cluster.",
+      "totalDiskGb": "Total provisioned disk space across all VMs (GB).",
+      "existingServerCount": "Number of physical servers currently in the cluster (used for SPECint sizing).",
+      "socketsPerServer": "Number of physical CPU sockets per existing server.",
+      "coresPerSocket": "Physical cores per socket from spec sheet — NOT OS-reported logical processors.",
+      "ramPerServerGb": "Total RAM installed per existing server (GB).",
+      "stretchCluster": "Stretched cluster: each site must carry the full workload on failure. Sizing doubles the server count and rounds up to an even number.",
+      "cpuUtilizationPercent": "Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.",
+      "ramUtilizationPercent": "Current average RAM utilization percent (0–100). Used to scale effective RAM demand.",
+      "cpuFrequencyGhz": "Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.",
+      "specintPerServer": "SPECrate2017_int_base score per existing server. Find at fjacquet.github.io/spec-search → filter by processor. Default is Dell R660 with 2x Xeon Gold 6526Y (~337). Both existing and target must use the same metric."
+    },
+    "detectedCpu": "Detected CPU:",
+    "lookupSpecrate": "Look up SPECrate",
+    "utilizationHint": "Most environments run well below 100%. Enter measured (LiveOptics) or a careful estimate.",
+    "utilizationHintStretch": "Stretch clusters often run <50% per site.",
+    "nextButton": "Next: Define Scenarios"
+  },
+  "derivedMetrics": {
+    "title": "Derived Metrics",
+    "vcpuRatio": "vCPU:pCore Ratio",
+    "vmsPerServer": "VMs/Server (CPU)",
+    "avgVcpuPerVm": "Avg vCPU/VM",
+    "avgRamPerVm": "Avg RAM/VM",
+    "avgDiskPerVm": "Avg Disk/VM",
+    "footnote": "Updates live as you enter values. VMs/Server is based on first scenario defaults. Avg metrics from import data."
+  },
+  "fileImport": {
+    "buttonLabel": "Import from file",
+    "ariaLabel": "Import from file",
+    "uploadAriaLabel": "Upload cluster export file",
+    "importing": "Importing…",
+    "errorFallback": "Failed to read file. Please check the file and try again."
+  },
+  "importPreview": {
+    "title": "Import Preview",
+    "description": "Review the extracted data before populating the form.",
+    "filterByCluster": "Filter by cluster",
+    "stretchDetected": "Stretch cluster detected",
+    "stretchSizingNote": "Sizing will double the server count for site symmetry.",
+    "confirmStretchAriaLabel": "Confirm stretch cluster topology",
+    "source": "Source",
+    "totalVcpus": "Total vCPUs",
+    "totalPcores": "Total pCores",
+    "totalVms": "Total VMs",
+    "totalDisk": "Total Disk",
+    "scenarios": "Scenarios",
+    "vmsFound": "VMs found",
+    "avgRamPerVm": "Avg RAM/VM (informational)",
+    "existingServers": "Existing servers",
+    "socketsPerServer": "Sockets/server",
+    "coresPerSocket": "Cores/socket",
+    "ramPerServer": "RAM/server",
+    "avgCpuUtil": "Avg CPU util",
+    "avgRamUtil": "Avg RAM util",
+    "noPcoresNote": "Total pCores could not be read from this file and must be entered manually before advancing to Step 2.",
+    "cancelButton": "Cancel",
+    "nextButton": "Next",
+    "backButton": "Back",
+    "applyButton": "Apply"
+  },
+  "scopeBadge": {
+    "label": "Scope",
+    "editAriaLabel": "Edit scope",
+    "dialogTitle": "Select active clusters",
+    "cancelButton": "Cancel",
+    "applyButton": "Apply"
+  }
 }

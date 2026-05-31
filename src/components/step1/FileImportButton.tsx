@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import type { AnyImportResult } from '@/lib/utils/import';
 import { ImportError, importFile } from '@/lib/utils/import';
 import { ImportPreviewModal } from './ImportPreviewModal';
 
 export function FileImportButton() {
+  const { t } = useTranslation('step1');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [importResult, setImportResult] = useState<AnyImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,7 @@ export function FileImportButton() {
       if (err instanceof ImportError) {
         setError(err.message);
       } else {
-        setError('Failed to read file. Please check the file and try again.');
+        setError(t('fileImport.errorFallback'));
       }
     } finally {
       setLoading(false);
@@ -41,7 +43,7 @@ export function FileImportButton() {
         onChange={(e) => {
           void handleFileChange(e);
         }}
-        aria-label="Upload cluster export file"
+        aria-label={t('fileImport.uploadAriaLabel')}
       />
       <div className="space-y-1">
         <Button
@@ -49,9 +51,9 @@ export function FileImportButton() {
           className="w-full sm:w-auto"
           onClick={() => inputRef.current?.click()}
           disabled={loading}
-          aria-label="Import from file"
+          aria-label={t('fileImport.ariaLabel')}
         >
-          {loading ? 'Importing…' : 'Import from file'}
+          {loading ? t('fileImport.importing') : t('fileImport.buttonLabel')}
         </Button>
         {error && (
           <p className="text-xs text-util-high" role="alert">

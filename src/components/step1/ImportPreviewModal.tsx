@@ -1,5 +1,6 @@
 import { Dialog } from '@base-ui/react/dialog';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { VmExclusionPanel } from '@/components/exclusions/VmExclusionPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ interface ScopeSelectorProps {
   selectedScopes: string[];
   onToggle: (key: string, checked: boolean) => void;
   rawByScope?: Map<string, ScopeData> | undefined;
+  filterLabel: string;
 }
 
 function ScopeSelector({
@@ -47,10 +49,11 @@ function ScopeSelector({
   selectedScopes,
   onToggle,
   rawByScope,
+  filterLabel,
 }: ScopeSelectorProps) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium">Filter by cluster</p>
+      <p className="text-sm font-medium">{filterLabel}</p>
       <div className="space-y-1">
         {detectedScopes.map((key) => {
           const hostCount = rawByScope?.get(key)?.existingServerCount;
@@ -75,6 +78,7 @@ function ScopeSelector({
 }
 
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
+  const { t } = useTranslation('step1');
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster);
   const setScenarios = useScenariosStore((s) => s.setScenarios);
   const seedFromCluster = useScenariosStore((s) => s.seedFromCluster);
@@ -189,6 +193,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             selectedScopes={selectedScopes}
             onToggle={handleToggle}
             rawByScope={'rawByScope' in result ? (result.rawByScope ?? undefined) : undefined}
+            filterLabel={t('importPreview.filterByCluster')}
           />
         )}
 
@@ -196,11 +201,11 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         <div className="flex items-start gap-2 p-2 rounded border border-amber-400/40 bg-amber-50/60 dark:bg-amber-950/20">
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">Stretch cluster detected</Badge>
+              <Badge variant="secondary">{t('importPreview.stretchDetected')}</Badge>
               <Switch
                 checked={stretchConfirmed}
                 onCheckedChange={setStretchConfirmed}
-                aria-label="Confirm stretch cluster topology"
+                aria-label={t('importPreview.confirmStretchAriaLabel')}
               />
             </div>
             {previewCluster.stretchSignals && previewCluster.stretchSignals.length > 0 && (
@@ -211,7 +216,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               </ul>
             )}
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Sizing will double the server count for site symmetry.
+              {t('importPreview.stretchSizingNote')}
             </p>
           </div>
         </div>
@@ -219,82 +224,99 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
       <div className="space-y-1 text-sm">
         <p>
-          <span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}
+          <span className="font-medium">{t('importPreview.source')}:</span>{' '}
+          {FORMAT_LABELS[result.sourceFormat]}
         </p>
 
         {isJson ? (
           <>
             <p>
-              <span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}
+              <span className="font-medium">{t('importPreview.totalVcpus')}:</span>{' '}
+              {result.cluster.totalVcpus}
             </p>
             <p>
-              <span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}
+              <span className="font-medium">{t('importPreview.totalPcores')}:</span>{' '}
+              {result.cluster.totalPcores}
             </p>
             <p>
-              <span className="font-medium">Total VMs:</span> {result.cluster.totalVms}
+              <span className="font-medium">{t('importPreview.totalVms')}:</span>{' '}
+              {result.cluster.totalVms}
             </p>
             {result.cluster.totalDiskGb != null && (
               <p>
-                <span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB
+                <span className="font-medium">{t('importPreview.totalDisk')}:</span>{' '}
+                {result.cluster.totalDiskGb} GB
               </p>
             )}
             <p>
-              <span className="font-medium">Scenarios:</span> {result.scenarios.length}
+              <span className="font-medium">{t('importPreview.scenarios')}:</span>{' '}
+              {result.scenarios.length}
             </p>
           </>
         ) : (
           <>
             <p>
-              <span className="font-medium">VMs found:</span> {previewCluster.vmCount}
+              <span className="font-medium">{t('importPreview.vmsFound')}:</span>{' '}
+              {previewCluster.vmCount}
             </p>
             <p>
-              <span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}
+              <span className="font-medium">{t('importPreview.totalVcpus')}:</span>{' '}
+              {previewCluster.totalVcpus}
             </p>
             <p>
-              <span className="font-medium">Total VMs:</span> {previewCluster.totalVms}
+              <span className="font-medium">{t('importPreview.totalVms')}:</span>{' '}
+              {previewCluster.totalVms}
             </p>
             <p>
-              <span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB
+              <span className="font-medium">{t('importPreview.totalDisk')}:</span>{' '}
+              {previewCluster.totalDiskGb} GB
             </p>
             <p className="text-slate-500 dark:text-slate-400">
               <span className="font-medium text-slate-900 dark:text-slate-100">
-                Avg RAM/VM (informational):
+                {t('importPreview.avgRamPerVm')}:
               </span>{' '}
               {previewCluster.avgRamPerVmGb} GB
             </p>
             {result.totalPcores != null && (
               <p>
-                <span className="font-medium">Total pCores:</span> {result.totalPcores}
+                <span className="font-medium">{t('importPreview.totalPcores')}:</span>{' '}
+                {result.totalPcores}
               </p>
             )}
             {result.existingServerCount != null && (
               <p>
-                <span className="font-medium">Existing servers:</span> {result.existingServerCount}
+                <span className="font-medium">{t('importPreview.existingServers')}:</span>{' '}
+                {result.existingServerCount}
               </p>
             )}
             {result.socketsPerServer != null && (
               <p>
-                <span className="font-medium">Sockets/server:</span> {result.socketsPerServer}
+                <span className="font-medium">{t('importPreview.socketsPerServer')}:</span>{' '}
+                {result.socketsPerServer}
               </p>
             )}
             {result.coresPerSocket != null && (
               <p>
-                <span className="font-medium">Cores/socket:</span> {result.coresPerSocket}
+                <span className="font-medium">{t('importPreview.coresPerSocket')}:</span>{' '}
+                {result.coresPerSocket}
               </p>
             )}
             {result.ramPerServerGb != null && (
               <p>
-                <span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB
+                <span className="font-medium">{t('importPreview.ramPerServer')}:</span>{' '}
+                {result.ramPerServerGb} GB
               </p>
             )}
             {result.cpuUtilizationPercent != null && (
               <p>
-                <span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%
+                <span className="font-medium">{t('importPreview.avgCpuUtil')}:</span>{' '}
+                {result.cpuUtilizationPercent}%
               </p>
             )}
             {result.ramUtilizationPercent != null && (
               <p>
-                <span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%
+                <span className="font-medium">{t('importPreview.avgRamUtil')}:</span>{' '}
+                {result.ramUtilizationPercent}%
               </p>
             )}
           </>
@@ -312,8 +334,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
       {!isJson && !pcoresKnown && (
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          <strong>Note:</strong> Total pCores could not be read from this file and must be entered
-          manually before advancing to Step 2.
+          <strong>Note:</strong> {t('importPreview.noPcoresNote')}
         </p>
       )}
     </>
@@ -324,19 +345,19 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
   const footerButtons = (
     <>
       <Button variant="outline" onClick={onClose}>
-        Cancel
+        {t('importPreview.cancelButton')}
       </Button>
       {step === 'scope' && canShowExclusions ? (
-        <Button onClick={() => setStep('exclusions')}>Next</Button>
+        <Button onClick={() => setStep('exclusions')}>{t('importPreview.nextButton')}</Button>
       ) : step === 'exclusions' ? (
         <>
           <Button variant="outline" onClick={() => setStep('scope')}>
-            Back
+            {t('importPreview.backButton')}
           </Button>
-          <Button onClick={handleApply}>Apply</Button>
+          <Button onClick={handleApply}>{t('importPreview.applyButton')}</Button>
         </>
       ) : (
-        <Button onClick={handleApply}>Apply</Button>
+        <Button onClick={handleApply}>{t('importPreview.applyButton')}</Button>
       )}
     </>
   );
@@ -351,10 +372,8 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       >
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader>
-            <DrawerTitle>Import Preview</DrawerTitle>
-            <DrawerDescription>
-              Review the extracted data before populating the form.
-            </DrawerDescription>
+            <DrawerTitle>{t('importPreview.title')}</DrawerTitle>
+            <DrawerDescription>{t('importPreview.description')}</DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-2 overflow-y-auto space-y-4">{body}</div>
           <DrawerFooter>{footerButtons}</DrawerFooter>
@@ -373,9 +392,9 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 bg-black/40 z-40" />
         <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
-          <Dialog.Title className="text-lg font-semibold">Import Preview</Dialog.Title>
+          <Dialog.Title className="text-lg font-semibold">{t('importPreview.title')}</Dialog.Title>
           <Dialog.Description className="text-sm text-slate-500 dark:text-slate-400">
-            Review the extracted data before populating the form.
+            {t('importPreview.description')}
           </Dialog.Description>
 
           {body}
