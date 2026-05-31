@@ -1,27 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock recharts -- ResponsiveContainer collapses to 0px in jsdom
-vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
+// Mock the ECharts <Chart> wrapper — jsdom can't render svg charts.
+vi.mock('@/components/charts/Chart', () => ({
+  Chart: ({ ariaLabel }: { ariaLabel?: string }) => (
+    <div data-testid="chart" role="img" aria-label={ariaLabel} />
   ),
-  Bar: ({ name, children }: { name: string; children?: React.ReactNode }) => (
-    <span data-testid="bar-series">
-      {name}
-      {children}
-    </span>
-  ),
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  Legend: () => <div data-testid="legend" />,
-  LabelList: ({ dataKey }: { dataKey: string }) => <span data-testid="label-list">{dataKey}</span>,
-  ReferenceLine: () => null,
 }));
 
 vi.mock('@/hooks/useVsanBreakdowns', () => ({
@@ -102,34 +87,25 @@ describe('CapacityStackedChart', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders chart heading "Capacity Breakdown" when breakdowns exist', () => {
+  it('renders chart heading "Capacity Breakdown" + a chart when breakdowns exist', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
     render(<CapacityStackedChart />);
     expect(screen.getByText(/Capacity Breakdown/)).toBeInTheDocument();
+    expect(screen.getByTestId('chart')).toBeInTheDocument();
   });
 
-  it('renders Download PNG button with correct aria-label', () => {
+  it('renders Download SVG button with correct aria-label', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
     render(<CapacityStackedChart />);
     expect(
-      screen.getByRole('button', { name: /download.*capacity.*chart.*png/i }),
+      screen.getByRole('button', { name: /download.*capacity.*chart.*svg/i }),
     ).toBeInTheDocument();
-  });
-
-  it('Download PNG button is clickable without error', async () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    render(<CapacityStackedChart />);
-    const btn = screen.getByRole('button', { name: /download.*capacity.*chart.*png/i });
-    await userEvent.click(btn);
   });
 
   it('renders one chart section per scenario', () => {
@@ -142,40 +118,17 @@ describe('CapacityStackedChart', () => {
     render(<CapacityStackedChart />);
     expect(screen.getByText(/Capacity Breakdown -- Scenario A/)).toBeInTheDocument();
     expect(screen.getByText(/Capacity Breakdown -- Scenario B/)).toBeInTheDocument();
+    expect(screen.getAllByTestId('chart')).toHaveLength(2);
   });
 
-  it('renders bar series for Required, Spare, and Excess segments', () => {
+  it('renders the on-screen Required/Spare/Excess legend row', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
     render(<CapacityStackedChart />);
-    const barSeries = screen.getAllByTestId('bar-series');
-    const names = barSeries.map((el) => el.textContent);
-    expect(names.some((n) => n?.includes('Required'))).toBe(true);
-    expect(names.some((n) => n?.includes('Spare'))).toBe(true);
-    expect(names.some((n) => n?.includes('Excess'))).toBe(true);
-  });
-
-  it('renders legend labels', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    render(<CapacityStackedChart />);
-    // Legend labels appear alongside bar series names
-    expect(screen.getAllByText('Required').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Spare').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Excess').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders h-full div inside responsive wrapper for PNG capture', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    const { container } = render(<CapacityStackedChart />);
-    const hFullDivs = container.querySelectorAll('div.h-full');
-    expect(hFullDivs.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Required')).toBeInTheDocument();
+    expect(screen.getByText('Spare')).toBeInTheDocument();
+    expect(screen.getByText('Excess')).toBeInTheDocument();
   });
 });
