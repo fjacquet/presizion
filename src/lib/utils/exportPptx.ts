@@ -27,6 +27,9 @@ import { buildDeck } from './pptx/builder';
  * @param results    - Computed results (parallel array with scenarios)
  * @param breakdowns - Capacity breakdowns (parallel array with scenarios)
  * @param charts     - Pre-captured chart PNGs keyed by "capacity-{id}" / "minnodes-{id}"
+ * @param showStorage - Whether to emit storage/disk rows. Pass `false` for the
+ *                      disaggregated layout (mirrors the web hiding storage).
+ *                      Defaults to `true` for back-compat (HCI output unchanged).
  */
 export async function exportPptx(
   cluster: OldCluster,
@@ -34,6 +37,7 @@ export async function exportPptx(
   results: readonly ScenarioResult[],
   breakdowns: readonly VsanCapacityBreakdown[],
   charts: Record<string, ChartCapture | null>,
+  showStorage = true,
 ): Promise<void> {
   const PptxGenJS = (await import('pptxgenjs')).default;
   const scenarioCharts = scenarios.map((s) => ({
@@ -52,6 +56,7 @@ export async function exportPptx(
     results,
     breakdowns,
     charts: scenarioCharts,
+    showStorage,
     date: new Date().toLocaleDateString(),
     ...(logoDataUrl ? { logoDataUrl } : {}),
   });

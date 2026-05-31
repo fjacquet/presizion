@@ -14,6 +14,8 @@ interface ComparisonSlideData {
   scenarios: readonly Scenario[];
   results: readonly ScenarioResult[];
   breakdowns: readonly VsanCapacityBreakdown[];
+  /** When false (disaggregated layout), storage/disk rows are omitted. */
+  showStorage: boolean;
 }
 
 type TableCellObj = {
@@ -33,7 +35,7 @@ export function addComparisonSlide(
   date: string,
   num: number,
 ): void {
-  const { cluster, scenarios, results } = d;
+  const { cluster, scenarios, results, showStorage } = d;
   const s = pptx.addSlide();
   s.background = { color: PPTX_COLORS.paper };
   addHeader(s, 'As-Is vs To-Be Comparison');
@@ -218,7 +220,14 @@ export function addComparisonSlide(
     });
   }
 
-  const compDataRows = compMetrics.map((mtr, rowIdx) => {
+  // In disaggregated layout, storage/disk is hidden on the web — mirror that here
+  // by dropping the storage/disk rows. HCI (showStorage=true) is untouched.
+  const STORAGE_ROW_LABELS = new Set(['Total Disk', 'Disk / Server (GB)', 'Avg Disk/VM (GiB)']);
+  const visibleMetrics = showStorage
+    ? compMetrics
+    : compMetrics.filter((mtr) => !STORAGE_ROW_LABELS.has(mtr.label));
+
+  const compDataRows = visibleMetrics.map((mtr, rowIdx) => {
     const fillColor = rowIdx % 2 === 0 ? PPTX_COLORS.pageBg : PPTX_COLORS.paper;
     const asIsCell =
       typeof mtr.asIs === 'string'

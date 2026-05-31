@@ -119,7 +119,14 @@ export function Step3ReviewExport() {
         entries.map(async ([key, inst]) => [key, await instanceToPng(inst)] as const),
       );
       const charts = Object.fromEntries(captures);
-      await exportPptx(currentCluster, scenarios, results, breakdowns, charts);
+      await exportPptx(
+        currentCluster,
+        scenarios,
+        results,
+        breakdowns,
+        charts,
+        layoutMode !== 'disaggregated',
+      );
     } catch (err) {
       console.error('PPTX export failed:', err);
       toast.error('PPTX export failed. Check browser console for details.');

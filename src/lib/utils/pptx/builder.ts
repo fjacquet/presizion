@@ -18,6 +18,8 @@ export interface DeckData {
   breakdowns: readonly VsanCapacityBreakdown[];
   charts: readonly ScenarioCharts[];
   date: string;
+  /** Whether to emit storage/disk rows. False in disaggregated layout (mirrors web). */
+  showStorage: boolean;
   logoDataUrl?: string;
 }
 

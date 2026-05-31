@@ -336,6 +336,70 @@ describe('exportPptx', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Disaggregated layout (showStorage=false): storage/disk rows are omitted from
+  // the comparison table to match the web (which hides storage when disaggregated).
+  // ---------------------------------------------------------------------------
+  function comparisonRowLabels(): string[] {
+    const tableCalls = mockAddTable.mock.calls as Array<[Array<Array<{ text: unknown }>>, unknown]>;
+    return tableCalls.flatMap(([rows]) =>
+      rows.map((row) => row[0]?.text).filter((t): t is string => typeof t === 'string'),
+    );
+  }
+
+  it('omits storage/disk comparison rows when showStorage is false (disaggregated)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {}, false);
+    const labels = comparisonRowLabels();
+    expect(labels).not.toContain('Total Disk');
+    expect(labels).not.toContain('Disk / Server (GB)');
+    expect(labels).not.toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('includes storage/disk comparison rows by default (showStorage defaults to true)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {});
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Total Disk');
+    expect(labels).toContain('Disk / Server (GB)');
+    expect(labels).toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('includes storage/disk comparison rows when showStorage is true (HCI)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {}, true);
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Total Disk');
+    expect(labels).toContain('Disk / Server (GB)');
+    expect(labels).toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('omits the Raw Storage capacity row when showStorage is false (disaggregated)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(
+      cluster,
+      [scenario],
+      [result],
+      [breakdown],
+      { 'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 } },
+      false,
+    );
+    const labels = comparisonRowLabels();
+    expect(labels).not.toContain('Raw Storage TiB');
+    // Non-storage capacity rows remain.
+    expect(labels).toContain('CPU GHz');
+    expect(labels).toContain('Memory GiB');
+  });
+
+  it('includes the Raw Storage capacity row by default (HCI)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {
+      'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 },
+    });
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Raw Storage TiB');
+  });
+
+  // ---------------------------------------------------------------------------
   // A captured ECharts PNG for a scenario yields an extra capacity chart slide
   // ---------------------------------------------------------------------------
   it('adds a capacity chart slide when a capture is supplied for the scenario', async () => {
