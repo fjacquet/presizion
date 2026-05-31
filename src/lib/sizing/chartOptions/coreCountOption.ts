@@ -1,6 +1,7 @@
 import type { EChartsOption } from 'echarts/types/dist/shared';
 import { CHART_COLORS } from '@/lib/sizing/chartColors';
 import { STATUS_COLORS } from '@/theme/echartsTheme';
+import { baseGrid, categoryXAxis, valueYAxis } from './_shared';
 
 export interface CoreCountRow {
   readonly name: string;
@@ -13,15 +14,11 @@ export function buildCoreCountOption(
   { asIsPcores }: { asIsPcores: number },
 ): EChartsOption {
   return {
-    grid: { top: 36, right: 16, bottom: 56, left: 48, containLabel: true },
+    grid: baseGrid({ top: 36 }),
     tooltip: { trigger: 'axis' },
     legend: { top: 0 },
-    xAxis: {
-      type: 'category',
-      data: rows.map((r) => r.name),
-      axisLabel: { rotate: 30, interval: 0 },
-    },
-    yAxis: { type: 'value', name: 'Physical Cores', nameLocation: 'middle', nameGap: 44 },
+    xAxis: categoryXAxis(rows.map((r) => r.name)),
+    yAxis: valueYAxis('Physical Cores', 44),
     series: [
       {
         type: 'bar',

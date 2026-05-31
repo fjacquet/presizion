@@ -1,6 +1,7 @@
 import type { EChartsOption } from 'echarts/types/dist/shared';
 import { CHART_COLORS } from '@/lib/sizing/chartColors';
 import { STATUS_COLORS } from '@/theme/echartsTheme';
+import { baseGrid, categoryXAxis, valueYAxis } from './_shared';
 
 export interface ServerCountRow {
   readonly name: string;
@@ -18,14 +19,10 @@ export function buildServerCountOption(rows: readonly ServerCountRow[]): ECharts
     return { value: r.servers, itemStyle: { color } };
   });
   return {
-    grid: { top: 24, right: 16, bottom: 56, left: 48, containLabel: true },
+    grid: baseGrid({ top: 24 }),
     tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'category',
-      data: rows.map((r) => r.name),
-      axisLabel: { rotate: 30, interval: 0 },
-    },
-    yAxis: { type: 'value', name: 'Servers', nameLocation: 'middle', nameGap: 36 },
+    xAxis: categoryXAxis(rows.map((r) => r.name)),
+    yAxis: valueYAxis('Servers', 36),
     series: [
       {
         type: 'bar',

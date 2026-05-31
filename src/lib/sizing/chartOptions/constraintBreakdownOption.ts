@@ -1,5 +1,6 @@
 import type { EChartsOption } from 'echarts/types/dist/shared';
 import { CHART_COLORS } from '@/lib/sizing/chartColors';
+import { baseGrid, categoryXAxis, valueYAxis } from './_shared';
 
 export interface ConstraintBreakdownRow {
   readonly name: string;
@@ -48,11 +49,11 @@ export function buildConstraintBreakdownOption(
       : []),
   ];
   return {
-    grid: { top: 36, right: 16, bottom: 56, left: 48, containLabel: true },
+    grid: baseGrid({ top: 36 }),
     tooltip: { trigger: 'axis' },
     legend: { top: 0 },
-    xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, interval: 0 } },
-    yAxis: { type: 'value', name: 'Servers', nameLocation: 'middle', nameGap: 36 },
+    xAxis: categoryXAxis(names),
+    yAxis: valueYAxis('Servers', 36),
     series,
   };
 }
