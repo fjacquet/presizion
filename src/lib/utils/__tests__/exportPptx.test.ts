@@ -37,11 +37,6 @@ vi.mock('pptxgenjs', () => {
   return { default: MockPptxGenJS };
 });
 
-// Mock chartRefToDataUrl to return null (no DOM in test env)
-vi.mock('@/lib/utils/chartCapture', () => ({
-  chartRefToDataUrl: vi.fn().mockResolvedValue(null),
-}));
-
 // Mock the logo helper (no canvas in test env)
 vi.mock('@/lib/utils/logoDataUrl', () => ({
   getLogoDataUrl: vi.fn().mockResolvedValue(''),
@@ -338,5 +333,86 @@ describe('exportPptx', () => {
       ([text]) => typeof text === 'string' && text.includes('Capacity Breakdown'),
     );
     expect(capacityTitles).toHaveLength(0);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Disaggregated layout (showStorage=false): storage/disk rows are omitted from
+  // the comparison table to match the web (which hides storage when disaggregated).
+  // ---------------------------------------------------------------------------
+  function comparisonRowLabels(): string[] {
+    const tableCalls = mockAddTable.mock.calls as Array<[Array<Array<{ text: unknown }>>, unknown]>;
+    return tableCalls.flatMap(([rows]) =>
+      rows.map((row) => row[0]?.text).filter((t): t is string => typeof t === 'string'),
+    );
+  }
+
+  it('omits storage/disk comparison rows when showStorage is false (disaggregated)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {}, false);
+    const labels = comparisonRowLabels();
+    expect(labels).not.toContain('Total Disk');
+    expect(labels).not.toContain('Disk / Server (GB)');
+    expect(labels).not.toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('includes storage/disk comparison rows by default (showStorage defaults to true)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {});
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Total Disk');
+    expect(labels).toContain('Disk / Server (GB)');
+    expect(labels).toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('includes storage/disk comparison rows when showStorage is true (HCI)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {}, true);
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Total Disk');
+    expect(labels).toContain('Disk / Server (GB)');
+    expect(labels).toContain('Avg Disk/VM (GiB)');
+  });
+
+  it('omits the Raw Storage capacity row when showStorage is false (disaggregated)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(
+      cluster,
+      [scenario],
+      [result],
+      [breakdown],
+      { 'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 } },
+      false,
+    );
+    const labels = comparisonRowLabels();
+    expect(labels).not.toContain('Raw Storage TiB');
+    // Non-storage capacity rows remain.
+    expect(labels).toContain('CPU GHz');
+    expect(labels).toContain('Memory GiB');
+  });
+
+  it('includes the Raw Storage capacity row by default (HCI)', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {
+      'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 },
+    });
+    const labels = comparisonRowLabels();
+    expect(labels).toContain('Raw Storage TiB');
+  });
+
+  // ---------------------------------------------------------------------------
+  // A captured ECharts PNG for a scenario yields an extra capacity chart slide
+  // ---------------------------------------------------------------------------
+  it('adds a capacity chart slide when a capture is supplied for the scenario', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {
+      'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 },
+    });
+    // Title + Summary + Comparison + 1 capacity chart slide = 4 slides
+    expect(mockAddSlide.mock.calls.length).toBe(4);
+    const textCalls = mockAddText.mock.calls as Array<[unknown, Record<string, unknown>]>;
+    const capacityTitles = textCalls.filter(
+      ([text]) => typeof text === 'string' && text.includes('Capacity Breakdown'),
+    );
+    expect(capacityTitles.length).toBeGreaterThan(0);
   });
 });

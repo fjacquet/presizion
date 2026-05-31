@@ -1,25 +1,13 @@
 import { useRef } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  LabelList,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
-import { CHART_COLORS } from '@/lib/sizing/chartColors';
-import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { buildConstraintBreakdownOption } from '@/lib/sizing/chartOptions/constraintBreakdownOption';
+import { buildServerCountOption } from '@/lib/sizing/chartOptions/serverCountOption';
+import { downloadChartSvg } from '@/lib/utils/chartImage';
 import { useClusterStore } from '@/store/useClusterStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
-
-const AS_IS_COLOR = '#94a3b8'; // slate-400
 
 export function SizingChart() {
   const scenarios = useScenariosStore((s) => s.scenarios);
@@ -27,8 +15,8 @@ export function SizingChart() {
   const sizingMode = useWizardStore((s) => s.sizingMode);
   const layoutMode = useWizardStore((s) => s.layoutMode);
   const currentCluster = useClusterStore((s) => s.currentCluster);
-  const comparisonRef = useRef<HTMLDivElement | null>(null);
-  const constraintRef = useRef<HTMLDivElement | null>(null);
+  const comparisonInstance = useRef<EChartsInstance | null>(null);
+  const constraintInstance = useRef<EChartsInstance | null>(null);
 
   if (scenarios.length === 0) return null;
 
@@ -69,42 +57,23 @@ export function SizingChart() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadChartPng(comparisonRef, 'cluster-sizing-chart.png')}
-            aria-label="Download chart as PNG"
+            onClick={() =>
+              comparisonInstance.current &&
+              downloadChartSvg(comparisonInstance.current, 'cluster-sizing-chart.svg')
+            }
+            aria-label="Download chart as SVG"
           >
-            Download PNG
+            Download SVG
           </Button>
         </div>
         <div className="h-48 sm:h-72">
-          <div ref={comparisonRef} className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-                <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Bar dataKey="servers" name="Servers Required">
-                  <LabelList
-                    dataKey="servers"
-                    position="top"
-                    style={{ fontSize: 12, fontWeight: 600 }}
-                  />
-                  {comparisonData.map((entry, idx) => (
-                    <Cell
-                      // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order comparison bars
-                      key={idx}
-                      fill={
-                        entry.isAsIs
-                          ? AS_IS_COLOR
-                          : (CHART_COLORS[(idx - (hasAsIs ? 1 : 0)) % CHART_COLORS.length] ??
-                            AS_IS_COLOR)
-                      }
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <Chart
+            option={buildServerCountOption(comparisonData)}
+            ariaLabel="Server count comparison"
+            onReady={(i) => {
+              comparisonInstance.current = i;
+            }}
+          />
         </div>
       </div>
 
@@ -117,35 +86,23 @@ export function SizingChart() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadChartPng(constraintRef, 'constraint-breakdown-chart.png')}
-            aria-label="Download constraint chart as PNG"
+            onClick={() =>
+              constraintInstance.current &&
+              downloadChartSvg(constraintInstance.current, 'constraint-breakdown-chart.svg')
+            }
+            aria-label="Download constraint chart as SVG"
           >
-            Download PNG
+            Download SVG
           </Button>
         </div>
         <div className="h-48 sm:h-72">
-          <div ref={constraintRef} className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={constraintData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-                <YAxis label={{ value: 'Servers', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="cpu" name={cpuBarName} fill={CHART_COLORS[0]}>
-                  <LabelList dataKey="cpu" position="top" style={{ fontSize: 11 }} />
-                </Bar>
-                <Bar dataKey="ram" name="RAM-limited" fill={CHART_COLORS[1]}>
-                  <LabelList dataKey="ram" position="top" style={{ fontSize: 11 }} />
-                </Bar>
-                {showDisk && (
-                  <Bar dataKey="disk" name="Disk-limited" fill={CHART_COLORS[2]}>
-                    <LabelList dataKey="disk" position="top" style={{ fontSize: 11 }} />
-                  </Bar>
-                )}
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <Chart
+            option={buildConstraintBreakdownOption(constraintData, { cpuBarName, showDisk })}
+            ariaLabel="Constraint breakdown per scenario"
+            onReady={(i) => {
+              constraintInstance.current = i;
+            }}
+          />
         </div>
       </div>
     </div>

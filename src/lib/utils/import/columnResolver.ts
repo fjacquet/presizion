@@ -27,6 +27,8 @@ export const RVTOOLS_VHOST_ALIASES: ColumnAliasMap = {
   cpu_sockets: ['# CPU', 'CPUs', 'Num CPU', 'Sockets'],
   cpu_cores_total: ['# Cores', 'CPU Cores', 'Cores'],
   memory_mb: ['Memory Size', 'Memory MB', 'Memory', '# Memory'],
+  cpu_usage_pct: ['CPU usage %', 'CPU Usage %', 'CPU %'],
+  mem_usage_pct: ['Memory usage %', 'Memory Usage %', 'Memory %'],
 };
 
 export const LIVEOPTICS_ESX_HOSTS_ALIASES: ColumnAliasMap = {

@@ -3,6 +3,7 @@
  * Requirements: EXPO-02, EXPO-03
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ResourceBreakdown, StorageBreakdown, VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
 import { buildCsvContent, buildJsonContent, csvEscape, downloadCsv, downloadJson } from '../export';
@@ -44,6 +45,39 @@ const result: ScenarioResult = {
   ramUtilizationPercent: 60.0,
   diskUtilizationPercent: 35.0,
   stretchApplied: false,
+};
+
+const resourceBd: ResourceBreakdown = {
+  vmsRequired: 100,
+  vsanConsumption: 0,
+  required: 100,
+  reservedMaxUtil: 20,
+  haReserve: 0,
+  spare: 20,
+  excess: 10,
+  total: 130,
+};
+
+const storageBd: StorageBreakdown = {
+  ...resourceBd,
+  required: 102400,
+  spare: 20480,
+  excess: 10240,
+  total: 133120,
+  usableRequired: 80000,
+  swapOverhead: 0,
+  metadataOverhead: 2400,
+  fttOverhead: 20000,
+  rawRequired: 102400,
+  slackSpace: 20480,
+};
+
+const breakdown: VsanCapacityBreakdown = {
+  scenarioId: 'test-scenario-1',
+  cpu: resourceBd,
+  memory: resourceBd,
+  storage: storageBd,
+  minNodesByConstraint: { cpu: 14, memory: 10, storage: 2 },
 };
 
 beforeEach(() => {
@@ -92,6 +126,25 @@ describe('buildCsvContent', () => {
 
   it('escapes fields containing double-quotes by doubling them', () => {
     expect(csvEscape('say "hello"')).toBe('"say ""hello"""');
+  });
+
+  it('omits the capacity breakdown section when no breakdowns are passed', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result]);
+    expect(csv).not.toContain('Capacity Breakdown');
+  });
+
+  it('appends a capacity breakdown section per scenario when breakdowns are passed', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result], [breakdown]);
+    expect(csv).toContain('Capacity Breakdown');
+    expect(csv).toContain('CPU GHz');
+    expect(csv).toContain('Required,Spare,Excess,Total');
+  });
+
+  it('includes Memory GiB and Raw Storage TiB rows with TiB conversion', () => {
+    const csv = buildCsvContent(cluster, [scenario], [result], [breakdown]);
+    expect(csv).toContain('Memory GiB');
+    // Raw Storage TiB: total 133120 GiB / 1024 = 130.0 TiB
+    expect(csv).toContain('Raw Storage TiB,100.0,20.0,10.0,130.0');
   });
 });
 

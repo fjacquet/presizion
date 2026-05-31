@@ -294,6 +294,98 @@ describe('rvtoolsParser', () => {
     });
   });
 
+  describe('vHost sheet — CPU/RAM utilization extraction', () => {
+    const VHOST_UTIL_SHEET = {};
+
+    it('averages CPU usage % / Memory usage % across hosts into global util fields', async () => {
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { vInfo: MOCK_SHEET, vHost: VHOST_UTIL_SHEET },
+        SheetNames: ['vInfo', 'vHost'],
+      } as unknown as ReturnType<typeof XLSX.read>);
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === VHOST_UTIL_SHEET)
+          return [
+            { Host: 'esxi-01', 'CPU usage %': 40, 'Memory usage %': 50 },
+            { Host: 'esxi-02', 'CPU usage %': 50, 'Memory usage %': 60 },
+          ];
+        return MOCK_ROWS;
+      });
+      const result = await parseRvtools(new ArrayBuffer(0));
+      expect(result.cpuUtilizationPercent).toBe(45); // avg(40,50)
+      expect(result.ramUtilizationPercent).toBe(55); // avg(50,60)
+    });
+
+    it('leaves util fields undefined when usage columns are absent (UI still prompts)', async () => {
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { vInfo: MOCK_SHEET, vHost: VHOST_UTIL_SHEET },
+        SheetNames: ['vInfo', 'vHost'],
+      } as unknown as ReturnType<typeof XLSX.read>);
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === VHOST_UTIL_SHEET)
+          return [
+            { Host: 'esxi-01', 'CPU Model': 'Xeon', 'Speed MHz': 2400 },
+            { Host: 'esxi-02', 'CPU Model': 'Xeon', 'Speed MHz': 2400 },
+          ];
+        return MOCK_ROWS;
+      });
+      const result = await parseRvtools(new ArrayBuffer(0));
+      expect(result.cpuUtilizationPercent).toBeUndefined();
+      expect(result.ramUtilizationPercent).toBeUndefined();
+    });
+
+    it('writes per-scope utilization grouped by scope key', async () => {
+      const vInfoRows = [
+        {
+          VM: 'web-01',
+          CPUs: 4,
+          Memory: 8192,
+          'Provisioned MB': 102400,
+          Template: false,
+          Cluster: 'CL-A',
+          Host: 'esxi-01',
+        },
+        {
+          VM: 'db-01',
+          CPUs: 8,
+          Memory: 16384,
+          'Provisioned MB': 204800,
+          Template: false,
+          Cluster: 'CL-A',
+          Host: 'esxi-02',
+        },
+        {
+          VM: 'app-01',
+          CPUs: 2,
+          Memory: 4096,
+          'Provisioned MB': 51200,
+          Template: false,
+          Cluster: 'CL-B',
+          Host: 'esxi-03',
+        },
+      ];
+      const vHostRows = [
+        { Host: 'esxi-01', 'CPU usage %': 40, 'Memory usage %': 50, Cluster: 'CL-A' },
+        { Host: 'esxi-02', 'CPU usage %': 50, 'Memory usage %': 60, Cluster: 'CL-A' },
+        { Host: 'esxi-03', 'CPU usage %': 70, 'Memory usage %': 80, Cluster: 'CL-B' },
+      ];
+      vi.mocked(XLSX.read).mockReturnValue({
+        Sheets: { vInfo: MOCK_SHEET, vHost: VHOST_UTIL_SHEET },
+        SheetNames: ['vInfo', 'vHost'],
+      } as unknown as ReturnType<typeof XLSX.read>);
+      vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet) => {
+        if (sheet === VHOST_UTIL_SHEET) return vHostRows;
+        return vInfoRows;
+      });
+      const result = await parseRvtools(new ArrayBuffer(0));
+      const scopeA = result.rawByScope?.get('CL-A');
+      const scopeB = result.rawByScope?.get('CL-B');
+      expect(scopeA?.cpuUtilizationPercent).toBe(45); // avg(40,50)
+      expect(scopeA?.ramUtilizationPercent).toBe(55); // avg(50,60)
+      expect(scopeB?.cpuUtilizationPercent).toBe(70);
+      expect(scopeB?.ramUtilizationPercent).toBe(80);
+    });
+  });
+
   describe('per-scope vHost config', () => {
     const VHOST_SHEET_2 = {};
 

@@ -1,9 +1,9 @@
 /**
  * Per-scenario chart-capture shape consumed by the PPTX slide builders.
- * Re-exports the existing capture type from `chartCapture` so the deck and
- * the wrapper share one source of truth.
+ * Re-exports the capture type from `chartImage` (the ECharts rasterizer) so the
+ * deck and the wrapper share one source of truth.
  */
-import type { ChartCapture } from '@/lib/utils/chartCapture';
+import type { ChartCapture } from '@/lib/utils/chartImage';
 
 export interface ScenarioCharts {
   readonly capacity: ChartCapture | null;

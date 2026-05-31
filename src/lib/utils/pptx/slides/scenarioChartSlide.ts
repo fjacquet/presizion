@@ -14,6 +14,8 @@ interface ScenarioChartSlidesData {
   results: readonly ScenarioResult[];
   breakdowns: readonly VsanCapacityBreakdown[];
   charts: readonly ScenarioCharts[];
+  /** When false (disaggregated layout), the storage capacity row is omitted. */
+  showStorage: boolean;
 }
 
 /** Strip `data:` prefix so pptxgenjs accepts it as `data`. */
@@ -32,7 +34,7 @@ export function addScenarioChartSlides(
   date: string,
   startNum: number,
 ): number {
-  const { scenarios, breakdowns, charts } = d;
+  const { scenarios, breakdowns, charts, showStorage } = d;
   let num = startNum;
 
   scenarios.forEach((scenario, i) => {
@@ -85,7 +87,7 @@ export function addScenarioChartSlides(
         headerCell('Excess'),
         headerCell('Total'),
       ];
-      const capTableRows = [
+      const capTableSource: string[][] = [
         ['CPU GHz', f1(bd.cpu.required), f1(bd.cpu.spare), f1(bd.cpu.excess), f1(bd.cpu.total)],
         [
           'Memory GiB',
@@ -94,14 +96,21 @@ export function addScenarioChartSlides(
           f1(bd.memory.excess),
           f1(bd.memory.total),
         ],
-        [
+      ];
+      // Disaggregated layout hides storage on the web — mirror that by omitting
+      // the storage row. HCI (showStorage=true) keeps it for byte-identical output.
+      if (showStorage) {
+        capTableSource.push([
           'Raw Storage TiB',
           f1(bd.storage.required / 1024),
           f1(bd.storage.spare / 1024),
           f1(bd.storage.excess / 1024),
           f1(bd.storage.total / 1024),
-        ],
-      ].map((cells, ri) => cells.map((c, ci) => dataCell(c, ri, ci === 0)));
+        ]);
+      }
+      const capTableRows = capTableSource.map((cells, ri) =>
+        cells.map((c, ci) => dataCell(c, ri, ci === 0)),
+      );
 
       s.addTable([capTableHeader, ...capTableRows], {
         x: M,

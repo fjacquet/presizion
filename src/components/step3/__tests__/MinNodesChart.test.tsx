@@ -1,28 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock recharts -- ResponsiveContainer collapses to 0px in jsdom
-vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
+// Mock the ECharts <Chart> wrapper — jsdom can't render svg charts.
+vi.mock('@/components/charts/Chart', () => ({
+  Chart: ({ ariaLabel }: { ariaLabel?: string }) => (
+    <div data-testid="chart" role="img" aria-label={ariaLabel} />
   ),
-  Bar: ({ name, children }: { name: string; children?: React.ReactNode }) => (
-    <span data-testid="bar-series">
-      {name}
-      {children}
-    </span>
-  ),
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  Legend: () => <div data-testid="legend" />,
-  LabelList: ({ dataKey }: { dataKey: string }) => <span data-testid="label-list">{dataKey}</span>,
-  ReferenceLine: () => null,
-  Cell: () => null,
 }));
 
 vi.mock('@/hooks/useVsanBreakdowns', () => ({
@@ -110,27 +94,18 @@ describe('MinNodesChart', () => {
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
     render(<MinNodesChart />);
     expect(screen.getByText(/Min Nodes by Constraint/)).toBeInTheDocument();
+    expect(screen.getByTestId('chart')).toBeInTheDocument();
   });
 
-  it('renders Download PNG button with correct aria-label', () => {
+  it('renders Download SVG button with correct aria-label', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
     render(<MinNodesChart />);
     expect(
-      screen.getByRole('button', { name: /download.*min.*nodes.*chart.*png/i }),
+      screen.getByRole('button', { name: /download.*min.*nodes.*chart.*svg/i }),
     ).toBeInTheDocument();
-  });
-
-  it('Download PNG button is clickable without error', async () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    render(<MinNodesChart />);
-    const btn = screen.getByRole('button', { name: /download.*min.*nodes.*chart.*png/i });
-    await userEvent.click(btn);
   });
 
   it('renders one chart section per scenario', () => {
@@ -143,35 +118,6 @@ describe('MinNodesChart', () => {
     render(<MinNodesChart />);
     expect(screen.getByText(/Min Nodes by Constraint -- Scenario A/)).toBeInTheDocument();
     expect(screen.getByText(/Min Nodes by Constraint -- Scenario B/)).toBeInTheDocument();
-  });
-
-  it('renders bar series with name "Min Nodes"', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    render(<MinNodesChart />);
-    const barSeries = screen.getAllByTestId('bar-series');
-    const names = barSeries.map((el) => el.textContent);
-    expect(names.some((n) => n?.includes('Min Nodes'))).toBe(true);
-  });
-
-  it('renders LabelList for node count labels', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    render(<MinNodesChart />);
-    expect(screen.getByTestId('label-list')).toBeInTheDocument();
-  });
-
-  it('renders h-full div inside responsive wrapper for PNG capture', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useVsanBreakdowns).mockReturnValue([baseBreakdown]);
-    const { container } = render(<MinNodesChart />);
-    const hFullDivs = container.querySelectorAll('div.h-full');
-    expect(hFullDivs.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByTestId('chart')).toHaveLength(2);
   });
 });

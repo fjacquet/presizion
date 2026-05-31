@@ -1,3 +1,4 @@
+import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ExclusionRules } from '@/types/exclusions';
 import { EMPTY_RULES } from '@/types/exclusions';
@@ -25,12 +26,15 @@ export function csvEscape(value: string | number | boolean): string {
  * @param _cluster - The existing cluster metrics (reserved for future use — cluster data in clipboard only)
  * @param scenarios - The target scenarios being compared
  * @param results - The computed ScenarioResult for each scenario (parallel array)
+ * @param breakdowns - Optional per-scenario capacity breakdowns; when present, a
+ *   "Capacity Breakdown" section is appended for each scenario
  * @returns CSV string with header row + one row per scenario
  */
 export function buildCsvContent(
   _cluster: OldCluster,
   scenarios: readonly Scenario[],
   results: readonly ScenarioResult[],
+  breakdowns: readonly VsanCapacityBreakdown[] = [],
 ): string {
   const headers = [
     'Name',
@@ -87,6 +91,23 @@ export function buildCsvContent(
     ];
 
     rows.push(cells.map(csvEscape).join(','));
+  });
+
+  breakdowns.forEach((bd, i) => {
+    const name = scenarios[i]?.name ?? `Scenario ${i + 1}`;
+    rows.push('', `Capacity Breakdown,${csvEscape(name)}`, 'Resource,Required,Spare,Excess,Total');
+    const line = (
+      label: string,
+      r: { required: number; spare: number; excess: number; total: number },
+      div = 1,
+    ): string =>
+      [label, r.required / div, r.spare / div, Math.max(0, r.excess) / div, r.total / div]
+        .map((v) => (typeof v === 'number' ? v.toFixed(1) : v))
+        .map(csvEscape)
+        .join(',');
+    rows.push(line('CPU GHz', bd.cpu));
+    rows.push(line('Memory GiB', bd.memory));
+    rows.push(line('Raw Storage TiB', bd.storage, 1024));
   });
 
   return rows.join('\n');

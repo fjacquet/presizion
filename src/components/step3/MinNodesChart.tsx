@@ -1,18 +1,9 @@
 import { useRef } from 'react';
-import {
-  Bar,
-  BarChart,
-  Cell,
-  LabelList,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
-import { CHART_COLORS } from '@/lib/sizing/chartColors';
-import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { buildMinNodesOption, type MinNodesRow } from '@/lib/sizing/chartOptions/minNodesOption';
+import { downloadChartSvg } from '@/lib/utils/chartImage';
 import { useScenariosStore } from '@/store/useScenariosStore';
 
 const CONSTRAINT_LABELS: Record<string, string> = {
@@ -26,27 +17,21 @@ const CONSTRAINT_LABELS: Record<string, string> = {
 /** Ordered keys for consistent bar rendering. */
 const CONSTRAINT_KEYS = ['cpu', 'memory', 'storage', 'ftha', 'vms'] as const;
 
-interface ConstraintRow {
-  readonly name: string;
-  readonly nodes: number;
-  readonly isBinding: boolean;
-}
-
 interface MinNodesChartProps {
-  /** When provided, chart container refs are written here for PDF/PPTX export capture. */
-  readonly chartRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>;
+  /** PPTX export hook: receives (`minnodes-${id}`, instance) on chart ready. */
+  readonly onChartReady?: (key: string, instance: EChartsInstance) => void;
 }
 
 /**
  * Horizontal bar chart showing minimum node count per constraint.
- * The binding constraint (highest node count) is highlighted in blue;
- * non-binding constraints are slate-400.
- * One chart per scenario, each with a Download PNG button.
+ * The binding constraint (highest node count) is highlighted in brand color;
+ * non-binding constraints are slate. One chart per scenario, each with a
+ * Download SVG button.
  */
-export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
+export function MinNodesChart({ onChartReady }: MinNodesChartProps = {}) {
   const scenarios = useScenariosStore((s) => s.scenarios);
   const breakdowns = useVsanBreakdowns();
-  const refs = useRef<Record<string, HTMLDivElement | null>>({});
+  const instances = useRef<Record<string, EChartsInstance | null>>({});
 
   if (scenarios.length === 0) return null;
 
@@ -60,7 +45,7 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
 
         const finalCount = Math.max(...Object.values(bd.minNodesByConstraint), 0);
 
-        const constraintRows: ConstraintRow[] = CONSTRAINT_KEYS.map((key) => {
+        const constraintRows: MinNodesRow[] = CONSTRAINT_KEYS.map((key) => {
           const nodes = bd.minNodesByConstraint[key] ?? 0;
           return {
             name: CONSTRAINT_LABELS[key] ?? key,
@@ -78,48 +63,24 @@ export function MinNodesChart({ chartRefs }: MinNodesChartProps = {}) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  downloadChartPng(
-                    { current: refs.current[scenarioId] ?? null },
-                    `min-nodes-${scenarioName}.png`,
-                  )
-                }
-                aria-label="Download min nodes chart as PNG"
+                onClick={() => {
+                  const inst = instances.current[scenarioId];
+                  if (inst) downloadChartSvg(inst, `min-nodes-${scenarioName}.svg`);
+                }}
+                aria-label="Download min nodes chart as SVG"
               >
-                Download PNG
+                Download SVG
               </Button>
             </div>
             <div className="h-[180px] sm:h-[220px]">
-              <div
-                className="h-full"
-                ref={(el) => {
-                  refs.current[scenarioId] = el;
-                  if (chartRefs) chartRefs.current[`minnodes-${scenarioId}`] = el;
+              <Chart
+                option={buildMinNodesOption(constraintRows)}
+                ariaLabel={`Min nodes by constraint for ${scenarioName}`}
+                onReady={(inst) => {
+                  instances.current[scenarioId] = inst;
+                  onChartReady?.(`minnodes-${scenarioId}`, inst);
                 }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={constraintRows}
-                    layout="vertical"
-                    margin={{ top: 8, right: 60, left: 90, bottom: 8 }}
-                  >
-                    <XAxis type="number" allowDecimals={false} />
-                    <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="nodes" name="Min Nodes">
-                      <LabelList
-                        dataKey="nodes"
-                        position="right"
-                        style={{ fontSize: 11, fontWeight: 600 }}
-                      />
-                      {constraintRows.map((row, idx) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: fixed-order constraint bars
-                        <Cell key={idx} fill={row.isBinding ? CHART_COLORS[0] : '#94a3b8'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              />
             </div>
           </div>
         );
