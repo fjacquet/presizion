@@ -1,4 +1,5 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,11 +32,13 @@ const selectClasses =
  * disclosure of ScenarioCard.
  */
 export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) {
+  const { t } = useTranslation('step2');
+
   if (layoutMode !== 'hci') return null;
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">vSAN Settings</p>
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('vsan.heading')}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* FTT Policy dropdown */}
         <Controller
@@ -43,7 +46,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
           name="vsanFttPolicy"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>FTT Policy</FormLabel>
+              <FormLabel>{t('vsan.fttPolicy')}</FormLabel>
               <FormControl>
                 <select
                   className={selectClasses}
@@ -51,7 +54,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
-                  <option value="">None (legacy sizing)</option>
+                  <option value="">{t('vsan.fttNone')}</option>
                   {(Object.keys(FTT_POLICY_MAP) as VsanFttPolicy[]).map((key) => (
                     <option key={key} value={key}>
                       {FTT_POLICY_MAP[key].label}
@@ -69,7 +72,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
           name="vsanCompressionFactor"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Compression Factor</FormLabel>
+              <FormLabel>{t('vsan.compressionFactor')}</FormLabel>
               <FormControl>
                 <select
                   className={selectClasses}
@@ -77,7 +80,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
                   value={field.value ?? ''}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
-                  <option value="">None (1.0x)</option>
+                  <option value="">{t('vsan.compressionNone')}</option>
                   {(Object.entries(COMPRESSION_FACTOR_LABELS) as [string, string][]).map(
                     ([key, label]) => (
                       <option key={key} value={key}>
@@ -97,7 +100,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
           name="vsanSlackPercent"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Slack Space %</FormLabel>
+              <FormLabel>{t('vsan.slackPercent')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -120,7 +123,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
           name="vsanCpuOverheadPercent"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>CPU Overhead %</FormLabel>
+              <FormLabel>{t('vsan.cpuOverheadPercent')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -143,7 +146,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
           name="vsanMemoryPerHostGb"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Memory/Host GB</FormLabel>
+              <FormLabel>{t('vsan.memoryPerHostGb')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -172,7 +175,7 @@ export function VsanSection({ form, scenarioId, layoutMode }: VsanSectionProps) 
               id={`${scenarioId}-vmSwap`}
             />
             <Label htmlFor={`${scenarioId}-vmSwap`} className="cursor-pointer text-sm">
-              VM Swap on vSAN
+              {t('vsan.vmSwap')}
             </Label>
           </div>
         )}

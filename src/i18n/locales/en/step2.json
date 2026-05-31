@@ -1,3 +1,84 @@
 {
-  "title": "Step 2: Define Target Scenarios"
+  "title": "Step 2: Define Target Scenarios",
+  "subtitle": "Configure one or more target server specs and sizing assumptions.",
+  "addScenario": "Add Scenario",
+  "scenarioCard": {
+    "namePlaceholder": "Scenario name",
+    "duplicateAriaLabel": "Duplicate scenario",
+    "removeAriaLabel": "Remove scenario",
+    "seededNotice": "Seeded from your import: {{ratio}}:1 ratio, {{growth}}% growth, {{safety}}% safety — adjust as needed.",
+    "serverConfig": {
+      "heading": "Target Server Config",
+      "socketsPerServer": "Sockets/Server",
+      "coresPerSocket": "Cores/Socket",
+      "ramPerServerGb": "RAM/Server GB",
+      "diskPerServerGb": "Disk/Server GB",
+      "totalCores": "Total cores/server:",
+      "noSocketCoreData": "No socket/core data from import — enter manually.",
+      "lookupTargetCpu": "Look up target CPU (optional)",
+      "cpuModelPlaceholder": "e.g. Xeon Gold 6526Y"
+    },
+    "sizingAssumptions": {
+      "heading": "Sizing Assumptions",
+      "vcpuToPCoreRatio": "vCPU:pCore Ratio",
+      "ramPerVmGb": "RAM/VM GB",
+      "diskPerVmGb": "Disk/VM GB",
+      "growthPercent": "Growth %",
+      "safetyPercent": "Safety buffer %",
+      "haReserve": "HA Reserve",
+      "haNone": "N (None)"
+    },
+    "performance": {
+      "heading": "Performance Target (required)",
+      "targetCpuFrequencyGhz": "New CPU Frequency (GHz)",
+      "specScoresCheckbox": "I have SPEC scores (more precise)",
+      "targetCpuModel": "Target CPU Model",
+      "targetSpecint": "SPECrate2017_int_base / Server (target)"
+    },
+    "advanced": {
+      "label": "Advanced",
+      "pinMinServers": "Pin minimum servers",
+      "minServerCountPlaceholder": "Minimum server count"
+    },
+    "tooltips": {
+      "socketsPerServer": "Physical CPU sockets per target server. Check the vendor spec sheet.",
+      "coresPerSocket": "Physical cores per socket — NOT hyperthreaded logical CPUs.",
+      "ramPerServerGb": "Total RAM installed per target server (GB).",
+      "diskPerServerGb": "Total usable storage per target server (GB).",
+      "targetVcpuToPCoreRatio": "Hard assignment-density cap: no more than N vCPUs per physical core. VMware recommends 4:1 for mixed workloads; use 2:1 for databases.",
+      "ramPerVmGb": "Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.",
+      "diskPerVmGb": "Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.",
+      "growthPercent": "Future workload growth. 0% = size for today only. Scales all demand (CPU, RAM, disk).",
+      "safetyPercent": "Operational buffer so the cluster never runs hot. 20% → sized to run ~83% under current load.",
+      "targetSpecint": "SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).",
+      "targetCpuFrequencyGhz": "Target server CPU clock frequency in GHz. Used with current frequency to compute GHz demand ratio.",
+      "minServerCount": "Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing."
+    }
+  },
+  "results": {
+    "noData": "Enter cluster data in Step 1 to see results.",
+    "serversRequired": "servers required",
+    "cpuLimited": "CPU-limited: ",
+    "specrateLimited": "SPECrate-limited: ",
+    "ramLimited": "RAM-limited: ",
+    "diskLimited": "Disk-limited: ",
+    "resourceLabels": {
+      "cpu": "CPU-limited",
+      "ram": "RAM-limited",
+      "disk": "Disk-limited",
+      "specint": "SPECrate-limited",
+      "ghz": "GHz-limited"
+    }
+  },
+  "vsan": {
+    "heading": "vSAN Settings",
+    "fttPolicy": "FTT Policy",
+    "fttNone": "None (legacy sizing)",
+    "compressionFactor": "Compression Factor",
+    "compressionNone": "None (1.0x)",
+    "slackPercent": "Slack Space %",
+    "cpuOverheadPercent": "CPU Overhead %",
+    "memoryPerHostGb": "Memory/Host GB",
+    "vmSwap": "VM Swap on vSAN"
+  }
 }

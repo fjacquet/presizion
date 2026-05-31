@@ -1,3 +1,84 @@
 {
-  "title": "Schritt 2: Zielszenarien definieren"
+  "title": "Schritt 2: Zielszenarien definieren",
+  "subtitle": "Konfigurieren Sie eine oder mehrere Zielserver-Spezifikationen und Dimensionierungsannahmen.",
+  "addScenario": "Szenario hinzufügen",
+  "scenarioCard": {
+    "namePlaceholder": "Szenarioname",
+    "duplicateAriaLabel": "Szenario duplizieren",
+    "removeAriaLabel": "Szenario entfernen",
+    "seededNotice": "Aus Import übernommen: Verhältnis {{ratio}}:1, {{growth}}% Wachstum, {{safety}}% Sicherheit — bei Bedarf anpassen.",
+    "serverConfig": {
+      "heading": "Zielserver-Konfiguration",
+      "socketsPerServer": "Sockets/Server",
+      "coresPerSocket": "Kerne/Socket",
+      "ramPerServerGb": "RAM/Server GB",
+      "diskPerServerGb": "Disk/Server GB",
+      "totalCores": "Gesamtkerne/Server:",
+      "noSocketCoreData": "Keine Socket-/Kerndaten aus Import — bitte manuell eingeben.",
+      "lookupTargetCpu": "Ziel-CPU nachschlagen (optional)",
+      "cpuModelPlaceholder": "z. B. Xeon Gold 6526Y"
+    },
+    "sizingAssumptions": {
+      "heading": "Dimensionierungsannahmen",
+      "vcpuToPCoreRatio": "vCPU:pCore-Verhältnis",
+      "ramPerVmGb": "RAM/VM GB",
+      "diskPerVmGb": "Disk/VM GB",
+      "growthPercent": "Wachstum %",
+      "safetyPercent": "Sicherheitspuffer %",
+      "haReserve": "HA-Reserve",
+      "haNone": "N (Keine)"
+    },
+    "performance": {
+      "heading": "Leistungsziel (erforderlich)",
+      "targetCpuFrequencyGhz": "Neue CPU-Frequenz (GHz)",
+      "specScoresCheckbox": "Ich habe SPEC-Werte (genauer)",
+      "targetCpuModel": "Ziel-CPU-Modell",
+      "targetSpecint": "SPECrate2017_int_base / Server (Ziel)"
+    },
+    "advanced": {
+      "label": "Erweitert",
+      "pinMinServers": "Mindestanzahl Server festlegen",
+      "minServerCountPlaceholder": "Mindestanzahl Server"
+    },
+    "tooltips": {
+      "socketsPerServer": "Physische CPU-Sockel pro Zielserver. Prüfen Sie das Datenblatt des Anbieters.",
+      "coresPerSocket": "Physische Kerne pro Sockel — NICHT hyperthreaded logische CPUs.",
+      "ramPerServerGb": "Gesamter installierter RAM pro Zielserver (GB).",
+      "diskPerServerGb": "Gesamter nutzbarer Speicher pro Zielserver (GB).",
+      "targetVcpuToPCoreRatio": "Harte Zuweisungsdichte: nicht mehr als N vCPUs pro physischem Kern. VMware empfiehlt 4:1 für gemischte Workloads; für Datenbanken 2:1 verwenden.",
+      "ramPerVmGb": "Durchschnittlicher RAM pro VM in Ihrem aktuellen Cluster. In vCenter: Monitor → Speicher verwendet ÷ VM-Anzahl. Verfügbar aus LiveOptics/RVTools-Import.",
+      "diskPerVmGb": "Durchschnittlich bereitgestellter Disk pro VM. Wird automatisch aus Gesamt-Disk GB ÷ Gesamt-VMs berechnet, wenn verfügbar. Oder aus RVTools/LiveOptics-Import gelesen.",
+      "growthPercent": "Zukünftiges Workload-Wachstum. 0% = nur für heute dimensionieren. Skaliert alle Anforderungen (CPU, RAM, Disk).",
+      "safetyPercent": "Betriebspuffer, damit der Cluster nie heiß läuft. 20% → dimensioniert für ca. 83% Auslastung unter aktueller Last.",
+      "targetSpecint": "SPECrate2017_int_base-Ergebnis für den Zielserver. Unter spec.org/cpu2017/results/ → nach neuem Servermodell filtern. Standard: Dell R660 mit 2× Xeon Gold 6526Y (337).",
+      "targetCpuFrequencyGhz": "CPU-Taktfrequenz des Zielservers in GHz. Wird mit der aktuellen Frequenz zur Berechnung des GHz-Bedarfsverhältnisses verwendet.",
+      "minServerCount": "Mindestgrenze festlegen: Die endgültige Serveranzahl wird unabhängig von der berechneten Größe niemals unter diesen Wert fallen."
+    }
+  },
+  "results": {
+    "noData": "Geben Sie in Schritt 1 Cluster-Daten ein, um Ergebnisse anzuzeigen.",
+    "serversRequired": "Server erforderlich",
+    "cpuLimited": "CPU-begrenzt: ",
+    "specrateLimited": "SPECrate-begrenzt: ",
+    "ramLimited": "RAM-begrenzt: ",
+    "diskLimited": "Disk-begrenzt: ",
+    "resourceLabels": {
+      "cpu": "CPU-begrenzt",
+      "ram": "RAM-begrenzt",
+      "disk": "Disk-begrenzt",
+      "specint": "SPECrate-begrenzt",
+      "ghz": "GHz-begrenzt"
+    }
+  },
+  "vsan": {
+    "heading": "vSAN-Einstellungen",
+    "fttPolicy": "FTT-Richtlinie",
+    "fttNone": "Keine (klassische Dimensionierung)",
+    "compressionFactor": "Kompressionsfaktor",
+    "compressionNone": "Keine (1,0x)",
+    "slackPercent": "Freier Speicher %",
+    "cpuOverheadPercent": "CPU-Overhead %",
+    "memoryPerHostGb": "Speicher/Host GB",
+    "vmSwap": "VM-Swap auf vSAN"
+  }
 }
