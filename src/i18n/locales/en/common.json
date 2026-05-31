@@ -2,6 +2,6 @@
   "appName": "Presizion",
   "appTagline": "Size your refreshed cluster based on existing metrics",
   "language": {
-    "switch": "Language: {{lang}}. Click to switch."
+    "select": "Select language"
   }
 }

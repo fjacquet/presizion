@@ -2,6 +2,6 @@
   "appName": "Presizion",
   "appTagline": "Dimensionieren Sie Ihren erneuerten Cluster anhand vorhandener Metriken",
   "language": {
-    "switch": "Sprache: {{lang}}. Zum Wechseln klicken."
+    "select": "Sprache wählen"
   }
 }
