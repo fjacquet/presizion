@@ -27,6 +27,10 @@
     "hci": "HCI",
     "disaggregated": "Disaggregiert"
   },
+  "stretch": {
+    "label": "Stretched Cluster",
+    "tooltip": "Stretched Cluster: Jeder Standort muss bei einem Ausfall die volle Last tragen. Die Dimensionierung verdoppelt die Serveranzahl und rundet auf eine gerade Zahl auf."
+  },
   "stepIndicator": {
     "navAriaLabel": "Assistentenschritte",
     "step1Label": "Aktueller Cluster",

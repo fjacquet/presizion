@@ -27,6 +27,10 @@
     "hci": "HCI",
     "disaggregated": "Désagrégé"
   },
+  "stretch": {
+    "label": "Cluster étendu",
+    "tooltip": "Cluster étendu : chaque site doit supporter la charge totale en cas de panne. Le dimensionnement double le nombre de serveurs et arrondit à un nombre pair."
+  },
   "stepIndicator": {
     "navAriaLabel": "Étapes de l'assistant",
     "step1Label": "Cluster actuel",

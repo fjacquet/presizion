@@ -27,6 +27,10 @@
     "hci": "HCI",
     "disaggregated": "Disaggregated"
   },
+  "stretch": {
+    "label": "Stretch cluster",
+    "tooltip": "Stretched cluster: each site must carry the full workload on failure. Sizing doubles the server count and rounds up to an even number."
+  },
   "stepIndicator": {
     "navAriaLabel": "Wizard steps",
     "step1Label": "Current Cluster",

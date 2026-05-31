@@ -27,6 +27,10 @@
     "hci": "HCI",
     "disaggregated": "Disaggregato"
   },
+  "stretch": {
+    "label": "Cluster esteso",
+    "tooltip": "Cluster esteso: ogni sito deve supportare il carico completo in caso di guasto. Il dimensionamento raddoppia il numero di server e arrotonda a un numero pari."
+  },
   "stepIndicator": {
     "navAriaLabel": "Passaggi della procedura guidata",
     "step1Label": "Cluster attuale",

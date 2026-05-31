@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSpecLookup } from '@/hooks/useSpecLookup';
 import { SPEC_SEARCH_WEB_URL } from '@/lib/config';
@@ -120,7 +119,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       ramUtilizationPercent: undefined,
       existingServerCount: undefined,
       cpuFrequencyGhz: undefined,
-      isStretchCluster: undefined,
     },
   });
 
@@ -139,8 +137,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
       formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent ||
       formVals.specintPerServer !== currentCluster.specintPerServer ||
-      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz ||
-      formVals.isStretchCluster !== currentCluster.isStretchCluster;
+      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz;
     if (changed) {
       form.reset({
         ...formVals,
@@ -156,7 +153,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         ramUtilizationPercent: currentCluster.ramUtilizationPercent,
         specintPerServer: currentCluster.specintPerServer,
         cpuFrequencyGhz: currentCluster.cpuFrequencyGhz,
-        isStretchCluster: currentCluster.isStretchCluster,
       });
     }
   }, [currentCluster, form]);
@@ -345,40 +341,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               optional
             />
           </div>
-          <FormField
-            control={form.control}
-            name="isStretchCluster"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-3 mt-4">
-                <FormControl>
-                  <Switch
-                    checked={field.value === true}
-                    onCheckedChange={(v) => field.onChange(v)}
-                    aria-label={t('currentClusterForm.fields.stretchCluster')}
-                    data-testid="input-isStretchCluster"
-                  />
-                </FormControl>
-                <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
-                  {t('currentClusterForm.fields.stretchCluster')}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info
-                          className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
-                          aria-label={`Info: ${t('currentClusterForm.fields.stretchCluster')}`}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs text-sm">
-                          {t('currentClusterForm.tooltips.stretchCluster')}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </FormLabel>
-              </FormItem>
-            )}
-          />
         </section>
 
         <section>

@@ -9,12 +9,16 @@
 
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useClusterStore } from '@/store/useClusterStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import { SizingModeToggle } from '../SizingModeToggle';
 
 describe('SizingModeToggle', () => {
   beforeEach(() => {
     useWizardStore.setState({ sizingMode: 'vcpu', layoutMode: 'hci' });
+    useClusterStore.setState({
+      currentCluster: { ...useClusterStore.getState().currentCluster, isStretchCluster: false },
+    });
   });
 
   it('renders only vCPU and Performance modes', () => {
@@ -68,6 +72,22 @@ describe('SizingModeToggle', () => {
     expect(within(layoutGroup).getByRole('switch')).not.toBeChecked();
     fireEvent.click(within(layoutGroup).getByRole('switch'));
     expect(setLayoutMode).toHaveBeenCalledWith('disaggregated');
+  });
+
+  it('stretch switch reflects and toggles currentCluster.isStretchCluster', () => {
+    const setCurrentCluster = vi.fn();
+    useClusterStore.setState({
+      currentCluster: { ...useClusterStore.getState().currentCluster, isStretchCluster: false },
+      setCurrentCluster,
+    });
+    render(<SizingModeToggle />);
+    const stretchGroup = screen.getByRole('group', { name: /stretch cluster/i });
+    const sw = within(stretchGroup).getByRole('switch');
+    expect(sw).not.toBeChecked();
+    fireEvent.click(sw);
+    expect(setCurrentCluster).toHaveBeenCalledWith(
+      expect.objectContaining({ isStretchCluster: true }),
+    );
   });
 
   describe('Phase 28: Mobile foundation', () => {
