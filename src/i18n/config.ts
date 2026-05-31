@@ -2,7 +2,15 @@
 export const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'it'] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const NAMESPACES = ['common', 'wizard', 'export', 'pptx'] as const;
+export const NAMESPACES = [
+  'common',
+  'wizard',
+  'step1',
+  'step2',
+  'step3',
+  'export',
+  'pptx',
+] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
 export const DEFAULT_NS: Namespace = 'common';

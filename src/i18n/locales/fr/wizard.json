@@ -1,5 +1,3 @@
 {
-  "step1": { "title": "Étape 1 : Saisir le cluster actuel" },
-  "step2": { "title": "Étape 2 : Définir les scénarios cibles" },
-  "step3": { "title": "Étape 3 : Réviser et exporter" }
+  "header": { "appName": "Presizion" }
 }

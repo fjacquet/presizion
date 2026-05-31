@@ -1,5 +1,3 @@
 {
-  "step1": { "title": "Step 1: Enter Current Cluster" },
-  "step2": { "title": "Step 2: Define Target Scenarios" },
-  "step3": { "title": "Step 3: Review & Export" }
+  "header": { "appName": "Presizion" }
 }

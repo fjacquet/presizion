@@ -1,5 +1,3 @@
 {
-  "step1": { "title": "Schritt 1: Aktuellen Cluster eingeben" },
-  "step2": { "title": "Schritt 2: Zielszenarien definieren" },
-  "step3": { "title": "Schritt 3: Überprüfen und exportieren" }
+  "header": { "appName": "Presizion" }
 }
