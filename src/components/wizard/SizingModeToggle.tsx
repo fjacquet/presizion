@@ -7,28 +7,24 @@ const ACTIVE = 'bg-primary-600 text-white dark:bg-primary-500 font-semibold';
 const INACTIVE =
   'bg-transparent text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700';
 
-function ModeBtn({
-  label,
-  isActive,
-  onClick,
-  disabled,
-}: {
+interface ModeBtnProps extends React.ComponentPropsWithRef<'button'> {
   label: string;
   isActive: boolean;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
+}
+
+function ModeBtn({ label, isActive, disabled, className, ...rest }: ModeBtnProps) {
   return (
     <button
       type="button"
       aria-pressed={isActive}
       disabled={disabled}
-      onClick={onClick}
       className={[
         'px-3 py-2 text-sm rounded-sm transition-colors min-h-[44px]',
         isActive ? ACTIVE : INACTIVE,
         disabled ? 'opacity-40 cursor-not-allowed' : '',
+        className ?? '',
       ].join(' ')}
+      {...rest}
     >
       {label}
     </button>
@@ -64,15 +60,15 @@ export function SizingModeToggle() {
         />
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
-              <span>
+            <TooltipTrigger
+              render={
                 <ModeBtn
                   label={t('sizingMode.performance')}
                   isActive={sizingMode === 'performance'}
                   onClick={() => setSizingMode('performance')}
                 />
-              </span>
-            </TooltipTrigger>
+              }
+            />
             <TooltipContent>
               <p className="max-w-xs text-sm">{t('sizingMode.performanceTooltip')}</p>
             </TooltipContent>

@@ -143,10 +143,13 @@ describe('MANIFEST-04: index.html contains apple-touch-icon link', () => {
     expect(fs.existsSync(path.join(iconsDir, 'apple-touch-icon-180x180.png'))).toBe(true);
   });
 
-  it('index.html contains link rel="manifest" pointing to /presizion/manifest.webmanifest', () => {
+  // NOTE: hrefs are root-relative WITHOUT the `/presizion/` base. Vite rebases
+  // `/`-paths onto `base` at serve/build time, so the source must NOT include
+  // the base itself — otherwise it gets doubled (→ /presizion/presizion/…, 404).
+  it('index.html contains link rel="manifest" resolving to /presizion/manifest.webmanifest', () => {
     htmlContent = fs.readFileSync(indexHtmlPath, 'utf-8');
     expect(htmlContent).toMatch(/rel="manifest"/);
-    expect(htmlContent).toMatch(/href="\/presizion\/manifest\.webmanifest"/);
+    expect(htmlContent).toMatch(/href="\/manifest\.webmanifest"/);
   });
 
   it('index.html contains link rel="apple-touch-icon" with sizes="180x180"', () => {
@@ -155,9 +158,10 @@ describe('MANIFEST-04: index.html contains apple-touch-icon link', () => {
     expect(htmlContent).toMatch(/sizes="180x180"/);
   });
 
-  it('apple-touch-icon href points to /presizion/icons/apple-touch-icon-180x180.png', () => {
+  it('apple-touch-icon href resolves to /presizion/icons/apple-touch-icon-180x180.png', () => {
     htmlContent = fs.readFileSync(indexHtmlPath, 'utf-8');
-    expect(htmlContent).toMatch(/href="\/presizion\/icons\/apple-touch-icon-180x180\.png"/);
+    // Root-relative without base — see NOTE above; Vite prepends `/presizion/`.
+    expect(htmlContent).toMatch(/href="\/icons\/apple-touch-icon-180x180\.png"/);
   });
 
   it('index.html contains meta apple-mobile-web-app-capable', () => {
