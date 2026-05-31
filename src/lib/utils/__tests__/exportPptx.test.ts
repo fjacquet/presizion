@@ -37,11 +37,6 @@ vi.mock('pptxgenjs', () => {
   return { default: MockPptxGenJS };
 });
 
-// Mock chartRefToDataUrl to return null (no DOM in test env)
-vi.mock('@/lib/utils/chartCapture', () => ({
-  chartRefToDataUrl: vi.fn().mockResolvedValue(null),
-}));
-
 // Mock the logo helper (no canvas in test env)
 vi.mock('@/lib/utils/logoDataUrl', () => ({
   getLogoDataUrl: vi.fn().mockResolvedValue(''),
@@ -338,5 +333,22 @@ describe('exportPptx', () => {
       ([text]) => typeof text === 'string' && text.includes('Capacity Breakdown'),
     );
     expect(capacityTitles).toHaveLength(0);
+  });
+
+  // ---------------------------------------------------------------------------
+  // A captured ECharts PNG for a scenario yields an extra capacity chart slide
+  // ---------------------------------------------------------------------------
+  it('adds a capacity chart slide when a capture is supplied for the scenario', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    await exportPptx(cluster, [scenario], [result], [breakdown], {
+      'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 },
+    });
+    // Title + Summary + Comparison + 1 capacity chart slide = 4 slides
+    expect(mockAddSlide.mock.calls.length).toBe(4);
+    const textCalls = mockAddText.mock.calls as Array<[unknown, Record<string, unknown>]>;
+    const capacityTitles = textCalls.filter(
+      ([text]) => typeof text === 'string' && text.includes('Capacity Breakdown'),
+    );
+    expect(capacityTitles.length).toBeGreaterThan(0);
   });
 });

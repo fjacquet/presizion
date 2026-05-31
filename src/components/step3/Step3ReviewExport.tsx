@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import type { EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -20,6 +21,7 @@ import {
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
+import { instanceToPng } from '@/lib/utils/chartImage';
 import { buildSummaryText, copyToClipboard } from '@/lib/utils/clipboard';
 import { buildCsvContent, buildJsonContent, downloadCsv, downloadJson } from '@/lib/utils/export';
 import { exportPptx } from '@/lib/utils/exportPptx';
@@ -48,8 +50,8 @@ export function Step3ReviewExport() {
   const [pptxLoading, setPptxLoading] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  /** Shared chart container refs for PPTX export */
-  const chartRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  /** Live ECharts instances keyed by "capacity-{id}" / "minnodes-{id}" for PPTX capture. */
+  const chartInstances = useRef<Record<string, EChartsInstance>>({});
 
   // Clear timeouts on unmount to prevent memory leak / setState-after-unmount warning
   useEffect(() => {
@@ -112,7 +114,12 @@ export function Step3ReviewExport() {
     }
     setPptxLoading(true);
     try {
-      await exportPptx(currentCluster, scenarios, results, breakdowns, chartRefs.current);
+      const entries = Object.entries(chartInstances.current);
+      const captures = await Promise.all(
+        entries.map(async ([key, inst]) => [key, await instanceToPng(inst)] as const),
+      );
+      const charts = Object.fromEntries(captures);
+      await exportPptx(currentCluster, scenarios, results, breakdowns, charts);
     } catch (err) {
       console.error('PPTX export failed:', err);
       toast.error('PPTX export failed. Check browser console for details.');
@@ -224,8 +231,16 @@ export function Step3ReviewExport() {
       <div className="print:hidden space-y-8">
         <SizingChart />
         <CoreCountChart />
-        <CapacityStackedChart chartRefs={chartRefs} />
-        <MinNodesChart chartRefs={chartRefs} />
+        <CapacityStackedChart
+          onChartReady={(key, inst) => {
+            chartInstances.current[key] = inst;
+          }}
+        />
+        <MinNodesChart
+          onChartReady={(key, inst) => {
+            chartInstances.current[key] = inst;
+          }}
+        />
       </div>
     </div>
   );
