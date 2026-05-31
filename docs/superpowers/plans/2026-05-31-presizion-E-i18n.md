@@ -12,8 +12,9 @@
 - **Fallback language:** `en` (source strings are authored in English).
 - **Translations:** machine-translate fr/de/it now, each locale dir carries a `_meta.json` `{ "status": "machine-translated", "reviewed": false }` flag so a human review pass is trackable.
 - **Number/unit formatting:** `Intl.NumberFormat` keyed to active `lng`, mapped to Swiss locales (`en-CH`/`fr-CH`/`de-CH`/`it-CH`).
-- **Namespaces:** single `wizard` namespace (no step1/2/3 split). Final set: `common`, `wizard`, `export`, `pptx`. `DEFAULT_NS = 'common'`.
+- **Namespaces:** per-step split so extraction units own disjoint locale files and can run in parallel. Final set: `common`, `wizard` (cross-step chrome: header, stepper, mode/theme/lang toggles, reset dialog), `step1`, `step2`, `step3`, `export`, `pptx`. `DEFAULT_NS = 'common'`.
 - **Branch:** `feat/presizion-E-i18n` off `main`.
+- **Execution:** scaffold (Units 1–4) sequential; extraction (Units 5–9) run in parallel — each edits only its own namespace JSON (en+fr/de/it) and its own component files, does not commit, and the controller commits + reviews afterward.
 
 ---
 
@@ -77,7 +78,7 @@ git commit -m "chore(i18n): add i18next, react-i18next, language detector"
 export const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'it'] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-export const NAMESPACES = ['common', 'wizard', 'export', 'pptx'] as const;
+export const NAMESPACES = ['common', 'wizard', 'step1', 'step2', 'step3', 'export', 'pptx'] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
 export const DEFAULT_NS: Namespace = 'common';
@@ -176,28 +177,21 @@ import {
   SUPPORTED_LANGUAGES,
 } from './config';
 
+// One import per (lang × namespace). 7 namespaces × 4 langs.
 import enCommon from './locales/en/common.json';
 import enWizard from './locales/en/wizard.json';
+import enStep1 from './locales/en/step1.json';
+import enStep2 from './locales/en/step2.json';
+import enStep3 from './locales/en/step3.json';
 import enExport from './locales/en/export.json';
 import enPptx from './locales/en/pptx.json';
-import frCommon from './locales/fr/common.json';
-import frWizard from './locales/fr/wizard.json';
-import frExport from './locales/fr/export.json';
-import frPptx from './locales/fr/pptx.json';
-import deCommon from './locales/de/common.json';
-import deWizard from './locales/de/wizard.json';
-import deExport from './locales/de/export.json';
-import dePptx from './locales/de/pptx.json';
-import itCommon from './locales/it/common.json';
-import itWizard from './locales/it/wizard.json';
-import itExport from './locales/it/export.json';
-import itPptx from './locales/it/pptx.json';
+// …and the fr/de/it equivalents (same 7 files per lang).
 
 export const resources = {
-  en: { common: enCommon, wizard: enWizard, export: enExport, pptx: enPptx },
-  fr: { common: frCommon, wizard: frWizard, export: frExport, pptx: frPptx },
-  de: { common: deCommon, wizard: deWizard, export: deExport, pptx: dePptx },
-  it: { common: itCommon, wizard: itWizard, export: itExport, pptx: itPptx },
+  en: { common: enCommon, wizard: enWizard, step1: enStep1, step2: enStep2, step3: enStep3, export: enExport, pptx: enPptx },
+  fr: { /* fr/* imports */ },
+  de: { /* de/* imports */ },
+  it: { /* it/* imports */ },
 } as const;
 
 i18n
@@ -437,8 +431,9 @@ Add to `src/i18n/locales/en/common.json` (and machine-translate into fr/de/it, t
 **Procedure (apply to every file below — this is the repeatable pattern):**
 
 1. Read the component; list every user-facing literal (visible text, `aria-label`, `title`, `placeholder`, toast messages, dialog copy). Skip non-UI strings (CSS classes, data keys, store keys, test ids).
-2. Add a key per string under the `wizard` namespace in `src/i18n/locales/en/wizard.json` (nested by component, e.g. `wizard.currentClusterForm.totalVcpus`). Interpolate variables with `{{var}}`; use the i18next `count` plural form for pluralized counts.
-3. In the component: `const { t } = useTranslation('wizard');` then replace each literal with `t('currentClusterForm.totalVcpus')`. Numbers that render to the user go through `formatInt`/`formatNumber` from `@/i18n/format`.
+2. Add a key per string under the UNIT'S namespace (`wizard` for chrome, `step1`/`step2`/`step3` for each step's content, `export`/`pptx` for exports) in `src/i18n/locales/en/<ns>.json` (nested by component, e.g. `step1.currentClusterForm.totalVcpus`). Interpolate variables with `{{var}}`; use the i18next `count` plural form for pluralized counts.
+3. In the component: `const { t } = useTranslation('<ns>');` then replace each literal with `t('currentClusterForm.totalVcpus')`. Numbers that render to the user go through `formatInt`/`formatNumber` from `@/i18n/format`.
+   **Each extraction unit owns exactly one namespace** and edits only that namespace's JSON (en+fr/de/it) plus its own component files — never another unit's files, never `config.ts`/`index.ts`/`package.json`.
 4. Mirror the new keys into fr/de/it (machine-translate the values).
 5. Run `npx vitest run src/i18n/__tests__/keyParity.test.ts` (must pass) + any component test touching that file.
 6. Commit per file or per small group: `git commit -m "i18n(wizard): externalize <Component> strings"`.
