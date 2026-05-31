@@ -1,27 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock recharts — ResponsiveContainer collapses to 0px in jsdom
-vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
+// Mock the ECharts <Chart> wrapper — jsdom can't render canvas/svg charts.
+vi.mock('@/components/charts/Chart', () => ({
+  Chart: ({ ariaLabel }: { ariaLabel?: string }) => (
+    <div data-testid="chart" role="img" aria-label={ariaLabel} />
   ),
-  Bar: ({ name, children }: { name: string; children?: React.ReactNode }) => (
-    <span data-testid="bar-series">
-      {name}
-      {children}
-    </span>
-  ),
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  Legend: () => <div data-testid="legend" />,
-  LabelList: ({ dataKey }: { dataKey: string }) => <span data-testid="label-list">{dataKey}</span>,
-  ReferenceLine: () => null,
 }));
 
 import { useScenariosStore } from '@/store/useScenariosStore';
@@ -74,54 +59,27 @@ beforeEach(() => {
 });
 
 describe('CoreCountChart', () => {
-  it('renders without crashing with empty store', () => {
+  it('renders nothing with empty store', () => {
     const { container } = render(<CoreCountChart />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders chart when results exist', () => {
+  it('renders heading and chart when results exist', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useScenariosResults).mockReturnValue([baseResult]);
     render(<CoreCountChart />);
     expect(screen.getByText('Total Physical Cores per Scenario')).toBeInTheDocument();
+    expect(screen.getByTestId('chart')).toBeInTheDocument();
   });
 
-  it('Download PNG button is present', () => {
+  it('Download SVG button is present', () => {
     act(() => {
       useScenariosStore.setState({ scenarios: [baseScenario] });
     });
     vi.mocked(useScenariosResults).mockReturnValue([baseResult]);
     render(<CoreCountChart />);
-    expect(screen.getByRole('button', { name: /download.*chart.*png/i })).toBeInTheDocument();
-  });
-
-  it('Download PNG button clickable without error', async () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useScenariosResults).mockReturnValue([baseResult]);
-    render(<CoreCountChart />);
-    const btn = screen.getByRole('button', { name: /download.*chart.*png/i });
-    await userEvent.click(btn);
-  });
-
-  it('always renders Legend even with single scenario', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useScenariosResults).mockReturnValue([baseResult]);
-    render(<CoreCountChart />);
-    expect(screen.getByTestId('legend')).toBeInTheDocument();
-  });
-
-  it('renders LabelList for data labels', () => {
-    act(() => {
-      useScenariosStore.setState({ scenarios: [baseScenario] });
-    });
-    vi.mocked(useScenariosResults).mockReturnValue([baseResult]);
-    render(<CoreCountChart />);
-    expect(screen.getByTestId('label-list')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /download.*svg/i })).toBeInTheDocument();
   });
 });

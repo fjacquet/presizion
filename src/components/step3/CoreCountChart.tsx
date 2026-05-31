@@ -1,33 +1,22 @@
 import { useRef } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  Legend,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
-import { CHART_COLORS } from '@/lib/sizing/chartColors';
-import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { buildCoreCountOption } from '@/lib/sizing/chartOptions/coreCountOption';
+import { downloadChartSvg } from '@/lib/utils/chartImage';
 import { useClusterStore } from '@/store/useClusterStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 
 /**
  * Bar chart showing total physical cores per scenario.
  * Includes an As-Is reference line when cluster.totalPcores > 0.
- * Legend is always shown. Data labels appear above bars.
+ * Data labels appear above bars.
  */
 export function CoreCountChart() {
   const scenarios = useScenariosStore((s) => s.scenarios);
   const results = useScenariosResults();
   const currentCluster = useClusterStore((s) => s.currentCluster);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const chartInstance = useRef<EChartsInstance | null>(null);
 
   if (scenarios.length === 0) return null;
 
@@ -45,35 +34,22 @@ export function CoreCountChart() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => downloadChartPng(containerRef, 'core-count-chart.png')}
-          aria-label="Download chart as PNG"
+          onClick={() =>
+            chartInstance.current && downloadChartSvg(chartInstance.current, 'core-count-chart.svg')
+          }
+          aria-label="Download chart as SVG"
         >
-          Download PNG
+          Download SVG
         </Button>
       </div>
       <div className="h-48 sm:h-72">
-        <div ref={containerRef} className="h-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-              <YAxis label={{ value: 'Physical Cores', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Legend />
-              {currentCluster.totalPcores > 0 && (
-                <ReferenceLine
-                  y={currentCluster.totalPcores}
-                  label="As-Is"
-                  stroke="#94a3b8"
-                  strokeDasharray="4 2"
-                />
-              )}
-              <Bar dataKey="cores" name="Physical Cores" fill={CHART_COLORS[0]}>
-                <LabelList dataKey="cores" position="top" style={{ fontSize: 11 }} />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <Chart
+          option={buildCoreCountOption(chartData, { asIsPcores: currentCluster.totalPcores })}
+          ariaLabel="Total physical cores per scenario"
+          onReady={(i) => {
+            chartInstance.current = i;
+          }}
+        />
       </div>
     </div>
   );
