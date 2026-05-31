@@ -257,6 +257,44 @@ export async function parseRvtools(
             }
           }
         }
+
+        // Host CPU/RAM utilization (mirrors LiveOptics ESX Performance handling).
+        // Only set when the usage columns are present AND at least one host
+        // reports a value — absent columns must leave fields undefined so the
+        // Step-1 UI still prompts for required utilization.
+        const hasCpuUsage = cols.cpu_usage_pct !== undefined;
+        const hasMemUsage = cols.mem_usage_pct !== undefined;
+        if (hasCpuUsage || hasMemUsage) {
+          // Global averages for backward compat (across all valid hosts)
+          if (hasCpuUsage && validHosts.some((h) => num(h, cols.cpu_usage_pct) > 0)) {
+            result.cpuUtilizationPercent = Math.round(
+              validHosts.reduce((s, h) => s + num(h, cols.cpu_usage_pct), 0) / validHosts.length,
+            );
+          }
+          if (hasMemUsage && validHosts.some((h) => num(h, cols.mem_usage_pct) > 0)) {
+            result.ramUtilizationPercent = Math.round(
+              validHosts.reduce((s, h) => s + num(h, cols.mem_usage_pct), 0) / validHosts.length,
+            );
+          }
+
+          // Per-scope averages grouped by the same scopeKey logic as ESX fields
+          for (const [scopeKey, scopeHosts] of hostsByScopeKey.entries()) {
+            const existing = rawByScope.get(scopeKey);
+            if (!existing || scopeHosts.length === 0) continue;
+            const utilFields: Partial<ScopeData> = {};
+            if (hasCpuUsage && scopeHosts.some((h) => num(h, cols.cpu_usage_pct) > 0)) {
+              utilFields.cpuUtilizationPercent = Math.round(
+                scopeHosts.reduce((s, h) => s + num(h, cols.cpu_usage_pct), 0) / scopeHosts.length,
+              );
+            }
+            if (hasMemUsage && scopeHosts.some((h) => num(h, cols.mem_usage_pct) > 0)) {
+              utilFields.ramUtilizationPercent = Math.round(
+                scopeHosts.reduce((s, h) => s + num(h, cols.mem_usage_pct), 0) / scopeHosts.length,
+              );
+            }
+            rawByScope.set(scopeKey, { ...existing, ...utilFields });
+          }
+        }
       }
     }
   }
