@@ -4,10 +4,10 @@
  * Every test asserts the CAP-06 invariant:
  *   required + spare + excess === total (within floating-point tolerance)
  */
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { ResourceBreakdown, StorageBreakdown } from '../../../types/breakdown';
 import type { OldCluster, Scenario } from '../../../types/cluster';
 import type { ScenarioResult } from '../../../types/results';
-import type { ResourceBreakdown, StorageBreakdown } from '../../../types/breakdown';
 import { computeVsanBreakdown } from '../vsanBreakdown';
 
 /** Helper to assert the CAP-06 invariant on a ResourceBreakdown */
@@ -54,7 +54,8 @@ function makeScenario(overrides: Partial<Scenario> = {}): Scenario {
     targetVcpuToPCoreRatio: 4,
     ramPerVmGb: 16,
     diskPerVmGb: 50,
-    growthPercent: 0, safetyPercent: 0,
+    growthPercent: 0,
+    safetyPercent: 0,
     haReserveCount: 0,
     targetCpuFrequencyGhz: 2.5,
     ...overrides,

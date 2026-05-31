@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import {
-  DEFAULT_VCPU_TO_PCORE_RATIO,
   DEFAULT_GROWTH_PERCENT,
-  DEFAULT_SAFETY_PERCENT,
   DEFAULT_HA_RESERVE_COUNT,
+  DEFAULT_SAFETY_PERCENT,
+  DEFAULT_VCPU_TO_PCORE_RATIO,
 } from '../lib/sizing/defaults';
 
 /**
@@ -14,7 +14,7 @@ import {
 const numericPreprocess = (val: unknown) => {
   if (val === '' || val === null || val === undefined) return undefined;
   const n = Number(val);
-  return isNaN(n) ? undefined : n;
+  return Number.isNaN(n) ? undefined : n;
 };
 
 /**
@@ -30,10 +30,7 @@ const requiredPositiveNumber = z.preprocess(
  * Optional positive number field.
  * Absent or empty string → undefined (no error); provided value must be > 0.
  */
-const optionalPositiveNumber = z.preprocess(
-  numericPreprocess,
-  z.number().positive().optional(),
-);
+const optionalPositiveNumber = z.preprocess(numericPreprocess, z.number().positive().optional());
 
 /**
  * Zod schema for Scenario form input.
@@ -76,7 +73,9 @@ export const scenarioSchema = z.object({
   ),
   vsanCompressionFactor: z.preprocess(
     numericPreprocess,
-    z.union([z.literal(1.0), z.literal(1.3), z.literal(1.5), z.literal(2.0), z.literal(3.0)]).optional(),
+    z
+      .union([z.literal(1.0), z.literal(1.3), z.literal(1.5), z.literal(2.0), z.literal(3.0)])
+      .optional(),
   ),
   vsanSlackPercent: z.preprocess(numericPreprocess, z.number().min(0).max(100).optional()),
   vsanCpuOverheadPercent: z.preprocess(numericPreprocess, z.number().min(0).max(100).optional()),

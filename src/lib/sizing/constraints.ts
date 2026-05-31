@@ -1,18 +1,18 @@
 import type { OldCluster, Scenario } from '../../types/cluster';
-import type { ScenarioResult, LimitingResource } from '../../types/results';
+import type { LimitingResource, ScenarioResult } from '../../types/results';
 import {
   serverCountByCpu,
+  serverCountByDisk,
   serverCountByGhz,
   serverCountByRam,
-  serverCountByDisk,
   serverCountBySpecint,
 } from './formulas';
+import { VSAN_DEFAULT_SLACK_PERCENT } from './vsanConstants';
 import {
-  serverCountByVsanStorage,
   computeVsanEffectiveGhzPerNode,
   computeVsanEffectiveRamPerNode,
+  serverCountByVsanStorage,
 } from './vsanFormulas';
-import { VSAN_DEFAULT_SLACK_PERCENT } from './vsanConstants';
 
 /**
  * Sizing mode — determines which CPU/performance formula drives CALC-01.
@@ -86,8 +86,7 @@ export function computeScenarioResult(
   layoutMode: LayoutMode = 'hci',
 ): ScenarioResult {
   const demandFactor =
-    (1 + (scenario.growthPercent ?? 0) / 100) *
-    (1 + (scenario.safetyPercent ?? 0) / 100);
+    (1 + (scenario.growthPercent ?? 0) / 100) * (1 + (scenario.safetyPercent ?? 0) / 100);
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
   const effectiveVmCount = cluster.totalVms;
@@ -220,7 +219,7 @@ export function computeScenarioResult(
 
   const cpuUtilizationPercent =
     finalCount > 0
-      ? (effectiveVcpus * (cpuUtilPct / 100) /
+      ? ((effectiveVcpus * (cpuUtilPct / 100)) /
           scenario.targetVcpuToPCoreRatio /
           (finalCount * coresPerServer)) *
         100
@@ -235,9 +234,7 @@ export function computeScenarioResult(
 
   const diskUtilizationPercent =
     finalCount > 0
-      ? ((effectiveVmCount * scenario.diskPerVmGb) /
-          (finalCount * scenario.diskPerServerGb)) *
-        100
+      ? ((effectiveVmCount * scenario.diskPerVmGb) / (finalCount * scenario.diskPerServerGb)) * 100
       : 0;
 
   return Object.freeze({

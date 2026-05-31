@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // We must set up localStorage mock BEFORE importing the store,
 // because the store calls readStored() at module load time.
@@ -6,10 +6,20 @@ const localStorageStore: Record<string, string> = {};
 
 const localStorageMock = {
   getItem: vi.fn((key: string) => localStorageStore[key] ?? null),
-  setItem: vi.fn((key: string, value: string) => { localStorageStore[key] = value; }),
-  removeItem: vi.fn((key: string) => { delete localStorageStore[key]; }),
-  clear: vi.fn(() => { Object.keys(localStorageStore).forEach(k => delete localStorageStore[k]); }),
-  get length() { return Object.keys(localStorageStore).length; },
+  setItem: vi.fn((key: string, value: string) => {
+    localStorageStore[key] = value;
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete localStorageStore[key];
+  }),
+  clear: vi.fn(() => {
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
+  }),
+  get length() {
+    return Object.keys(localStorageStore).length;
+  },
   key: vi.fn((index: number) => Object.keys(localStorageStore)[index] ?? null),
 };
 
@@ -32,7 +42,9 @@ import { useThemeStore } from '../useThemeStore';
 describe('useThemeStore', () => {
   beforeEach(() => {
     // Clear localStorage mock store
-    Object.keys(localStorageStore).forEach(k => delete localStorageStore[k]);
+    Object.keys(localStorageStore).forEach((k) => {
+      delete localStorageStore[k];
+    });
     // Reset all mock call records
     vi.clearAllMocks();
     // Remove dark class

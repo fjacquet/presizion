@@ -6,8 +6,5 @@ import type { OldCluster } from '../../types/cluster';
  * (measured or explicitly estimated) before Step 2/3 may run.
  */
 export function isClusterSizingReady(cluster: OldCluster): boolean {
-  return (
-    cluster.cpuUtilizationPercent !== undefined &&
-    cluster.ramUtilizationPercent !== undefined
-  );
+  return cluster.cpuUtilizationPercent !== undefined && cluster.ramUtilizationPercent !== undefined;
 }

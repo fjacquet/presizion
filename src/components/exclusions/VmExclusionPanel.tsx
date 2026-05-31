@@ -1,65 +1,70 @@
-import { useMemo, useState } from 'react'
-import type { VmRow } from '@/lib/utils/import'
-import { useExclusionsStore } from '@/store/useExclusionsStore'
-import { applyExclusions } from '@/lib/utils/import/exclusions'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
-import { VirtualizedVmList } from './VirtualizedVmList'
+import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import type { VmRow } from '@/lib/utils/import';
+import { applyExclusions } from '@/lib/utils/import/exclusions';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
+import { VirtualizedVmList } from './VirtualizedVmList';
 
 interface VmExclusionPanelProps {
-  readonly rows: readonly VmRow[]
+  readonly rows: readonly VmRow[];
 }
 
 export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
-  const rules = useExclusionsStore((s) => s.rules)
-  const setRules = useExclusionsStore((s) => s.setRules)
-  const toggleManual = useExclusionsStore((s) => s.toggleManual)
-  const [reviewOpen, setReviewOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const [showOnlyExcluded, setShowOnlyExcluded] = useState(false)
-  const [exactNamesText, setExactNamesText] = useState(() => rules.exactNames.join('\n'))
-  const [lastSyncedNames, setLastSyncedNames] = useState(rules.exactNames)
+  const rules = useExclusionsStore((s) => s.rules);
+  const setRules = useExclusionsStore((s) => s.setRules);
+  const toggleManual = useExclusionsStore((s) => s.toggleManual);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [showOnlyExcluded, setShowOnlyExcluded] = useState(false);
+  const [exactNamesText, setExactNamesText] = useState(() => rules.exactNames.join('\n'));
+  const [lastSyncedNames, setLastSyncedNames] = useState(rules.exactNames);
   if (rules.exactNames !== lastSyncedNames) {
-    setLastSyncedNames(rules.exactNames)
-    setExactNamesText(rules.exactNames.join('\n'))
+    setLastSyncedNames(rules.exactNames);
+    setExactNamesText(rules.exactNames.join('\n'));
   }
 
   const commitExactNames = (): void => {
-    const parsed = exactNamesText.split('\n').map((s) => s.trim()).filter(Boolean)
-    setRules({ exactNames: parsed })
-  }
+    const parsed = exactNamesText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    setRules({ exactNames: parsed });
+  };
 
-  const hasPowerState = rows.some((r) => r.powerState !== undefined)
+  const hasPowerState = rows.some((r) => r.powerState !== undefined);
 
   const { filtered, stats } = useMemo(() => {
-    const grouped = new Map<string, VmRow[]>([['__all__', [...rows]]])
-    const { filteredByScope, stats } = applyExclusions(grouped, rules)
-    return { filtered: filteredByScope.get('__all__') ?? [], stats }
-  }, [rows, rules])
+    const grouped = new Map<string, VmRow[]>([['__all__', [...rows]]]);
+    const { filteredByScope, stats } = applyExclusions(grouped, rules);
+    return { filtered: filteredByScope.get('__all__') ?? [], stats };
+  }, [rows, rules]);
 
   const excludedKeys = useMemo(() => {
-    const keep = new Set(filtered.map((r) => `${r.scopeKey}::${r.name}`))
+    const keep = new Set(filtered.map((r) => `${r.scopeKey}::${r.name}`));
     return new Set(
-      rows.filter((r) => !keep.has(`${r.scopeKey}::${r.name}`)).map((r) => `${r.scopeKey}::${r.name}`),
-    )
-  }, [rows, filtered])
+      rows
+        .filter((r) => !keep.has(`${r.scopeKey}::${r.name}`))
+        .map((r) => `${r.scopeKey}::${r.name}`),
+    );
+  }, [rows, filtered]);
 
   const listedRows = useMemo(() => {
-    let list: readonly VmRow[] = rows
+    let list: readonly VmRow[] = rows;
     if (search) {
-      const q = search.toLowerCase()
-      list = list.filter((r) => r.name.toLowerCase().includes(q))
+      const q = search.toLowerCase();
+      list = list.filter((r) => r.name.toLowerCase().includes(q));
     }
-    if (showOnlyExcluded) list = list.filter((r) => excludedKeys.has(`${r.scopeKey}::${r.name}`))
-    return list
-  }, [rows, search, showOnlyExcluded, excludedKeys])
+    if (showOnlyExcluded) list = list.filter((r) => excludedKeys.has(`${r.scopeKey}::${r.name}`));
+    return list;
+  }, [rows, search, showOnlyExcluded, excludedKeys]);
 
   const handleRowToggle = (vmKey: string): void => {
-    const kind = excludedKeys.has(vmKey) ? 'included' : 'excluded'
-    toggleManual(vmKey, kind)
-  }
+    const kind = excludedKeys.has(vmKey) ? 'included' : 'excluded';
+    toggleManual(vmKey, kind);
+  };
 
   return (
     <div className="space-y-3 border rounded-md p-3">
@@ -94,19 +99,14 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
           />
           Exclude powered-off VMs
           {!hasPowerState && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               (power state not available in source file)
             </span>
           )}
         </label>
       </div>
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => setReviewOpen((v) => !v)}
-      >
+      <Button type="button" variant="outline" size="sm" onClick={() => setReviewOpen((v) => !v)}>
         {reviewOpen ? 'Hide' : 'Review'} {rows.length} VMs individually
       </Button>
 
@@ -136,8 +136,10 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
         </div>
       )}
 
-      <div className="text-xs text-muted-foreground">
-        <p>Excluded: {stats.excludedCount} of {stats.totalVms} VMs</p>
+      <div className="text-xs text-slate-500 dark:text-slate-400">
+        <p>
+          Excluded: {stats.excludedCount} of {stats.totalVms} VMs
+        </p>
         <ul className="list-disc pl-5">
           <li>{stats.excludedByRule.namePattern} by name pattern</li>
           <li>{stats.excludedByRule.exactNames} by exact name</li>
@@ -146,5 +148,5 @@ export function VmExclusionPanel({ rows }: VmExclusionPanelProps) {
         </ul>
       </div>
     </div>
-  )
+  );
 }

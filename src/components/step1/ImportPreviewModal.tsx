@@ -1,29 +1,29 @@
-import { useMemo, useState } from 'react'
-import { Dialog } from '@base-ui/react/dialog'
+import { Dialog } from '@base-ui/react/dialog';
+import { useMemo, useState } from 'react';
+import { VmExclusionPanel } from '@/components/exclusions/VmExclusionPanel';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-} from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Switch } from '@/components/ui/switch'
-import { Badge } from '@/components/ui/badge'
-import { useClusterStore } from '@/store/useClusterStore'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useImportStore } from '@/store/useImportStore'
-import { aggregateScopes } from '@/lib/utils/import/scopeAggregator'
-import { useIsMobile } from '@/hooks/useIsMobile'
-import { VmExclusionPanel } from '@/components/exclusions/VmExclusionPanel'
-import type { AnyImportResult, ScopeData } from '@/lib/utils/import'
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
+import { Switch } from '@/components/ui/switch';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import type { AnyImportResult, ScopeData } from '@/lib/utils/import';
+import { aggregateScopes } from '@/lib/utils/import/scopeAggregator';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useImportStore } from '@/store/useImportStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
 
 interface ImportPreviewModalProps {
-  result: AnyImportResult
-  open: boolean
-  onClose: () => void
+  result: AnyImportResult;
+  open: boolean;
+  onClose: () => void;
 }
 
 const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
@@ -31,25 +31,31 @@ const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
   'liveoptics-xlsx': 'LiveOptics (xlsx)',
   'liveoptics-csv': 'LiveOptics (csv)',
   'presizion-json': 'Presizion JSON export',
-}
+};
 
 interface ScopeSelectorProps {
-  detectedScopes: string[]
-  scopeLabels: Record<string, string>
-  selectedScopes: string[]
-  onToggle: (key: string, checked: boolean) => void
-  rawByScope?: Map<string, ScopeData> | undefined
+  detectedScopes: string[];
+  scopeLabels: Record<string, string>;
+  selectedScopes: string[];
+  onToggle: (key: string, checked: boolean) => void;
+  rawByScope?: Map<string, ScopeData> | undefined;
 }
 
-function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, rawByScope }: ScopeSelectorProps) {
+function ScopeSelector({
+  detectedScopes,
+  scopeLabels,
+  selectedScopes,
+  onToggle,
+  rawByScope,
+}: ScopeSelectorProps) {
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium">Filter by cluster</p>
       <div className="space-y-1">
         {detectedScopes.map((key) => {
-          const hostCount = rawByScope?.get(key)?.existingServerCount
-          const label = scopeLabels[key] ?? key
-          const displayLabel = hostCount != null ? `${label} (${hostCount} hosts)` : label
+          const hostCount = rawByScope?.get(key)?.existingServerCount;
+          const label = scopeLabels[key] ?? key;
+          const displayLabel = hostCount != null ? `${label} (${hostCount} hosts)` : label;
           return (
             <div key={key} className="flex items-center gap-2">
               <Checkbox
@@ -61,60 +67,56 @@ function ScopeSelector({ detectedScopes, scopeLabels, selectedScopes, onToggle, 
                 {displayLabel}
               </label>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
 export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModalProps) {
-  const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster)
-  const setScenarios = useScenariosStore((s) => s.setScenarios)
-  const seedFromCluster = useScenariosStore((s) => s.seedFromCluster)
-  const setImportBuffer = useImportStore((s) => s.setImportBuffer)
+  const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster);
+  const setScenarios = useScenariosStore((s) => s.setScenarios);
+  const seedFromCluster = useScenariosStore((s) => s.seedFromCluster);
+  const setImportBuffer = useImportStore((s) => s.setImportBuffer);
 
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
-  const isJson = result.sourceFormat === 'presizion-json'
+  const isJson = result.sourceFormat === 'presizion-json';
 
-  const isMultiScope =
-    !isJson &&
-    result.detectedScopes != null &&
-    result.detectedScopes.length > 1
+  const isMultiScope = !isJson && result.detectedScopes != null && result.detectedScopes.length > 1;
 
-  const scopesFromResult = 'detectedScopes' in result ? (result.detectedScopes ?? []) : []
+  const scopesFromResult = 'detectedScopes' in result ? (result.detectedScopes ?? []) : [];
 
   // Track previous result to reset selection state when a new import arrives
-  const [prevResult, setPrevResult] = useState<AnyImportResult>(result)
-  const [selectedScopes, setSelectedScopes] = useState<string[]>(scopesFromResult)
-  const [step, setStep] = useState<'scope' | 'exclusions'>('scope')
-  const initialStretch = !isJson && result.isStretchCluster === true
-  const [stretchConfirmed, setStretchConfirmed] = useState<boolean>(initialStretch)
+  const [prevResult, setPrevResult] = useState<AnyImportResult>(result);
+  const [selectedScopes, setSelectedScopes] = useState<string[]>(scopesFromResult);
+  const [step, setStep] = useState<'scope' | 'exclusions'>('scope');
+  const initialStretch = !isJson && result.isStretchCluster === true;
+  const [stretchConfirmed, setStretchConfirmed] = useState<boolean>(initialStretch);
 
   if (prevResult !== result) {
-    setPrevResult(result)
-    setSelectedScopes(scopesFromResult)
-    setStep('scope')
-    setStretchConfirmed(initialStretch)
+    setPrevResult(result);
+    setSelectedScopes(scopesFromResult);
+    setStep('scope');
+    setStretchConfirmed(initialStretch);
   }
 
-  const canShowExclusions =
-    !isJson && 'vmRowsByScope' in result && result.vmRowsByScope != null
+  const canShowExclusions = !isJson && 'vmRowsByScope' in result && result.vmRowsByScope != null;
 
   const previewCluster: ScopeData =
     isMultiScope && 'rawByScope' in result && result.rawByScope != null
       ? aggregateScopes(result.rawByScope, selectedScopes)
-      : (result as ScopeData)
+      : (result as ScopeData);
 
   const handleToggle = (key: string, checked: boolean) => {
-    setSelectedScopes((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)))
-  }
+    setSelectedScopes((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
+  };
 
   const handleApply = () => {
     if (isJson) {
-      setCurrentCluster({ ...result.cluster })
-      setScenarios(result.scenarios)
+      setCurrentCluster({ ...result.cluster });
+      setScenarios(result.scenarios);
     } else {
       const cluster = {
         totalVcpus: previewCluster.totalVcpus,
@@ -122,51 +124,73 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         totalVms: previewCluster.totalVms,
         totalDiskGb: previewCluster.totalDiskGb,
         avgRamPerVmGb: previewCluster.avgRamPerVmGb,
-        ...(previewCluster.existingServerCount != null && { existingServerCount: previewCluster.existingServerCount }),
-        ...(previewCluster.socketsPerServer != null && { socketsPerServer: previewCluster.socketsPerServer }),
-        ...(previewCluster.coresPerSocket != null && { coresPerSocket: previewCluster.coresPerSocket }),
-        ...(previewCluster.ramPerServerGb != null && { ramPerServerGb: previewCluster.ramPerServerGb }),
-        ...(previewCluster.cpuUtilizationPercent != null && { cpuUtilizationPercent: previewCluster.cpuUtilizationPercent }),
-        ...(previewCluster.ramUtilizationPercent != null && { ramUtilizationPercent: previewCluster.ramUtilizationPercent }),
+        ...(previewCluster.existingServerCount != null && {
+          existingServerCount: previewCluster.existingServerCount,
+        }),
+        ...(previewCluster.socketsPerServer != null && {
+          socketsPerServer: previewCluster.socketsPerServer,
+        }),
+        ...(previewCluster.coresPerSocket != null && {
+          coresPerSocket: previewCluster.coresPerSocket,
+        }),
+        ...(previewCluster.ramPerServerGb != null && {
+          ramPerServerGb: previewCluster.ramPerServerGb,
+        }),
+        ...(previewCluster.cpuUtilizationPercent != null && {
+          cpuUtilizationPercent: previewCluster.cpuUtilizationPercent,
+        }),
+        ...(previewCluster.ramUtilizationPercent != null && {
+          ramUtilizationPercent: previewCluster.ramUtilizationPercent,
+        }),
         ...(previewCluster.cpuModel != null && { cpuModel: previewCluster.cpuModel }),
-        ...(previewCluster.cpuFrequencyGhz != null && { cpuFrequencyGhz: previewCluster.cpuFrequencyGhz }),
-        ...(previewCluster.isStretchCluster === true && stretchConfirmed && { isStretchCluster: true }),
-      }
-      setCurrentCluster(cluster)
-      seedFromCluster(cluster)
-      if (result.rawByScope != null && result.detectedScopes != null && result.scopeLabels != null) {
+        ...(previewCluster.cpuFrequencyGhz != null && {
+          cpuFrequencyGhz: previewCluster.cpuFrequencyGhz,
+        }),
+        ...(previewCluster.isStretchCluster === true &&
+          stretchConfirmed && { isStretchCluster: true }),
+      };
+      setCurrentCluster(cluster);
+      seedFromCluster(cluster);
+      if (
+        result.rawByScope != null &&
+        result.detectedScopes != null &&
+        result.scopeLabels != null
+      ) {
         setImportBuffer(
           result.rawByScope,
           result.scopeLabels,
           selectedScopes,
           'vmRowsByScope' in result ? result.vmRowsByScope : undefined,
-        )
+        );
       }
     }
-    onClose()
-  }
+    onClose();
+  };
 
   const exclusionRows = useMemo(() => {
-    if (!canShowExclusions) return []
-    const map = 'vmRowsByScope' in result ? result.vmRowsByScope : undefined
-    if (map == null) return []
-    const keys = selectedScopes.length > 0 ? selectedScopes : [...map.keys()]
-    return keys.flatMap((k) => map.get(k) ?? [])
-  }, [canShowExclusions, result, selectedScopes])
+    if (!canShowExclusions) return [];
+    const map = 'vmRowsByScope' in result ? result.vmRowsByScope : undefined;
+    if (map == null) return [];
+    const keys = selectedScopes.length > 0 ? selectedScopes : [...map.keys()];
+    return keys.flatMap((k) => map.get(k) ?? []);
+  }, [canShowExclusions, result, selectedScopes]);
 
-  const pcoresKnown = !isJson && result.totalPcores != null && result.totalPcores > 0
+  const pcoresKnown = !isJson && result.totalPcores != null && result.totalPcores > 0;
 
   const sharedContent = (
     <>
-      {isMultiScope && 'scopeLabels' in result && result.scopeLabels != null && result.detectedScopes != null && (
-        <ScopeSelector
-          detectedScopes={result.detectedScopes}
-          scopeLabels={result.scopeLabels}
-          selectedScopes={selectedScopes}
-          onToggle={handleToggle}
-          rawByScope={'rawByScope' in result ? result.rawByScope ?? undefined : undefined}
-        />
-      )}
+      {isMultiScope &&
+        'scopeLabels' in result &&
+        result.scopeLabels != null &&
+        result.detectedScopes != null && (
+          <ScopeSelector
+            detectedScopes={result.detectedScopes}
+            scopeLabels={result.scopeLabels}
+            selectedScopes={selectedScopes}
+            onToggle={handleToggle}
+            rawByScope={'rawByScope' in result ? (result.rawByScope ?? undefined) : undefined}
+          />
+        )}
 
       {!isJson && previewCluster.isStretchCluster === true && (
         <div className="flex items-start gap-2 p-2 rounded border border-amber-400/40 bg-amber-50/60 dark:bg-amber-950/20">
@@ -180,11 +204,13 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               />
             </div>
             {previewCluster.stretchSignals && previewCluster.stretchSignals.length > 0 && (
-              <ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
-                {previewCluster.stretchSignals.map((s) => <li key={s}>{s}</li>)}
+              <ul className="text-xs text-slate-500 dark:text-slate-400 list-disc list-inside space-y-0.5">
+                {previewCluster.stretchSignals.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
               </ul>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Sizing will double the server count for site symmetry.
             </p>
           </div>
@@ -192,48 +218,84 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       )}
 
       <div className="space-y-1 text-sm">
-        <p><span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}</p>
+        <p>
+          <span className="font-medium">Source:</span> {FORMAT_LABELS[result.sourceFormat]}
+        </p>
 
         {isJson ? (
           <>
-            <p><span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}</p>
-            <p><span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}</p>
-            <p><span className="font-medium">Total VMs:</span> {result.cluster.totalVms}</p>
+            <p>
+              <span className="font-medium">Total vCPUs:</span> {result.cluster.totalVcpus}
+            </p>
+            <p>
+              <span className="font-medium">Total pCores:</span> {result.cluster.totalPcores}
+            </p>
+            <p>
+              <span className="font-medium">Total VMs:</span> {result.cluster.totalVms}
+            </p>
             {result.cluster.totalDiskGb != null && (
-              <p><span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB</p>
+              <p>
+                <span className="font-medium">Total Disk:</span> {result.cluster.totalDiskGb} GB
+              </p>
             )}
-            <p><span className="font-medium">Scenarios:</span> {result.scenarios.length}</p>
+            <p>
+              <span className="font-medium">Scenarios:</span> {result.scenarios.length}
+            </p>
           </>
         ) : (
           <>
-            <p><span className="font-medium">VMs found:</span> {previewCluster.vmCount}</p>
-            <p><span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}</p>
-            <p><span className="font-medium">Total VMs:</span> {previewCluster.totalVms}</p>
-            <p><span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB</p>
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Avg RAM/VM (informational):</span>{' '}
+            <p>
+              <span className="font-medium">VMs found:</span> {previewCluster.vmCount}
+            </p>
+            <p>
+              <span className="font-medium">Total vCPUs:</span> {previewCluster.totalVcpus}
+            </p>
+            <p>
+              <span className="font-medium">Total VMs:</span> {previewCluster.totalVms}
+            </p>
+            <p>
+              <span className="font-medium">Total Disk:</span> {previewCluster.totalDiskGb} GB
+            </p>
+            <p className="text-slate-500 dark:text-slate-400">
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                Avg RAM/VM (informational):
+              </span>{' '}
               {previewCluster.avgRamPerVmGb} GB
             </p>
             {result.totalPcores != null && (
-              <p><span className="font-medium">Total pCores:</span> {result.totalPcores}</p>
+              <p>
+                <span className="font-medium">Total pCores:</span> {result.totalPcores}
+              </p>
             )}
             {result.existingServerCount != null && (
-              <p><span className="font-medium">Existing servers:</span> {result.existingServerCount}</p>
+              <p>
+                <span className="font-medium">Existing servers:</span> {result.existingServerCount}
+              </p>
             )}
             {result.socketsPerServer != null && (
-              <p><span className="font-medium">Sockets/server:</span> {result.socketsPerServer}</p>
+              <p>
+                <span className="font-medium">Sockets/server:</span> {result.socketsPerServer}
+              </p>
             )}
             {result.coresPerSocket != null && (
-              <p><span className="font-medium">Cores/socket:</span> {result.coresPerSocket}</p>
+              <p>
+                <span className="font-medium">Cores/socket:</span> {result.coresPerSocket}
+              </p>
             )}
             {result.ramPerServerGb != null && (
-              <p><span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB</p>
+              <p>
+                <span className="font-medium">RAM/server:</span> {result.ramPerServerGb} GB
+              </p>
             )}
             {result.cpuUtilizationPercent != null && (
-              <p><span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%</p>
+              <p>
+                <span className="font-medium">Avg CPU util:</span> {result.cpuUtilizationPercent}%
+              </p>
             )}
             {result.ramUtilizationPercent != null && (
-              <p><span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%</p>
+              <p>
+                <span className="font-medium">Avg RAM util:</span> {result.ramUtilizationPercent}%
+              </p>
             )}
           </>
         )}
@@ -241,61 +303,78 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
       {'warnings' in result && result.warnings.length > 0 && (
         <div className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
-          {result.warnings.map((w, i) => <p key={i}>&#x26A0; {w}</p>)}
+          {result.warnings.map((w, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static warning list, never reordered
+            <p key={i}>&#x26A0; {w}</p>
+          ))}
         </div>
       )}
 
       {!isJson && !pcoresKnown && (
-        <p className="text-xs text-muted-foreground">
-          <strong>Note:</strong> Total pCores could not be read from this file and must be
-          entered manually before advancing to Step 2.
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          <strong>Note:</strong> Total pCores could not be read from this file and must be entered
+          manually before advancing to Step 2.
         </p>
       )}
     </>
-  )
+  );
 
-  const body = step === 'scope' ? sharedContent : <VmExclusionPanel rows={exclusionRows} />
+  const body = step === 'scope' ? sharedContent : <VmExclusionPanel rows={exclusionRows} />;
 
   const footerButtons = (
     <>
-      <Button variant="outline" onClick={onClose}>Cancel</Button>
+      <Button variant="outline" onClick={onClose}>
+        Cancel
+      </Button>
       {step === 'scope' && canShowExclusions ? (
         <Button onClick={() => setStep('exclusions')}>Next</Button>
       ) : step === 'exclusions' ? (
         <>
-          <Button variant="outline" onClick={() => setStep('scope')}>Back</Button>
+          <Button variant="outline" onClick={() => setStep('scope')}>
+            Back
+          </Button>
           <Button onClick={handleApply}>Apply</Button>
         </>
       ) : (
         <Button onClick={handleApply}>Apply</Button>
       )}
     </>
-  )
+  );
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={(o) => { if (!o) onClose() }}>
+      <Drawer
+        open={open}
+        onOpenChange={(o) => {
+          if (!o) onClose();
+        }}
+      >
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader>
             <DrawerTitle>Import Preview</DrawerTitle>
-            <DrawerDescription>Review the extracted data before populating the form.</DrawerDescription>
+            <DrawerDescription>
+              Review the extracted data before populating the form.
+            </DrawerDescription>
           </DrawerHeader>
-          <div className="px-4 pb-2 overflow-y-auto space-y-4">
-            {body}
-          </div>
+          <div className="px-4 pb-2 overflow-y-auto space-y-4">{body}</div>
           <DrawerFooter>{footerButtons}</DrawerFooter>
         </DrawerContent>
       </Drawer>
-    )
+    );
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
+    >
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 bg-black/40 z-40" />
-        <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
+        <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
           <Dialog.Title className="text-lg font-semibold">Import Preview</Dialog.Title>
-          <Dialog.Description className="text-sm text-muted-foreground">
+          <Dialog.Description className="text-sm text-slate-500 dark:text-slate-400">
             Review the extracted data before populating the form.
           </Dialog.Description>
 
@@ -305,5 +384,5 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

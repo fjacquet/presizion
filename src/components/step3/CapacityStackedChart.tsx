@@ -1,34 +1,27 @@
-import { useRef } from 'react'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useWizardStore } from '@/store/useWizardStore'
-import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns'
-import { Button } from '@/components/ui/button'
-import { CHART_COLORS } from '@/lib/sizing/chartColors'
-import { downloadChartPng } from '@/lib/utils/downloadChartPng'
+import { useRef } from 'react';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
+import { CHART_COLORS } from '@/lib/sizing/chartColors';
+import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { useWizardStore } from '@/store/useWizardStore';
 
 /** Absolute values for label display */
 interface AbsoluteRow {
-  readonly name: string
-  readonly required: number
-  readonly spare: number
-  readonly excess: number
-  readonly total: number
+  readonly name: string;
+  readonly required: number;
+  readonly spare: number;
+  readonly excess: number;
+  readonly total: number;
 }
 
 /** Normalized to percentages (all bars same width = 100%) */
 interface ChartRow {
-  readonly name: string
-  readonly required: number
-  readonly spare: number
-  readonly excess: number
+  readonly name: string;
+  readonly required: number;
+  readonly spare: number;
+  readonly excess: number;
 }
 
 /**
@@ -37,30 +30,34 @@ interface ChartRow {
  * Returns an invisible <text> element when hidden (Recharts label prop requires ReactElement).
  */
 interface SegmentLabelProps {
-  x?: string | number | undefined
-  y?: string | number | undefined
-  width?: string | number | undefined
-  height?: string | number | undefined
-  index?: number | undefined
+  x?: string | number | undefined;
+  y?: string | number | undefined;
+  width?: string | number | undefined;
+  height?: string | number | undefined;
+  index?: number | undefined;
 }
 
-function renderSegmentLabel(absRows: readonly AbsoluteRow[], chartRows: readonly ChartRow[], dataKey: 'required' | 'spare' | 'excess') {
+function renderSegmentLabel(
+  absRows: readonly AbsoluteRow[],
+  chartRows: readonly ChartRow[],
+  dataKey: 'required' | 'spare' | 'excess',
+) {
   return function SegmentLabel(props: SegmentLabelProps): React.ReactElement<SVGElement> {
-    const x = Number(props.x ?? 0)
-    const y = Number(props.y ?? 0)
-    const width = Number(props.width ?? 0)
-    const height = Number(props.height ?? 0)
-    const index = props.index ?? 0
-    const abs = absRows[index]
-    const chart = chartRows[index]
+    const x = Number(props.x ?? 0);
+    const y = Number(props.y ?? 0);
+    const width = Number(props.width ?? 0);
+    const height = Number(props.height ?? 0);
+    const index = props.index ?? 0;
+    const abs = absRows[index];
+    const chart = chartRows[index];
     if (!abs || !chart || width < 40 || abs.total === 0) {
-      return <text visibility="hidden" />
+      return <text visibility="hidden" />;
     }
     // Show the chart percentage (capped at 100% total) not the raw ratio
-    const pct = chart[dataKey].toFixed(1)
+    const pct = chart[dataKey].toFixed(1);
     // Flag overcommit: when required > total, show warning
-    const isOvercommit = dataKey === 'required' && abs.required > abs.total
-    const label = isOvercommit ? `${pct}% (!!)` : `${pct}%`
+    const isOvercommit = dataKey === 'required' && abs.required > abs.total;
+    const label = isOvercommit ? `${pct}% (!!)` : `${pct}%`;
     return (
       <text
         x={x + width / 2}
@@ -73,22 +70,22 @@ function renderSegmentLabel(absRows: readonly AbsoluteRow[], chartRows: readonly
       >
         {label}
       </text>
-    )
-  }
+    );
+  };
 }
 
 /** Normalize absolute row to percentages (capped at 100% total) */
 function normalizeRow(abs: AbsoluteRow): ChartRow {
-  if (abs.total === 0) return { name: abs.name, required: 0, spare: 0, excess: 0 }
-  const reqPct = Math.min((abs.required / abs.total) * 100, 100)
-  const sparePct = Math.min((abs.spare / abs.total) * 100, 100 - reqPct)
-  const excessPct = Math.max(0, 100 - reqPct - sparePct)
-  return { name: abs.name, required: reqPct, spare: sparePct, excess: excessPct }
+  if (abs.total === 0) return { name: abs.name, required: 0, spare: 0, excess: 0 };
+  const reqPct = Math.min((abs.required / abs.total) * 100, 100);
+  const sparePct = Math.min((abs.spare / abs.total) * 100, 100 - reqPct);
+  const excessPct = Math.max(0, 100 - reqPct - sparePct);
+  return { name: abs.name, required: reqPct, spare: sparePct, excess: excessPct };
 }
 
 interface CapacityStackedChartProps {
   /** When provided, chart container refs are written here for PDF/PPTX export capture. */
-  readonly chartRefs?: React.RefObject<Record<string, HTMLDivElement | null>>
+  readonly chartRefs?: React.RefObject<Record<string, HTMLDivElement | null>>;
 }
 
 /**
@@ -98,21 +95,21 @@ interface CapacityStackedChartProps {
  * One chart per scenario, each with a Download PNG button.
  */
 export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = {}) {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const layoutMode = useWizardStore((s) => s.layoutMode)
-  const breakdowns = useVsanBreakdowns()
-  const refs = useRef<Record<string, HTMLDivElement | null>>({})
-  const showStorage = layoutMode !== 'disaggregated'
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const layoutMode = useWizardStore((s) => s.layoutMode);
+  const breakdowns = useVsanBreakdowns();
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
+  const showStorage = layoutMode !== 'disaggregated';
 
-  if (scenarios.length === 0) return null
+  if (scenarios.length === 0) return null;
 
   return (
     <div className="space-y-6">
       {breakdowns.map((bd, i) => {
-        const scenario = scenarios[i]
-        if (!scenario) return null
-        const scenarioName = scenario.name
-        const scenarioId = scenario.id
+        const scenario = scenarios[i];
+        if (!scenario) return null;
+        const scenarioName = scenario.name;
+        const scenarioId = scenario.id;
 
         // Absolute values (for labels and tooltips)
         const absRows: AbsoluteRow[] = [
@@ -130,39 +127,53 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
             excess: Math.max(0, bd.memory.excess),
             total: bd.memory.total,
           },
-          ...(showStorage ? [{
-            name: 'Raw Storage TiB',
-            required: bd.storage.required / 1024,
-            spare: bd.storage.spare / 1024,
-            excess: Math.max(0, bd.storage.excess) / 1024,
-            total: bd.storage.total / 1024,
-          }] : []),
-          ...(showStorage ? [(() => {
-            if (bd.storage.total === 0) {
-              return { name: 'Usable Storage TiB', required: 0, spare: 0, excess: 0, total: 0 }
-            }
-            const usableReq = bd.storage.usableRequired / 1024
-            const spareFrac = bd.storage.spare / bd.storage.total
-            const excessFrac = Math.max(0, bd.storage.excess) / bd.storage.total
-            const usableSpare = usableReq * spareFrac
-            const usableExcess = usableReq * excessFrac
-            return {
-              name: 'Usable Storage TiB',
-              required: usableReq,
-              spare: usableSpare,
-              excess: usableExcess,
-              total: usableReq + usableSpare + usableExcess,
-            }
-          })()] : []),
-        ]
+          ...(showStorage
+            ? [
+                {
+                  name: 'Raw Storage TiB',
+                  required: bd.storage.required / 1024,
+                  spare: bd.storage.spare / 1024,
+                  excess: Math.max(0, bd.storage.excess) / 1024,
+                  total: bd.storage.total / 1024,
+                },
+              ]
+            : []),
+          ...(showStorage
+            ? [
+                (() => {
+                  if (bd.storage.total === 0) {
+                    return {
+                      name: 'Usable Storage TiB',
+                      required: 0,
+                      spare: 0,
+                      excess: 0,
+                      total: 0,
+                    };
+                  }
+                  const usableReq = bd.storage.usableRequired / 1024;
+                  const spareFrac = bd.storage.spare / bd.storage.total;
+                  const excessFrac = Math.max(0, bd.storage.excess) / bd.storage.total;
+                  const usableSpare = usableReq * spareFrac;
+                  const usableExcess = usableReq * excessFrac;
+                  return {
+                    name: 'Usable Storage TiB',
+                    required: usableReq,
+                    spare: usableSpare,
+                    excess: usableExcess,
+                    total: usableReq + usableSpare + usableExcess,
+                  };
+                })(),
+              ]
+            : []),
+        ];
 
         // Normalized to % (all bars same width = 100%)
-        const chartRows = absRows.map(normalizeRow)
+        const chartRows = absRows.map(normalizeRow);
 
         return (
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Capacity Breakdown -- {scenarioName}
               </h3>
               <Button
@@ -179,7 +190,7 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
                         { label: 'Excess', color: CHART_COLORS[2]! },
                       ],
                       tableHeaders: ['Required', 'Spare', 'Excess', 'Total'],
-                      tableRows: absRows.map(r => ({
+                      tableRows: absRows.map((r) => ({
                         label: r.name,
                         values: [
                           r.required.toFixed(1),
@@ -197,73 +208,87 @@ export function CapacityStackedChart({ chartRefs }: CapacityStackedChartProps = 
               </Button>
             </div>
             <div className={showStorage ? 'h-[140px] sm:h-[220px]' : 'h-[100px] sm:h-[130px]'}>
-              <div className="h-full" ref={(el) => {
-                refs.current[scenarioId] = el
-                if (chartRefs) chartRefs.current[`capacity-${scenarioId}`] = el
-              }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartRows}
-                  layout="vertical"
-                  margin={{ top: 8, right: 40, left: 90, bottom: 8 }}
-                >
-                  <XAxis type="number" hide domain={[0, 100]} />
-                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
-                  <Tooltip
-                    formatter={(_v, name, item) => {
-                      const payload = (item as { payload?: ChartRow & { name?: string } }).payload
-                      const rowName = payload?.name
-                      const idx = absRows.findIndex(r => r.name === rowName)
-                      const abs = absRows[idx]
-                      if (!abs) return ''
-                      const key = name === 'Required' ? 'required' : name === 'Spare' ? 'spare' : 'excess'
-                      const val = abs[key as keyof AbsoluteRow] as number
-                      const pct = abs.total > 0 ? ((val / abs.total) * 100).toFixed(1) : '0.0'
-                      return `${val.toFixed(1)} (${pct}% of ${abs.total.toFixed(1)} total)`
-                    }}
-                  />
-                  <Bar
-                    dataKey="required"
-                    name="Required"
-                    stackId="cap"
-                    fill={CHART_COLORS[0]}
-                    label={renderSegmentLabel(absRows, chartRows, 'required')}
-                  />
-                  <Bar
-                    dataKey="spare"
-                    name="Spare"
-                    stackId="cap"
-                    fill={CHART_COLORS[1]}
-                    label={renderSegmentLabel(absRows, chartRows, 'spare')}
-                  />
-                  <Bar
-                    dataKey="excess"
-                    name="Excess"
-                    stackId="cap"
-                    fill={CHART_COLORS[2]}
-                    label={renderSegmentLabel(absRows, chartRows, 'excess')}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+              <div
+                className="h-full"
+                ref={(el) => {
+                  refs.current[scenarioId] = el;
+                  if (chartRefs) chartRefs.current[`capacity-${scenarioId}`] = el;
+                }}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartRows}
+                    layout="vertical"
+                    margin={{ top: 8, right: 40, left: 90, bottom: 8 }}
+                  >
+                    <XAxis type="number" hide domain={[0, 100]} />
+                    <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+                    <Tooltip
+                      formatter={(_v, name, item) => {
+                        const payload = (item as { payload?: ChartRow & { name?: string } })
+                          .payload;
+                        const rowName = payload?.name;
+                        const idx = absRows.findIndex((r) => r.name === rowName);
+                        const abs = absRows[idx];
+                        if (!abs) return '';
+                        const key =
+                          name === 'Required' ? 'required' : name === 'Spare' ? 'spare' : 'excess';
+                        const val = abs[key as keyof AbsoluteRow] as number;
+                        const pct = abs.total > 0 ? ((val / abs.total) * 100).toFixed(1) : '0.0';
+                        return `${val.toFixed(1)} (${pct}% of ${abs.total.toFixed(1)} total)`;
+                      }}
+                    />
+                    <Bar
+                      dataKey="required"
+                      name="Required"
+                      stackId="cap"
+                      fill={CHART_COLORS[0]}
+                      label={renderSegmentLabel(absRows, chartRows, 'required')}
+                    />
+                    <Bar
+                      dataKey="spare"
+                      name="Spare"
+                      stackId="cap"
+                      fill={CHART_COLORS[1]}
+                      label={renderSegmentLabel(absRows, chartRows, 'spare')}
+                    />
+                    <Bar
+                      dataKey="excess"
+                      name="Excess"
+                      stackId="cap"
+                      fill={CHART_COLORS[2]}
+                      label={renderSegmentLabel(absRows, chartRows, 'excess')}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
-            <div className="flex justify-center gap-6 text-xs text-muted-foreground pb-2">
+            <div className="flex justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 pb-2">
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[0] }} />
+                <span
+                  className="inline-block w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: CHART_COLORS[0] }}
+                />
                 Required
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[1] }} />
+                <span
+                  className="inline-block w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: CHART_COLORS[1] }}
+                />
                 Spare
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: CHART_COLORS[2] }} />
+                <span
+                  className="inline-block w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: CHART_COLORS[2] }}
+                />
                 Excess
               </span>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

@@ -15,6 +15,7 @@
 ## File Inventory
 
 **New files:**
+
 - `src/types/exclusions.ts` — `ExclusionRules`, `EMPTY_RULES`
 - `src/lib/utils/import/exclusions.ts` — `compileNamePattern`, `isExcluded`, `applyExclusions`, `aggregateVmRows`, `ExclusionStats`
 - `src/lib/utils/import/__tests__/exclusions.test.ts`
@@ -33,6 +34,7 @@
 - `docs/adr/ADR-021-vm-exclusion-rules-persistence.md`
 
 **Modified files:**
+
 - `src/lib/utils/import/index.ts` — add `VmRow`, extend `ClusterImportResult` with `vmRowsByScope`
 - `src/lib/utils/import/columnResolver.ts` — add `power_state` aliases to `LIVEOPTICS_ALIASES` and `RVTOOLS_ALIASES`
 - `src/lib/utils/import/liveopticParser.ts` — emit `vmRowsByScope` from `aggregate()`
@@ -51,6 +53,7 @@
 ## Task 1: Types and constants
 
 **Files:**
+
 - Create: `src/types/exclusions.ts`
 
 - [ ] **Step 1: Write the type module**
@@ -93,6 +96,7 @@ git commit -m "feat(exclusions): add ExclusionRules type and EMPTY_RULES constan
 ## Task 2: Extend `ClusterImportResult` with `VmRow` and `vmRowsByScope`
 
 **Files:**
+
 - Modify: `src/lib/utils/import/index.ts`
 
 - [ ] **Step 1: Add `VmRow` type and extend the result**
@@ -147,6 +151,7 @@ git commit -m "feat(exclusions): add VmRow and vmRowsByScope to ClusterImportRes
 ## Task 3: Exclusion engine — `compileNamePattern`
 
 **Files:**
+
 - Create: `src/lib/utils/import/exclusions.ts`
 - Create: `src/lib/utils/import/__tests__/exclusions.test.ts`
 
@@ -280,6 +285,7 @@ git commit -m "feat(exclusions): compileNamePattern with glob-to-regex translato
 ## Task 4: Exclusion engine — `isExcluded` short-circuit order
 
 **Files:**
+
 - Modify: `src/lib/utils/import/exclusions.ts`
 - Modify: `src/lib/utils/import/__tests__/exclusions.test.ts`
 
@@ -395,6 +401,7 @@ git commit -m "feat(exclusions): isExcluded with override-wins short-circuit"
 ## Task 5: Exclusion engine — `applyExclusions` + stats
 
 **Files:**
+
 - Modify: `src/lib/utils/import/exclusions.ts`
 - Modify: `src/lib/utils/import/__tests__/exclusions.test.ts`
 
@@ -554,6 +561,7 @@ git commit -m "feat(exclusions): applyExclusions with per-rule stats attribution
 ## Task 6: Exclusion engine — `aggregateVmRows`
 
 **Files:**
+
 - Modify: `src/lib/utils/import/exclusions.ts`
 - Modify: `src/lib/utils/import/__tests__/exclusions.test.ts`
 
@@ -654,6 +662,7 @@ git commit -m "feat(exclusions): aggregateVmRows for VM-derived ScopeData fields
 ## Task 7: LiveOptics parser emits `vmRowsByScope`
 
 **Files:**
+
 - Modify: `src/lib/utils/import/columnResolver.ts`
 - Modify: `src/lib/utils/import/liveopticParser.ts`
 - Create: `src/lib/utils/import/__tests__/liveopticParser.exclusions.test.ts`
@@ -809,6 +818,7 @@ git commit -m "feat(exclusions): liveoptics parser emits vmRowsByScope with powe
 ## Task 8: RVTools parser emits `vmRowsByScope`
 
 **Files:**
+
 - Modify: `src/lib/utils/import/columnResolver.ts`
 - Modify: `src/lib/utils/import/rvtoolsParser.ts`
 - Create: `src/lib/utils/import/__tests__/rvtoolsParser.exclusions.test.ts`
@@ -945,6 +955,7 @@ git commit -m "feat(exclusions): rvtools parser emits vmRowsByScope with power s
 ## Task 9: `useExclusionsStore` (persisted)
 
 **Files:**
+
 - Create: `src/store/useExclusionsStore.ts`
 - Create: `src/store/__tests__/useExclusionsStore.test.ts`
 
@@ -1075,6 +1086,7 @@ git commit -m "feat(exclusions): add persisted useExclusionsStore with migration
 ## Task 10: `useImportStore` carries session-only `vmRowsByScope` + `recomputeCluster()`
 
 **Files:**
+
 - Modify: `src/store/useImportStore.ts`
 - Create: `src/hooks/useRecomputeCluster.ts`
 
@@ -1207,6 +1219,7 @@ export function useRecomputeCluster(): void {
 rtk npx tsc -b --noEmit
 rtk npx vitest run src/store
 ```
+
 Expected: clean. (Existing `useImportStore.test.ts` — if any — should still pass because `setActiveScope` and `clearImport` keep their contracts.)
 
 - [ ] **Step 4: Commit**
@@ -1221,6 +1234,7 @@ git commit -m "feat(exclusions): import store carries vmRowsByScope, recomputeCl
 ## Task 11: JSON schema v2 — read and write
 
 **Files:**
+
 - Modify: `src/lib/utils/export.ts`
 - Modify: `src/lib/utils/import/jsonParser.ts`
 - Create: `src/lib/utils/__tests__/persistence.exclusions.test.ts`
@@ -1384,6 +1398,7 @@ git commit -m "feat(exclusions): JSON schema v2 with optional exclusions block"
 ## Task 12: URL hash v2 with truncation
 
 **Files:**
+
 - Modify: `src/lib/utils/persistence.ts`
 - Modify: `src/lib/utils/__tests__/persistence.exclusions.test.ts`
 
@@ -1562,6 +1577,7 @@ git commit -m "feat(exclusions): URL hash v2 with truncation order + decoder fla
 ## Task 13: Boot — hydrate exclusions from hash/localStorage
 
 **Files:**
+
 - Modify: `src/main.tsx`
 
 - [ ] **Step 1: Hydrate rules on boot and show truncation toast**
@@ -1626,6 +1642,7 @@ Find callers (`rtk grep -rn "encodeSessionToHash(" src/`) and pass `exclusions: 
 rtk npx tsc -b --noEmit
 rtk npm run test
 ```
+
 Expected: all tests pass.
 
 - [ ] **Step 4: Commit**
@@ -1640,6 +1657,7 @@ git commit -m "feat(exclusions): hydrate rules on boot, surface URL-hash truncat
 ## Task 14: `<VirtualizedVmList/>` — lean windowed list
 
 **Files:**
+
 - Create: `src/components/exclusions/VirtualizedVmList.tsx`
 - Create: `src/components/exclusions/__tests__/VirtualizedVmList.test.tsx`
 
@@ -1785,6 +1803,7 @@ git commit -m "feat(exclusions): hand-rolled virtualized VM list"
 ## Task 15: `<VmExclusionPanel/>` shared component
 
 **Files:**
+
 - Create: `src/components/exclusions/VmExclusionPanel.tsx`
 - Create: `src/components/exclusions/__tests__/VmExclusionPanel.test.tsx`
 
@@ -2007,6 +2026,7 @@ git commit -m "feat(exclusions): VmExclusionPanel with live stats and per-row ov
 ## Task 16: `<ExclusionSummaryCard/>` for Step 1
 
 **Files:**
+
 - Create: `src/components/exclusions/ExclusionSummaryCard.tsx`
 - Create: `src/components/exclusions/__tests__/ExclusionSummaryCard.test.tsx`
 - Modify: `src/components/step1/Step1CurrentCluster.tsx`
@@ -2189,6 +2209,7 @@ git commit -m "feat(exclusions): Step 1 summary card with edit dialog"
 ## Task 17: Import Preview modal — step-2 exclusions
 
 **Files:**
+
 - Modify: `src/components/step1/ImportPreviewModal.tsx`
 - Modify: `src/components/step1/__tests__/ImportPreviewModal.test.tsx`
 
@@ -2300,6 +2321,7 @@ rtk npm run lint
 rtk npm run test
 rtk npm run build
 ```
+
 Expected: lint clean, all tests pass (target ~720+ tests), production build succeeds.
 
 - [ ] **Step 2: Dev server manual verification**
@@ -2332,6 +2354,7 @@ Verify in-browser:
 ## Task 19: ADR + docs updates
 
 **Files:**
+
 - Create: `docs/adr/ADR-021-vm-exclusion-rules-persistence.md`
 - Modify: `CHANGELOG.md`, `docs/prd.md`, `docs/architecture.md`, `docs/state-management.md`, `docs/import-export.md`, `docs/userguide.md`, `docs/testing.md`, `README.md`
 
@@ -2405,6 +2428,7 @@ git commit -m "docs(exclusions): ADR-021 + prd/architecture/state-management/use
 ## Self-Review Results
 
 **Spec coverage:**
+
 - §1 Problem → covered by user-facing UI (Tasks 15–17) and engine (Tasks 3–6).
 - §2 User-facing behavior (rules + overrides + dual placement) → Tasks 9, 15, 16, 17.
 - §3.1 Data flow → Task 10 (`recomputeCluster` preserves ESX fields, re-aggregates VM-derived).

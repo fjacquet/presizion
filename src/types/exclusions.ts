@@ -1,9 +1,9 @@
 export interface ExclusionRules {
-  readonly namePattern: string
-  readonly exactNames: readonly string[]
-  readonly excludePoweredOff: boolean
-  readonly manuallyExcluded: readonly string[]
-  readonly manuallyIncluded: readonly string[]
+  readonly namePattern: string;
+  readonly exactNames: readonly string[];
+  readonly excludePoweredOff: boolean;
+  readonly manuallyExcluded: readonly string[];
+  readonly manuallyIncluded: readonly string[];
 }
 
 export const EMPTY_RULES: ExclusionRules = {
@@ -12,6 +12,6 @@ export const EMPTY_RULES: ExclusionRules = {
   excludePoweredOff: false,
   manuallyExcluded: [],
   manuallyIncluded: [],
-}
+};
 
-export type PowerState = 'poweredOn' | 'poweredOff' | 'suspended' | 'unknown'
+export type PowerState = 'poweredOn' | 'poweredOff' | 'suspended' | 'unknown';

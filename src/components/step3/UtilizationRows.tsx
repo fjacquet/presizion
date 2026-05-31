@@ -1,23 +1,29 @@
-import { TableCell, TableRow } from '@/components/ui/table'
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ScenarioResult } from '@/types/results'
-import type { SizingMode, LayoutMode } from '@/lib/sizing/constraints'
-import { UtilizationCell } from './UtilizationCell'
+import { TableCell, TableRow } from '@/components/ui/table';
+import type { LayoutMode, SizingMode } from '@/lib/sizing/constraints';
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { ScenarioResult } from '@/types/results';
+import { UtilizationCell } from './UtilizationCell';
 
-const STICKY = 'font-medium sticky left-0 bg-background z-10'
-const ASIS = 'text-center bg-muted/30'
+const STICKY = 'font-medium sticky left-0 bg-white dark:bg-surface-900 z-10';
+const ASIS = 'text-center bg-slate-100/30 dark:bg-surface-700/30';
 
 interface UtilizationRowsProps {
-  readonly cluster: OldCluster
-  readonly scenarios: readonly Scenario[]
-  readonly results: readonly ScenarioResult[]
-  readonly sizingMode: SizingMode
-  readonly layoutMode: LayoutMode
+  readonly cluster: OldCluster;
+  readonly scenarios: readonly Scenario[];
+  readonly results: readonly ScenarioResult[];
+  readonly sizingMode: SizingMode;
+  readonly layoutMode: LayoutMode;
 }
 
-export function UtilizationRows({ cluster, scenarios, results, sizingMode, layoutMode }: UtilizationRowsProps) {
-  const showCpuUtilRow = cluster.cpuUtilizationPercent !== undefined
-  const cpuUtilIsSizingDriver = sizingMode === 'performance'
+export function UtilizationRows({
+  cluster,
+  scenarios,
+  results,
+  sizingMode,
+  layoutMode,
+}: UtilizationRowsProps) {
+  const showCpuUtilRow = cluster.cpuUtilizationPercent !== undefined;
+  const cpuUtilIsSizingDriver = sizingMode === 'performance';
 
   return (
     <>
@@ -38,10 +44,7 @@ export function UtilizationRows({ cluster, scenarios, results, sizingMode, layou
               : '\u2014'}
           </TableCell>
           {results.map((result, i) => (
-            <UtilizationCell
-              key={scenarios[i]?.id ?? i}
-              pct={result.cpuUtilizationPercent}
-            />
+            <UtilizationCell key={scenarios[i]?.id ?? i} pct={result.cpuUtilizationPercent} />
           ))}
         </TableRow>
       )}
@@ -55,10 +58,7 @@ export function UtilizationRows({ cluster, scenarios, results, sizingMode, layou
             : '\u2014'}
         </TableCell>
         {results.map((result, i) => (
-          <UtilizationCell
-            key={scenarios[i]?.id ?? i}
-            pct={result.ramUtilizationPercent}
-          />
+          <UtilizationCell key={scenarios[i]?.id ?? i} pct={result.ramUtilizationPercent} />
         ))}
       </TableRow>
 
@@ -68,13 +68,10 @@ export function UtilizationRows({ cluster, scenarios, results, sizingMode, layou
           <TableCell className={STICKY}>Disk Util %</TableCell>
           <TableCell className={ASIS}>{'\u2014'}</TableCell>
           {results.map((result, i) => (
-            <UtilizationCell
-              key={scenarios[i]?.id ?? i}
-              pct={result.diskUtilizationPercent}
-            />
+            <UtilizationCell key={scenarios[i]?.id ?? i} pct={result.diskUtilizationPercent} />
           ))}
         </TableRow>
       )}
     </>
-  )
+  );
 }

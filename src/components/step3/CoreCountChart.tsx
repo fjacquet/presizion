@@ -1,22 +1,22 @@
-import { useRef } from 'react'
+import { useRef } from 'react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  Legend,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ReferenceLine,
-  LabelList,
-} from 'recharts'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useScenariosResults } from '@/hooks/useScenariosResults'
-import { useClusterStore } from '@/store/useClusterStore'
-import { Button } from '@/components/ui/button'
-import { CHART_COLORS } from '@/lib/sizing/chartColors'
-import { downloadChartPng } from '@/lib/utils/downloadChartPng'
+} from 'recharts';
+import { Button } from '@/components/ui/button';
+import { useScenariosResults } from '@/hooks/useScenariosResults';
+import { CHART_COLORS } from '@/lib/sizing/chartColors';
+import { downloadChartPng } from '@/lib/utils/downloadChartPng';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
 
 /**
  * Bar chart showing total physical cores per scenario.
@@ -24,22 +24,24 @@ import { downloadChartPng } from '@/lib/utils/downloadChartPng'
  * Legend is always shown. Data labels appear above bars.
  */
 export function CoreCountChart() {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const results = useScenariosResults()
-  const currentCluster = useClusterStore((s) => s.currentCluster)
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const results = useScenariosResults();
+  const currentCluster = useClusterStore((s) => s.currentCluster);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  if (scenarios.length === 0) return null
+  if (scenarios.length === 0) return null;
 
   const chartData = scenarios.map((s, i) => ({
     name: s.name,
     cores: (results[i]?.finalCount ?? 0) * s.socketsPerServer * s.coresPerSocket,
-  }))
+  }));
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">Total Physical Cores per Scenario</h3>
+        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Total Physical Cores per Scenario
+        </h3>
         <Button
           variant="outline"
           size="sm"
@@ -51,28 +53,28 @@ export function CoreCountChart() {
       </div>
       <div className="h-48 sm:h-72">
         <div ref={containerRef} className="h-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
-            <YAxis label={{ value: 'Physical Cores', angle: -90, position: 'insideLeft' }} />
-            <Tooltip />
-            <Legend />
-            {currentCluster.totalPcores > 0 && (
-              <ReferenceLine
-                y={currentCluster.totalPcores}
-                label="As-Is"
-                stroke="#94a3b8"
-                strokeDasharray="4 2"
-              />
-            )}
-            <Bar dataKey="cores" name="Physical Cores" fill={CHART_COLORS[0]}>
-              <LabelList dataKey="cores" position="top" style={{ fontSize: 11 }} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 20, right: 16, bottom: 40, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
+              <YAxis label={{ value: 'Physical Cores', angle: -90, position: 'insideLeft' }} />
+              <Tooltip />
+              <Legend />
+              {currentCluster.totalPcores > 0 && (
+                <ReferenceLine
+                  y={currentCluster.totalPcores}
+                  label="As-Is"
+                  stroke="#94a3b8"
+                  strokeDasharray="4 2"
+                />
+              )}
+              <Bar dataKey="cores" name="Physical Cores" fill={CHART_COLORS[0]}>
+                <LabelList dataKey="cores" position="top" style={{ fontSize: 11 }} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
-  )
+  );
 }

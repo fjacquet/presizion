@@ -9,7 +9,8 @@ import { currentClusterSchema } from './currentClusterSchema';
  */
 const requiredPercent = z.preprocess(
   (v) => (v === '' || v === null || v === undefined ? undefined : Number(v)),
-  z.number({ error: 'Utilization is required — enter measured or estimated %' })
+  z
+    .number({ error: 'Utilization is required — enter measured or estimated %' })
     .min(1, 'Must be at least 1%')
     .max(100, 'Cannot exceed 100%'),
 );

@@ -1,12 +1,15 @@
 /**
- * Shared professional color palette for all bar charts.
- * Uses Tailwind 500-level colors chosen for accessibility (WCAG AA contrast on white).
+ * Shared brand color palette for all bar charts — the Midnight Executive
+ * series (sub-project B). These sRGB-hex values are the brand source of
+ * truth: the primary ramp first, then status bands and extra series colors.
+ * The PPTX export (`pptx/primitives/colors.ts`, added in B3) and the ECharts
+ * theme (sub-project C) will mirror these same values.
  */
 export const CHART_COLORS = [
-  '#3b82f6', // blue-500 — CPU-limited / primary bar
-  '#22c55e', // green-500 — RAM-limited
-  '#f59e0b', // amber-500 — Disk-limited
-  '#8b5cf6', // violet-500 — 4th scenario
-  '#ec4899', // pink-500 — 5th scenario
-  '#14b8a6', // teal-500 — 6th scenario
-] as const
+  '#3245b7', // primary-500 — primary bar / CPU-limited
+  '#819ae9', // primary-300 — series 2 / RAM-limited
+  '#b0c2f9', // primary-200 — series 3 / Disk-limited
+  '#4aa342', // util-low (green)
+  '#ef8700', // util-mid (orange)
+  '#df202e', // util-high (red)
+] as const;

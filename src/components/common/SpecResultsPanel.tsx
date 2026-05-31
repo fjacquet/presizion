@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
-import type { SpecResult, SpecLookupResult } from '@/lib/utils/specLookup'
+import { ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import type { SpecLookupResult, SpecResult } from '@/lib/utils/specLookup';
 
 interface SpecResultsPanelProps {
-  results: SpecResult[]
-  status: SpecLookupResult['status']
-  isLoading: boolean
-  onSelect: (result: SpecResult) => void
-  selectedScore?: number | undefined
+  results: SpecResult[];
+  status: SpecLookupResult['status'];
+  isLoading: boolean;
+  onSelect: (result: SpecResult) => void;
+  selectedScore?: number | undefined;
 }
 
 /**
@@ -21,35 +21,33 @@ export function SpecResultsPanel({
   onSelect,
   selectedScore,
 }: SpecResultsPanelProps) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="border rounded-md mb-3">
       <button
         type="button"
-        className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-left hover:bg-muted/50"
+        className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-left hover:bg-slate-100/50 dark:hover:bg-surface-700/50"
         onClick={() => setOpen(!open)}
       >
-        <ChevronRight
-          className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`}
-        />
+        <ChevronRight className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`} />
         SPECrate2017 Results
       </button>
 
       {open && (
         <div className="px-3 pb-3">
           {isLoading && (
-            <p className="text-sm text-muted-foreground py-2">Loading...</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 py-2">Loading...</p>
           )}
 
           {!isLoading && status === 'no-results' && (
-            <p className="text-sm text-muted-foreground py-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 py-2">
               No SPECrate2017 results found for this CPU model
             </p>
           )}
 
           {!isLoading && status === 'error' && (
-            <p className="text-sm text-destructive py-2">
+            <p className="text-sm text-util-high py-2">
               Could not fetch SPEC results. Use manual entry below.
             </p>
           )}
@@ -58,7 +56,7 @@ export function SpecResultsPanel({
             <div className="overflow-x-auto">
               <table className="min-w-max w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-muted-foreground">
+                  <tr className="border-b text-left text-slate-500 dark:text-slate-400">
                     <th className="py-1 pr-3">Vendor</th>
                     <th className="py-1 pr-3">System</th>
                     <th className="py-1 pr-3">Base Score</th>
@@ -69,9 +67,12 @@ export function SpecResultsPanel({
                 <tbody>
                   {results.map((row, i) => (
                     <tr
+                      // biome-ignore lint/suspicious/noArrayIndexKey: vendor+system+index disambiguates duplicate SPEC rows
                       key={`${row.vendor}-${row.system}-${i}`}
-                      className={`cursor-pointer hover:bg-muted ${
-                        selectedScore === row.baseResult ? 'bg-primary/10' : ''
+                      className={`cursor-pointer hover:bg-slate-100 dark:hover:bg-surface-700 ${
+                        selectedScore === row.baseResult
+                          ? 'bg-primary-600/10 dark:bg-primary-500/10'
+                          : ''
                       }`}
                       onClick={() => onSelect(row)}
                     >
@@ -89,5 +90,5 @@ export function SpecResultsPanel({
         </div>
       )}
     </div>
-  )
+  );
 }

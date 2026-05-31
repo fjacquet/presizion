@@ -1,31 +1,31 @@
-import { useState, useMemo } from 'react'
-import { useExclusionsStore } from '@/store/useExclusionsStore'
-import { useImportStore } from '@/store/useImportStore'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Dialog } from '@base-ui/react/dialog'
-import { VmExclusionPanel } from './VmExclusionPanel'
+import { Dialog } from '@base-ui/react/dialog';
+import { useMemo, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
+import { useImportStore } from '@/store/useImportStore';
+import { VmExclusionPanel } from './VmExclusionPanel';
 
 export function ExclusionSummaryCard() {
-  const rules = useExclusionsStore((s) => s.rules)
-  const vmRowsByScope = useImportStore((s) => s.vmRowsByScope)
-  const activeScope = useImportStore((s) => s.activeScope)
-  const [open, setOpen] = useState(false)
+  const rules = useExclusionsStore((s) => s.rules);
+  const vmRowsByScope = useImportStore((s) => s.vmRowsByScope);
+  const activeScope = useImportStore((s) => s.activeScope);
+  const [open, setOpen] = useState(false);
 
   const hasAnyRule =
     rules.namePattern !== '' ||
     rules.exactNames.length > 0 ||
     rules.excludePoweredOff ||
     rules.manuallyExcluded.length > 0 ||
-    rules.manuallyIncluded.length > 0
+    rules.manuallyIncluded.length > 0;
 
   const activeRows = useMemo(() => {
-    if (vmRowsByScope == null) return null
-    const scopes = activeScope.length > 0 ? activeScope : [...vmRowsByScope.keys()]
-    return scopes.flatMap((k) => vmRowsByScope.get(k) ?? [])
-  }, [vmRowsByScope, activeScope])
+    if (vmRowsByScope == null) return null;
+    const scopes = activeScope.length > 0 ? activeScope : [...vmRowsByScope.keys()];
+    return scopes.flatMap((k) => vmRowsByScope.get(k) ?? []);
+  }, [vmRowsByScope, activeScope]);
 
-  if (!hasAnyRule && activeRows == null) return null
+  if (!hasAnyRule && activeRows == null) return null;
 
   return (
     <div className="border rounded-md p-3 space-y-2">
@@ -36,7 +36,9 @@ export function ExclusionSummaryCard() {
             Edit exclusions
           </Button>
         ) : (
-          <span className="text-xs text-muted-foreground">Re-import source file to edit</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            Re-import source file to edit
+          </span>
         )}
       </div>
       <div className="flex flex-wrap gap-1">
@@ -53,10 +55,15 @@ export function ExclusionSummaryCard() {
         )}
       </div>
       {open && activeRows != null && (
-        <Dialog.Root open={open} onOpenChange={(o) => { if (!o) setOpen(false) }}>
+        <Dialog.Root
+          open={open}
+          onOpenChange={(o) => {
+            if (!o) setOpen(false);
+          }}
+        >
           <Dialog.Portal>
             <Dialog.Backdrop className="fixed inset-0 bg-black/40 z-40" />
-            <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border rounded-lg shadow-lg p-6 w-full max-w-lg">
+            <Dialog.Popup className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-900 border border-slate-200 dark:border-surface-700 rounded-lg shadow-lg p-6 w-full max-w-lg">
               <Dialog.Title className="text-lg font-semibold mb-2">Edit VM Exclusions</Dialog.Title>
               <VmExclusionPanel rows={activeRows} />
               <div className="flex justify-end mt-3">
@@ -67,5 +74,5 @@ export function ExclusionSummaryCard() {
         </Dialog.Root>
       )}
     </div>
-  )
+  );
 }

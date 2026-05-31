@@ -1,24 +1,24 @@
-import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useScenariosStore } from '@/store/useScenariosStore'
-import { useClusterStore } from '@/store/useClusterStore'
-import { ScenarioCard } from './ScenarioCard'
-import { ScenarioResults } from './ScenarioResults'
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useClusterStore } from '@/store/useClusterStore';
+import { useScenariosStore } from '@/store/useScenariosStore';
+import { ScenarioCard } from './ScenarioCard';
+import { ScenarioResults } from './ScenarioResults';
 
 export function Step2Scenarios() {
-  const scenarios = useScenariosStore((s) => s.scenarios)
-  const addScenario = useScenariosStore((s) => s.addScenario)
-  const currentCluster = useClusterStore((s) => s.currentCluster)
+  const scenarios = useScenariosStore((s) => s.scenarios);
+  const addScenario = useScenariosStore((s) => s.addScenario);
+  const currentCluster = useClusterStore((s) => s.currentCluster);
 
-  const firstScenarioId = scenarios[0]?.id ?? ''
+  const firstScenarioId = scenarios[0]?.id ?? '';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Step 2: Define Target Scenarios</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Configure one or more target server specs and sizing assumptions.
           </p>
         </div>
@@ -26,16 +26,19 @@ export function Step2Scenarios() {
           type="button"
           variant="outline"
           onClick={() => {
-            const ramPerVmGb = currentCluster.avgRamPerVmGb
+            const ramPerVmGb = currentCluster.avgRamPerVmGb;
             const diskPerVmGb =
               currentCluster.totalDiskGb && currentCluster.totalVms
                 ? Math.round((currentCluster.totalDiskGb / currentCluster.totalVms) * 10) / 10
-                : undefined
+                : undefined;
             addScenario(
               ramPerVmGb != null || diskPerVmGb != null
-                ? { ...(ramPerVmGb != null && { ramPerVmGb }), ...(diskPerVmGb != null && { diskPerVmGb }) }
-                : undefined
-            )
+                ? {
+                    ...(ramPerVmGb != null && { ramPerVmGb }),
+                    ...(diskPerVmGb != null && { diskPerVmGb }),
+                  }
+                : undefined,
+            );
           }}
           aria-label="Add Scenario"
         >
@@ -61,5 +64,5 @@ export function Step2Scenarios() {
         ))}
       </Tabs>
     </div>
-  )
+  );
 }

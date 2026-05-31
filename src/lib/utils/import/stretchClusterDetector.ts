@@ -63,7 +63,8 @@ export function analyzeStretchCluster(input: StretchDetectorInput): StretchAnaly
       const dcs = Array.from(input.hostCountByDc.keys()).join(' / ');
       signals.push(`2 datacenters with symmetric host counts (${a} / ${b} across ${dcs})`);
       const nameMatch = NAME_KEYWORD_RE.test(input.scopeLabel);
-      if (nameMatch) signals.push(`scope label "${input.scopeLabel}" contains stretch/metro keyword`);
+      if (nameMatch)
+        signals.push(`scope label "${input.scopeLabel}" contains stretch/metro keyword`);
       return {
         isStretchCluster: true,
         confidence: nameMatch ? 'high' : 'medium',

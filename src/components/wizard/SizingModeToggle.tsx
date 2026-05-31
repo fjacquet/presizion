@@ -1,14 +1,10 @@
-import { useWizardStore } from '@/store/useWizardStore'
-import type { LayoutMode } from '@/store/useWizardStore'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { LayoutMode } from '@/store/useWizardStore';
+import { useWizardStore } from '@/store/useWizardStore';
 
-const ACTIVE = 'bg-primary text-primary-foreground font-semibold'
-const INACTIVE = 'bg-transparent text-foreground hover:bg-muted'
+const ACTIVE = 'bg-primary-600 text-white dark:bg-primary-500 font-semibold';
+const INACTIVE =
+  'bg-transparent text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700';
 
 function ModeBtn({
   label,
@@ -16,10 +12,10 @@ function ModeBtn({
   onClick,
   disabled,
 }: {
-  label: string
-  isActive: boolean
-  onClick: () => void
-  disabled?: boolean
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -35,45 +31,62 @@ function ModeBtn({
     >
       {label}
     </button>
-  )
+  );
 }
 
 /**
  * Global mode controls rendered in the WizardShell header.
  *
- * Row 1 — Sizing mode (2 options):
- *   vCPU | Performance
- *
- * Row 2 — Layout mode:
- *   HCI | Disaggregated
+ * Both groups sit on the same level (side by side), wrapping to two rows
+ * only when the viewport is too narrow:
+ *   [ vCPU | Performance ]   [ HCI | Disaggregated ]
  */
 export function SizingModeToggle() {
-  const sizingMode = useWizardStore((s) => s.sizingMode)
-  const setSizingMode = useWizardStore((s) => s.setSizingMode)
-  const layoutMode = useWizardStore((s) => s.layoutMode)
-  const setLayoutMode = useWizardStore((s) => s.setLayoutMode)
+  const sizingMode = useWizardStore((s) => s.sizingMode);
+  const setSizingMode = useWizardStore((s) => s.setSizingMode);
+  const layoutMode = useWizardStore((s) => s.layoutMode);
+  const setLayoutMode = useWizardStore((s) => s.setLayoutMode);
 
   return (
-    <div className="flex flex-col items-center gap-1.5 mt-2">
-      {/* Row 1 — Sizing mode */}
-      <div role="group" aria-label="Sizing mode" className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40">
-        <ModeBtn label="vCPU" isActive={sizingMode === 'vcpu'} onClick={() => setSizingMode('vcpu')} />
+    <div className="flex flex-row flex-wrap items-center justify-center gap-2 mt-2">
+      {/* Sizing mode */}
+      <div
+        role="group"
+        aria-label="Sizing mode"
+        className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
+      >
+        <ModeBtn
+          label="vCPU"
+          isActive={sizingMode === 'vcpu'}
+          onClick={() => setSizingMode('vcpu')}
+        />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <span>
-                <ModeBtn label="Performance" isActive={sizingMode === 'performance'} onClick={() => setSizingMode('performance')} />
+                <ModeBtn
+                  label="Performance"
+                  isActive={sizingMode === 'performance'}
+                  onClick={() => setSizingMode('performance')}
+                />
               </span>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="max-w-xs text-sm">Sizes on new-vs-old per-core performance (GHz by default; add SPEC scores in the scenario for precision).</p>
+              <p className="max-w-xs text-sm">
+                Sizes on new-vs-old per-core performance (GHz by default; add SPEC scores in the
+                scenario for precision).
+              </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
 
-      {/* Row 2 — Layout mode */}
-      <div role="group" aria-label="Layout mode" className="flex flex-wrap gap-0.5 border rounded-md p-0.5 bg-muted/40">
+      {/* Layout mode */}
+      <div
+        role="group"
+        aria-label="Layout mode"
+        className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
+      >
         {(['hci', 'disaggregated'] as LayoutMode[]).map((lm) => (
           <ModeBtn
             key={lm}
@@ -84,5 +97,5 @@ export function SizingModeToggle() {
         ))}
       </div>
     </div>
-  )
+  );
 }

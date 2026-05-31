@@ -27,7 +27,9 @@ function readStored(): Theme {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
     if (v === 'light' || v === 'dark' || v === 'system') return v;
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return 'system';
 }
 
@@ -41,7 +43,9 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   setTheme: (theme) => {
     try {
       localStorage.setItem(STORAGE_KEY, theme);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     applyClass(theme);
     set({ theme });
   },
@@ -60,4 +64,6 @@ try {
       applyClass('system');
     }
   });
-} catch { /* matchMedia not available */ }
+} catch {
+  /* matchMedia not available */
+}

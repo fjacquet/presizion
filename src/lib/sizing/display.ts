@@ -12,36 +12,36 @@
  */
 
 export interface CpuFormulaParams {
-  readonly totalVcpus: number
-  readonly safetyPercent: number
-  readonly targetVcpuToPCoreRatio: number
-  readonly coresPerServer: number
-  readonly cpuUtilizationPercent?: number
-  readonly growthPercent?: number
+  readonly totalVcpus: number;
+  readonly safetyPercent: number;
+  readonly targetVcpuToPCoreRatio: number;
+  readonly coresPerServer: number;
+  readonly cpuUtilizationPercent?: number;
+  readonly growthPercent?: number;
 }
 
 export interface RamFormulaParams {
-  readonly totalVms: number
-  readonly ramPerVmGb: number
-  readonly safetyPercent: number
-  readonly ramPerServerGb: number
-  readonly ramUtilizationPercent?: number
-  readonly growthPercent?: number
+  readonly totalVms: number;
+  readonly ramPerVmGb: number;
+  readonly safetyPercent: number;
+  readonly ramPerServerGb: number;
+  readonly ramUtilizationPercent?: number;
+  readonly growthPercent?: number;
 }
 
 export interface DiskFormulaParams {
-  readonly totalVms: number
-  readonly diskPerVmGb: number
-  readonly safetyPercent: number
-  readonly diskPerServerGb: number
-  readonly growthPercent?: number
+  readonly totalVms: number;
+  readonly diskPerVmGb: number;
+  readonly safetyPercent: number;
+  readonly diskPerServerGb: number;
+  readonly growthPercent?: number;
 }
 
 export interface SpecintFormulaParams {
-  readonly existingServers: number
-  readonly specintPerServer: number
-  readonly safetyPercent: number
-  readonly targetSpecint: number
+  readonly existingServers: number;
+  readonly specintPerServer: number;
+  readonly safetyPercent: number;
+  readonly targetSpecint: number;
 }
 
 /**
@@ -55,13 +55,20 @@ export interface SpecintFormulaParams {
  * Example (with util): "ceil(2000 × 70% × 120% / 4 / 48)"
  */
 export function cpuFormulaString(params: CpuFormulaParams): string {
-  const { totalVcpus, safetyPercent, targetVcpuToPCoreRatio, coresPerServer, cpuUtilizationPercent, growthPercent } = params
-  const headroomDisplay = `${100 + safetyPercent}%`
-  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : ''
+  const {
+    totalVcpus,
+    safetyPercent,
+    targetVcpuToPCoreRatio,
+    coresPerServer,
+    cpuUtilizationPercent,
+    growthPercent,
+  } = params;
+  const headroomDisplay = `${100 + safetyPercent}%`;
+  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : '';
   if (cpuUtilizationPercent !== undefined && cpuUtilizationPercent !== 100) {
-    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
+    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
   }
-  return `ceil(${totalVcpus} × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`
+  return `ceil(${totalVcpus} × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
 }
 
 /**
@@ -75,13 +82,20 @@ export function cpuFormulaString(params: CpuFormulaParams): string {
  * Example (with util): "ceil(300 × 80% × 16 GB × 120% / 512 GB)"
  */
 export function ramFormulaString(params: RamFormulaParams): string {
-  const { totalVms, ramPerVmGb, safetyPercent, ramPerServerGb, ramUtilizationPercent, growthPercent } = params
-  const headroomDisplay = `${100 + safetyPercent}%`
-  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : ''
+  const {
+    totalVms,
+    ramPerVmGb,
+    safetyPercent,
+    ramPerServerGb,
+    ramUtilizationPercent,
+    growthPercent,
+  } = params;
+  const headroomDisplay = `${100 + safetyPercent}%`;
+  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : '';
   if (ramUtilizationPercent !== undefined && ramUtilizationPercent !== 100) {
-    return `ceil(${totalVms} × ${ramUtilizationPercent}% × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`
+    return `ceil(${totalVms} × ${ramUtilizationPercent}% × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`;
   }
-  return `ceil(${totalVms} × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`
+  return `ceil(${totalVms} × ${ramPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${ramPerServerGb} GB)`;
 }
 
 /**
@@ -91,10 +105,10 @@ export function ramFormulaString(params: RamFormulaParams): string {
  * Example: "ceil(300 × 100 GB × 120% / 20000 GB)"
  */
 export function diskFormulaString(params: DiskFormulaParams): string {
-  const { totalVms, diskPerVmGb, safetyPercent, diskPerServerGb, growthPercent } = params
-  const headroomDisplay = `${100 + safetyPercent}%`
-  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : ''
-  return `ceil(${totalVms} × ${diskPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${diskPerServerGb} GB)`
+  const { totalVms, diskPerVmGb, safetyPercent, diskPerServerGb, growthPercent } = params;
+  const headroomDisplay = `${100 + safetyPercent}%`;
+  const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : '';
+  return `ceil(${totalVms} × ${diskPerVmGb} GB × ${headroomDisplay}${growthSuffix} / ${diskPerServerGb} GB)`;
 }
 
 /**
@@ -104,7 +118,7 @@ export function diskFormulaString(params: DiskFormulaParams): string {
  * Example: "ceil(10 servers × 337 SPECrate2017_int_base × 1.20 / 450 SPECrate2017_int_base)"
  */
 export function specintFormulaString(params: SpecintFormulaParams): string {
-  const { existingServers, specintPerServer, safetyPercent, targetSpecint } = params
-  const headroomFactor = (1 + safetyPercent / 100).toFixed(2)
-  return `ceil(${existingServers} servers × ${specintPerServer} SPECrate2017_int_base × ${headroomFactor} / ${targetSpecint} SPECrate2017_int_base)`
+  const { existingServers, specintPerServer, safetyPercent, targetSpecint } = params;
+  const headroomFactor = (1 + safetyPercent / 100).toFixed(2);
+  return `ceil(${existingServers} servers × ${specintPerServer} SPECrate2017_int_base × ${headroomFactor} / ${targetSpecint} SPECrate2017_int_base)`;
 }

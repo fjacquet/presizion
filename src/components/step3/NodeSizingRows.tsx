@@ -1,7 +1,7 @@
-import { TableCell, TableRow } from '@/components/ui/table'
-import type { OldCluster, Scenario } from '@/types/cluster'
-import type { ScenarioResult, LimitingResource } from '@/types/results'
-import type { SizingMode } from '@/lib/sizing/constraints'
+import { TableCell, TableRow } from '@/components/ui/table';
+import type { SizingMode } from '@/lib/sizing/constraints';
+import type { OldCluster, Scenario } from '@/types/cluster';
+import type { LimitingResource, ScenarioResult } from '@/types/results';
 
 const RESOURCE_LABELS: Record<LimitingResource, string> = {
   cpu: 'CPU-limited',
@@ -9,42 +9,41 @@ const RESOURCE_LABELS: Record<LimitingResource, string> = {
   disk: 'Disk-limited',
   specint: 'SPECrate2017',
   ghz: 'GHz-limited',
-}
+};
 
-const STICKY = 'font-medium sticky left-0 bg-background z-10'
-const ASIS = 'text-center bg-muted/30'
+const STICKY = 'font-medium sticky left-0 bg-white dark:bg-surface-900 z-10';
+const ASIS = 'text-center bg-slate-100/30 dark:bg-surface-700/30';
 
 interface NodeSizingRowsProps {
-  readonly cluster: OldCluster
-  readonly scenarios: readonly Scenario[]
-  readonly results: readonly ScenarioResult[]
-  readonly sizingMode: SizingMode
+  readonly cluster: OldCluster;
+  readonly scenarios: readonly Scenario[];
+  readonly results: readonly ScenarioResult[];
+  readonly sizingMode: SizingMode;
 }
 
 export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: NodeSizingRowsProps) {
-  const showRatioRow = sizingMode === 'vcpu'
+  const showRatioRow = sizingMode === 'vcpu';
 
   return (
     <>
       {/* Servers Required */}
       <TableRow>
         <TableCell className={STICKY}>Servers Required</TableCell>
-        <TableCell className={ASIS}>
-          {cluster.existingServerCount ?? '—'}
-        </TableCell>
+        <TableCell className={ASIS}>{cluster.existingServerCount ?? '—'}</TableCell>
         {results.map((result, i) => {
-          const base = result.stretchApplied && result.stretchPairedCount != null
-            ? result.stretchPairedCount
-            : result.requiredCount
+          const base =
+            result.stretchApplied && result.stretchPairedCount != null
+              ? result.stretchPairedCount
+              : result.requiredCount;
           const baseLabel = result.stretchApplied
             ? `${result.requiredCount}×2`
-            : `${result.requiredCount}`
+            : `${result.requiredCount}`;
           return (
             <TableCell key={scenarios[i]?.id ?? i} className="text-center">
               {result.haReserveApplied ? (
                 <span>
                   {result.stretchApplied ? `${baseLabel}=${base}` : base}
-                  <span className="text-xs text-muted-foreground ml-1">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
                     + {result.haReserveCount} (N+{result.haReserveCount})
                   </span>
                   {' = '}
@@ -54,7 +53,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
                 result.finalCount
               )}
             </TableCell>
-          )
+          );
         })}
       </TableRow>
 
@@ -87,18 +86,16 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
       {/* vCPU:pCore Ratio */}
       {showRatioRow && (
         <TableRow>
-          <TableCell className={STICKY}>
-            vCPU:pCore Ratio
-          </TableCell>
+          <TableCell className={STICKY}>vCPU:pCore Ratio</TableCell>
           <TableCell className={ASIS}>
             {cluster.totalPcores > 0
               ? `${(cluster.totalVcpus / cluster.totalPcores).toFixed(1)}:1`
               : '—'}
           </TableCell>
           {results.map((result, i) => {
-            const achieved = result.achievedVcpuToPCoreRatio
-            const target = scenarios[i]?.targetVcpuToPCoreRatio ?? 0
-            const exceeds = sizingMode === 'vcpu' && target > 0 && achieved > target + 0.05
+            const achieved = result.achievedVcpuToPCoreRatio;
+            const target = scenarios[i]?.targetVcpuToPCoreRatio ?? 0;
+            const exceeds = sizingMode === 'vcpu' && target > 0 && achieved > target + 0.05;
             return (
               <TableCell
                 key={scenarios[i]?.id ?? i}
@@ -106,10 +103,12 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
               >
                 {exceeds ? `⚠ ${achieved.toFixed(1)}:1` : `${achieved.toFixed(1)}:1`}
                 {exceeds && (
-                  <span className="text-xs text-muted-foreground ml-1">(target: {target})</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+                    (target: {target})
+                  </span>
                 )}
               </TableCell>
-            )
+            );
           })}
         </TableRow>
       )}
@@ -140,5 +139,5 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
         ))}
       </TableRow>
     </>
-  )
+  );
 }

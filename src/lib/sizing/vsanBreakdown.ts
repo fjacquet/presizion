@@ -10,19 +10,19 @@
  * @module vsanBreakdown
  */
 
-import type { OldCluster, Scenario } from '../../types/cluster';
-import type { ScenarioResult } from '../../types/results';
 import type {
   ResourceBreakdown,
   StorageBreakdown,
   VsanCapacityBreakdown,
 } from '../../types/breakdown';
+import type { OldCluster, Scenario } from '../../types/cluster';
+import type { ScenarioResult } from '../../types/results';
 import {
   FTT_POLICY_MAP,
-  VSAN_METADATA_OVERHEAD_RATIO,
-  VSAN_DEFAULT_SLACK_PERCENT,
   VSAN_DEFAULT_CPU_OVERHEAD_PCT,
   VSAN_DEFAULT_MEMORY_PER_HOST_GB,
+  VSAN_DEFAULT_SLACK_PERCENT,
+  VSAN_METADATA_OVERHEAD_RATIO,
 } from './vsanConstants';
 
 /**
@@ -95,10 +95,7 @@ export function computeVsanBreakdown(
     memory: result.ramLimitedCount,
     storage: result.diskLimitedCount,
     ftha: result.haReserveCount,
-    vms:
-      result.vmsPerServer > 0
-        ? Math.ceil(effectiveVmCount / result.vmsPerServer)
-        : 0,
+    vms: result.vmsPerServer > 0 ? Math.ceil(effectiveVmCount / result.vmsPerServer) : 0,
   };
 
   return Object.freeze({
