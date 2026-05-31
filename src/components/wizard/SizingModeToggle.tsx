@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { LayoutMode } from '@/store/useWizardStore';
 import { useWizardStore } from '@/store/useWizardStore';
@@ -42,6 +43,7 @@ function ModeBtn({
  *   [ vCPU | Performance ]   [ HCI | Disaggregated ]
  */
 export function SizingModeToggle() {
+  const { t } = useTranslation('wizard');
   const sizingMode = useWizardStore((s) => s.sizingMode);
   const setSizingMode = useWizardStore((s) => s.setSizingMode);
   const layoutMode = useWizardStore((s) => s.layoutMode);
@@ -52,11 +54,11 @@ export function SizingModeToggle() {
       {/* Sizing mode */}
       <div
         role="group"
-        aria-label="Sizing mode"
+        aria-label={t('sizingMode.groupAriaLabel')}
         className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
       >
         <ModeBtn
-          label="vCPU"
+          label={t('sizingMode.vcpu')}
           isActive={sizingMode === 'vcpu'}
           onClick={() => setSizingMode('vcpu')}
         />
@@ -65,17 +67,14 @@ export function SizingModeToggle() {
             <TooltipTrigger>
               <span>
                 <ModeBtn
-                  label="Performance"
+                  label={t('sizingMode.performance')}
                   isActive={sizingMode === 'performance'}
                   onClick={() => setSizingMode('performance')}
                 />
               </span>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="max-w-xs text-sm">
-                Sizes on new-vs-old per-core performance (GHz by default; add SPEC scores in the
-                scenario for precision).
-              </p>
+              <p className="max-w-xs text-sm">{t('sizingMode.performanceTooltip')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -84,13 +83,13 @@ export function SizingModeToggle() {
       {/* Layout mode */}
       <div
         role="group"
-        aria-label="Layout mode"
+        aria-label={t('layoutMode.groupAriaLabel')}
         className="flex flex-wrap gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40"
       >
         {(['hci', 'disaggregated'] as LayoutMode[]).map((lm) => (
           <ModeBtn
             key={lm}
-            label={lm === 'hci' ? 'HCI' : 'Disaggregated'}
+            label={lm === 'hci' ? t('layoutMode.hci') : t('layoutMode.disaggregated')}
             isActive={layoutMode === lm}
             onClick={() => setLayoutMode(lm)}
           />

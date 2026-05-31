@@ -1,5 +1,6 @@
 import { Database, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Step1CurrentCluster } from '@/components/step1/Step1CurrentCluster';
 import { Step2Scenarios } from '@/components/step2/Step2Scenarios';
 import { Step3ReviewExport } from '@/components/step3/Step3ReviewExport';
@@ -25,6 +26,7 @@ import { StepIndicator } from './StepIndicator';
 import { ThemeToggle } from './ThemeToggle';
 
 export function WizardShell() {
+  const { t } = useTranslation('wizard');
   const currentStep = useWizardStore((s) => s.currentStep);
   const prevStep = useWizardStore((s) => s.prevStep);
   const nextStep = useWizardStore((s) => s.nextStep);
@@ -69,7 +71,7 @@ export function WizardShell() {
               variant="ghost"
               size="icon"
               onClick={() => setResetOpen(true)}
-              aria-label="Reset"
+              aria-label={t('header.resetAriaLabel')}
               className="h-11 w-11 p-0"
             >
               <RotateCcw className="h-4 w-4" />
@@ -78,7 +80,7 @@ export function WizardShell() {
               href={STORE_PREDICT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              title="Storage Calculator (Store-Predict)"
+              title={t('header.storePredictTitle')}
               className="inline-flex items-center justify-center rounded-md h-11 w-11 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700 transition-colors"
             >
               <Database className="h-4 w-4" />
@@ -89,9 +91,9 @@ export function WizardShell() {
             <ThemeToggle />
           </div>
           <img src="/presizion/logo.svg" alt="Presizion" className="mx-auto mb-3 h-8 w-auto" />
-          <h1 className="text-2xl font-bold tracking-tight">Cluster Refresh Sizing</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('header.tagline')}</h1>
           <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Size your refreshed cluster based on existing metrics
+            {t('header.subtitle')}
           </p>
           <SizingModeToggle />
         </header>
@@ -112,11 +114,11 @@ export function WizardShell() {
             style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
           >
             <Button type="button" variant="outline" onClick={prevStep} className="min-h-[44px]">
-              Back
+              {t('nav.back')}
             </Button>
             {currentStep === 2 && (
               <Button type="button" onClick={nextStep} className="min-h-[44px]">
-                Next: Review &amp; Export
+                {t('nav.nextReview')}
               </Button>
             )}
           </div>
@@ -126,17 +128,15 @@ export function WizardShell() {
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset all data?</DialogTitle>
+            <DialogTitle>{t('reset.title')}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            All cluster data and scenarios will be cleared. This cannot be undone.
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('reset.body')}</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setResetOpen(false)}>
-              Cancel
+              {t('reset.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmReset}>
-              Reset
+              {t('reset.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

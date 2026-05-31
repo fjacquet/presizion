@@ -1,3 +1,47 @@
 {
-  "header": { "appName": "Presizion" }
+  "header": {
+    "appName": "Presizion",
+    "tagline": "Cluster Refresh Sizing",
+    "subtitle": "Size your refreshed cluster based on existing metrics",
+    "resetAriaLabel": "Reset",
+    "storePredictTitle": "Storage Calculator (Store-Predict)"
+  },
+  "nav": {
+    "back": "Back",
+    "nextReview": "Next: Review & Export"
+  },
+  "reset": {
+    "title": "Reset all data?",
+    "body": "All cluster data and scenarios will be cleared. This cannot be undone.",
+    "confirm": "Reset",
+    "cancel": "Cancel"
+  },
+  "sizingMode": {
+    "groupAriaLabel": "Sizing mode",
+    "vcpu": "vCPU",
+    "performance": "Performance",
+    "performanceTooltip": "Sizes on new-vs-old per-core performance (GHz by default; add SPEC scores in the scenario for precision)."
+  },
+  "layoutMode": {
+    "groupAriaLabel": "Layout mode",
+    "hci": "HCI",
+    "disaggregated": "Disaggregated"
+  },
+  "stepIndicator": {
+    "navAriaLabel": "Wizard steps",
+    "step1Label": "Current Cluster",
+    "step2Label": "Define Scenarios",
+    "step3Label": "Review & Export",
+    "stepAriaLabel": "Step {{step}}: {{label}}"
+  },
+  "themeToggle": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "ariaLabel": "Theme: {{theme}}. Click to switch.",
+    "title": "Theme: {{theme}}"
+  },
+  "toast": {
+    "exclusionsTrimmed": "Some exclusion rules were trimmed from the shared URL due to size. Re-import the source file to reproduce exact per-VM selections."
+  }
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface StepIndicatorProps {
   currentStep: 1 | 2 | 3;
   totalSteps: 3;
@@ -5,20 +7,27 @@ interface StepIndicatorProps {
   onStepClick?: (step: 1 | 2 | 3) => void;
 }
 
-const DEFAULT_LABELS: [string, string, string] = [
-  'Current Cluster',
-  'Define Scenarios',
-  'Review & Export',
-];
-
 export function StepIndicator({
   currentStep,
   totalSteps,
-  labels = DEFAULT_LABELS,
+  labels,
   onStepClick,
 }: StepIndicatorProps) {
+  const { t } = useTranslation('wizard');
+
+  const defaultLabels: [string, string, string] = [
+    t('stepIndicator.step1Label'),
+    t('stepIndicator.step2Label'),
+    t('stepIndicator.step3Label'),
+  ];
+
+  const resolvedLabels = labels ?? defaultLabels;
+
   return (
-    <nav aria-label="Wizard steps" className="flex items-center justify-center gap-0 mb-8">
+    <nav
+      aria-label={t('stepIndicator.navAriaLabel')}
+      className="flex items-center justify-center gap-0 mb-8"
+    >
       {Array.from({ length: totalSteps }, (_, i) => {
         const step = (i + 1) as 1 | 2 | 3;
         const isActive = step === currentStep;
@@ -41,7 +50,7 @@ export function StepIndicator({
                       : 'border-slate-400/30 bg-white text-slate-500 dark:border-slate-500/30 dark:bg-surface-900 dark:text-slate-400 cursor-default',
                 ].join(' ')}
                 aria-current={isActive ? 'step' : undefined}
-                aria-label={`Step ${step}: ${labels[i]}`}
+                aria-label={t('stepIndicator.stepAriaLabel', { step, label: resolvedLabels[i] })}
                 data-testid={`step-indicator-${step}`}
               >
                 {step}
@@ -57,7 +66,7 @@ export function StepIndicator({
                 onClick={() => isClickable && onStepClick(step)}
                 role={isClickable ? 'button' : undefined}
               >
-                {labels[i]}
+                {resolvedLabels[i]}
               </span>
             </div>
             {step < totalSteps && (
