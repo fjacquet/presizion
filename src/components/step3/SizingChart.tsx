@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
@@ -10,6 +11,7 @@ import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
 
 export function SizingChart() {
+  const { t } = useTranslation('step3');
   const scenarios = useScenariosStore((s) => s.scenarios);
   const results = useScenariosResults();
   const sizingMode = useWizardStore((s) => s.sizingMode);
@@ -22,7 +24,10 @@ export function SizingChart() {
 
   const showDisk = layoutMode !== 'disaggregated';
 
-  const cpuBarName = sizingMode === 'performance' ? 'Performance-limited' : 'CPU-limited';
+  const cpuBarName =
+    sizingMode === 'performance'
+      ? t('nodeSizingRows.cpuBarPerformance')
+      : t('nodeSizingRows.cpuBarVcpu');
 
   // Per-constraint breakdown data (grouped bars per scenario)
   const constraintData = scenarios.map((s, i) => ({
@@ -52,7 +57,7 @@ export function SizingChart() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            Server Count Comparison
+            {t('sizingChart.serverCountTitle')}
           </h3>
           <Button
             variant="outline"
@@ -61,15 +66,15 @@ export function SizingChart() {
               comparisonInstance.current &&
               downloadChartSvg(comparisonInstance.current, 'cluster-sizing-chart.svg')
             }
-            aria-label="Download chart as SVG"
+            aria-label={t('sizingChart.downloadSvgAriaLabel')}
           >
-            Download SVG
+            {t('sizingChart.downloadSvg')}
           </Button>
         </div>
         <div className="h-48 sm:h-72">
           <Chart
             option={buildServerCountOption(comparisonData)}
-            ariaLabel="Server count comparison"
+            ariaLabel={t('sizingChart.serverCountAriaLabel')}
             onReady={(i) => {
               comparisonInstance.current = i;
             }}
@@ -81,7 +86,7 @@ export function SizingChart() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            Constraint Breakdown per Scenario
+            {t('sizingChart.constraintBreakdownTitle')}
           </h3>
           <Button
             variant="outline"
@@ -90,15 +95,15 @@ export function SizingChart() {
               constraintInstance.current &&
               downloadChartSvg(constraintInstance.current, 'constraint-breakdown-chart.svg')
             }
-            aria-label="Download constraint chart as SVG"
+            aria-label={t('sizingChart.downloadConstraintAriaLabel')}
           >
-            Download SVG
+            {t('sizingChart.downloadSvg')}
           </Button>
         </div>
         <div className="h-48 sm:h-72">
           <Chart
             option={buildConstraintBreakdownOption(constraintData, { cpuBarName, showDisk })}
-            ariaLabel="Constraint breakdown per scenario"
+            ariaLabel={t('sizingChart.constraintBreakdownAriaLabel')}
             onReady={(i) => {
               constraintInstance.current = i;
             }}

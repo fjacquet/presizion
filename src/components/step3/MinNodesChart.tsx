@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
@@ -6,6 +7,8 @@ import { buildMinNodesOption, type MinNodesRow } from '@/lib/sizing/chartOptions
 import { downloadChartSvg } from '@/lib/utils/chartImage';
 import { useScenariosStore } from '@/store/useScenariosStore';
 
+// CONSTRAINT_LABELS are data keys used as y-axis category labels inside ECharts option;
+// they are ambiguous (data keys vs display labels) and are LEFT untranslated intentionally.
 const CONSTRAINT_LABELS: Record<string, string> = {
   cpu: 'CPU',
   memory: 'Memory',
@@ -29,6 +32,7 @@ interface MinNodesChartProps {
  * Download SVG button.
  */
 export function MinNodesChart({ onChartReady }: MinNodesChartProps = {}) {
+  const { t } = useTranslation('step3');
   const scenarios = useScenariosStore((s) => s.scenarios);
   const breakdowns = useVsanBreakdowns();
   const instances = useRef<Record<string, EChartsInstance | null>>({});
@@ -58,7 +62,7 @@ export function MinNodesChart({ onChartReady }: MinNodesChartProps = {}) {
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Min Nodes by Constraint -- {scenarioName}
+                {t('minNodesChart.titlePrefix', { scenarioName })}
               </h3>
               <Button
                 variant="outline"
@@ -67,15 +71,15 @@ export function MinNodesChart({ onChartReady }: MinNodesChartProps = {}) {
                   const inst = instances.current[scenarioId];
                   if (inst) downloadChartSvg(inst, `min-nodes-${scenarioName}.svg`);
                 }}
-                aria-label="Download min nodes chart as SVG"
+                aria-label={t('minNodesChart.downloadSvgAriaLabel')}
               >
-                Download SVG
+                {t('minNodesChart.downloadSvg')}
               </Button>
             </div>
             <div className="h-[180px] sm:h-[220px]">
               <Chart
                 option={buildMinNodesOption(constraintRows)}
-                ariaLabel={`Min nodes by constraint for ${scenarioName}`}
+                ariaLabel={t('minNodesChart.ariaLabel', { scenarioName })}
                 onReady={(inst) => {
                   instances.current[scenarioId] = inst;
                   onChartReady?.(`minnodes-${scenarioId}`, inst);

@@ -1,3 +1,88 @@
 {
-  "title": "Étape 3 : Réviser et exporter"
+  "title": "Étape 3 : Réviser et exporter",
+  "reviewExport": {
+    "heading": "Révision et export",
+    "subheading": "Comparez vos scénarios cibles côte à côte, puis exportez les résultats.",
+    "exportShare": "Exporter / Partager",
+    "exportResults": "Exporter les résultats",
+    "copySummary": "Copier le résumé",
+    "copied": "Copié !",
+    "downloadCsv": "Télécharger CSV",
+    "downloadJson": "Télécharger JSON",
+    "share": "Partager",
+    "linkCopied": "Lien copié !",
+    "exportPptx": "Exporter PPTX",
+    "generating": "Génération...",
+    "close": "Fermer",
+    "pptxSafariWarning": "Le téléchargement PPTX n'est pas pris en charge sur Safari. Utilisez Chrome ou un navigateur de bureau.",
+    "pptxExportError": "Échec de l'export PPTX. Consultez la console du navigateur pour plus de détails."
+  },
+  "comparisonTable": {
+    "modeLabel": "Mode :",
+    "layoutLabel": "Disposition :",
+    "layoutHci": "HCI",
+    "layoutDisaggregated": "Désagrégé",
+    "metricHeader": "Métrique",
+    "asIs": "Existant"
+  },
+  "nodeSizingRows": {
+    "serversRequired": "Serveurs requis",
+    "serverConfig": "Config. serveur",
+    "limitingResource": "Ressource limitante",
+    "vcpuPcoreRatio": "Ratio vCPU:pCore",
+    "vmsPerServer": "VMs/Serveur",
+    "growthSafety": "Croissance / Sécurité",
+    "notApplicable": "N/A",
+    "resourceCpu": "Limité par CPU",
+    "resourceRam": "Limité par RAM",
+    "resourceDisk": "Limité par disque",
+    "resourceSpecint": "SPECrate2017",
+    "resourceGhz": "Limité par GHz",
+    "cpuBarPerformance": "Limité par performances",
+    "cpuBarVcpu": "Limité par CPU"
+  },
+  "utilizationRows": {
+    "sizingDriver": "facteur de dimensionnement",
+    "cpuUtil": "Util. CPU %",
+    "ramUtil": "Util. RAM %",
+    "diskUtil": "Util. disque %"
+  },
+  "clusterTotalRows": {
+    "totalVcpus": "Total vCPU",
+    "totalPcores": "Total pCores",
+    "totalVms": "Total VMs",
+    "totalRamGb": "RAM totale (Go)",
+    "totalDiskGb": "Disque total (Go)",
+    "totalDiskRequired": "Disque total requis"
+  },
+  "sizingChart": {
+    "serverCountTitle": "Comparaison du nombre de serveurs",
+    "serverCountAriaLabel": "Comparaison du nombre de serveurs",
+    "constraintBreakdownTitle": "Répartition des contraintes par scénario",
+    "constraintBreakdownAriaLabel": "Répartition des contraintes par scénario",
+    "downloadSvg": "Télécharger SVG",
+    "downloadSvgAriaLabel": "Télécharger le graphique au format SVG",
+    "downloadConstraintAriaLabel": "Télécharger le graphique de contraintes au format SVG"
+  },
+  "coreCountChart": {
+    "title": "Nombre total de cœurs physiques par scénario",
+    "ariaLabel": "Nombre total de cœurs physiques par scénario",
+    "downloadSvg": "Télécharger SVG",
+    "downloadSvgAriaLabel": "Télécharger le graphique au format SVG"
+  },
+  "capacityStackedChart": {
+    "titlePrefix": "Répartition des capacités -- {{scenarioName}}",
+    "ariaLabel": "Répartition des capacités pour {{scenarioName}}",
+    "downloadSvg": "Télécharger SVG",
+    "downloadSvgAriaLabel": "Télécharger le graphique de capacités au format SVG",
+    "legendRequired": "Requis",
+    "legendSpare": "Disponible",
+    "legendExcess": "Excédent"
+  },
+  "minNodesChart": {
+    "titlePrefix": "Nœuds min. par contrainte -- {{scenarioName}}",
+    "ariaLabel": "Nœuds min. par contrainte pour {{scenarioName}}",
+    "downloadSvg": "Télécharger SVG",
+    "downloadSvgAriaLabel": "Télécharger le graphique des nœuds min. au format SVG"
+  }
 }

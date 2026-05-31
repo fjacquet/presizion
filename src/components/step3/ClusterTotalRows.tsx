@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from '@/components/ui/table';
 import {
   asIsRamGb,
@@ -28,13 +29,14 @@ export function ClusterTotalRows({
   results,
   layoutMode,
 }: ClusterTotalRowsProps) {
+  const { t } = useTranslation('step3');
   const asIsTotalRam = asIsRamGb(cluster);
 
   return (
     <>
       {/* Total vCPUs */}
       <TableRow>
-        <TableCell className={STICKY}>Total vCPUs</TableCell>
+        <TableCell className={STICKY}>{t('clusterTotalRows.totalVcpus')}</TableCell>
         <TableCell className={ASIS}>{cluster.totalVcpus.toLocaleString()}</TableCell>
         {scenarios.map((s, i) => (
           <TableCell key={s.id ?? i} className="text-center">
@@ -45,7 +47,7 @@ export function ClusterTotalRows({
 
       {/* Total pCores */}
       <TableRow>
-        <TableCell className={STICKY}>Total pCores</TableCell>
+        <TableCell className={STICKY}>{t('clusterTotalRows.totalPcores')}</TableCell>
         <TableCell className={ASIS}>{cluster.totalPcores.toLocaleString()}</TableCell>
         {results.map((result, i) => (
           <TableCell key={scenarios[i]?.id ?? i} className="text-center">
@@ -56,7 +58,7 @@ export function ClusterTotalRows({
 
       {/* Total VMs */}
       <TableRow>
-        <TableCell className={STICKY}>Total VMs</TableCell>
+        <TableCell className={STICKY}>{t('clusterTotalRows.totalVms')}</TableCell>
         <TableCell className={ASIS}>{cluster.totalVms.toLocaleString()}</TableCell>
         {scenarios.map((s, i) => (
           <TableCell key={s.id ?? i} className="text-center">
@@ -67,7 +69,7 @@ export function ClusterTotalRows({
 
       {/* Total RAM (GB) */}
       <TableRow>
-        <TableCell className={STICKY}>Total RAM (GB)</TableCell>
+        <TableCell className={STICKY}>{t('clusterTotalRows.totalRamGb')}</TableCell>
         <TableCell className={ASIS}>
           {asIsTotalRam !== undefined ? asIsTotalRam.toLocaleString() : '\u2014'}
         </TableCell>
@@ -81,7 +83,7 @@ export function ClusterTotalRows({
       {/* Total Disk (GB) — HCI/vSAN only */}
       {layoutMode === 'hci' && (
         <TableRow>
-          <TableCell className={STICKY}>Total Disk (GB)</TableCell>
+          <TableCell className={STICKY}>{t('clusterTotalRows.totalDiskGb')}</TableCell>
           <TableCell className={ASIS}>
             {cluster.totalDiskGb ? Math.round(cluster.totalDiskGb).toLocaleString() : '\u2014'}
           </TableCell>
@@ -96,7 +98,7 @@ export function ClusterTotalRows({
       {/* Total Disk Required — disaggregated only */}
       {layoutMode === 'disaggregated' && (
         <TableRow>
-          <TableCell className={STICKY}>Total Disk Required</TableCell>
+          <TableCell className={STICKY}>{t('clusterTotalRows.totalDiskRequired')}</TableCell>
           <TableCell className={ASIS}>
             {cluster.totalDiskGb
               ? `${Math.round(cluster.totalDiskGb).toLocaleString()} GB`

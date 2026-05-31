@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from '@/components/ui/table';
 import type { LayoutMode, SizingMode } from '@/lib/sizing/constraints';
 import type { OldCluster, Scenario } from '@/types/cluster';
@@ -22,6 +23,7 @@ export function UtilizationRows({
   sizingMode,
   layoutMode,
 }: UtilizationRowsProps) {
+  const { t } = useTranslation('step3');
   const showCpuUtilRow = cluster.cpuUtilizationPercent !== undefined;
   const cpuUtilIsSizingDriver = sizingMode === 'performance';
 
@@ -33,10 +35,10 @@ export function UtilizationRows({
           <TableCell className={STICKY}>
             {cpuUtilIsSizingDriver && (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 mr-1.5">
-                sizing driver
+                {t('utilizationRows.sizingDriver')}
               </span>
             )}
-            CPU Util %
+            {t('utilizationRows.cpuUtil')}
           </TableCell>
           <TableCell className={ASIS}>
             {cluster.cpuUtilizationPercent !== undefined
@@ -51,7 +53,7 @@ export function UtilizationRows({
 
       {/* RAM Util % */}
       <TableRow>
-        <TableCell className={STICKY}>RAM Util %</TableCell>
+        <TableCell className={STICKY}>{t('utilizationRows.ramUtil')}</TableCell>
         <TableCell className={ASIS}>
           {cluster.ramUtilizationPercent !== undefined
             ? `${cluster.ramUtilizationPercent.toFixed(1)}%`
@@ -65,7 +67,7 @@ export function UtilizationRows({
       {/* Disk Util % — HCI only */}
       {layoutMode === 'hci' && (
         <TableRow>
-          <TableCell className={STICKY}>Disk Util %</TableCell>
+          <TableCell className={STICKY}>{t('utilizationRows.diskUtil')}</TableCell>
           <TableCell className={ASIS}>{'\u2014'}</TableCell>
           {results.map((result, i) => (
             <UtilizationCell key={scenarios[i]?.id ?? i} pct={result.diskUtilizationPercent} />
