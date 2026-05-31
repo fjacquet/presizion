@@ -79,7 +79,7 @@ export function Step3ReviewExport() {
   };
 
   const handleDownloadCsv = (): void => {
-    const csv = buildCsvContent(currentCluster, scenarios, results);
+    const csv = buildCsvContent(currentCluster, scenarios, results, breakdowns);
     downloadCsv('cluster-sizing.csv', csv);
   };
 
