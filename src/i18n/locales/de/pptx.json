@@ -1,3 +1,75 @@
 {
-  "deckTitle": "Cluster-Erneuerungsplanung"
+  "deckTitle": "Cluster-Erneuerungsplanung",
+  "slide": {
+    "title": "Cluster-Dimensionierungsbericht",
+    "executiveSummary": "Zusammenfassung",
+    "comparison": "Vergleich Ist-Zustand vs. Ziel",
+    "capacityBreakdown": "Kapazitätsaufschlüsselung — {{name}}",
+    "minNodes": "Mindestknoten pro Einschränkung — {{name}}"
+  },
+  "kpi": {
+    "asIsServers": "Aktuelle Server",
+    "targetServers": "{{name}} Server",
+    "cpuUtilization": "CPU-Auslastung",
+    "ramUtilization": "RAM-Auslastung"
+  },
+  "summary": {
+    "colScenario": "Szenario",
+    "colServers": "Server",
+    "colLimitingResource": "Begrenzende Ressource",
+    "colCpuUtil": "CPU-Auslastung %",
+    "colRamUtil": "RAM-Auslastung %"
+  },
+  "comparison": {
+    "colMetric": "Metrik",
+    "colAsIs": "Ist-Zustand",
+    "rowServers": "Server",
+    "rowLimitingResource": "Begrenzende Ressource",
+    "rowVmsPerServer": "VMs/Server",
+    "rowVcpuRatio": "vCPU:pCore-Verhältnis",
+    "rowCpuUtil": "CPU-Auslastung %",
+    "rowRamUtil": "RAM-Auslastung %",
+    "rowTotalDisk": "Gesamtspeicher",
+    "rowSocketsPerServer": "Sockets / Server",
+    "rowCoresPerSocket": "Kerne / Socket",
+    "rowTotalCoresPerServer": "Gesamtkerne / Server",
+    "rowRamPerServer": "RAM / Server (GB)",
+    "rowDiskPerServer": "Festplatte / Server (GB)",
+    "rowSafetyPct": "Sicherheit %",
+    "rowHaReserve": "HA-Reserve",
+    "rowAvgVcpuPerVm": "Ø vCPU/VM",
+    "rowAvgRamPerVm": "Ø RAM/VM (GiB)",
+    "rowAvgDiskPerVm": "Ø Festplatte/VM (GiB)",
+    "rowFttPolicy": "FTT-Richtlinie",
+    "rowCompressionFactor": "Kompressionsfaktor",
+    "rowSlackPct": "Puffer %",
+    "rowGrowthPct": "Wachstum %",
+    "valueNone": "Keine",
+    "valueNA": "N/A"
+  },
+  "capacityTable": {
+    "colResource": "Ressource",
+    "colRequired": "Erforderlich",
+    "colSpare": "Verfügbar",
+    "colExcess": "Überschuss",
+    "colTotal": "Gesamt",
+    "rowCpuGhz": "CPU GHz",
+    "rowMemoryGib": "Arbeitsspeicher GiB",
+    "rowRawStorageTib": "Roher Speicher TiB"
+  },
+  "legend": {
+    "required": "Erforderlich",
+    "spare": "Verfügbar",
+    "excess": "Überschuss"
+  },
+  "minNodesTable": {
+    "colConstraint": "Einschränkung",
+    "colMinNodes": "Min. Knoten",
+    "colBinding": "Bindend?",
+    "valueYes": "Ja",
+    "subtitle": "Die bindende Einschränkung bestimmt die Mindestgröße des Clusters."
+  },
+  "footer": {
+    "slide": "Folie {{num}}"
+  }
 }

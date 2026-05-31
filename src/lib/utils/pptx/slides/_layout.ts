@@ -1,5 +1,7 @@
 /** Shared slide geometry + header/KPI/footer helpers (vatlas _layout shape). */
+
 import type PptxGenJS from 'pptxgenjs';
+import i18n from '@/i18n';
 import { PPTX_COLORS } from '../primitives/colors';
 import { SLIDE } from '../theme';
 
@@ -64,6 +66,7 @@ export function addKpiRow(
 
 /** Footer: product mark + date + slide number. */
 export function addFooter(s: Slide, date: string, num: number): void {
+  const t = i18n.t.bind(i18n);
   s.addText(
     [
       {
@@ -71,7 +74,7 @@ export function addFooter(s: Slide, date: string, num: number): void {
         options: { bold: true, color: PPTX_COLORS.primary500, fontSize: 8, fontFace: 'Arial' },
       },
       {
-        text: `  |  ${date}  |  Slide ${num}`,
+        text: `  |  ${date}  |  ${t('pptx:footer.slide', { num })}`,
         options: { color: PPTX_COLORS.inkMuted, fontSize: 8, fontFace: 'Arial' },
       },
     ],

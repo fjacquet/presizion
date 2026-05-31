@@ -1,3 +1,75 @@
 {
-  "deckTitle": "Cluster Refresh Sizing"
+  "deckTitle": "Cluster Refresh Sizing",
+  "slide": {
+    "title": "Cluster Sizing Report",
+    "executiveSummary": "Executive Summary",
+    "comparison": "As-Is vs To-Be Comparison",
+    "capacityBreakdown": "Capacity Breakdown — {{name}}",
+    "minNodes": "Minimum Nodes per Constraint — {{name}}"
+  },
+  "kpi": {
+    "asIsServers": "As-Is Servers",
+    "targetServers": "{{name}} Servers",
+    "cpuUtilization": "CPU Utilization",
+    "ramUtilization": "RAM Utilization"
+  },
+  "summary": {
+    "colScenario": "Scenario",
+    "colServers": "Servers",
+    "colLimitingResource": "Limiting Resource",
+    "colCpuUtil": "CPU Util %",
+    "colRamUtil": "RAM Util %"
+  },
+  "comparison": {
+    "colMetric": "Metric",
+    "colAsIs": "As-Is",
+    "rowServers": "Servers",
+    "rowLimitingResource": "Limiting Resource",
+    "rowVmsPerServer": "VMs/Server",
+    "rowVcpuRatio": "vCPU:pCore Ratio",
+    "rowCpuUtil": "CPU Util %",
+    "rowRamUtil": "RAM Util %",
+    "rowTotalDisk": "Total Disk",
+    "rowSocketsPerServer": "Sockets / Server",
+    "rowCoresPerSocket": "Cores / Socket",
+    "rowTotalCoresPerServer": "Total Cores / Server",
+    "rowRamPerServer": "RAM / Server (GB)",
+    "rowDiskPerServer": "Disk / Server (GB)",
+    "rowSafetyPct": "Safety %",
+    "rowHaReserve": "HA Reserve",
+    "rowAvgVcpuPerVm": "Avg vCPU/VM",
+    "rowAvgRamPerVm": "Avg RAM/VM (GiB)",
+    "rowAvgDiskPerVm": "Avg Disk/VM (GiB)",
+    "rowFttPolicy": "FTT Policy",
+    "rowCompressionFactor": "Compression Factor",
+    "rowSlackPct": "Slack %",
+    "rowGrowthPct": "Growth %",
+    "valueNone": "None",
+    "valueNA": "N/A"
+  },
+  "capacityTable": {
+    "colResource": "Resource",
+    "colRequired": "Required",
+    "colSpare": "Spare",
+    "colExcess": "Excess",
+    "colTotal": "Total",
+    "rowCpuGhz": "CPU GHz",
+    "rowMemoryGib": "Memory GiB",
+    "rowRawStorageTib": "Raw Storage TiB"
+  },
+  "legend": {
+    "required": "Required",
+    "spare": "Spare",
+    "excess": "Excess"
+  },
+  "minNodesTable": {
+    "colConstraint": "Constraint",
+    "colMinNodes": "Min Nodes",
+    "colBinding": "Binding?",
+    "valueYes": "Yes",
+    "subtitle": "The binding constraint determines the minimum cluster size."
+  },
+  "footer": {
+    "slide": "Slide {{num}}"
+  }
 }

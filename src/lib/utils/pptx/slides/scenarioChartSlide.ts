@@ -1,5 +1,7 @@
 /** Per-scenario chart slides — capacity breakdown + min-nodes (when captured). */
+
 import type PptxGenJS from 'pptxgenjs';
+import i18n from '@/i18n';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
@@ -34,6 +36,7 @@ export function addScenarioChartSlides(
   date: string,
   startNum: number,
 ): number {
+  const t = i18n.t.bind(i18n);
   const { scenarios, breakdowns, charts, showStorage } = d;
   let num = startNum;
 
@@ -45,13 +48,13 @@ export function addScenarioChartSlides(
     if (sc?.capacity && bd) {
       const s = pptx.addSlide();
       s.background = { color: PPTX_COLORS.paper };
-      addHeader(s, `Capacity Breakdown — ${scenario.name}`);
+      addHeader(s, t('pptx:slide.capacityBreakdown', { name: scenario.name }));
 
       // Legend: colored squares + labels
       const legendItems = [
-        { label: 'Required', color: PPTX_COLORS.primary500 },
-        { label: 'Spare', color: PPTX_COLORS.primary300 },
-        { label: 'Excess', color: PPTX_COLORS.accent },
+        { label: t('pptx:legend.required'), color: PPTX_COLORS.primary500 },
+        { label: t('pptx:legend.spare'), color: PPTX_COLORS.primary300 },
+        { label: t('pptx:legend.excess'), color: PPTX_COLORS.accent },
       ];
       legendItems.forEach((item, li) => {
         const lx = M + li * 2.2;
@@ -81,16 +84,22 @@ export function addScenarioChartSlides(
       // Absolute values table below chart
       const tableY = 1.5 + Math.min(imgH, 3.5) + 0.2;
       const capTableHeader = [
-        headerCell('Resource'),
-        headerCell('Required'),
-        headerCell('Spare'),
-        headerCell('Excess'),
-        headerCell('Total'),
+        headerCell(t('pptx:capacityTable.colResource')),
+        headerCell(t('pptx:capacityTable.colRequired')),
+        headerCell(t('pptx:capacityTable.colSpare')),
+        headerCell(t('pptx:capacityTable.colExcess')),
+        headerCell(t('pptx:capacityTable.colTotal')),
       ];
       const capTableSource: string[][] = [
-        ['CPU GHz', f1(bd.cpu.required), f1(bd.cpu.spare), f1(bd.cpu.excess), f1(bd.cpu.total)],
         [
-          'Memory GiB',
+          t('pptx:capacityTable.rowCpuGhz'),
+          f1(bd.cpu.required),
+          f1(bd.cpu.spare),
+          f1(bd.cpu.excess),
+          f1(bd.cpu.total),
+        ],
+        [
+          t('pptx:capacityTable.rowMemoryGib'),
           f1(bd.memory.required),
           f1(bd.memory.spare),
           f1(bd.memory.excess),
@@ -101,7 +110,7 @@ export function addScenarioChartSlides(
       // the storage row. HCI (showStorage=true) keeps it for byte-identical output.
       if (showStorage) {
         capTableSource.push([
-          'Raw Storage TiB',
+          t('pptx:capacityTable.rowRawStorageTib'),
           f1(bd.storage.required / 1024),
           f1(bd.storage.spare / 1024),
           f1(bd.storage.excess / 1024),
@@ -126,9 +135,9 @@ export function addScenarioChartSlides(
     if (sc?.minnodes && bd) {
       const s = pptx.addSlide();
       s.background = { color: PPTX_COLORS.paper };
-      addHeader(s, `Minimum Nodes per Constraint — ${scenario.name}`);
+      addHeader(s, t('pptx:slide.minNodes', { name: scenario.name }));
 
-      s.addText('The binding constraint determines the minimum cluster size.', {
+      s.addText(t('pptx:minNodesTable.subtitle'), {
         x: M,
         y: 1.05,
         w: 12,
@@ -151,13 +160,21 @@ export function addScenarioChartSlides(
 
       // Constraint table below
       const tableY = 1.5 + Math.min(imgH, 3.5) + 0.2;
-      const mnHeader = [headerCell('Constraint'), headerCell('Min Nodes'), headerCell('Binding?')];
+      const mnHeader = [
+        headerCell(t('pptx:minNodesTable.colConstraint')),
+        headerCell(t('pptx:minNodesTable.colMinNodes')),
+        headerCell(t('pptx:minNodesTable.colBinding')),
+      ];
       const constraints = Object.entries(bd.minNodesByConstraint);
       const maxNodes = Math.max(...constraints.map(([, v]) => v));
       const mnRows = constraints.map(([key, nodes], ri) => [
         dataCell(key.charAt(0).toUpperCase() + key.slice(1), ri, true),
         dataCell(String(nodes), ri),
-        dataCell(nodes === maxNodes && nodes > 0 ? 'Yes' : '', ri, nodes === maxNodes && nodes > 0),
+        dataCell(
+          nodes === maxNodes && nodes > 0 ? t('pptx:minNodesTable.valueYes') : '',
+          ri,
+          nodes === maxNodes && nodes > 0,
+        ),
       ]);
 
       s.addTable([mnHeader, ...mnRows], {

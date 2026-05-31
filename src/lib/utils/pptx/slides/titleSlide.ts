@@ -1,5 +1,7 @@
 /** Title slide — paper background, Arial 28pt title, muted subtitle, optional logo. */
+
 import type PptxGenJS from 'pptxgenjs';
+import i18n from '@/i18n';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import { PPTX_COLORS } from '../primitives/colors';
 import { SLIDE } from '../theme';
@@ -13,6 +15,7 @@ interface TitleSlideData {
 }
 
 export function addTitleSlide(pptx: PptxGenJS, d: TitleSlideData): void {
+  const t = i18n.t.bind(i18n);
   const s = pptx.addSlide();
   s.background = { color: PPTX_COLORS.paper };
 
@@ -23,7 +26,7 @@ export function addTitleSlide(pptx: PptxGenJS, d: TitleSlideData): void {
     s.addImage({ data: d.logoDataUrl, x: M, y: 0.8, w: 4, h: 1 });
   }
 
-  s.addText('Cluster Sizing Report', {
+  s.addText(t('pptx:slide.title'), {
     x: M,
     y: 2.2,
     w: SLIDE.w - 2 * M,

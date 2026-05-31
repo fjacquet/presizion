@@ -1,6 +1,7 @@
 /** As-Is vs To-Be Comparison slide — full metric table (ported verbatim). */
 
 import type PptxGenJS from 'pptxgenjs';
+import i18n from '@/i18n';
 import { FTT_POLICY_MAP } from '@/lib/sizing/vsanConstants';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
@@ -24,10 +25,15 @@ type TableCellObj = {
 };
 
 interface CompMetric {
+  /** Internal stable key used for storage-row filtering. */
+  readonly key: string;
   readonly label: string;
   readonly asIs: string | TableCellObj;
   readonly scenarioValues: readonly (string | TableCellObj)[];
 }
+
+/** Set of internal keys whose rows are hidden in disaggregated (no-storage) layout. */
+const STORAGE_ROW_KEYS = new Set(['totalDisk', 'diskPerServer', 'avgDiskPerVm']);
 
 export function addComparisonSlide(
   pptx: PptxGenJS,
@@ -35,10 +41,11 @@ export function addComparisonSlide(
   date: string,
   num: number,
 ): void {
+  const t = i18n.t.bind(i18n);
   const { cluster, scenarios, results, showStorage } = d;
   const s = pptx.addSlide();
   s.background = { color: PPTX_COLORS.paper };
-  addHeader(s, 'As-Is vs To-Be Comparison');
+  addHeader(s, t('pptx:slide.comparison'));
 
   const asIsRatio =
     cluster.totalPcores > 0 ? `${(cluster.totalVcpus / cluster.totalPcores).toFixed(1)}:1` : '--';
@@ -62,36 +69,41 @@ export function addComparisonSlide(
       : '--';
 
   const compHeaderRow = [
-    headerCell('Metric'),
-    headerCell('As-Is'),
+    headerCell(t('pptx:comparison.colMetric')),
+    headerCell(t('pptx:comparison.colAsIs')),
     ...scenarios.map((scenario) => headerCell(scenario.name)),
   ];
 
   // --- Sizing results section ---
   const compMetrics: CompMetric[] = [
     {
-      label: 'Servers',
+      key: 'servers',
+      label: t('pptx:comparison.rowServers'),
       asIs: cluster.existingServerCount !== undefined ? String(cluster.existingServerCount) : '--',
       scenarioValues: results.map((r) => String(r.finalCount)),
     },
     {
-      label: 'Limiting Resource',
-      asIs: 'N/A',
+      key: 'limitingResource',
+      label: t('pptx:comparison.rowLimitingResource'),
+      asIs: t('pptx:comparison.valueNA'),
       scenarioValues: results.map((r) => r.limitingResource),
     },
     {
-      label: 'VMs/Server',
+      key: 'vmsPerServer',
+      label: t('pptx:comparison.rowVmsPerServer'),
       asIs: asIsVmsPerServer,
       scenarioValues: results.map((r) => r.vmsPerServer.toFixed(1)),
     },
     {
-      label: 'vCPU:pCore Ratio',
+      key: 'vcpuRatio',
+      label: t('pptx:comparison.rowVcpuRatio'),
       asIs: asIsRatio,
       scenarioValues: results.map((r) => `${r.achievedVcpuToPCoreRatio.toFixed(1)}:1`),
     },
     {
       // Row index 4 in this metric list → even → page-bg fill.
-      label: 'CPU Util %',
+      key: 'cpuUtil',
+      label: t('pptx:comparison.rowCpuUtil'),
       asIs:
         cluster.cpuUtilizationPercent !== undefined
           ? utilCell(cluster.cpuUtilizationPercent, 4)
@@ -100,7 +112,8 @@ export function addComparisonSlide(
     },
     {
       // Row index 5 in this metric list → odd → paper fill.
-      label: 'RAM Util %',
+      key: 'ramUtil',
+      label: t('pptx:comparison.rowRamUtil'),
       asIs:
         cluster.ramUtilizationPercent !== undefined
           ? utilCell(cluster.ramUtilizationPercent, 5)
@@ -108,7 +121,8 @@ export function addComparisonSlide(
       scenarioValues: results.map((r) => utilCell(r.ramUtilizationPercent, 5)),
     },
     {
-      label: 'Total Disk',
+      key: 'totalDisk',
+      label: t('pptx:comparison.rowTotalDisk'),
       asIs: asIsTotalDisk,
       scenarioValues: results.map((r, idx) => {
         const scenario = scenarios[idx];
@@ -119,17 +133,20 @@ export function addComparisonSlide(
     },
     // --- Server configuration section ---
     {
-      label: 'Sockets / Server',
+      key: 'socketsPerServer',
+      label: t('pptx:comparison.rowSocketsPerServer'),
       asIs: cluster.socketsPerServer !== undefined ? String(cluster.socketsPerServer) : '--',
       scenarioValues: scenarios.map((scenario) => String(scenario.socketsPerServer)),
     },
     {
-      label: 'Cores / Socket',
+      key: 'coresPerSocket',
+      label: t('pptx:comparison.rowCoresPerSocket'),
       asIs: cluster.coresPerSocket !== undefined ? String(cluster.coresPerSocket) : '--',
       scenarioValues: scenarios.map((scenario) => String(scenario.coresPerSocket)),
     },
     {
-      label: 'Total Cores / Server',
+      key: 'totalCoresPerServer',
+      label: t('pptx:comparison.rowTotalCoresPerServer'),
       asIs:
         cluster.socketsPerServer !== undefined && cluster.coresPerSocket !== undefined
           ? String(cluster.socketsPerServer * cluster.coresPerSocket)
@@ -139,40 +156,49 @@ export function addComparisonSlide(
       ),
     },
     {
-      label: 'RAM / Server (GB)',
+      key: 'ramPerServer',
+      label: t('pptx:comparison.rowRamPerServer'),
       asIs: cluster.ramPerServerGb !== undefined ? cluster.ramPerServerGb.toLocaleString() : '--',
       scenarioValues: scenarios.map((scenario) => scenario.ramPerServerGb.toLocaleString()),
     },
     {
-      label: 'Disk / Server (GB)',
+      key: 'diskPerServer',
+      label: t('pptx:comparison.rowDiskPerServer'),
       asIs: '--',
       scenarioValues: scenarios.map((scenario) => scenario.diskPerServerGb.toLocaleString()),
     },
     // --- Sizing assumptions section ---
     {
-      label: 'Safety %',
-      asIs: 'N/A',
+      key: 'safetyPct',
+      label: t('pptx:comparison.rowSafetyPct'),
+      asIs: t('pptx:comparison.valueNA'),
       scenarioValues: scenarios.map((scenario) => `${scenario.safetyPercent}%`),
     },
     {
-      label: 'HA Reserve',
-      asIs: 'N/A',
+      key: 'haReserve',
+      label: t('pptx:comparison.rowHaReserve'),
+      asIs: t('pptx:comparison.valueNA'),
       scenarioValues: scenarios.map((scenario) =>
-        scenario.haReserveCount === 0 ? 'None' : `N+${scenario.haReserveCount}`,
+        scenario.haReserveCount === 0
+          ? t('pptx:comparison.valueNone')
+          : `N+${scenario.haReserveCount}`,
       ),
     },
     {
-      label: 'Avg vCPU/VM',
+      key: 'avgVcpuPerVm',
+      label: t('pptx:comparison.rowAvgVcpuPerVm'),
       asIs: avgVcpuPerVm,
       scenarioValues: scenarios.map(() => avgVcpuPerVm),
     },
     {
-      label: 'Avg RAM/VM (GiB)',
+      key: 'avgRamPerVm',
+      label: t('pptx:comparison.rowAvgRamPerVm'),
       asIs: avgRamPerVm,
       scenarioValues: scenarios.map((scenario) => scenario.ramPerVmGb.toFixed(1)),
     },
     {
-      label: 'Avg Disk/VM (GiB)',
+      key: 'avgDiskPerVm',
+      label: t('pptx:comparison.rowAvgDiskPerVm'),
       asIs: avgDiskPerVm,
       scenarioValues: scenarios.map((scenario) => scenario.diskPerVmGb.toFixed(1)),
     },
@@ -183,15 +209,19 @@ export function addComparisonSlide(
   if (hasVsan) {
     compMetrics.push(
       {
-        label: 'FTT Policy',
-        asIs: 'N/A',
+        key: 'fttPolicy',
+        label: t('pptx:comparison.rowFttPolicy'),
+        asIs: t('pptx:comparison.valueNA'),
         scenarioValues: scenarios.map((scenario) =>
-          scenario.vsanFttPolicy ? FTT_POLICY_MAP[scenario.vsanFttPolicy].label : 'N/A',
+          scenario.vsanFttPolicy
+            ? FTT_POLICY_MAP[scenario.vsanFttPolicy].label
+            : t('pptx:comparison.valueNA'),
         ),
       },
       {
-        label: 'Compression Factor',
-        asIs: 'N/A',
+        key: 'compressionFactor',
+        label: t('pptx:comparison.rowCompressionFactor'),
+        asIs: t('pptx:comparison.valueNA'),
         scenarioValues: scenarios.map((scenario) =>
           scenario.vsanCompressionFactor !== undefined
             ? `${scenario.vsanCompressionFactor}x`
@@ -199,8 +229,9 @@ export function addComparisonSlide(
         ),
       },
       {
-        label: 'Slack %',
-        asIs: 'N/A',
+        key: 'slackPct',
+        label: t('pptx:comparison.rowSlackPct'),
+        asIs: t('pptx:comparison.valueNA'),
         scenarioValues: scenarios.map((scenario) =>
           scenario.vsanSlackPercent !== undefined ? `${scenario.vsanSlackPercent}%` : '25%',
         ),
@@ -214,18 +245,18 @@ export function addComparisonSlide(
   );
   if (hasGrowth) {
     compMetrics.push({
-      label: 'Growth %',
-      asIs: 'N/A',
+      key: 'growthPct',
+      label: t('pptx:comparison.rowGrowthPct'),
+      asIs: t('pptx:comparison.valueNA'),
       scenarioValues: scenarios.map((scenario) => `${scenario.growthPercent ?? 0}%`),
     });
   }
 
   // In disaggregated layout, storage/disk is hidden on the web — mirror that here
   // by dropping the storage/disk rows. HCI (showStorage=true) is untouched.
-  const STORAGE_ROW_LABELS = new Set(['Total Disk', 'Disk / Server (GB)', 'Avg Disk/VM (GiB)']);
   const visibleMetrics = showStorage
     ? compMetrics
-    : compMetrics.filter((mtr) => !STORAGE_ROW_LABELS.has(mtr.label));
+    : compMetrics.filter((mtr) => !STORAGE_ROW_KEYS.has(mtr.key));
 
   const compDataRows = visibleMetrics.map((mtr, rowIdx) => {
     const fillColor = rowIdx % 2 === 0 ? PPTX_COLORS.pageBg : PPTX_COLORS.paper;

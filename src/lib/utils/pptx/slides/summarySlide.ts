@@ -1,5 +1,7 @@
 /** Executive Summary slide — KPI row + scenario summary table. */
+
 import type PptxGenJS from 'pptxgenjs';
+import i18n from '@/i18n';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
 import { PPTX_COLORS } from '../primitives/colors';
@@ -18,10 +20,11 @@ export function addSummarySlide(
   date: string,
   num: number,
 ): void {
+  const t = i18n.t.bind(i18n);
   const { cluster, scenarios, results } = d;
   const s = pptx.addSlide();
   s.background = { color: PPTX_COLORS.paper };
-  const headerBottom = addHeader(s, 'Executive Summary');
+  const headerBottom = addHeader(s, t('pptx:slide.executiveSummary'));
 
   // KPI callouts for key numbers (low density)
   const bestResult = results[0];
@@ -30,13 +33,19 @@ export function addSummarySlide(
     tableY = addKpiRow(
       s,
       [
-        { value: String(cluster.existingServerCount ?? '?'), label: 'As-Is Servers' },
+        { value: String(cluster.existingServerCount ?? '?'), label: t('pptx:kpi.asIsServers') },
         {
           value: String(bestResult.finalCount),
-          label: `${scenarios[0]?.name ?? 'Target'} Servers`,
+          label: t('pptx:kpi.targetServers', { name: scenarios[0]?.name ?? 'Target' }),
         },
-        { value: `${bestResult.cpuUtilizationPercent.toFixed(0)}%`, label: 'CPU Utilization' },
-        { value: `${bestResult.ramUtilizationPercent.toFixed(0)}%`, label: 'RAM Utilization' },
+        {
+          value: `${bestResult.cpuUtilizationPercent.toFixed(0)}%`,
+          label: t('pptx:kpi.cpuUtilization'),
+        },
+        {
+          value: `${bestResult.ramUtilizationPercent.toFixed(0)}%`,
+          label: t('pptx:kpi.ramUtilization'),
+        },
       ],
       tableY,
     );
@@ -44,11 +53,11 @@ export function addSummarySlide(
   }
 
   const headerRow = [
-    headerCell('Scenario', 11),
-    headerCell('Servers', 11),
-    headerCell('Limiting Resource', 11),
-    headerCell('CPU Util %', 11),
-    headerCell('RAM Util %', 11),
+    headerCell(t('pptx:summary.colScenario'), 11),
+    headerCell(t('pptx:summary.colServers'), 11),
+    headerCell(t('pptx:summary.colLimitingResource'), 11),
+    headerCell(t('pptx:summary.colCpuUtil'), 11),
+    headerCell(t('pptx:summary.colRamUtil'), 11),
   ];
 
   const dataRows = scenarios.map((scenario, i) => {
