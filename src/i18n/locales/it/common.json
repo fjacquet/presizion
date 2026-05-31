@@ -1,4 +1,7 @@
 {
   "appName": "Presizion",
-  "appTagline": "Dimensiona il tuo cluster rinnovato in base alle metriche esistenti"
+  "appTagline": "Dimensiona il tuo cluster rinnovato in base alle metriche esistenti",
+  "language": {
+    "switch": "Lingua: {{lang}}. Clicca per cambiare."
+  }
 }

@@ -19,6 +19,7 @@ import { useClusterStore } from '@/store/useClusterStore';
 import { useImportStore } from '@/store/useImportStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { SizingModeToggle } from './SizingModeToggle';
 import { StepIndicator } from './StepIndicator';
 import { ThemeToggle } from './ThemeToggle';
@@ -83,7 +84,8 @@ export function WizardShell() {
               <Database className="h-4 w-4" />
             </a>
           </div>
-          <div className="absolute right-0 top-0 [&_button]:h-11 [&_button]:w-11">
+          <div className="absolute right-0 top-0 flex items-center gap-1 [&_button]:h-11 [&_button]:w-11">
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
           <img src="/presizion/logo.svg" alt="Presizion" className="mx-auto mb-3 h-8 w-auto" />
