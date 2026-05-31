@@ -11,12 +11,15 @@ interface MetricItemProps {
 
 function MetricItem({ label, value, unit }: MetricItemProps) {
   return (
-    <div className="flex flex-col">
-      <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
-      <span className="text-lg font-semibold tabular-nums">
+    <div className="flex flex-col gap-1">
+      <span className="flex items-center gap-1.5 text-[0.68rem] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <span className="status-dot" aria-hidden="true" />
+        {label}
+      </span>
+      <span className="data-readout text-lg font-semibold text-slate-900 dark:text-slate-100">
         {value}
         {unit ? (
-          <span className="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1">
+          <span className="text-xs font-normal text-slate-500 dark:text-slate-400 ml-1">
             {unit}
           </span>
         ) : null}
@@ -49,7 +52,7 @@ export function DerivedMetricsPanel() {
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">{t('derivedMetrics.title')}</CardTitle>
+        <CardTitle className="cockpit-eyebrow">{t('derivedMetrics.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">

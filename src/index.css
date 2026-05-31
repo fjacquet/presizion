@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/oxanium";
+@import "@fontsource-variable/jetbrains-mono";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -45,6 +47,8 @@
   /* Typography + radius scale (survivors from the removed shadcn token system;
    * button sizes use rounded-[min(var(--radius-md),…)]). */
   --font-sans: "Geist Variable", sans-serif;
+  --font-display: "Oxanium Variable", "Geist Variable", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -107,21 +111,57 @@
   }
 }
 
+/* ── Precision Cockpit field ──────────────────────────────────────────────
+ * Atmospheric background: a deep gradient field with a masked grid overlay.
+ * Light + dark variants are driven by the --cockpit-* custom properties. */
+:root {
+  --cockpit-base: linear-gradient(180deg, #eef1f8 0%, #e6eaf3 100%);
+  --cockpit-glow: oklch(68% 0.13 270 / 0.32);
+  --cockpit-grid: rgba(50, 69, 183, 0.07);
+}
+.dark {
+  --cockpit-base: linear-gradient(180deg, #090d17 0%, #0c1119 70%, #0a0f18 100%);
+  --cockpit-glow: oklch(48% 0.19 270 / 0.34);
+  --cockpit-grid: rgba(125, 145, 255, 0.06);
+}
+
 #root {
   width: 1126px;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  padding-inline: clamp(0.75rem, 3vw, 2.5rem);
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
+  min-height: 100svh;
+  background:
+    radial-gradient(1100px 520px at 50% -8%, var(--cockpit-glow), transparent 62%),
+    var(--cockpit-base);
+  background-attachment: fixed;
+}
+
+/* Masked grid overlay — fades out toward the edges so it reads as depth, not a table. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--cockpit-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cockpit-grid) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(circle at 50% 28%, #000 0%, transparent 80%);
+  mask-image: radial-gradient(circle at 50% 28%, #000 0%, transparent 80%);
 }
 
 /* MOBILE-01: prevent iOS Safari auto-zoom on input focus */
@@ -145,13 +185,12 @@ h2 {
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
 }
 h2 {
   font-size: 24px;
@@ -193,12 +232,47 @@ code {
   }
 }
 
+:root {
+  --panel-bg: rgba(255, 255, 255, 0.74);
+  --panel-border: rgba(50, 69, 183, 0.14);
+  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 12px 34px -14px rgba(20, 30, 80, 0.2);
+  --panel-edge: rgba(50, 69, 183, 0.35);
+}
+.dark {
+  --panel-bg: rgba(17, 23, 39, 0.72);
+  --panel-border: rgba(125, 145, 255, 0.16);
+  --panel-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 22px 54px -22px rgba(0, 0, 0, 0.75),
+    0 0 46px -18px var(--cockpit-glow);
+  --panel-edge: oklch(70% 0.16 270 / 0.85);
+}
+
 @layer components {
+  /* Cockpit panel: translucent surface floating over the field, hairline top
+   * highlight, and an accent edge that ignites on hover. */
   .panel {
-    @apply rounded-lg border border-slate-200 bg-white p-4;
+    @apply relative rounded-xl border p-4;
+    border-color: var(--panel-border);
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s;
   }
-  .dark .panel {
-    @apply border-surface-700 bg-surface-800;
+  .panel::after {
+    content: "";
+    position: absolute;
+    inset-inline: 1rem;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--panel-edge), transparent);
+    opacity: 0.5;
+  }
+  .panel:hover {
+    border-color: color-mix(in oklch, var(--panel-edge) 50%, var(--panel-border));
   }
 
   .label {
@@ -206,6 +280,39 @@ code {
   }
   .dark .label {
     @apply text-slate-300;
+  }
+
+  /* Instrument eyebrow: uppercase technical label with a leading accent tick. */
+  .cockpit-eyebrow {
+    font-family: var(--font-display);
+    @apply inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-primary-600 dark:text-primary-300;
+  }
+  .cockpit-eyebrow::before {
+    content: "";
+    @apply inline-block h-3 w-[3px] rounded-full bg-primary-500;
+    box-shadow: 0 0 10px 1px oklch(60% 0.2 270 / 0.7);
+  }
+
+  /* Display heading for the hero. */
+  .cockpit-title {
+    font-family: var(--font-display);
+    @apply font-semibold tracking-tight;
+    font-variation-settings: "wght" 600;
+  }
+
+  /* Monospace numeric readout. */
+  .data-readout {
+    font-family: var(--font-mono);
+    @apply tabular-nums tracking-tight;
+    font-feature-settings:
+      "tnum" 1,
+      "zero" 1;
+  }
+
+  /* Small glowing status light. */
+  .status-dot {
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-primary-500;
+    box-shadow: 0 0 8px 1px oklch(60% 0.2 270 / 0.65);
   }
 
   .util-bar-track {

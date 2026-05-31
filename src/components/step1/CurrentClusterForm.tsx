@@ -234,48 +234,76 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-            {t('currentClusterForm.sections.clusterTotals')}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <NumericFormField
-              control={form.control}
-              name="totalVcpus"
-              label={t('currentClusterForm.fields.totalVcpus')}
-              tooltip={t('currentClusterForm.tooltips.totalVcpus')}
-              testId="input-totalVcpus"
-            />
-            <NumericFormField
-              control={form.control}
-              name="totalPcores"
-              label={t('currentClusterForm.fields.totalPcores')}
-              tooltip={t('currentClusterForm.tooltips.totalPcores')}
-              testId="input-totalPcores"
-            />
-            <NumericFormField
-              control={form.control}
-              name="totalVms"
-              label={t('currentClusterForm.fields.totalVms')}
-              tooltip={t('currentClusterForm.tooltips.totalVms')}
-              testId="input-totalVms"
-            />
-          </div>
-          <div className="mt-4">
-            <NumericFormField
-              control={form.control}
-              name="totalDiskGb"
-              label={t('currentClusterForm.fields.totalDiskGb')}
-              tooltip={t('currentClusterForm.tooltips.totalDiskGb')}
-              testId="input-totalDiskGb"
-              optional
-            />
-          </div>
-        </section>
+      <form className="space-y-4 text-left" onSubmit={(e) => e.preventDefault()}>
+        {/* Required-first: the two required input groups sit side by side. */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
+              {t('currentClusterForm.sections.clusterTotals')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField
+                control={form.control}
+                name="totalVcpus"
+                label={t('currentClusterForm.fields.totalVcpus')}
+                tooltip={t('currentClusterForm.tooltips.totalVcpus')}
+                testId="input-totalVcpus"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalPcores"
+                label={t('currentClusterForm.fields.totalPcores')}
+                tooltip={t('currentClusterForm.tooltips.totalPcores')}
+                testId="input-totalPcores"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalVms"
+                label={t('currentClusterForm.fields.totalVms')}
+                tooltip={t('currentClusterForm.tooltips.totalVms')}
+                testId="input-totalVms"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalDiskGb"
+                label={t('currentClusterForm.fields.totalDiskGb')}
+                tooltip={t('currentClusterForm.tooltips.totalDiskGb')}
+                testId="input-totalDiskGb"
+                optional
+              />
+            </div>
+          </section>
 
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
+              {t('currentClusterForm.sections.currentUtilization')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField
+                control={form.control}
+                name="cpuUtilizationPercent"
+                label={t('currentClusterForm.fields.cpuUtilizationPercent')}
+                tooltip={t('currentClusterForm.tooltips.cpuUtilizationPercent')}
+                testId="input-cpuUtilizationPercent"
+              />
+              <NumericFormField
+                control={form.control}
+                name="ramUtilizationPercent"
+                label={t('currentClusterForm.fields.ramUtilizationPercent')}
+                tooltip={t('currentClusterForm.tooltips.ramUtilizationPercent')}
+                testId="input-ramUtilizationPercent"
+              />
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+              {currentCluster.isStretchCluster
+                ? t('currentClusterForm.utilizationHintStretch')
+                : t('currentClusterForm.utilizationHint')}
+            </p>
+          </section>
+        </div>
+
+        <section className="panel">
+          <h3 className="cockpit-eyebrow mb-4">
             {t('currentClusterForm.sections.existingServerConfig')}
           </h3>
           {currentCluster.cpuModel && (
@@ -307,7 +335,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               }}
             />
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <NumericFormField
               control={form.control}
               name="existingServerCount"
@@ -343,36 +371,9 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
           </div>
         </section>
 
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-            {t('currentClusterForm.sections.currentUtilization')}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <NumericFormField
-              control={form.control}
-              name="cpuUtilizationPercent"
-              label={t('currentClusterForm.fields.cpuUtilizationPercent')}
-              tooltip={t('currentClusterForm.tooltips.cpuUtilizationPercent')}
-              testId="input-cpuUtilizationPercent"
-            />
-            <NumericFormField
-              control={form.control}
-              name="ramUtilizationPercent"
-              label={t('currentClusterForm.fields.ramUtilizationPercent')}
-              tooltip={t('currentClusterForm.tooltips.ramUtilizationPercent')}
-              testId="input-ramUtilizationPercent"
-            />
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {currentCluster.isStretchCluster
-              ? t('currentClusterForm.utilizationHintStretch')
-              : t('currentClusterForm.utilizationHint')}
-          </p>
-        </section>
-
         {sizingMode === 'performance' && (
-          <section>
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
               {t('currentClusterForm.sections.performanceMode')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -42,12 +42,12 @@ export function StepIndicator({
                 onClick={() => isClickable && onStepClick(step)}
                 disabled={!isClickable}
                 className={[
-                  'flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors',
+                  'data-readout flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold border-2 transition-all',
                   isActive
-                    ? 'border-primary-600 bg-primary-600 text-white dark:border-primary-500 dark:bg-primary-500'
+                    ? 'border-primary-500 bg-primary-600 text-white dark:bg-primary-500 shadow-[0_0_20px_-2px_rgba(80,104,255,0.7)]'
                     : isCompleted
                       ? 'border-primary-600 bg-primary-600/20 text-primary-600 dark:border-primary-500 dark:bg-primary-500/20 dark:text-primary-300 cursor-pointer hover:bg-primary-600/30 dark:hover:bg-primary-500/30'
-                      : 'border-slate-400/30 bg-white text-slate-500 dark:border-slate-500/30 dark:bg-surface-900 dark:text-slate-400 cursor-default',
+                      : 'border-slate-400/30 bg-white/60 text-slate-500 dark:border-slate-500/30 dark:bg-surface-900/60 dark:text-slate-400 cursor-default backdrop-blur-sm',
                 ].join(' ')}
                 aria-current={isActive ? 'step' : undefined}
                 aria-label={t('stepIndicator.stepAriaLabel', { step, label: resolvedLabels[i] })}
