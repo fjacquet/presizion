@@ -64,6 +64,31 @@ describe('rvtoolsParser', () => {
     expect(result.totalRamGb).toBe(24);
   });
 
+  it('captures consumedRamGb from the vMemory sheet (joined by VM name)', async () => {
+    const VINFO_SHEET = { tag: 'vInfo' };
+    const VMEM_SHEET = { tag: 'vMemory' };
+    vi.mocked(XLSX.read).mockReturnValue({
+      Sheets: { vInfo: VINFO_SHEET, vMemory: VMEM_SHEET },
+      SheetNames: ['vInfo', 'vMemory'],
+    } as unknown as ReturnType<typeof XLSX.read>);
+    vi.mocked(XLSX.utils.sheet_to_json).mockImplementation((sheet: unknown) =>
+      sheet === VMEM_SHEET
+        ? [
+            { VM: 'web-01', Consumed: 4096 },
+            { VM: 'db-01', Consumed: 12288 },
+          ]
+        : MOCK_ROWS,
+    );
+    const result = await parseRvtools(new ArrayBuffer(0));
+    // (4096 + 12288) / 1024 = 16
+    expect(result.consumedRamGb).toBe(16);
+  });
+
+  it('leaves consumedRamGb undefined when there is no vMemory sheet', async () => {
+    const result = await parseRvtools(new ArrayBuffer(0));
+    expect(result.consumedRamGb).toBeUndefined();
+  });
+
   it('returns zero totalDiskGb when provisioned_mib column is absent', async () => {
     vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
       { VM: 'web-01', CPUs: 4, Memory: 8192, Template: false },

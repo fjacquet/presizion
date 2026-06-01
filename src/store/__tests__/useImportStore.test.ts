@@ -118,6 +118,35 @@ describe('useImportStore', () => {
     });
   });
 
+  describe('VM-level RAM utilization from consumed RAM', () => {
+    it('derives ramUtilizationPercent = consumed/provisioned and sets consumedRamGb', () => {
+      vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue({
+        ...AGGREGATE_RESULT,
+        totalRamGb: 1372.3,
+        consumedRamGb: 1358,
+        ramUtilizationPercent: 67, // host-level — must be overridden by consumed-derived 99%
+      });
+      useImportStore.getState().setImportBuffer(rawByScope, scopeLabels, activeScope);
+
+      expect(mockSetCurrentCluster).toHaveBeenCalledWith(
+        expect.objectContaining({ consumedRamGb: 1358, ramUtilizationPercent: 99 }),
+      );
+    });
+
+    it('falls back to host-level ramUtilizationPercent when consumed RAM is absent', () => {
+      vi.mocked(scopeAggregatorModule.aggregateScopes).mockReturnValue({
+        ...AGGREGATE_RESULT,
+        totalRamGb: 1000,
+        ramUtilizationPercent: 67,
+      });
+      useImportStore.getState().setImportBuffer(rawByScope, scopeLabels, activeScope);
+
+      const cluster = mockSetCurrentCluster.mock.calls.at(-1)?.[0];
+      expect(cluster.ramUtilizationPercent).toBe(67);
+      expect(cluster.consumedRamGb).toBeUndefined();
+    });
+  });
+
   describe('Test 4: setActiveScope with empty array', () => {
     it('calls aggregateScopes with [] and updates cluster to zeros', () => {
       const zeroResult: ScopeData = {

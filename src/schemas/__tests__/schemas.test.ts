@@ -71,6 +71,16 @@ describe('currentClusterSchema', () => {
     expect(result.totalRamGb).toBe(4096);
   });
 
+  it('parses and preserves consumedRamGb', () => {
+    const result = currentClusterSchema.parse({
+      totalVcpus: 100,
+      totalPcores: 50,
+      totalVms: 20,
+      consumedRamGb: 3072,
+    });
+    expect(result.consumedRamGb).toBe(3072);
+  });
+
   it('throws ZodError for negative required fields', () => {
     expect(() =>
       currentClusterSchema.parse({ totalVcpus: -1, totalPcores: 50, totalVms: 20 }),

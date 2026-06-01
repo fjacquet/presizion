@@ -233,6 +233,18 @@ describe('aggregateVmRows', () => {
     expect(aggregateVmRows(all.slice(0, 1)).totalRamGb).toBe(8);
   });
 
+  it('shrinks consumedRamGb when VMs are excluded; omits it when rows lack consumed data', () => {
+    const withConsumed: VmRow[] = [
+      { name: 'a', scopeKey: 's', vcpus: 4, ramMib: 8192, diskMib: 0, ramConsumedMib: 6144 },
+      { name: 'b', scopeKey: 's', vcpus: 2, ramMib: 4096, diskMib: 0, ramConsumedMib: 2048 },
+    ];
+    expect(aggregateVmRows(withConsumed).consumedRamGb).toBe(8); // (6144 + 2048) / 1024
+    expect(aggregateVmRows(withConsumed.slice(0, 1)).consumedRamGb).toBe(6); // 6144 / 1024
+    // No ramConsumedMib on the rows → consumedRamGb omitted.
+    const noConsumed: VmRow[] = [{ name: 'a', scopeKey: 's', vcpus: 4, ramMib: 8192, diskMib: 0 }];
+    expect(aggregateVmRows(noConsumed).consumedRamGb).toBeUndefined();
+  });
+
   it('rounds disk and RAM to 1 decimal', () => {
     const input: VmRow[] = [{ name: 'a', scopeKey: 's', vcpus: 1, ramMib: 1000, diskMib: 1536 }];
     const out = aggregateVmRows(input);
