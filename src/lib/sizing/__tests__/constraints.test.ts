@@ -204,6 +204,38 @@ describe('computeScenarioResult — unified demand factor + 2-mode dispatch', ()
   });
 });
 
+describe('computeScenarioResult — as-is refresh reproduces the existing footprint', () => {
+  it('420 vCPU / 96 pCore / 97 VM cluster sizes to 4 hosts (matches 4 existing)', () => {
+    // Real RVTools case: 4 existing hosts × 1 socket × 24 cores = 96 pCores.
+    // Ratio seeded from existing density 420/96 = 4.4; RAM right-sized on consumed
+    // (1358/1372 ≈ 99%); as-is = growth 0, safety 0, disaggregated storage.
+    const cluster: OldCluster = {
+      totalVcpus: 420,
+      totalPcores: 96,
+      totalVms: 97,
+      totalRamGb: 1372.3,
+      consumedRamGb: 1358,
+      ramUtilizationPercent: 99,
+    };
+    const scenario = {
+      ...createDefaultScenario(),
+      socketsPerServer: 1,
+      coresPerSocket: 24,
+      ramPerServerGb: 479,
+      ramPerVmGb: 14.1, // seeded 1372.3 / 97
+      targetVcpuToPCoreRatio: 4.4,
+      growthPercent: 0,
+      safetyPercent: 0,
+    };
+    const r = computeScenarioResult(cluster, scenario, 'vcpu', 'disaggregated');
+    expect(r.cpuLimitedCount).toBe(4); // ceil(420 / 4.4 / 24) = ceil(3.98)
+    expect(r.ramLimitedCount).toBe(3); // ceil(97 × 14.1 × 0.99 / 479) = ceil(2.83)
+    expect(r.diskLimitedCount).toBe(0); // disaggregated
+    expect(r.finalCount).toBe(4);
+    expect(r.limitingResource).toBe('cpu');
+  });
+});
+
 describe('computeScenarioResult', () => {
   describe('CALC-05: constraint selection and limiting resource', () => {
     it('CPU-limited: finalCount=20, limitingResource=cpu', () => {

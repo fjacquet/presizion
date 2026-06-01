@@ -34,7 +34,7 @@
       "coresPerSocket": "Physical cores per socket from spec sheet — NOT OS-reported logical processors.",
       "ramPerServerGb": "Total RAM installed per existing server (GB).",
       "cpuUtilizationPercent": "Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.",
-      "ramUtilizationPercent": "Current average RAM utilization percent (0–100). Used to scale effective RAM demand.",
+      "ramUtilizationPercent": "Average RAM utilization (0–100) used to right-size RAM demand. Auto-derived from consumed ÷ provisioned on RVTools import; host-level on LiveOptics; your design target on manual entry.",
       "cpuFrequencyGhz": "Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.",
       "specintPerServer": "SPECrate2017_int_base score per existing server. Find at fjacquet.github.io/spec-search → filter by processor. Default is Dell R660 with 2x Xeon Gold 6526Y (~337). Both existing and target must use the same metric."
     },

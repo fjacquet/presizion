@@ -34,7 +34,7 @@
       "coresPerSocket": "Cœurs physiques par socket selon la fiche technique — PAS les processeurs logiques rapportés par l'OS.",
       "ramPerServerGb": "RAM totale installée par serveur existant (Go).",
       "cpuUtilizationPercent": "Pourcentage d'utilisation CPU moyen actuel (0–100). Utilisé pour mettre à l'échelle la demande vCPU effective.",
-      "ramUtilizationPercent": "Pourcentage d'utilisation RAM moyen actuel (0–100). Utilisé pour mettre à l'échelle la demande RAM effective.",
+      "ramUtilizationPercent": "Utilisation RAM moyenne (0–100) servant à dimensionner au plus juste la demande RAM. Déduite de consommé ÷ provisionné à l'import RVTools ; au niveau hôte pour LiveOptics ; votre cible de conception en saisie manuelle.",
       "cpuFrequencyGhz": "Fréquence d'horloge CPU moyenne des serveurs existants en GHz. Remplie automatiquement depuis l'import RVTools/LiveOptics si disponible.",
       "specintPerServer": "Score SPECrate2017_int_base par serveur existant. Disponible sur fjacquet.github.io/spec-search → filtrer par processeur. La valeur par défaut est Dell R660 avec 2x Xeon Gold 6526Y (~337). Les serveurs existants et cibles doivent utiliser la même métrique."
     },

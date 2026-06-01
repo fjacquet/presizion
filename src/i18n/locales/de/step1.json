@@ -34,7 +34,7 @@
       "coresPerSocket": "Physische Kerne pro Socket laut Spezifikationsblatt — NICHT die vom OS gemeldeten logischen Prozessoren.",
       "ramPerServerGb": "Gesamter installierter RAM pro vorhandenem Server (GB).",
       "cpuUtilizationPercent": "Aktueller durchschnittlicher CPU-Auslastungsprozentsatz (0–100). Wird zur Skalierung der effektiven vCPU-Nachfrage verwendet.",
-      "ramUtilizationPercent": "Aktueller durchschnittlicher RAM-Auslastungsprozentsatz (0–100). Wird zur Skalierung der effektiven RAM-Nachfrage verwendet.",
+      "ramUtilizationPercent": "Durchschnittliche RAM-Auslastung (0–100) zur passgenauen Dimensionierung der RAM-Nachfrage. Bei RVTools-Import aus verbraucht ÷ bereitgestellt abgeleitet; bei LiveOptics auf Host-Ebene; bei manueller Eingabe Ihr Auslegungsziel.",
       "cpuFrequencyGhz": "Durchschnittliche CPU-Taktfrequenz vorhandener Server in GHz. Wird beim Import von RVTools/LiveOptics automatisch ausgefüllt.",
       "specintPerServer": "SPECrate2017_int_base-Score pro vorhandenem Server. Zu finden auf fjacquet.github.io/spec-search → nach Prozessor filtern. Standard ist Dell R660 mit 2x Xeon Gold 6526Y (~337). Bestehende und Zielserver müssen dieselbe Metrik verwenden."
     },
