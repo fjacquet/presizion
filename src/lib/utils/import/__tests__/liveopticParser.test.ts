@@ -211,6 +211,33 @@ describe('liveopticParser', () => {
       expect(result.rawByScope?.get('CL-B')?.totalVcpus).toBe(8);
     });
 
+    it('captures per-scope largest VM by vCPU and by RAM (independent dimensions)', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        // RAM-max VM (low vCPU, high RAM)
+        {
+          'VM Name': 'mem-hog',
+          'Virtual CPU': 4,
+          'Provisioned Memory (MiB)': 65536,
+          'Virtual Disk Size (MiB)': 102400,
+          Template: false,
+          Cluster: 'CL-A',
+        },
+        // vCPU-max VM (high vCPU, low RAM) — a DIFFERENT VM
+        {
+          'VM Name': 'cpu-hog',
+          'Virtual CPU': 32,
+          'Provisioned Memory (MiB)': 8192,
+          'Virtual Disk Size (MiB)': 204800,
+          Template: false,
+          Cluster: 'CL-A',
+        },
+      ]);
+      const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx');
+      const scope = result.rawByScope?.get('CL-A');
+      expect(scope?.largestVmVcpus).toBe(32);
+      expect(scope?.largestVmRamMib).toBe(65536);
+    });
+
     it("file with no cluster column defaults to '__all__'", async () => {
       vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
         {

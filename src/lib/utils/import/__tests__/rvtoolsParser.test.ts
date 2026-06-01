@@ -179,6 +179,33 @@ describe('rvtoolsParser', () => {
       expect(result.detectedScopes).toContain('CL-B');
     });
 
+    it('captures per-scope largest VM by vCPU and by RAM (independent dimensions)', async () => {
+      vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
+        // RAM-max VM (low vCPU, high RAM)
+        {
+          VM: 'mem-hog',
+          CPUs: 4,
+          Memory: 65536,
+          'Provisioned MB': 102400,
+          Template: false,
+          Cluster: 'CL-A',
+        },
+        // vCPU-max VM (high vCPU, low RAM) — a DIFFERENT VM
+        {
+          VM: 'cpu-hog',
+          CPUs: 32,
+          Memory: 8192,
+          'Provisioned MB': 204800,
+          Template: false,
+          Cluster: 'CL-A',
+        },
+      ]);
+      const result = await parseRvtools(new ArrayBuffer(0));
+      const scope = result.rawByScope?.get('CL-A');
+      expect(scope?.largestVmVcpus).toBe(32);
+      expect(scope?.largestVmRamMib).toBe(65536);
+    });
+
     it('rawByScope contains independent vcpu totals per cluster', async () => {
       vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
         {

@@ -32,6 +32,8 @@ interface ScopeAccum {
   totalMemMib: number;
   totalDiskMib: number;
   vmCount: number;
+  largestVcpus: number;
+  largestMemMib: number;
 }
 
 /** Compute ESX fields for a group of vHost rows */
@@ -146,12 +148,16 @@ export async function parseRvtools(
       totalMemMib: 0,
       totalDiskMib: 0,
       vmCount: 0,
+      largestVcpus: 0,
+      largestMemMib: 0,
     };
     scopeMap.set(scopeKey, {
       totalVcpus: existing.totalVcpus + cpus,
       totalMemMib: existing.totalMemMib + mem,
       totalDiskMib: existing.totalDiskMib + disk,
       vmCount: existing.vmCount + 1,
+      largestVcpus: Math.max(existing.largestVcpus, cpus),
+      largestMemMib: Math.max(existing.largestMemMib, mem),
     });
   }
 
@@ -171,6 +177,8 @@ export async function parseRvtools(
         accum.vmCount > 0 ? Math.round((accum.totalMemMib / accum.vmCount / 1024) * 10) / 10 : 0,
       vmCount: accum.vmCount,
       warnings: [],
+      largestVmVcpus: accum.largestVcpus,
+      largestVmRamMib: accum.largestMemMib,
     });
   }
 
