@@ -26,16 +26,24 @@ export function Step2Scenarios() {
           type="button"
           variant="outline"
           onClick={() => {
-            const ramPerVmGb = currentCluster.avgRamPerVmGb;
+            const ramPerVmGb =
+              currentCluster.totalRamGb && currentCluster.totalVms
+                ? Math.round((currentCluster.totalRamGb / currentCluster.totalVms) * 10) / 10
+                : currentCluster.avgRamPerVmGb;
             const diskPerVmGb =
               currentCluster.totalDiskGb && currentCluster.totalVms
                 ? Math.round((currentCluster.totalDiskGb / currentCluster.totalVms) * 10) / 10
                 : undefined;
+            const targetVcpuToPCoreRatio =
+              currentCluster.totalVcpus > 0 && currentCluster.totalPcores > 0
+                ? Math.round((currentCluster.totalVcpus / currentCluster.totalPcores) * 10) / 10
+                : undefined;
             addScenario(
-              ramPerVmGb != null || diskPerVmGb != null
+              ramPerVmGb != null || diskPerVmGb != null || targetVcpuToPCoreRatio != null
                 ? {
                     ...(ramPerVmGb != null && { ramPerVmGb }),
                     ...(diskPerVmGb != null && { diskPerVmGb }),
+                    ...(targetVcpuToPCoreRatio != null && { targetVcpuToPCoreRatio }),
                   }
                 : undefined,
             );
