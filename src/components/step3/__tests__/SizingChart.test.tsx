@@ -18,6 +18,16 @@ vi.mock('@/hooks/useScenariosResults', () => ({
 }));
 
 import { useScenariosResults } from '@/hooks/useScenariosResults';
+import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
+
+const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
+  vcpu: 'unknown',
+  ram: 'unknown',
+  overall: 'unknown',
+  coresPerServer: 0,
+  logicalCpus: 0,
+  usableRamGb: 0,
+};
 
 const baseScenario = {
   id: 's1',
@@ -50,6 +60,7 @@ const baseResult = {
   cpuUtilizationPercent: 80,
   ramUtilizationPercent: 60,
   diskUtilizationPercent: 15,
+  singleVmFit: UNKNOWN_SINGLE_VM_FIT,
 };
 
 beforeEach(() => {

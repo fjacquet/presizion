@@ -8,7 +8,17 @@ import { describe, expect, it } from 'vitest';
 import type { ResourceBreakdown, StorageBreakdown } from '../../../types/breakdown';
 import type { OldCluster, Scenario } from '../../../types/cluster';
 import type { ScenarioResult } from '../../../types/results';
+import type { SingleVmFit } from '../singleVmFit';
 import { computeVsanBreakdown } from '../vsanBreakdown';
+
+const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
+  vcpu: 'unknown',
+  ram: 'unknown',
+  overall: 'unknown',
+  coresPerServer: 0,
+  logicalCpus: 0,
+  usableRamGb: 0,
+};
 
 /** Helper to assert the CAP-06 invariant on a ResourceBreakdown */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -79,6 +89,7 @@ function makeResult(overrides: Partial<ScenarioResult> = {}): ScenarioResult {
     cpuUtilizationPercent: 50,
     ramUtilizationPercent: 50,
     diskUtilizationPercent: 12.5,
+    singleVmFit: UNKNOWN_SINGLE_VM_FIT,
     ...overrides,
   };
 }

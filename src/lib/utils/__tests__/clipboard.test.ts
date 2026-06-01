@@ -5,7 +5,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
+import type { SingleVmFit } from '../../sizing/singleVmFit';
 import { buildSummaryText, copyToClipboard } from '../clipboard';
+
+const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
+  vcpu: 'unknown',
+  ram: 'unknown',
+  overall: 'unknown',
+  coresPerServer: 0,
+  logicalCpus: 0,
+  usableRamGb: 0,
+};
 
 const cluster: OldCluster = {
   totalVcpus: 2000,
@@ -45,6 +55,7 @@ const result: ScenarioResult = {
   cpuUtilizationPercent: 85.0,
   ramUtilizationPercent: 60.0,
   diskUtilizationPercent: 35.0,
+  singleVmFit: UNKNOWN_SINGLE_VM_FIT,
 };
 
 beforeEach(() => {
