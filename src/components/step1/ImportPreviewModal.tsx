@@ -318,6 +318,19 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
                 {result.ramUtilizationPercent}%
               </p>
             )}
+            {previewCluster.largestVmVcpus != null && (
+              <p>
+                <span className="font-medium">
+                  {t('importPreview.largestVm', {
+                    vcpu: previewCluster.largestVmVcpus,
+                    ram:
+                      previewCluster.largestVmRamMib != null
+                        ? Math.round((previewCluster.largestVmRamMib / 1024) * 10) / 10
+                        : 0,
+                  })}
+                </span>
+              </p>
+            )}
           </>
         )}
       </div>
