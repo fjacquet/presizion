@@ -119,6 +119,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         totalVcpus: previewCluster.totalVcpus,
         totalPcores: previewCluster.totalPcores ?? 0,
         totalVms: previewCluster.totalVms,
+        totalRamGb: previewCluster.totalRamGb,
         totalDiskGb: previewCluster.totalDiskGb,
         avgRamPerVmGb: previewCluster.avgRamPerVmGb,
         ...(previewCluster.existingServerCount != null && {
@@ -241,6 +242,12 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               <span className="font-medium">{t('importPreview.totalVms')}:</span>{' '}
               {result.cluster.totalVms}
             </p>
+            {result.cluster.totalRamGb != null && (
+              <p>
+                <span className="font-medium">{t('importPreview.totalMemory')}:</span>{' '}
+                {result.cluster.totalRamGb} GB
+              </p>
+            )}
             {result.cluster.totalDiskGb != null && (
               <p>
                 <span className="font-medium">{t('importPreview.totalDisk')}:</span>{' '}
@@ -265,6 +272,10 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
             <p>
               <span className="font-medium">{t('importPreview.totalVms')}:</span>{' '}
               {previewCluster.totalVms}
+            </p>
+            <p>
+              <span className="font-medium">{t('importPreview.totalMemory')}:</span>{' '}
+              {previewCluster.totalRamGb} GB
             </p>
             <p>
               <span className="font-medium">{t('importPreview.totalDisk')}:</span>{' '}

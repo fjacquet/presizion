@@ -59,7 +59,12 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
 
   seedFromCluster: (cluster) =>
     set((state) => {
-      const ramPerVmGb = cluster.avgRamPerVmGb;
+      // Prefer the explicit cluster total (mirrors diskPerVmGb); fall back to the
+      // imported per-VM average for older sessions/imports that lack totalRamGb.
+      const ramPerVmGb =
+        cluster.totalRamGb && cluster.totalVms
+          ? Math.round((cluster.totalRamGb / cluster.totalVms) * 10) / 10
+          : cluster.avgRamPerVmGb;
       const diskPerVmGb =
         cluster.totalDiskGb && cluster.totalVms
           ? Math.round((cluster.totalDiskGb / cluster.totalVms) * 10) / 10
@@ -68,13 +73,21 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
       const socketsPerServer = cluster.socketsPerServer ?? undefined;
       const coresPerSocket = cluster.coresPerSocket ?? undefined;
       const ramPerServerGb = cluster.ramPerServerGb ?? undefined;
+      // Seed the target vCPU:pCore ratio from the existing cluster's achieved
+      // density so an as-is refresh reproduces the existing footprint instead of
+      // a generic 4:1 default that may be lower (and inflate the host count).
+      const recommendedRatio =
+        cluster.totalVcpus > 0 && cluster.totalPcores > 0
+          ? Math.round((cluster.totalVcpus / cluster.totalPcores) * 10) / 10
+          : undefined;
 
       const hasUpdates =
         ramPerVmGb != null ||
         diskPerVmGb != null ||
         socketsPerServer != null ||
         coresPerSocket != null ||
-        ramPerServerGb != null;
+        ramPerServerGb != null ||
+        recommendedRatio != null;
       if (!hasUpdates) return state;
 
       return {
@@ -85,7 +98,7 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
           ...(socketsPerServer != null && { socketsPerServer }),
           ...(coresPerSocket != null && { coresPerSocket }),
           ...(ramPerServerGb != null && { ramPerServerGb }),
-          targetVcpuToPCoreRatio: s.targetVcpuToPCoreRatio ?? 4,
+          targetVcpuToPCoreRatio: recommendedRatio ?? s.targetVcpuToPCoreRatio ?? 4,
           growthPercent: s.growthPercent ?? 0,
           safetyPercent: s.safetyPercent ?? 20,
         })),

@@ -6,6 +6,8 @@ export interface VmRow {
   readonly vcpus: number;
   readonly ramMib: number;
   readonly diskMib: number;
+  /** Host-consumed (in-use) RAM in MiB — RVTools vMemory join; absent otherwise. */
+  readonly ramConsumedMib?: number;
   readonly powerState?: PowerState;
 }
 
@@ -18,6 +20,9 @@ export interface ClusterImportResult {
   totalVcpus: number;
   totalVms: number;
   totalDiskGb: number;
+  totalRamGb: number;
+  /** Total host-consumed (in-use) RAM across all VMs in GiB — RVTools vMemory only. */
+  consumedRamGb?: number;
   avgRamPerVmGb: number;
   sourceFormat: 'rvtools' | 'liveoptics-xlsx' | 'liveoptics-csv';
   vmCount: number;

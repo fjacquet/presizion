@@ -3,6 +3,7 @@ import {
   DATACENTER_ALIASES,
   RVTOOLS_ALIASES,
   RVTOOLS_VHOST_ALIASES,
+  RVTOOLS_VMEMORY_ALIASES,
   RVTOOLS_VSAN_ALIASES,
   resolveColumns,
 } from './columnResolver';
@@ -34,6 +35,7 @@ interface ScopeAccum {
   vmCount: number;
   largestVcpus: number;
   largestMemMib: number;
+  consumedMemMib: number;
 }
 
 /** Compute ESX fields for a group of vHost rows */
@@ -77,6 +79,7 @@ export async function parseRvtools(
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -95,8 +98,29 @@ export async function parseRvtools(
   let totalVcpus = 0;
   let totalMemMib = 0;
   let totalDiskMib = 0;
+  let totalConsumedMemMib = 0;
   let vmCount = 0;
   const warnings: string[] = [];
+
+  // Per-VM host-consumed RAM lives on the optional vMemory sheet, joined by VM name.
+  // When present it enables VM-level RAM right-sizing (consumed ÷ provisioned).
+  const consumedByVm = new Map<string, number>();
+  let hasConsumed = false;
+  const vMemSheet = wb.Sheets.vMemory;
+  if (vMemSheet) {
+    const vmemRows = XLSX.utils.sheet_to_json<VInfoRow>(vMemSheet, { defval: null });
+    const firstVmem = vmemRows[0];
+    if (firstVmem) {
+      const vmemCols = resolveColumns(Object.keys(firstVmem), RVTOOLS_VMEMORY_ALIASES, new Set());
+      if (vmemCols.vm_name !== undefined && vmemCols.consumed_mib !== undefined) {
+        hasConsumed = true;
+        for (const r of vmemRows) {
+          const n = str(r, vmemCols.vm_name);
+          if (n) consumedByVm.set(n, num(r, vmemCols.consumed_mib));
+        }
+      }
+    }
+  }
 
   const scopeMap = new Map<string, ScopeAccum>();
   const hostToCluster = new Map<string, string>();
@@ -131,6 +155,8 @@ export async function parseRvtools(
     }
 
     const vmName = str(row, colMap.vm_name);
+    const consumed = hasConsumed ? (consumedByVm.get(vmName) ?? 0) : 0;
+    totalConsumedMemMib += consumed;
     const powerStateRaw = hasPowerStateCol ? str(row, colMap.power_state) : '';
     const powerState = hasPowerStateCol ? parsePowerState(powerStateRaw) : undefined;
     const vmRow: ScopedVmRow = {
@@ -139,6 +165,7 @@ export async function parseRvtools(
       vcpus: cpus,
       ramMib: mem,
       diskMib: disk,
+      ...(hasConsumed && { ramConsumedMib: consumed }),
       ...(powerState !== undefined && { powerState }),
     };
     appendToMap(vmRowsByScope, scopeKey, vmRow);
@@ -150,6 +177,7 @@ export async function parseRvtools(
       vmCount: 0,
       largestVcpus: 0,
       largestMemMib: 0,
+      consumedMemMib: 0,
     };
     scopeMap.set(scopeKey, {
       totalVcpus: existing.totalVcpus + cpus,
@@ -158,6 +186,7 @@ export async function parseRvtools(
       vmCount: existing.vmCount + 1,
       largestVcpus: Math.max(existing.largestVcpus, cpus),
       largestMemMib: Math.max(existing.largestMemMib, mem),
+      consumedMemMib: existing.consumedMemMib + consumed,
     });
   }
 
@@ -173,6 +202,8 @@ export async function parseRvtools(
       totalVcpus: accum.totalVcpus,
       totalVms: accum.vmCount,
       totalDiskGb: Math.round((accum.totalDiskMib / 1024) * 10) / 10,
+      totalRamGb: Math.round((accum.totalMemMib / 1024) * 10) / 10,
+      ...(hasConsumed && { consumedRamGb: Math.round((accum.consumedMemMib / 1024) * 10) / 10 }),
       avgRamPerVmGb:
         accum.vmCount > 0 ? Math.round((accum.totalMemMib / accum.vmCount / 1024) * 10) / 10 : 0,
       vmCount: accum.vmCount,
@@ -186,6 +217,8 @@ export async function parseRvtools(
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
+    totalRamGb: Math.round((totalMemMib / 1024) * 10) / 10,
+    ...(hasConsumed && { consumedRamGb: Math.round((totalConsumedMemMib / 1024) * 10) / 10 }),
     avgRamPerVmGb: vmCount > 0 ? Math.round((totalMemMib / vmCount / 1024) * 10) / 10 : 0,
     vmCount,
     warnings,

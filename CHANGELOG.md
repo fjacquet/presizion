@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.11.0] -- 2026-06-01
+
+### Added
+
+- **Total Memory (GB) cluster input** in Step 1 "Cluster Totals" (mirrors Total Disk): captured at import, derives per-VM RAM (`totalRamGb / totalVms`), populates the As-Is Total RAM for manual users, and round-trips through session/JSON. Localized en/fr/de/it.
+- **Per-VM consumed-RAM capture (RVTools)**: the optional `vMemory` sheet's `Consumed` column is joined to `vInfo` by VM name and aggregated, enabling VM-level RAM right-sizing.
+
+### Changed
+
+- **As-is sizing is grounded in the existing cluster's measured reality** instead of generic defaults, so a refresh reproduces the existing footprint:
+  - **Target vCPU:pCore ratio is seeded from the existing achieved density** (`totalVcpus / totalPcores`, e.g. 420/96 → 4.4) rather than a flat 4:1 — preventing a dense cluster from inflating its host count.
+  - **RAM utilization is derived from consumed ÷ provisioned (VM-level) on RVTools import**, overriding the host-level "Memory usage %" that previously under-sized RAM. LiveOptics keeps host-level; manual entry is your design target (clarified in the field tooltip).
+  - **In vCPU mode the safety buffer no longer inflates the CPU count** — the vCPU:pCore ratio is itself the CPU headroom, so safety applies to RAM/disk only. Performance (GHz/SPECrate) mode keeps the full growth×safety factor on CPU.
+
+  Combined effect: an as-is refresh (growth 0 / safety 0) of a 4-host cluster now sizes to 4 hosts instead of inflating to 5 and under-sizing RAM.
+
 ## [2.10.0] -- 2026-06-01
 
 ### Added

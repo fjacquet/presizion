@@ -138,23 +138,45 @@ export function applyExclusions(
  */
 export function aggregateVmRows(
   rows: readonly VmRow[],
-): Pick<ScopeData, 'totalVcpus' | 'totalVms' | 'totalDiskGb' | 'avgRamPerVmGb' | 'vmCount'> {
+): Pick<
+  ScopeData,
+  | 'totalVcpus'
+  | 'totalVms'
+  | 'totalDiskGb'
+  | 'totalRamGb'
+  | 'consumedRamGb'
+  | 'avgRamPerVmGb'
+  | 'vmCount'
+> {
   if (rows.length === 0) {
-    return { totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0 };
+    return {
+      totalVcpus: 0,
+      totalVms: 0,
+      totalDiskGb: 0,
+      totalRamGb: 0,
+      avgRamPerVmGb: 0,
+      vmCount: 0,
+    };
   }
   let totalVcpus = 0;
   let totalMemMib = 0;
   let totalDiskMib = 0;
+  let consumedMemMib = 0;
+  // Consumed RAM is present only when the import joined the RVTools vMemory sheet.
+  const hasConsumed = rows.some((r) => r.ramConsumedMib !== undefined);
   for (const r of rows) {
     totalVcpus += r.vcpus;
     totalMemMib += r.ramMib;
     totalDiskMib += r.diskMib;
+    consumedMemMib += r.ramConsumedMib ?? 0;
   }
   const vmCount = rows.length;
   return {
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
+    totalRamGb: Math.round((totalMemMib / 1024) * 10) / 10,
+    ...(hasConsumed && { consumedRamGb: Math.round((consumedMemMib / 1024) * 10) / 10 }),
     avgRamPerVmGb: Math.round((totalMemMib / vmCount / 1024) * 10) / 10,
     vmCount,
   };

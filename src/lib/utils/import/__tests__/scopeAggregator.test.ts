@@ -12,6 +12,7 @@ function makeScope(overrides: Partial<ScopeEntry> = {}): ScopeEntry {
     totalVcpus: 0,
     totalVms: 0,
     totalDiskGb: 0,
+    totalRamGb: 0,
     avgRamPerVmGb: 0,
     vmCount: 0,
     warnings: [],
@@ -45,6 +46,31 @@ describe('aggregateScopes', () => {
     ]);
     const result = aggregateScopes(map, ['CL-A', 'CL-B']);
     expect(result.totalDiskGb).toBe(300);
+  });
+
+  it('sums totalRamGb across two scopes', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ totalRamGb: 256, vmCount: 2 })],
+      ['CL-B', makeScope({ totalRamGb: 512, vmCount: 3 })],
+    ]);
+    const result = aggregateScopes(map, ['CL-A', 'CL-B']);
+    expect(result.totalRamGb).toBe(768);
+  });
+
+  it('returns totalRamGb 0 for empty selection', () => {
+    const map = new Map<string, ScopeEntry>([['CL-A', makeScope({ totalRamGb: 256, vmCount: 2 })]]);
+    expect(aggregateScopes(map, []).totalRamGb).toBe(0);
+  });
+
+  it('sums consumedRamGb across scopes when present, omits it when absent', () => {
+    const withConsumed = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ consumedRamGb: 200, vmCount: 2 })],
+      ['CL-B', makeScope({ consumedRamGb: 150, vmCount: 3 })],
+    ]);
+    expect(aggregateScopes(withConsumed, ['CL-A', 'CL-B']).consumedRamGb).toBe(350);
+
+    const withoutConsumed = new Map<string, ScopeEntry>([['CL-A', makeScope({ vmCount: 2 })]]);
+    expect(aggregateScopes(withoutConsumed, ['CL-A']).consumedRamGb).toBeUndefined();
   });
 
   it('computes avgRamPerVmGb as weighted average across scopes', () => {

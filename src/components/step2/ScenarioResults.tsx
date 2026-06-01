@@ -50,6 +50,8 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     growthPercent: scenario.growthPercent,
     targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
     coresPerServer,
+    // vCPU mode excludes the safety buffer from CPU; performance mode keeps it.
+    applySafety: sizingMode !== 'vcpu',
   });
 
   const effectiveVmCount = currentCluster.totalVms;

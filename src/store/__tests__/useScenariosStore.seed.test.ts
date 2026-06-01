@@ -29,6 +29,38 @@ describe('useScenariosStore.seedFromCluster', () => {
     });
   });
 
+  it('derives ramPerVmGb from totalRamGb / totalVms when totalRamGb is present', () => {
+    const cluster: OldCluster = {
+      totalVcpus: 400,
+      totalPcores: 100,
+      totalVms: 50,
+      totalRamGb: 800,
+      avgRamPerVmGb: 12, // present but ignored — totalRamGb takes precedence
+    };
+
+    useScenariosStore.getState().seedFromCluster(cluster);
+
+    useScenariosStore.getState().scenarios.forEach((s) => {
+      expect(s.ramPerVmGb).toBe(16); // 800 / 50
+    });
+  });
+
+  it('falls back to avgRamPerVmGb when totalRamGb is absent (back-compat)', () => {
+    const cluster: OldCluster = {
+      totalVcpus: 400,
+      totalPcores: 100,
+      totalVms: 50,
+      avgRamPerVmGb: 9.5,
+      // totalRamGb intentionally omitted (old session/import)
+    };
+
+    useScenariosStore.getState().seedFromCluster(cluster);
+
+    useScenariosStore.getState().scenarios.forEach((s) => {
+      expect(s.ramPerVmGb).toBe(9.5);
+    });
+  });
+
   it('Test 2: sets all scenarios diskPerVmGb when totalDiskGb and totalVms provided', () => {
     const cluster: OldCluster = {
       totalVcpus: 400,
@@ -68,7 +100,7 @@ describe('useScenariosStore.seedFromCluster', () => {
     });
   });
 
-  it('seedFromCluster sets recommended ratio/growth/safety', () => {
+  it('seedFromCluster seeds ratio from existing density and recommended growth/safety', () => {
     useScenariosStore.setState({ scenarios: [createDefaultScenario()] });
     useScenariosStore.getState().seedFromCluster({
       totalVcpus: 100,
@@ -82,9 +114,24 @@ describe('useScenariosStore.seedFromCluster', () => {
     const s = useScenariosStore.getState().scenarios[0];
     expect(s).toBeDefined();
     expect(s?.ramPerVmGb).toBe(6);
-    expect(s?.targetVcpuToPCoreRatio).toBe(4);
+    expect(s?.targetVcpuToPCoreRatio).toBe(2.5); // existing achieved 100/40 = 2.5
     expect(s?.growthPercent).toBe(0);
     expect(s?.safetyPercent).toBe(20);
+  });
+
+  it('seeds targetVcpuToPCoreRatio from the existing achieved ratio (as-is parity)', () => {
+    useScenariosStore.setState({ scenarios: [createDefaultScenario()] });
+    // 420 vCPU on 96 pCores = 4.375 → rounded 4.4; reproduces the existing 4-host footprint.
+    useScenariosStore
+      .getState()
+      .seedFromCluster({ totalVcpus: 420, totalPcores: 96, totalVms: 97 });
+    expect(useScenariosStore.getState().scenarios[0]?.targetVcpuToPCoreRatio).toBe(4.4);
+  });
+
+  it('falls back to default ratio 4 when pCores are absent', () => {
+    useScenariosStore.setState({ scenarios: [createDefaultScenario()] });
+    useScenariosStore.getState().seedFromCluster({ totalVcpus: 100, totalPcores: 0, totalVms: 50 });
+    expect(useScenariosStore.getState().scenarios[0]?.targetVcpuToPCoreRatio).toBe(4);
   });
 
   it('Test 4: addScenario with overrides seeds ramPerVmGb and diskPerVmGb from import data', () => {

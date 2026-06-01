@@ -64,11 +64,23 @@ export const useImportStore = create<ImportState>((set, get) => ({
     }
 
     const aggregate = aggregateScopes(effectiveRawByScope, activeScope);
+    // When per-VM consumed RAM is available (RVTools vMemory), right-size on the
+    // workload's actual usage: derive RAM utilization as consumed ÷ provisioned
+    // (VM-level), overriding the host-level "Memory usage %" the parser captured.
+    const ramUtilizationPercent =
+      aggregate.consumedRamGb != null && aggregate.totalRamGb > 0
+        ? Math.min(
+            100,
+            Math.max(1, Math.round((aggregate.consumedRamGb / aggregate.totalRamGb) * 100)),
+          )
+        : aggregate.ramUtilizationPercent;
     const cluster: OldCluster = {
       totalVcpus: aggregate.totalVcpus,
       totalPcores: aggregate.totalPcores ?? 0,
       totalVms: aggregate.totalVms,
       ...(aggregate.totalDiskGb != null && { totalDiskGb: aggregate.totalDiskGb }),
+      ...(aggregate.totalRamGb != null && { totalRamGb: aggregate.totalRamGb }),
+      ...(aggregate.consumedRamGb != null && { consumedRamGb: aggregate.consumedRamGb }),
       ...(aggregate.existingServerCount != null && {
         existingServerCount: aggregate.existingServerCount,
       }),
@@ -78,9 +90,7 @@ export const useImportStore = create<ImportState>((set, get) => ({
       ...(aggregate.cpuUtilizationPercent != null && {
         cpuUtilizationPercent: aggregate.cpuUtilizationPercent,
       }),
-      ...(aggregate.ramUtilizationPercent != null && {
-        ramUtilizationPercent: aggregate.ramUtilizationPercent,
-      }),
+      ...(ramUtilizationPercent != null && { ramUtilizationPercent }),
       ...(aggregate.avgRamPerVmGb != null && { avgRamPerVmGb: aggregate.avgRamPerVmGb }),
       ...(aggregate.cpuModel != null && { cpuModel: aggregate.cpuModel }),
       ...(aggregate.cpuFrequencyGhz != null && { cpuFrequencyGhz: aggregate.cpuFrequencyGhz }),

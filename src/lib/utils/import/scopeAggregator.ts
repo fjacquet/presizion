@@ -19,6 +19,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -34,6 +35,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -43,6 +45,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   let totalVcpus = 0;
   let totalVms = 0;
   let totalDiskGb = 0;
+  let totalRamGb = 0;
   let totalVmCount = 0;
   let weightedRamSum = 0;
   const allWarnings: string[] = [];
@@ -72,6 +75,9 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   let maxLargestVmVcpus: number | undefined;
   let maxLargestVmRamMib: number | undefined;
 
+  // Host-consumed RAM: summed across scopes when present (RVTools vMemory only).
+  let consumedRamGbAcc: number | undefined;
+
   // Stretch: any selected scope being stretched poisons the aggregate (conservative).
   let anyStretch = false;
   const stretchSignalsAcc: string[] = [];
@@ -80,9 +86,14 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
     totalVcpus += scope.totalVcpus;
     totalVms += scope.totalVms;
     totalDiskGb += scope.totalDiskGb;
+    totalRamGb += scope.totalRamGb;
     totalVmCount += scope.vmCount;
     weightedRamSum += scope.avgRamPerVmGb * scope.vmCount;
     allWarnings.push(...scope.warnings);
+
+    if (scope.consumedRamGb !== undefined) {
+      consumedRamGbAcc = (consumedRamGbAcc ?? 0) + scope.consumedRamGb;
+    }
 
     // Additive fields
     if (scope.totalPcores !== undefined) {
@@ -172,6 +183,9 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   // Largest-VM fields: max across scopes
   if (maxLargestVmVcpus !== undefined) esxFields.largestVmVcpus = maxLargestVmVcpus;
   if (maxLargestVmRamMib !== undefined) esxFields.largestVmRamMib = maxLargestVmRamMib;
+  if (consumedRamGbAcc !== undefined) {
+    esxFields.consumedRamGb = Math.round(consumedRamGbAcc * 10) / 10;
+  }
 
   // Weighted average utilization
   if (cpuUtilServerCount > 0) {
@@ -185,6 +199,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
     totalVcpus,
     totalVms,
     totalDiskGb,
+    totalRamGb,
     avgRamPerVmGb,
     vmCount: totalVmCount,
     warnings: allWarnings,

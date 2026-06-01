@@ -53,8 +53,9 @@ describe('useScenariosResults — sizingMode integration (PERF-04, PERF-05)', ()
       safetyPercent: 20,
       haReserveCount: 0 as const,
     };
+    // vCPU mode: CPU uses growth only (safety excluded): ceil(3200×1.00/4/40)=20
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO, 'vcpu');
-    expect(result.finalCount).toBe(24);
+    expect(result.finalCount).toBe(20);
     expect(result.limitingResource).toBe('cpu');
   });
 

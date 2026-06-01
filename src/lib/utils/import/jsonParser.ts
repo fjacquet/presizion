@@ -42,6 +42,9 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
     totalPcores: num(c.totalPcores, 'totalPcores'),
     totalVms: num(c.totalVms, 'totalVms'),
     ...(c.totalDiskGb != null && { totalDiskGb: num(c.totalDiskGb, 'totalDiskGb') }),
+    ...(c.totalRamGb != null && { totalRamGb: num(c.totalRamGb, 'totalRamGb') }),
+    ...(c.consumedRamGb != null && { consumedRamGb: num(c.consumedRamGb, 'consumedRamGb') }),
+    ...(c.avgRamPerVmGb != null && { avgRamPerVmGb: num(c.avgRamPerVmGb, 'avgRamPerVmGb') }),
     ...(c.socketsPerServer != null && {
       socketsPerServer: num(c.socketsPerServer, 'socketsPerServer'),
     }),

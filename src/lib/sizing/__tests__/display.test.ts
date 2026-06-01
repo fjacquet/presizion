@@ -310,7 +310,8 @@ describe('cpuFormulaString — displayed value equals computed count (regression
       growthPercent: scenario.growthPercent,
       targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
       coresPerServer: scenario.socketsPerServer * scenario.coresPerSocket,
+      applySafety: false, // vCPU mode: safety excluded from CPU (ratio is the headroom)
     });
-    expect(evalCpuFormula(formula)).toBe(result.cpuLimitedCount); // 24, not 3
+    expect(evalCpuFormula(formula)).toBe(result.cpuLimitedCount); // 20, not 3
   });
 });

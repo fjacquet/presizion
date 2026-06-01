@@ -36,6 +36,7 @@ const AGGREGATED_RESULT = {
   totalVcpus: 40,
   totalVms: 20,
   totalDiskGb: 400,
+  totalRamGb: 256,
   avgRamPerVmGb: 10,
   vmCount: 20,
   warnings: [],
@@ -50,6 +51,7 @@ const SCOPE_A_DATA = {
   totalVcpus: 80,
   totalVms: 40,
   totalDiskGb: 800,
+  totalRamGb: 0,
   avgRamPerVmGb: 8,
   vmCount: 40,
   existingServerCount: 4,
@@ -60,6 +62,7 @@ const SCOPE_B_DATA = {
   totalVcpus: 40,
   totalVms: 20,
   totalDiskGb: 400,
+  totalRamGb: 0,
   avgRamPerVmGb: 10,
   vmCount: 20,
   existingServerCount: 3,
@@ -75,6 +78,7 @@ const MULTI_SCOPE_RESULT: ClusterImportResult = {
   totalVcpus: 120,
   totalVms: 60,
   totalDiskGb: 1200,
+  totalRamGb: 0,
   avgRamPerVmGb: 8.67,
   sourceFormat: 'rvtools',
   vmCount: 60,
@@ -88,6 +92,7 @@ const SINGLE_SCOPE_RESULT: ClusterImportResult = {
   totalVcpus: 80,
   totalVms: 40,
   totalDiskGb: 800,
+  totalRamGb: 0,
   avgRamPerVmGb: 8,
   sourceFormat: 'rvtools',
   vmCount: 40,
@@ -101,6 +106,7 @@ const NO_SCOPE_RESULT: ClusterImportResult = {
   totalVcpus: 80,
   totalVms: 40,
   totalDiskGb: 800,
+  totalRamGb: 320,
   avgRamPerVmGb: 8,
   sourceFormat: 'liveoptics-csv',
   vmCount: 40,
@@ -257,8 +263,16 @@ describe('ImportPreviewModal', () => {
       fireEvent.click(applyBtn);
 
       expect(mockSetCurrentCluster).toHaveBeenCalledWith(
-        expect.objectContaining({ totalVcpus: 80, totalVms: 40 }),
+        expect.objectContaining({ totalVcpus: 80, totalVms: 40, totalRamGb: 320 }),
       );
+    });
+  });
+
+  describe('Total Memory preview row', () => {
+    it('renders the Total Memory row with the cluster total', () => {
+      render(<ImportPreviewModal result={NO_SCOPE_RESULT} {...defaultProps} />);
+      expect(screen.getByText('Total Memory:')).toBeInTheDocument();
+      expect(screen.getByText(/320 GB/)).toBeInTheDocument();
     });
   });
 
@@ -300,6 +314,7 @@ describe('ImportPreviewModal', () => {
         totalVcpus: 4,
         totalVms: 2,
         totalDiskGb: 10,
+        totalRamGb: 0,
         avgRamPerVmGb: 4,
         vmCount: 2,
         warnings: [],
@@ -312,6 +327,7 @@ describe('ImportPreviewModal', () => {
               totalVcpus: 4,
               totalVms: 2,
               totalDiskGb: 10,
+              totalRamGb: 0,
               avgRamPerVmGb: 4,
               vmCount: 2,
               warnings: [],
@@ -341,6 +357,7 @@ describe('ImportPreviewModal', () => {
       totalVcpus: 100,
       totalVms: 20,
       totalDiskGb: 500,
+      totalRamGb: 160,
       avgRamPerVmGb: 8,
       sourceFormat: 'rvtools',
       vmCount: 20,

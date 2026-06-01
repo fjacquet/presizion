@@ -41,7 +41,14 @@ export function DerivedMetricsPanel() {
     derived.vcpuToPcoreRatio != null ? derived.vcpuToPcoreRatio.toFixed(2) : '—';
   const vmsPerServer = firstResult ? firstResult.vmsPerServer.toFixed(1) : '—';
   const avgVcpuPerVm = derived.avgVcpuPerVm != null ? derived.avgVcpuPerVm.toFixed(1) : '—';
-  const avgRamPerVm = cluster.avgRamPerVmGb != null ? cluster.avgRamPerVmGb.toFixed(1) : '—';
+  // Prefer the total-derived average (reflects a manual Total Memory edit or
+  // post-exclusion totals); fall back to the imported per-VM average.
+  const avgRamPerVm =
+    derived.avgRamPerVmGb != null
+      ? derived.avgRamPerVmGb.toFixed(1)
+      : cluster.avgRamPerVmGb != null
+        ? cluster.avgRamPerVmGb.toFixed(1)
+        : '—';
   const avgDiskPerVm = derived.avgDiskPerVmGb != null ? derived.avgDiskPerVmGb.toFixed(1) : '—';
 
   return (

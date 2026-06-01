@@ -33,7 +33,8 @@ function stripVsanProps<T extends Partial<Scenario>>(
 // OldCluster: totalVcpus=3200, totalVms=100, totalPcores=800
 // Scenario: sockets=2, coresPerSocket=20 (40 pCores/server), ram=1024GB/server, disk=50000GB/server
 //           ratio=4, ramPerVm=2GB, diskPerVm=10GB, safety=20% (demandFactor=1.20), haReserve=false
-// Expected: cpuCount=24, ramCount=1, diskCount=1, finalCount=24, limiting='cpu'
+// vCPU mode: CPU uses growth only (safety excluded — the ratio is the CPU headroom).
+// Expected: cpuCount=ceil(3200×1.00/4/40)=20, ramCount=1, diskCount=1, finalCount=20, limiting='cpu'
 const CPU_LIMITED_CLUSTER = { totalVcpus: 3200, totalVms: 100, totalPcores: 800 };
 const CPU_LIMITED_SCENARIO = {
   id: '00000000-0000-0000-0000-000000000001',
@@ -116,9 +117,57 @@ describe('computeScenarioResult — unified demand factor + 2-mode dispatch', ()
       socketsPerServer: 2,
       coresPerSocket: 16,
     };
-    // vCPU mode: ceil(1000 × 1.10 × 1.20 / 4 / 32) = ceil(10.3125) = 11
+    // vCPU mode: CPU uses growth only (safety excluded — ratio is the headroom):
+    // ceil(1000 × 1.10 / 4 / 32) = ceil(8.59375) = 9
     const r = computeScenarioResult(baseCluster, s, 'vcpu', 'hci');
-    expect(r.cpuLimitedCount).toBe(11);
+    expect(r.cpuLimitedCount).toBe(9);
+  });
+
+  it('vCPU mode: the safety buffer does NOT change the CPU count (ratio is the headroom)', () => {
+    const base = {
+      ...createDefaultScenario(),
+      growthPercent: 0,
+      targetVcpuToPCoreRatio: 4,
+      socketsPerServer: 2,
+      coresPerSocket: 16,
+    };
+    const noSafety = computeScenarioResult(
+      baseCluster,
+      { ...base, safetyPercent: 0 },
+      'vcpu',
+      'hci',
+    );
+    const withSafety = computeScenarioResult(
+      baseCluster,
+      { ...base, safetyPercent: 50 },
+      'vcpu',
+      'hci',
+    );
+    expect(withSafety.cpuLimitedCount).toBe(noSafety.cpuLimitedCount);
+  });
+
+  it('performance mode: the safety buffer DOES still increase the CPU count', () => {
+    const base = {
+      ...createDefaultScenario(),
+      growthPercent: 0,
+      targetSpecint: 300,
+      socketsPerServer: 2,
+      coresPerSocket: 16,
+    };
+    const cluster = { ...baseCluster, existingServerCount: 10, specintPerServer: 300 };
+    const noSafety = computeScenarioResult(
+      cluster,
+      { ...base, safetyPercent: 0 },
+      'performance',
+      'hci',
+    );
+    const withSafety = computeScenarioResult(
+      cluster,
+      { ...base, safetyPercent: 50 },
+      'performance',
+      'hci',
+    );
+    expect(withSafety.cpuLimitedCount).toBeGreaterThan(noSafety.cpuLimitedCount);
   });
 
   it('performance mode uses GHz by default', () => {
@@ -155,14 +204,46 @@ describe('computeScenarioResult — unified demand factor + 2-mode dispatch', ()
   });
 });
 
+describe('computeScenarioResult — as-is refresh reproduces the existing footprint', () => {
+  it('420 vCPU / 96 pCore / 97 VM cluster sizes to 4 hosts (matches 4 existing)', () => {
+    // Real RVTools case: 4 existing hosts × 1 socket × 24 cores = 96 pCores.
+    // Ratio seeded from existing density 420/96 = 4.4; RAM right-sized on consumed
+    // (1358/1372 ≈ 99%); as-is = growth 0, safety 0, disaggregated storage.
+    const cluster: OldCluster = {
+      totalVcpus: 420,
+      totalPcores: 96,
+      totalVms: 97,
+      totalRamGb: 1372.3,
+      consumedRamGb: 1358,
+      ramUtilizationPercent: 99,
+    };
+    const scenario = {
+      ...createDefaultScenario(),
+      socketsPerServer: 1,
+      coresPerSocket: 24,
+      ramPerServerGb: 479,
+      ramPerVmGb: 14.1, // seeded 1372.3 / 97
+      targetVcpuToPCoreRatio: 4.4,
+      growthPercent: 0,
+      safetyPercent: 0,
+    };
+    const r = computeScenarioResult(cluster, scenario, 'vcpu', 'disaggregated');
+    expect(r.cpuLimitedCount).toBe(4); // ceil(420 / 4.4 / 24) = ceil(3.98)
+    expect(r.ramLimitedCount).toBe(3); // ceil(97 × 14.1 × 0.99 / 479) = ceil(2.83)
+    expect(r.diskLimitedCount).toBe(0); // disaggregated
+    expect(r.finalCount).toBe(4);
+    expect(r.limitingResource).toBe('cpu');
+  });
+});
+
 describe('computeScenarioResult', () => {
   describe('CALC-05: constraint selection and limiting resource', () => {
-    it('CPU-limited: finalCount=24, limitingResource=cpu', () => {
+    it('CPU-limited: finalCount=20, limitingResource=cpu', () => {
       const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
-      expect(result.cpuLimitedCount).toBe(24);
+      expect(result.cpuLimitedCount).toBe(20);
       expect(result.ramLimitedCount).toBe(1);
       expect(result.diskLimitedCount).toBe(1);
-      expect(result.finalCount).toBe(24);
+      expect(result.finalCount).toBe(20);
       expect(result.limitingResource).toBe('cpu');
       expect(result.haReserveApplied).toBe(false);
     });
@@ -195,7 +276,7 @@ describe('computeScenarioResult', () => {
     it('haReserveCount=1: adds exactly 1 (not a percentage) to final count', () => {
       const haScenario = { ...CPU_LIMITED_SCENARIO, haReserveCount: 1 as const };
       const result = computeScenarioResult(CPU_LIMITED_CLUSTER, haScenario);
-      expect(result.finalCount).toBe(25);
+      expect(result.finalCount).toBe(21);
     });
     it('haReserveCount=2 (N+2): finalCount equals rawCount + 2', () => {
       const haScenario = { ...CPU_LIMITED_SCENARIO, haReserveCount: 2 as const };
@@ -215,14 +296,14 @@ describe('computeScenarioResult', () => {
   describe('CALC-06: utilization metrics', () => {
     it('achievedVcpuToPCoreRatio is correct for CPU-limited fixture', () => {
       const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
-      // 3200 / (24 * 40) ≈ 3.333...
-      const expected = 3200 / (24 * 40);
+      // 3200 / (20 * 40) = 4.0
+      const expected = 3200 / (20 * 40);
       expect(Math.abs(result.achievedVcpuToPCoreRatio - expected)).toBeLessThan(0.01);
     });
     it('vmsPerServer is correct for CPU-limited fixture', () => {
       const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
-      // 100 / 24 ≈ 4.166...
-      const expected = 100 / 24;
+      // 100 / 20 = 5.0
+      const expected = 100 / 20;
       expect(Math.abs(result.vmsPerServer - expected)).toBeLessThan(0.01);
     });
     it('cpuUtilizationPercent is in range 0–100', () => {
@@ -274,7 +355,8 @@ const SPECINT_SCENARIO = {
 
 // Utilization scaling fixtures
 // CPU cluster: totalVcpus=1000, cpuUtilizationPercent=60
-// vcpu mode ratio is a hard cap: ceil(1000 × 1.20 / 4 / 40) = ceil(7.5) = 8 (util ignored)
+// vcpu mode ratio is a hard cap, CPU uses growth only (safety excluded):
+// ceil(1000 × 1.00 / 4 / 40) = ceil(6.25) = 7 (util and safety both ignored for the count)
 const UTIL_CPU_CLUSTER = {
   totalVcpus: 1000,
   totalVms: 100,
@@ -331,7 +413,7 @@ describe('computeScenarioResult — performance/SPECint mode (PERF-04, PERF-05)'
     const withDefault = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
     expect(withExplicit.finalCount).toBe(withDefault.finalCount);
     expect(withExplicit.limitingResource).toBe(withDefault.limitingResource);
-    expect(withDefault.finalCount).toBe(24);
+    expect(withDefault.finalCount).toBe(20);
   });
   it('limitingResource=specint only when specint count exceeds ram and disk', () => {
     const result = computeScenarioResult(SPECINT_CLUSTER, SPECINT_SCENARIO, 'performance');
@@ -348,19 +430,20 @@ describe('computeScenarioResult — performance/SPECint mode (PERF-04, PERF-05)'
 });
 
 describe('computeScenarioResult — utilization scaling (UTIL-03)', () => {
-  it('cpuUtilizationPercent=60: cpuLimitedCount = ceil(1000×1.20/4/40)=8 (ratio hard cap, util ignored)', () => {
+  it('cpuUtilizationPercent=60: cpuLimitedCount = ceil(1000×1.00/4/40)=7 (ratio hard cap, util + safety ignored)', () => {
     // cpuUtilPct does NOT reduce cpuLimitedCount — ratio is a hard assignment-density cap.
+    // Safety is also excluded from the CPU count in vCPU mode (the ratio is the headroom).
     const result = computeScenarioResult(UTIL_CPU_CLUSTER, UTIL_CPU_SCENARIO, 'vcpu');
-    expect(result.cpuLimitedCount).toBe(8);
+    expect(result.cpuLimitedCount).toBe(7);
   });
   it('ramUtilizationPercent=80: ramLimitedCount = ceil(500×16×0.80×1.20/512)=15', () => {
     const result = computeScenarioResult(UTIL_RAM_CLUSTER, UTIL_RAM_SCENARIO, 'vcpu');
     expect(result.ramLimitedCount).toBe(15);
   });
-  it('cpuUtilizationPercent result applies cpuUtilPct factor in display only: finalCount=8, util=46.9%', () => {
+  it('cpuUtilizationPercent result applies cpuUtilPct factor in display only: finalCount=7, util=53.6%', () => {
     const result = computeScenarioResult(UTIL_CPU_CLUSTER, UTIL_CPU_SCENARIO, 'vcpu');
-    // finalCount=8 (ratio hard cap), cpuUtil = 1000×0.60/4/(8×40)×100 = 46.875%
-    expect(result.cpuUtilizationPercent).toBeCloseTo(46.9, 1);
+    // finalCount=7 (ratio hard cap), cpuUtil = 1000×0.60/4/(7×40)×100 = 53.571%
+    expect(result.cpuUtilizationPercent).toBeCloseTo(53.6, 1);
   });
   it('ramUtilizationPercent result applies ramUtilPct factor: 80% util reduces display %', () => {
     const result = computeScenarioResult(UTIL_RAM_CLUSTER, UTIL_RAM_SCENARIO, 'vcpu');
@@ -484,7 +567,7 @@ describe('computeScenarioResult — minServerCount pin floor', () => {
   it('minServerCount < computed: finalCount unaffected', () => {
     const pinnedScenario = { ...CPU_LIMITED_SCENARIO, minServerCount: 1 };
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, pinnedScenario);
-    expect(result.finalCount).toBe(24); // CPU-limited count wins
+    expect(result.finalCount).toBe(20); // CPU-limited count wins
   });
 });
 
@@ -513,8 +596,8 @@ describe('demand factor (growth × safety)', () => {
     expect(noGrowthResult.cpuLimitedCount).toBe(7);
   });
 
-  it('growth and safety compound: (1+growth)(1+safety)', () => {
-    // ceil(1000 × 1.20 × 1.20 / 4 / 40) = ceil(9) = 9
+  it('growth and safety compound: vCPU CPU uses growth only (safety excluded)', () => {
+    // vCPU mode excludes safety from the CPU count: ceil(1000 × 1.20 / 4 / 40) = ceil(7.5) = 8
     const cluster = { totalVcpus: 1000, totalVms: 10, totalPcores: 250 };
     const scenario = {
       id: '00000000-0000-0000-0000-000000000g02',
@@ -531,7 +614,7 @@ describe('demand factor (growth × safety)', () => {
       haReserveCount: 0 as const,
     };
     const result = computeScenarioResult(cluster, scenario);
-    expect(result.cpuLimitedCount).toBe(9);
+    expect(result.cpuLimitedCount).toBe(8);
   });
 
   it('absent growth/safety fields treated as 0 demand', () => {
@@ -559,10 +642,10 @@ describe('demand factor (growth × safety)', () => {
 
   it('existing CPU-limited fixture produces unchanged results (regression guard)', () => {
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
-    expect(result.cpuLimitedCount).toBe(24);
+    expect(result.cpuLimitedCount).toBe(20);
     expect(result.ramLimitedCount).toBe(1);
     expect(result.diskLimitedCount).toBe(1);
-    expect(result.finalCount).toBe(24);
+    expect(result.finalCount).toBe(20);
     expect(result.limitingResource).toBe('cpu');
   });
 });
@@ -632,11 +715,11 @@ describe('computeScenarioResult — vSAN integration (Phase 18)', () => {
     const result = computeScenarioResult(VSAN_CLUSTER, legacyScenario);
     // Legacy: ceil(200 × 50 × 1.20 / 10000) = ceil(1.2) = 2
     expect(result.diskLimitedCount).toBe(2);
-    // CPU count: ceil(800 × 1.20 / 4 / 40) = ceil(6) = 6
-    expect(result.cpuLimitedCount).toBe(6);
+    // CPU count (vCPU mode, growth only — safety excluded): ceil(800 × 1.00 / 4 / 40) = ceil(5) = 5
+    expect(result.cpuLimitedCount).toBe(5);
     // RAM count: ceil(200 × 8 × 1.20 / 512) = ceil(3.75) = 4
     expect(result.ramLimitedCount).toBe(4);
-    expect(result.finalCount).toBe(6);
+    expect(result.finalCount).toBe(5);
     expect(result.limitingResource).toBe('cpu');
   });
 
@@ -728,16 +811,16 @@ describe('computeScenarioResult — stretch cluster', () => {
   it('isStretchCluster=true doubles finalCount and sets stretchApplied', () => {
     const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
     const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
-    expect(result.rawCount).toBe(24);
+    expect(result.rawCount).toBe(20);
     expect(result.stretchApplied).toBe(true);
-    expect(result.stretchPairedCount).toBe(48);
-    expect(result.finalCount).toBe(48);
+    expect(result.stretchPairedCount).toBe(40);
+    expect(result.finalCount).toBe(40);
   });
 
   it('isStretchCluster=true preserves requiredCount (pre-stretch demand)', () => {
     const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
     const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
-    expect(result.requiredCount).toBe(24);
+    expect(result.requiredCount).toBe(20);
   });
 
   it('stretch + haReserveCount=1 applies the reserve per-site (doubled): (rawCount + 1) × 2', () => {
@@ -745,15 +828,15 @@ describe('computeScenarioResult — stretch cluster', () => {
     const stretchedScenario = { ...CPU_LIMITED_SCENARIO, haReserveCount: 1 as const };
     const result = computeScenarioResult(stretchedCluster, stretchedScenario);
     // workload doubling is reserve-independent; reserve is one spare host per site
-    expect(result.stretchPairedCount).toBe(48); // rawCount(24) × 2
-    expect(result.finalCount).toBe(50); // (24 + 1) × 2
+    expect(result.stretchPairedCount).toBe(40); // rawCount(20) × 2
+    expect(result.finalCount).toBe(42); // (20 + 1) × 2
     expect(result.haReserveApplied).toBe(true);
   });
 
   it('stretch + haReserveCount=0 gives paired count exactly (stretch IS the HA mechanism)', () => {
     const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
     const result = computeScenarioResult(stretchedCluster, CPU_LIMITED_SCENARIO);
-    expect(result.finalCount).toBe(48);
+    expect(result.finalCount).toBe(40);
     expect(result.haReserveApplied).toBe(false);
   });
 
@@ -777,14 +860,14 @@ describe('computeScenarioResult — stretch cluster', () => {
     const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
     expect(result.stretchApplied).toBe(false);
     expect(result.stretchPairedCount).toBeUndefined();
-    expect(result.finalCount).toBe(24);
+    expect(result.finalCount).toBe(20);
   });
 
   it('isStretchCluster=false explicitly: same as absent (regression)', () => {
     const notStretched = { ...CPU_LIMITED_CLUSTER, isStretchCluster: false };
     const result = computeScenarioResult(notStretched, CPU_LIMITED_SCENARIO);
     expect(result.stretchApplied).toBe(false);
-    expect(result.finalCount).toBe(24);
+    expect(result.finalCount).toBe(20);
   });
 
   it('stretch + performance/SPEC mode: pre-stretch count from specint formula, then doubled', () => {

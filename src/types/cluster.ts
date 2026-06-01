@@ -9,6 +9,8 @@ export interface OldCluster {
   readonly totalPcores: number;
   readonly totalVms: number;
   readonly totalDiskGb?: number;
+  readonly totalRamGb?: number; // total provisioned RAM across all VMs (GiB) — mirrors totalDiskGb; seeds ramPerVmGb
+  readonly consumedRamGb?: number; // total host-consumed (in-use) RAM (GiB) — RVTools vMemory; basis for VM-level RAM utilization
   readonly socketsPerServer?: number;
   readonly coresPerSocket?: number;
   readonly ramPerServerGb?: number;

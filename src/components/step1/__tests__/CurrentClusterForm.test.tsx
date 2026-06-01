@@ -63,6 +63,11 @@ describe('CurrentClusterForm', () => {
       render(<CurrentClusterForm onNext={() => {}} />);
       expect(screen.getByTestId('input-totalDiskGb')).toBeInTheDocument();
     });
+
+    it('renders the Total Memory field', () => {
+      render(<CurrentClusterForm onNext={() => {}} />);
+      expect(screen.getByTestId('input-totalRamGb')).toBeInTheDocument();
+    });
   });
 
   describe('INPUT-02: cluster totals fields', () => {
