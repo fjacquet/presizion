@@ -55,7 +55,7 @@ export function WizardShell() {
     useExclusionsStore.getState().reset();
     goToStep(1);
     setSizingMode('vcpu');
-    setLayoutMode('hci');
+    setLayoutMode('disaggregated');
     try {
       localStorage.removeItem('presizion-session');
     } catch {

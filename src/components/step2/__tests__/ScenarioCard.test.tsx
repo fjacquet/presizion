@@ -45,7 +45,8 @@ function scenarioWithoutSpec() {
 beforeEach(() => {
   useScenariosStore.setState({ scenarios: [scenarioWithoutSpec()] });
   useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } });
-  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu' });
+  // Pin HCI so the disk/server field renders (hidden in the disaggregated default).
+  useWizardStore.setState({ currentStep: 1, sizingMode: 'vcpu', layoutMode: 'hci' });
 });
 
 describe('Step2Scenarios / ScenarioCard', () => {

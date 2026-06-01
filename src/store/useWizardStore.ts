@@ -40,7 +40,8 @@ interface WizardStore {
 export const useWizardStore = create<WizardStore>((set) => ({
   currentStep: 1,
   sizingMode: 'vcpu',
-  layoutMode: 'hci',
+  // Disaggregated (external storage) is the modern default; HCI is opt-in.
+  layoutMode: 'disaggregated',
 
   goToStep: (step) => set({ currentStep: step }),
 

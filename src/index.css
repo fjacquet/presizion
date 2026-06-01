@@ -92,25 +92,6 @@
   --radius: 0.625rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
 /* ── Precision Cockpit field ──────────────────────────────────────────────
  * Atmospheric background: a deep gradient field with a masked grid overlay.
  * Light + dark variants are driven by the --cockpit-* custom properties. */
@@ -119,7 +100,19 @@
   --cockpit-glow: oklch(68% 0.13 270 / 0.32);
   --cockpit-grid: rgba(50, 69, 183, 0.07);
 }
+
+/* Dark theme is CLASS-driven (theme toggle / boot script add `.dark`), NOT
+ * `prefers-color-scheme`. The legacy --text/--text-h/--bg/--border tokens
+ * (consumed by h1/h2/code) must switch here too, or headings render near-black
+ * on the dark field when the OS is in light mode. */
 .dark {
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
+  --bg: #16171d;
+  --border: #2e303a;
+  --code-bg: #1f2028;
+  --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+
   --cockpit-base: linear-gradient(180deg, #090d17 0%, #0c1119 70%, #0a0f18 100%);
   --cockpit-glow: oklch(48% 0.19 270 / 0.34);
   --cockpit-grid: rgba(125, 145, 255, 0.06);
