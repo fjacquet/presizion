@@ -77,3 +77,28 @@ describe('assessSingleVmFit — overall', () => {
     expect(fit.largestVmRamGb).toBe(256);
   });
 });
+
+describe('assessSingleVmFit — degenerate host config (no division, only compares)', () => {
+  const ZERO_HOST: Scenario = {
+    ...createDefaultScenario(),
+    socketsPerServer: 0,
+    coresPerSocket: 0,
+    ramPerServerGb: 0,
+  };
+
+  it('fails a positive largest VM against a zero-core / zero-RAM host', () => {
+    const fit = assessSingleVmFit(clusterWith(8, 16), ZERO_HOST);
+    expect(fit.vcpu).toBe('fail');
+    expect(fit.ram).toBe('fail');
+    expect(fit.overall).toBe('fail');
+  });
+
+  it('treats a zero-sized largest VM as ok (0 <= 0), never NaN', () => {
+    const fit = assessSingleVmFit(clusterWith(0, 0), ZERO_HOST);
+    expect(fit.vcpu).toBe('ok');
+    expect(fit.ram).toBe('ok');
+    expect(fit.coresPerServer).toBe(0);
+    expect(fit.logicalCpus).toBe(0);
+    expect(fit.usableRamGb).toBe(0);
+  });
+});
