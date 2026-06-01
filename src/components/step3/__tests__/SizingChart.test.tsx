@@ -48,6 +48,7 @@ const baseResult = {
   cpuLimitedCount: 10,
   ramLimitedCount: 8,
   diskLimitedCount: 3,
+  vmsLimitedCount: 0,
   rawCount: 10,
   requiredCount: 10,
   finalCount: 10,

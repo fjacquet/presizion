@@ -38,6 +38,7 @@
     "resourceDisk": "Limitato da disco",
     "resourceSpecint": "SPECrate2017",
     "resourceGhz": "Limitato da GHz",
+    "resourceVms": "Limitato da VM",
     "cpuBarPerformance": "Limitato dalle prestazioni",
     "cpuBarVcpu": "Limitato da CPU"
   },

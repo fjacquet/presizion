@@ -36,19 +36,22 @@ export type LayoutMode = 'hci' | 'disaggregated';
 /**
  * Determines which resource constraint drove the final (maximum) server count.
  *
- * Tie-breaking priority when counts are equal: cpu/specint/ghz > ram > disk.
+ * Tie-breaking priority when counts are equal: cpu/specint/ghz > ram > disk > vms.
  * The cpu slot carries the label the active CPU formula produced
- * ('cpu' | 'specint' | 'ghz').
+ * ('cpu' | 'specint' | 'ghz'). The vms slot is the optional VM-density cap and
+ * only wins when it strictly exceeds every other constraint.
  */
 function determineLimitingResource(
   cpu: number,
   ram: number,
   disk: number,
+  vms: number,
   cpuLabel: 'cpu' | 'specint' | 'ghz',
 ): LimitingResource {
-  if (cpu >= ram && cpu >= disk) return cpuLabel;
-  if (ram > cpu && ram >= disk) return 'ram';
-  return 'disk';
+  if (cpu >= ram && cpu >= disk && cpu >= vms) return cpuLabel;
+  if (ram > cpu && ram >= disk && ram >= vms) return 'ram';
+  if (disk > cpu && disk > ram && disk >= vms) return 'disk';
+  return 'vms';
 }
 
 /**
@@ -184,16 +187,24 @@ export function computeScenarioResult(
     );
   }
 
+  // CALC-VMS: VM-density cap. A host can run at most maxVmsPerHost VMs; when set,
+  // this is a genuine constraint on the node count (demand scaled like RAM/disk).
+  // Absent/0 → no cap → 0, which never wins the max or the limiting-resource pick.
+  const maxVmsPerHost = scenario.maxVmsPerHost ?? 0;
+  const vmsLimitedCount =
+    maxVmsPerHost > 0 ? Math.ceil((effectiveVmCount * demandFactor) / maxVmsPerHost) : 0;
+
   // CALC-05: Limiting resource — determined from the raw counts (before HA)
   const limitingResource = determineLimitingResource(
     cpuLimitedCount,
     ramLimitedCount,
     diskLimitedCount,
+    vmsLimitedCount,
     cpuResourceLabel,
   );
 
   // CALC-05: Raw count is the maximum of all active constraints
-  const rawCount = Math.max(cpuLimitedCount, ramLimitedCount, diskLimitedCount);
+  const rawCount = Math.max(cpuLimitedCount, ramLimitedCount, diskLimitedCount, vmsLimitedCount);
 
   // CALC-STRETCH + CALC-04: stretched topology — each site carries the full
   // workload, so the workload is doubled for site symmetry (stretchPairedCount).
@@ -249,6 +260,7 @@ export function computeScenarioResult(
     cpuLimitedCount,
     ramLimitedCount,
     diskLimitedCount,
+    vmsLimitedCount,
     rawCount,
     requiredCount,
     finalCount,

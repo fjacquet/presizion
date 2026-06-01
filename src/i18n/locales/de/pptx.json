@@ -3,6 +3,8 @@
   "slide": {
     "title": "Cluster-Dimensionierungsbericht",
     "executiveSummary": "Zusammenfassung",
+    "execSummaryComparison": "Zusammenfassung & Vergleich",
+    "configAppendix": "Konfiguration & Annahmen",
     "comparison": "Vergleich Ist-Zustand vs. Ziel",
     "capacityBreakdown": "Kapazitätsaufschlüsselung — {{name}}",
     "minNodes": "Mindestknoten pro Einschränkung — {{name}}"
@@ -11,7 +13,9 @@
     "asIsServers": "Aktuelle Server",
     "targetServers": "{{name}} Server",
     "cpuUtilization": "CPU-Auslastung",
-    "ramUtilization": "RAM-Auslastung"
+    "ramUtilization": "RAM-Auslastung",
+    "cpuUtilizationToBe": "CPU-Auslastung (Ziel)",
+    "ramUtilizationToBe": "RAM-Auslastung (Ziel)"
   },
   "summary": {
     "colScenario": "Szenario",
@@ -37,6 +41,7 @@
     "rowDiskPerServer": "Festplatte / Server (GB)",
     "rowSafetyPct": "Sicherheit %",
     "rowHaReserve": "HA-Reserve",
+    "rowMaxVmsPerHost": "Max. VMs / Host",
     "rowAvgVcpuPerVm": "Ø vCPU/VM",
     "rowAvgRamPerVm": "Ø RAM/VM (GiB)",
     "rowAvgDiskPerVm": "Ø Festplatte/VM (GiB)",

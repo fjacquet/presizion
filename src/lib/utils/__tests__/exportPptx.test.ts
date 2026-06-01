@@ -83,6 +83,7 @@ const result: ScenarioResult = {
   cpuLimitedCount: 14,
   ramLimitedCount: 10,
   diskLimitedCount: 2,
+  vmsLimitedCount: 0,
   rawCount: 14,
   requiredCount: 14,
   finalCount: 14,
@@ -209,12 +210,21 @@ describe('exportPptx', () => {
     await expect(exportPptx(cluster, [], [], [], {})).resolves.toBeUndefined();
   });
 
-  it('creates exactly 3 slides for single scenario without charts (title + summary + comparison)', async () => {
+  it('creates exactly 3 slides for single HCI scenario without charts (title + merged + config appendix)', async () => {
     const { exportPptx } = await import('../exportPptx');
     await exportPptx(cluster, [scenario], [result], [breakdown], {});
-    // Title + Summary + As-Is vs To-Be Comparison = exactly 3 slides
+    // HCI (default showStorage=true) has enough config rows that the config table
+    // overflows to its own appendix slide: Title + Summary&Comparison + Config = 3.
     // (mock returns null charts, so no per-scenario chart slides)
     expect(mockAddSlide.mock.calls.length).toBe(3);
+  });
+
+  it('merges config inline (2 slides) for a disaggregated scenario without charts', async () => {
+    const { exportPptx } = await import('../exportPptx');
+    // showStorage=false drops the storage rows, so sizing+config fit on one slide:
+    // Title + merged Summary&Comparison(+Config inline) = 2 slides.
+    await exportPptx(cluster, [scenario], [result], [breakdown], {}, false);
+    expect(mockAddSlide.mock.calls.length).toBe(2);
   });
 
   it('generates a table on the executive summary slide', async () => {
@@ -318,17 +328,21 @@ describe('exportPptx', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // MERGE-03: the As-Is vs To-Be Comparison header is present; no separate
-  // "Scenario Comparison" / "Sizing Parameters" slide titles.
+  // MERGE-03: slides 2 & 3 are merged into "Executive Summary & Comparison" with
+  // a "Configuration & Assumptions" appendix; no separate standalone titles.
   // ---------------------------------------------------------------------------
-  it('emits the As-Is vs To-Be Comparison header and no merged-away slide titles', async () => {
+  it('emits the merged executive + appendix headers and no merged-away slide titles', async () => {
     const { exportPptx } = await import('../exportPptx');
     await exportPptx(cluster, [scenario], [result], [breakdown], {});
     const textCalls = mockAddText.mock.calls as Array<[unknown, Record<string, unknown>]>;
     const headings = textCalls
       .map(([text]) => (typeof text === 'string' ? text : ''))
       .filter(Boolean);
-    expect(headings).toContain('As-Is vs To-Be Comparison');
+    expect(headings).toContain('Executive Summary & Comparison');
+    expect(headings).toContain('Configuration & Assumptions');
+    // The standalone summary / comparison slides no longer exist as their own slides.
+    expect(headings).not.toContain('Executive Summary');
+    expect(headings).not.toContain('As-Is vs To-Be Comparison');
     expect(headings).not.toContain('Scenario Comparison');
     expect(headings).not.toContain('Sizing Parameters');
   });
@@ -418,7 +432,7 @@ describe('exportPptx', () => {
     await exportPptx(cluster, [scenario], [result], [breakdown], {
       'capacity-a': { dataUrl: 'data:image/png;base64,AAA', width: 100, height: 50 },
     });
-    // Title + Summary + Comparison + 1 capacity chart slide = 4 slides
+    // HCI default: Title + Summary&Comparison + 1 capacity chart + Config appendix = 4 slides
     expect(mockAddSlide.mock.calls.length).toBe(4);
     const textCalls = mockAddText.mock.calls as Array<[unknown, Record<string, unknown>]>;
     const capacityTitles = textCalls.filter(

@@ -4,7 +4,7 @@
  */
 import type { SingleVmFit } from '../lib/sizing/singleVmFit';
 
-export type LimitingResource = 'cpu' | 'ram' | 'disk' | 'specint' | 'ghz';
+export type LimitingResource = 'cpu' | 'ram' | 'disk' | 'specint' | 'ghz' | 'vms';
 
 /**
  * The computed output from a sizing calculation for a given OldCluster + Scenario pair.
@@ -19,6 +19,8 @@ export interface ScenarioResult {
   readonly cpuLimitedCount: number;
   readonly ramLimitedCount: number;
   readonly diskLimitedCount: number;
+  /** Server count required by the VM-density cap (maxVmsPerHost). 0 when no cap is set. */
+  readonly vmsLimitedCount: number;
   readonly rawCount: number;
   /** Server count required by constraints alone, before HA margin */
   readonly requiredCount: number;

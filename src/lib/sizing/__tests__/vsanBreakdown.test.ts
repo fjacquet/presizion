@@ -77,6 +77,7 @@ function makeResult(overrides: Partial<ScenarioResult> = {}): ScenarioResult {
     cpuLimitedCount: 2,
     ramLimitedCount: 2,
     diskLimitedCount: 1,
+    vmsLimitedCount: 0,
     rawCount: 2,
     requiredCount: 2,
     finalCount: 4,
@@ -330,6 +331,7 @@ describe('computeVsanBreakdown', () => {
       cpuLimitedCount: 3,
       ramLimitedCount: 2,
       diskLimitedCount: 1,
+      vmsLimitedCount: 5,
       haReserveCount: 1,
       finalCount: 4,
       vmsPerServer: 25,
@@ -341,7 +343,44 @@ describe('computeVsanBreakdown', () => {
     expect(bd.minNodesByConstraint.memory).toBe(2);
     expect(bd.minNodesByConstraint.storage).toBe(1);
     expect(bd.minNodesByConstraint.ftha).toBe(1);
-    expect(bd.minNodesByConstraint.vms).toBe(4); // ceil(100 / 25)
+    // Real VM-density cap (vmsLimitedCount), NOT the old tautological ceil(totalVms / vmsPerServer)
+    expect(bd.minNodesByConstraint.vms).toBe(5);
+  });
+
+  it('reports vms min-node as 0 when no maxVmsPerHost cap is set (never spuriously binding)', () => {
+    const cluster = makeCluster();
+    const scenario = makeScenario();
+    const result = makeResult({ finalCount: 4, vmsLimitedCount: 0, vmsPerServer: 25 });
+
+    const bd = computeVsanBreakdown(cluster, scenario, result);
+
+    expect(bd.minNodesByConstraint.vms).toBe(0);
+  });
+
+  // ------------------------------------------------------------------
+  // CPU/RAM breakdown right-sizes on consumed (observed utilization),
+  // matching constraints.ts. Regression for the slide 3 vs slide 4 gap.
+  // ------------------------------------------------------------------
+  it('scales CPU and RAM required by observed utilization (right-size on consumed)', () => {
+    const scenario = makeScenario(); // no vSAN, growth 0 → required = vmsRequired
+    const result = makeResult({ finalCount: 4 });
+    const full = computeVsanBreakdown(
+      makeCluster({ cpuUtilizationPercent: 100, ramUtilizationPercent: 100 }),
+      scenario,
+      result,
+    );
+    const half = computeVsanBreakdown(
+      makeCluster({ cpuUtilizationPercent: 50, ramUtilizationPercent: 50 }),
+      scenario,
+      result,
+    );
+
+    // CPU: 200 vCPUs / 4 ratio × 2.5 GHz = 125 at 100% util, halved at 50%
+    expect(full.cpu.required).toBeCloseTo(125, 5);
+    expect(half.cpu.required).toBeCloseTo(62.5, 5);
+    // RAM: 100 VMs × 16 GiB = 1600 at 100% util, halved at 50%
+    expect(full.memory.required).toBeCloseTo(1600, 5);
+    expect(half.memory.required).toBeCloseTo(800, 5);
   });
 
   // ------------------------------------------------------------------

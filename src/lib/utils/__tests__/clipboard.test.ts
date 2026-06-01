@@ -43,6 +43,7 @@ const result: ScenarioResult = {
   cpuLimitedCount: 24,
   ramLimitedCount: 19,
   diskLimitedCount: 12,
+  vmsLimitedCount: 0,
   rawCount: 24,
   requiredCount: 24,
   finalCount: 24,

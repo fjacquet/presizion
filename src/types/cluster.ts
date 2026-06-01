@@ -49,6 +49,7 @@ export interface Scenario {
   readonly targetSpecint?: number; // SPECint benchmark score for target server (SPECint mode)
   readonly minServerCount?: number; // pin floor: finalCount is never less than this value
   readonly targetCpuFrequencyGhz?: number; // target server CPU clock frequency in GHz (GHz mode)
+  readonly maxVmsPerHost?: number; // VM-density cap per host — absent/0 = no cap; drives 'vms' constraint
 
   // --- vSAN settings (Phase 18; all optional — absent = legacy sizing path, VSAN-12) ---
   readonly vsanFttPolicy?: VsanFttPolicy; // VSAN-01 — triggers vSAN storage path when present

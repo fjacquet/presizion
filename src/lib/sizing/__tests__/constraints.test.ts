@@ -259,6 +259,30 @@ describe('computeScenarioResult', () => {
     });
   });
 
+  describe('CALC-VMS: max VMs per host (density cap)', () => {
+    it('no cap → vmsLimitedCount 0 and never limiting', () => {
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+      expect(result.vmsLimitedCount).toBe(0);
+      expect(result.limitingResource).toBe('cpu');
+    });
+    it('cap above CPU need → counted but not binding', () => {
+      // 100 VMs × demandFactor(1.2) / 10 = ceil(12) < cpuLimitedCount(20)
+      const s = { ...CPU_LIMITED_SCENARIO, maxVmsPerHost: 10 };
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, s);
+      expect(result.vmsLimitedCount).toBe(12);
+      expect(result.finalCount).toBe(20);
+      expect(result.limitingResource).toBe('cpu');
+    });
+    it('tight cap → vms becomes the limiting resource', () => {
+      // 100 VMs × demandFactor(1.2) / 5 = ceil(24) > cpuLimitedCount(20)
+      const s = { ...CPU_LIMITED_SCENARIO, maxVmsPerHost: 5 };
+      const result = computeScenarioResult(CPU_LIMITED_CLUSTER, s);
+      expect(result.vmsLimitedCount).toBe(24);
+      expect(result.finalCount).toBe(24);
+      expect(result.limitingResource).toBe('vms');
+    });
+  });
+
   describe('CALC-04: HA reserve', () => {
     it('haReserveCount=0: finalCount equals rawCount', () => {
       const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);

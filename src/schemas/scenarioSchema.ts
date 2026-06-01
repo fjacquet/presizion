@@ -65,6 +65,7 @@ export const scenarioSchema = z.object({
   targetSpecint: optionalPositiveNumber,
   minServerCount: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
   targetCpuFrequencyGhz: optionalPositiveNumber,
+  maxVmsPerHost: z.preprocess(numericPreprocess, z.number().int().positive().optional()),
 
   // vSAN settings (Phase 20 — all optional; absent = legacy sizing path per VSAN-12)
   vsanFttPolicy: z.preprocess(

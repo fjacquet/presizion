@@ -38,7 +38,9 @@
     "advanced": {
       "label": "Erweitert",
       "pinMinServers": "Mindestanzahl Server festlegen",
-      "minServerCountPlaceholder": "Mindestanzahl Server"
+      "minServerCountPlaceholder": "Mindestanzahl Server",
+      "maxVmsPerHost": "Max. VMs / Host",
+      "maxVmsPerHostPlaceholder": "Keine Begrenzung"
     },
     "tooltips": {
       "socketsPerServer": "Physische CPU-Sockel pro Zielserver. Prüfen Sie das Datenblatt des Anbieters.",
@@ -52,7 +54,8 @@
       "safetyPercent": "Betriebspuffer, damit der Cluster nie heiß läuft. 20% → dimensioniert für ca. 83% Auslastung unter aktueller Last.",
       "targetSpecint": "SPECrate2017_int_base-Ergebnis für den Zielserver. Unter spec.org/cpu2017/results/ → nach neuem Servermodell filtern. Standard: Dell R660 mit 2× Xeon Gold 6526Y (337).",
       "targetCpuFrequencyGhz": "CPU-Taktfrequenz des Zielservers in GHz. Wird mit der aktuellen Frequenz zur Berechnung des GHz-Bedarfsverhältnisses verwendet.",
-      "minServerCount": "Mindestgrenze festlegen: Die endgültige Serveranzahl wird unabhängig von der berechneten Größe niemals unter diesen Wert fallen."
+      "minServerCount": "Mindestgrenze festlegen: Die endgültige Serveranzahl wird unabhängig von der berechneten Größe niemals unter diesen Wert fallen.",
+      "maxVmsPerHost": "Optionale VM-Dichte-Obergrenze: Die endgültige Serveranzahl wird bei Bedarf erhöht, damit kein Host mehr VMs ausführt als dieser Wert. Leer lassen für keine Begrenzung."
     }
   },
   "results": {
@@ -67,7 +70,8 @@
       "ram": "RAM-begrenzt",
       "disk": "Disk-begrenzt",
       "specint": "SPECrate-begrenzt",
-      "ghz": "GHz-begrenzt"
+      "ghz": "GHz-begrenzt",
+      "vms": "VM-begrenzt"
     }
   },
   "singleVmFit": {

@@ -38,7 +38,9 @@
     "advanced": {
       "label": "Advanced",
       "pinMinServers": "Pin minimum servers",
-      "minServerCountPlaceholder": "Minimum server count"
+      "minServerCountPlaceholder": "Minimum server count",
+      "maxVmsPerHost": "Max VMs / host",
+      "maxVmsPerHostPlaceholder": "No cap"
     },
     "tooltips": {
       "socketsPerServer": "Physical CPU sockets per target server. Check the vendor spec sheet.",
@@ -52,7 +54,8 @@
       "safetyPercent": "Operational buffer so the cluster never runs hot. 20% → sized to run ~83% under current load.",
       "targetSpecint": "SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).",
       "targetCpuFrequencyGhz": "Target server CPU clock frequency in GHz. Used with current frequency to compute GHz demand ratio.",
-      "minServerCount": "Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing."
+      "minServerCount": "Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing.",
+      "maxVmsPerHost": "Optional VM-density cap: the final server count is raised if needed so no host runs more VMs than this. Leave empty for no cap."
     }
   },
   "results": {
@@ -67,7 +70,8 @@
       "ram": "RAM-limited",
       "disk": "Disk-limited",
       "specint": "SPECrate-limited",
-      "ghz": "GHz-limited"
+      "ghz": "GHz-limited",
+      "vms": "VM-limited"
     }
   },
   "singleVmFit": {
