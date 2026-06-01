@@ -56,7 +56,12 @@
     "ariaLabel": "Aus Datei importieren",
     "uploadAriaLabel": "Cluster-Exportdatei hochladen",
     "importing": "Importiere…",
-    "errorFallback": "Datei konnte nicht gelesen werden. Bitte Datei prüfen und erneut versuchen."
+    "errorFallback": "Datei konnte nicht gelesen werden. Bitte Datei prüfen und erneut versuchen.",
+    "dropzone": {
+      "instruction": "Cluster-Export hierher ziehen und ablegen",
+      "active": "Zum Importieren ablegen",
+      "hint": "oder zum Durchsuchen klicken · .xlsx, .csv, .zip, .json"
+    }
   },
   "importPreview": {
     "title": "Import-Vorschau",

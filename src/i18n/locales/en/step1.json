@@ -56,7 +56,12 @@
     "ariaLabel": "Import from file",
     "uploadAriaLabel": "Upload cluster export file",
     "importing": "Importing…",
-    "errorFallback": "Failed to read file. Please check the file and try again."
+    "errorFallback": "Failed to read file. Please check the file and try again.",
+    "dropzone": {
+      "instruction": "Drag & drop your cluster export here",
+      "active": "Drop to import",
+      "hint": "or click to browse · .xlsx, .csv, .zip, .json"
+    }
   },
   "importPreview": {
     "title": "Import Preview",

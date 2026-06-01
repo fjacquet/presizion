@@ -56,7 +56,12 @@
     "ariaLabel": "Importa da file",
     "uploadAriaLabel": "Carica file di esportazione del cluster",
     "importing": "Importazione…",
-    "errorFallback": "Impossibile leggere il file. Verificare il file e riprovare."
+    "errorFallback": "Impossibile leggere il file. Verificare il file e riprovare.",
+    "dropzone": {
+      "instruction": "Trascina qui l’export del cluster",
+      "active": "Rilascia per importare",
+      "hint": "o clicca per sfogliare · .xlsx, .csv, .zip, .json"
+    }
   },
   "importPreview": {
     "title": "Anteprima importazione",
