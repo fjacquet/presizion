@@ -47,5 +47,6 @@
   },
   "toast": {
     "exclusionsTrimmed": "Einige Ausschlussregeln wurden aufgrund der Größe aus der geteilten URL entfernt. Importieren Sie die Quelldatei erneut, um genaue Pro-VM-Auswahlen zu reproduzieren."
-  }
+  },
+  "infoAria": "Info: {{label}}"
 }

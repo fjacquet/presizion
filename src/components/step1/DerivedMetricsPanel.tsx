@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
+import { deriveClusterMetrics } from '@/lib/sizing/derivedMetrics';
 import { useClusterStore } from '@/store/useClusterStore';
 
 interface MetricItemProps {
@@ -33,21 +34,15 @@ export function DerivedMetricsPanel() {
   const cluster = useClusterStore((s) => s.currentCluster);
   const results = useScenariosResults();
 
-  const vcpuToPcoreRatio =
-    cluster.totalPcores > 0 ? (cluster.totalVcpus / cluster.totalPcores).toFixed(2) : '—';
-
+  const derived = deriveClusterMetrics(cluster);
   const firstResult = results[0];
+
+  const vcpuToPcoreRatio =
+    derived.vcpuToPcoreRatio != null ? derived.vcpuToPcoreRatio.toFixed(2) : '—';
   const vmsPerServer = firstResult ? firstResult.vmsPerServer.toFixed(1) : '—';
-
-  const avgVcpuPerVm =
-    cluster.totalVms > 0 ? (cluster.totalVcpus / cluster.totalVms).toFixed(1) : '—';
-
+  const avgVcpuPerVm = derived.avgVcpuPerVm != null ? derived.avgVcpuPerVm.toFixed(1) : '—';
   const avgRamPerVm = cluster.avgRamPerVmGb != null ? cluster.avgRamPerVmGb.toFixed(1) : '—';
-
-  const avgDiskPerVm =
-    cluster.totalDiskGb != null && cluster.totalVms > 0
-      ? (cluster.totalDiskGb / cluster.totalVms).toFixed(1)
-      : '—';
+  const avgDiskPerVm = derived.avgDiskPerVmGb != null ? derived.avgDiskPerVmGb.toFixed(1) : '—';
 
   return (
     <Card className="mt-6">

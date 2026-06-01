@@ -12,16 +12,10 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { useScenariosResults } from '@/hooks/useScenariosResults';
 import { useClusterStore } from '@/store/useClusterStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
-import type { SizingMode } from '@/store/useWizardStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import { ClusterTotalRows } from './ClusterTotalRows';
 import { NodeSizingRows } from './NodeSizingRows';
 import { UtilizationRows } from './UtilizationRows';
-
-const MODE_LABELS: Record<SizingMode, string> = {
-  vcpu: 'vCPU',
-  performance: 'Performance',
-};
 
 export function ComparisonTable() {
   const { t } = useTranslation('step3');
@@ -36,7 +30,7 @@ export function ComparisonTable() {
       {/* Metadata chips */}
       <div className="flex flex-wrap gap-2 text-sm">
         <span className="text-slate-500 dark:text-slate-400">{t('comparisonTable.modeLabel')}</span>
-        <Badge variant="outline">{MODE_LABELS[sizingMode]}</Badge>
+        <Badge variant="outline">{t(`wizard:sizingMode.${sizingMode}`)}</Badge>
         <span className="text-slate-500 dark:text-slate-400 ml-2">
           {t('comparisonTable.layoutLabel')}
         </span>

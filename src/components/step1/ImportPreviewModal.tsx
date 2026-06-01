@@ -27,13 +27,6 @@ interface ImportPreviewModalProps {
   onClose: () => void;
 }
 
-const FORMAT_LABELS: Record<AnyImportResult['sourceFormat'], string> = {
-  rvtools: 'RVTools',
-  'liveoptics-xlsx': 'LiveOptics (xlsx)',
-  'liveoptics-csv': 'LiveOptics (csv)',
-  'presizion-json': 'Presizion JSON export',
-};
-
 interface ScopeSelectorProps {
   detectedScopes: string[];
   scopeLabels: Record<string, string>;
@@ -225,7 +218,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
       <div className="space-y-1 text-sm">
         <p>
           <span className="font-medium">{t('importPreview.source')}:</span>{' '}
-          {FORMAT_LABELS[result.sourceFormat]}
+          {t(`importPreview.formats.${result.sourceFormat}`)}
         </p>
 
         {isJson ? (

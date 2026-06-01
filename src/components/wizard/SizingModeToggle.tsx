@@ -55,7 +55,7 @@ export function SizingModeToggle() {
               <TooltipTrigger>
                 <Info
                   className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
-                  aria-label={`Info: ${t('sizingMode.performance')}`}
+                  aria-label={t('infoAria', { label: t('sizingMode.performance') })}
                 />
               </TooltipTrigger>
               <TooltipContent>
@@ -107,7 +107,7 @@ export function SizingModeToggle() {
               <TooltipTrigger>
                 <Info
                   className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
-                  aria-label={`Info: ${t('stretch.label')}`}
+                  aria-label={t('infoAria', { label: t('stretch.label') })}
                 />
               </TooltipTrigger>
               <TooltipContent>

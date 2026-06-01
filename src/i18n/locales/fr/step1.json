@@ -89,7 +89,13 @@
     "nextButton": "Suivant",
     "backButton": "Retour",
     "applyButton": "Appliquer",
-    "noteLabel": "Remarque :"
+    "noteLabel": "Remarque :",
+    "formats": {
+      "rvtools": "RVTools",
+      "liveoptics-xlsx": "LiveOptics (xlsx)",
+      "liveoptics-csv": "LiveOptics (csv)",
+      "presizion-json": "Export JSON Presizion"
+    }
   },
   "scopeBadge": {
     "label": "Périmètre",

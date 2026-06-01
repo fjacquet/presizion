@@ -47,5 +47,6 @@
   },
   "toast": {
     "exclusionsTrimmed": "Some exclusion rules were trimmed from the shared URL due to size. Re-import the source file to reproduce exact per-VM selections."
-  }
+  },
+  "infoAria": "Info: {{label}}"
 }

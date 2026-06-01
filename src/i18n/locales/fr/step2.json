@@ -1,6 +1,6 @@
 {
   "title": "Étape 2 : Définir les scénarios cibles",
-  "subtitle": "Configurez un ou plusieurs specs de serveurs cibles et hypothèses de dimensionnement.",
+  "subtitle": "Configurez une ou plusieurs configurations de serveurs cibles et hypothèses de dimensionnement.",
   "addScenario": "Ajouter un scénario",
   "scenarioCard": {
     "namePlaceholder": "Nom du scénario",

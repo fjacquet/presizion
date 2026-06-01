@@ -13,11 +13,24 @@ import { useClusterStore } from '@/store/useClusterStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import { SizingModeToggle } from '../SizingModeToggle';
 
+// Capture the real store actions once so each test starts from the genuine
+// implementation — individual cases swap in vi.fn() spies, which would
+// otherwise leak across cases and make the suite order-dependent.
+const realSetSizingMode = useWizardStore.getState().setSizingMode;
+const realSetLayoutMode = useWizardStore.getState().setLayoutMode;
+const realSetCurrentCluster = useClusterStore.getState().setCurrentCluster;
+
 describe('SizingModeToggle', () => {
   beforeEach(() => {
-    useWizardStore.setState({ sizingMode: 'vcpu', layoutMode: 'hci' });
+    useWizardStore.setState({
+      sizingMode: 'vcpu',
+      layoutMode: 'hci',
+      setSizingMode: realSetSizingMode,
+      setLayoutMode: realSetLayoutMode,
+    });
     useClusterStore.setState({
       currentCluster: { ...useClusterStore.getState().currentCluster, isStretchCluster: false },
+      setCurrentCluster: realSetCurrentCluster,
     });
   });
 

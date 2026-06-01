@@ -89,7 +89,13 @@
     "nextButton": "Next",
     "backButton": "Back",
     "applyButton": "Apply",
-    "noteLabel": "Note:"
+    "noteLabel": "Note:",
+    "formats": {
+      "rvtools": "RVTools",
+      "liveoptics-xlsx": "LiveOptics (xlsx)",
+      "liveoptics-csv": "LiveOptics (csv)",
+      "presizion-json": "Presizion JSON export"
+    }
   },
   "scopeBadge": {
     "label": "Scope",

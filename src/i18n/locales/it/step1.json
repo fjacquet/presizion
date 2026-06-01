@@ -89,7 +89,13 @@
     "nextButton": "Avanti",
     "backButton": "Indietro",
     "applyButton": "Applica",
-    "noteLabel": "Nota:"
+    "noteLabel": "Nota:",
+    "formats": {
+      "rvtools": "RVTools",
+      "liveoptics-xlsx": "LiveOptics (xlsx)",
+      "liveoptics-csv": "LiveOptics (csv)",
+      "presizion-json": "Export JSON Presizion"
+    }
   },
   "scopeBadge": {
     "label": "Ambito",

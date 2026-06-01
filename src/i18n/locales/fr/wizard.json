@@ -47,5 +47,6 @@
   },
   "toast": {
     "exclusionsTrimmed": "Certaines règles d'exclusion ont été supprimées de l'URL partagée en raison de leur taille. Réimportez le fichier source pour reproduire exactement les sélections par VM."
-  }
+  },
+  "infoAria": "Infos : {{label}}"
 }
