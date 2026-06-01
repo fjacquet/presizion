@@ -6,10 +6,10 @@
  * Visual assertions target the Midnight Executive palette + Arial/Consolas fonts.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 import type { ResourceBreakdown, StorageBreakdown, VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
-import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 
 const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
   vcpu: 'unknown',

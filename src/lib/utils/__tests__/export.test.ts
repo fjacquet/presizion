@@ -3,10 +3,10 @@
  * Requirements: EXPO-02, EXPO-03
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 import type { ResourceBreakdown, StorageBreakdown, VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
-import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 import { buildCsvContent, buildJsonContent, csvEscape, downloadCsv, downloadJson } from '../export';
 
 const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
