@@ -69,6 +69,7 @@ export const useImportStore = create<ImportState>((set, get) => ({
       totalPcores: aggregate.totalPcores ?? 0,
       totalVms: aggregate.totalVms,
       ...(aggregate.totalDiskGb != null && { totalDiskGb: aggregate.totalDiskGb }),
+      ...(aggregate.totalRamGb != null && { totalRamGb: aggregate.totalRamGb }),
       ...(aggregate.existingServerCount != null && {
         existingServerCount: aggregate.existingServerCount,
       }),

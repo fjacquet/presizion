@@ -58,6 +58,12 @@ describe('rvtoolsParser', () => {
     expect(result.avgRamPerVmGb).toBe(12);
   });
 
+  it('computes totalRamGb as sum of memory_mib / 1024', async () => {
+    const result = await parseRvtools(new ArrayBuffer(0));
+    // (8192 + 16384) / 1024 = 24 (template excluded)
+    expect(result.totalRamGb).toBe(24);
+  });
+
   it('returns zero totalDiskGb when provisioned_mib column is absent', async () => {
     vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([
       { VM: 'web-01', CPUs: 4, Memory: 8192, Template: false },

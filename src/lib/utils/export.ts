@@ -169,6 +169,8 @@ function normaliseCluster(cluster: OldCluster): Record<string, string | number |
     totalPcores: cluster.totalPcores,
     totalVms: cluster.totalVms,
     totalDiskGb: cluster.totalDiskGb ?? null,
+    totalRamGb: cluster.totalRamGb ?? null,
+    avgRamPerVmGb: cluster.avgRamPerVmGb ?? null,
     socketsPerServer: cluster.socketsPerServer ?? null,
     coresPerSocket: cluster.coresPerSocket ?? null,
     ramPerServerGb: cluster.ramPerServerGb ?? null,

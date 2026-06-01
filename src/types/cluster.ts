@@ -9,6 +9,7 @@ export interface OldCluster {
   readonly totalPcores: number;
   readonly totalVms: number;
   readonly totalDiskGb?: number;
+  readonly totalRamGb?: number; // total provisioned RAM across all VMs (GiB) — mirrors totalDiskGb; seeds ramPerVmGb
   readonly socketsPerServer?: number;
   readonly coresPerSocket?: number;
   readonly ramPerServerGb?: number;

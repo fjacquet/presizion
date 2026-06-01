@@ -73,6 +73,11 @@ describe('liveopticParser', () => {
     expect(result.avgRamPerVmGb).toBe(12);
   });
 
+  it('computes totalRamGb as sum of Provisioned Memory (MiB) / 1024', async () => {
+    const result = await parseLiveoptics(new ArrayBuffer(0), 'liveoptics-xlsx');
+    expect(result.totalRamGb).toBe(24);
+  });
+
   describe('ESX Hosts sheet — cpuModel and cpuFrequencyGhz extraction', () => {
     it('extracts cpuModel from CPU Model column of first ESX host', async () => {
       const HOSTS_SHEET = {};

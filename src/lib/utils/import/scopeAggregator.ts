@@ -19,6 +19,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -34,6 +35,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -43,6 +45,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   let totalVcpus = 0;
   let totalVms = 0;
   let totalDiskGb = 0;
+  let totalRamGb = 0;
   let totalVmCount = 0;
   let weightedRamSum = 0;
   const allWarnings: string[] = [];
@@ -80,6 +83,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
     totalVcpus += scope.totalVcpus;
     totalVms += scope.totalVms;
     totalDiskGb += scope.totalDiskGb;
+    totalRamGb += scope.totalRamGb;
     totalVmCount += scope.vmCount;
     weightedRamSum += scope.avgRamPerVmGb * scope.vmCount;
     allWarnings.push(...scope.warnings);
@@ -185,6 +189,7 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
     totalVcpus,
     totalVms,
     totalDiskGb,
+    totalRamGb,
     avgRamPerVmGb,
     vmCount: totalVmCount,
     warnings: allWarnings,

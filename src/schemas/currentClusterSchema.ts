@@ -55,6 +55,7 @@ export const currentClusterSchema = z.object({
   totalPcores: requiredNonNegativeInt,
   totalVms: requiredNonNegativeInt,
   totalDiskGb: optionalNonNegativeNumber,
+  totalRamGb: optionalNonNegativeNumber,
   socketsPerServer: optionalNonNegativeNumber,
   coresPerSocket: optionalNonNegativeNumber,
   ramPerServerGb: optionalNonNegativeNumber,

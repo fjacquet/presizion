@@ -12,6 +12,7 @@ function makeScope(overrides: Partial<ScopeEntry> = {}): ScopeEntry {
     totalVcpus: 0,
     totalVms: 0,
     totalDiskGb: 0,
+    totalRamGb: 0,
     avgRamPerVmGb: 0,
     vmCount: 0,
     warnings: [],
@@ -45,6 +46,20 @@ describe('aggregateScopes', () => {
     ]);
     const result = aggregateScopes(map, ['CL-A', 'CL-B']);
     expect(result.totalDiskGb).toBe(300);
+  });
+
+  it('sums totalRamGb across two scopes', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['CL-A', makeScope({ totalRamGb: 256, vmCount: 2 })],
+      ['CL-B', makeScope({ totalRamGb: 512, vmCount: 3 })],
+    ]);
+    const result = aggregateScopes(map, ['CL-A', 'CL-B']);
+    expect(result.totalRamGb).toBe(768);
+  });
+
+  it('returns totalRamGb 0 for empty selection', () => {
+    const map = new Map<string, ScopeEntry>([['CL-A', makeScope({ totalRamGb: 256, vmCount: 2 })]]);
+    expect(aggregateScopes(map, []).totalRamGb).toBe(0);
   });
 
   it('computes avgRamPerVmGb as weighted average across scopes', () => {

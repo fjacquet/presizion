@@ -138,9 +138,19 @@ export function applyExclusions(
  */
 export function aggregateVmRows(
   rows: readonly VmRow[],
-): Pick<ScopeData, 'totalVcpus' | 'totalVms' | 'totalDiskGb' | 'avgRamPerVmGb' | 'vmCount'> {
+): Pick<
+  ScopeData,
+  'totalVcpus' | 'totalVms' | 'totalDiskGb' | 'totalRamGb' | 'avgRamPerVmGb' | 'vmCount'
+> {
   if (rows.length === 0) {
-    return { totalVcpus: 0, totalVms: 0, totalDiskGb: 0, avgRamPerVmGb: 0, vmCount: 0 };
+    return {
+      totalVcpus: 0,
+      totalVms: 0,
+      totalDiskGb: 0,
+      totalRamGb: 0,
+      avgRamPerVmGb: 0,
+      vmCount: 0,
+    };
   }
   let totalVcpus = 0;
   let totalMemMib = 0;
@@ -155,6 +165,7 @@ export function aggregateVmRows(
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
+    totalRamGb: Math.round((totalMemMib / 1024) * 10) / 10,
     avgRamPerVmGb: Math.round((totalMemMib / vmCount / 1024) * 10) / 10,
     vmCount,
   };

@@ -18,6 +18,7 @@ export interface ClusterImportResult {
   totalVcpus: number;
   totalVms: number;
   totalDiskGb: number;
+  totalRamGb: number;
   avgRamPerVmGb: number;
   sourceFormat: 'rvtools' | 'liveoptics-xlsx' | 'liveoptics-csv';
   vmCount: number;

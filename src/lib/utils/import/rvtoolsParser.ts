@@ -77,6 +77,7 @@ export async function parseRvtools(
       totalVcpus: 0,
       totalVms: 0,
       totalDiskGb: 0,
+      totalRamGb: 0,
       avgRamPerVmGb: 0,
       vmCount: 0,
       warnings: [],
@@ -173,6 +174,7 @@ export async function parseRvtools(
       totalVcpus: accum.totalVcpus,
       totalVms: accum.vmCount,
       totalDiskGb: Math.round((accum.totalDiskMib / 1024) * 10) / 10,
+      totalRamGb: Math.round((accum.totalMemMib / 1024) * 10) / 10,
       avgRamPerVmGb:
         accum.vmCount > 0 ? Math.round((accum.totalMemMib / accum.vmCount / 1024) * 10) / 10 : 0,
       vmCount: accum.vmCount,
@@ -186,6 +188,7 @@ export async function parseRvtools(
     totalVcpus,
     totalVms: vmCount,
     totalDiskGb: Math.round((totalDiskMib / 1024) * 10) / 10,
+    totalRamGb: Math.round((totalMemMib / 1024) * 10) / 10,
     avgRamPerVmGb: vmCount > 0 ? Math.round((totalMemMib / vmCount / 1024) * 10) / 10 : 0,
     vmCount,
     warnings,
