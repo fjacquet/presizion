@@ -5,6 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.12.0] -- 2026-06-01
+
+### Fixed
+
+- **The capacity breakdown now reconciles with the utilization metrics.** The CPU/RAM capacity breakdown (Step 3 charts, PDF, and PPTX) ignored observed utilization, while the sizing engine right-sizes on *consumed* capacity. The breakdown therefore overstated demand by exactly the observed-utilization factor — e.g. CPU showed ~99 % required with negative headroom while the comparison showed ~53 % utilized (a ~2× discrepancy). `computeVsanBreakdown` now applies the same observed CPU/RAM utilization factor as `computeScenarioResult`, so every view tells one consistent story.
+- **"Minimum nodes per constraint" no longer reports a phantom VM constraint.** The `vms` row was computed as `ceil(totalVms / vmsPerServer)`, which is identically equal to the final node count and so was *always* flagged as the binding constraint. It now reflects the real VM-density cap (below) and is `0` when unset.
+
+### Added
+
+- **Max VMs / host (VM-density cap).** Optional per-scenario advanced input. When set it participates as a genuine sizing constraint (`vms` limiting resource) and can raise the node count; left empty it imposes no cap. Localized en/fr/de/it.
+
+### Changed
+
+- **PPTX report restructured into fewer, denser slides.** The Executive Summary and the As-Is vs To-Be comparison are merged into one **Executive Summary & Comparison** slide (As-Is/To-Be-labeled KPIs + sizing-results table), with server configuration and sizing assumptions in a **Configuration & Assumptions** section. The config section renders inline beneath the sizing table when it fits, and overflows to its own appendix slide on denser (HCI / vSAN) layouts so nothing runs past the footer. KPI callouts are now explicitly labeled "To-Be".
+
+### Internal
+
+- Added `src/lib/utils/pptx/slides/_comparison.ts` (shared As-Is/To-Be comparison-table builders) and `configAppendixSlide.ts`; removed `comparisonSlide.ts`.
+
 ## [2.11.0] -- 2026-06-01
 
 ### Added

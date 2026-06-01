@@ -24,6 +24,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
     disk: t('nodeSizingRows.resourceDisk'),
     specint: t('nodeSizingRows.resourceSpecint'),
     ghz: t('nodeSizingRows.resourceGhz'),
+    vms: t('nodeSizingRows.resourceVms'),
   };
 
   return (

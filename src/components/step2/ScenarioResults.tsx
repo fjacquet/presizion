@@ -30,6 +30,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     disk: t('results.resourceLabels.disk'),
     specint: t('results.resourceLabels.specint'),
     ghz: t('results.resourceLabels.ghz'),
+    vms: t('results.resourceLabels.vms'),
   };
 
   const idx = scenarios.findIndex((s) => s.id === scenarioId);

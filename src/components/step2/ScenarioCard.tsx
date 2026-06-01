@@ -690,6 +690,55 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     )}
                   </div>
 
+                  {/* Max VMs per host (VM-density cap) */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor={`input-maxVmsPerHost-${scenarioId}`}
+                      className="flex items-center gap-1 text-sm"
+                    >
+                      {t('scenarioCard.advanced.maxVmsPerHost')}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Info className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs text-sm">
+                              {t('scenarioCard.tooltips.maxVmsPerHost')}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
+                    <FormField
+                      control={form.control}
+                      name="maxVmsPerHost"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              id={`input-maxVmsPerHost-${scenarioId}`}
+                              type="number"
+                              min={1}
+                              step={1}
+                              placeholder={t('scenarioCard.advanced.maxVmsPerHostPlaceholder')}
+                              data-testid={`input-maxVmsPerHost-${scenarioId}`}
+                              {...field}
+                              value={field.value ?? ''}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <VsanSection form={form} scenarioId={scenarioId} layoutMode={layoutMode} />
                 </div>
               )}

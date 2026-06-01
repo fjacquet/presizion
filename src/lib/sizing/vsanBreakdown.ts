@@ -95,7 +95,9 @@ export function computeVsanBreakdown(
     memory: result.ramLimitedCount,
     storage: result.diskLimitedCount,
     ftha: result.haReserveCount,
-    vms: result.vmsPerServer > 0 ? Math.ceil(effectiveVmCount / result.vmsPerServer) : 0,
+    // Real VM-density cap (maxVmsPerHost). 0 when no cap is set — never spuriously binding.
+    // (Previously a circular ceil(totalVms / vmsPerServer) that always equalled finalCount.)
+    vms: result.vmsLimitedCount,
   };
 
   return Object.freeze({
@@ -126,8 +128,12 @@ function computeCpuBreakdown(
 
   // Demand: in GHz mode, use vCPU * freq; in vCPU mode, normalize by ratio so required <= total
   const ratio = scenario.targetVcpuToPCoreRatio > 0 ? scenario.targetVcpuToPCoreRatio : 1;
-  // Effective pCores needed = vCPUs / ratio (what the sizing engine actually computes)
-  const effectivePcoresNeeded = (cluster.totalVcpus * cpuGrowthFactor) / ratio;
+  // Right-size on consumed: scale demand by observed CPU utilization, mirroring
+  // the sizing engine (constraints.ts cpuUtilizationPercent). Omitting this factor
+  // overstated demand and produced bogus negative CPU headroom.
+  const cpuUtilPct = cluster.cpuUtilizationPercent ?? 100;
+  // Effective pCores needed = consumed vCPUs / ratio (what the sizing engine computes)
+  const effectivePcoresNeeded = (cluster.totalVcpus * cpuGrowthFactor * (cpuUtilPct / 100)) / ratio;
   const vmsRequired = effectivePcoresNeeded * freqGhz;
 
   // Total configured GHz for the cluster
@@ -171,7 +177,7 @@ function computeCpuBreakdown(
 // =====================================================================
 
 function computeMemoryBreakdown(
-  _cluster: OldCluster,
+  cluster: OldCluster,
   scenario: Scenario,
   result: ScenarioResult,
   effectiveVmCount: number,
@@ -182,8 +188,11 @@ function computeMemoryBreakdown(
   // Target-util removed from the model; the safety buffer now provides headroom.
   const targetRamUtilPct = 100;
 
-  // Demand: VM count * RAM per VM * growth factor
-  const vmsRequired = effectiveVmCount * scenario.ramPerVmGb * memGrowthFactor;
+  // Right-size on consumed: scale demand by observed RAM utilization, mirroring
+  // the sizing engine (constraints.ts ramUtilizationPercent).
+  const ramUtilPct = cluster.ramUtilizationPercent ?? 100;
+  // Demand: VM count * RAM per VM * growth factor * observed utilization
+  const vmsRequired = effectiveVmCount * scenario.ramPerVmGb * memGrowthFactor * (ramUtilPct / 100);
 
   // vSAN memory overhead: per-host memory reservation
   const vsanMemPerHost = scenario.vsanMemoryPerHostGb ?? VSAN_DEFAULT_MEMORY_PER_HOST_GB;

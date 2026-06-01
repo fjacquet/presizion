@@ -38,6 +38,7 @@
     "resourceDisk": "Festplatten-begrenzt",
     "resourceSpecint": "SPECrate2017",
     "resourceGhz": "GHz-begrenzt",
+    "resourceVms": "VM-begrenzt",
     "cpuBarPerformance": "Leistungs-begrenzt",
     "cpuBarVcpu": "CPU-begrenzt"
   },

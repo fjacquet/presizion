@@ -3,6 +3,8 @@
   "slide": {
     "title": "Report di dimensionamento del cluster",
     "executiveSummary": "Sommario Esecutivo",
+    "execSummaryComparison": "Sommario Esecutivo e Confronto",
+    "configAppendix": "Configurazione e Ipotesi",
     "comparison": "Confronto Stato Attuale vs Obiettivo",
     "capacityBreakdown": "Distribuzione della capacità — {{name}}",
     "minNodes": "Nodi minimi per vincolo — {{name}}"
@@ -11,7 +13,9 @@
     "asIsServers": "Server Attuali",
     "targetServers": "Server {{name}}",
     "cpuUtilization": "Utilizzo CPU",
-    "ramUtilization": "Utilizzo RAM"
+    "ramUtilization": "Utilizzo RAM",
+    "cpuUtilizationToBe": "Utilizzo CPU Obiettivo",
+    "ramUtilizationToBe": "Utilizzo RAM Obiettivo"
   },
   "summary": {
     "colScenario": "Scenario",
@@ -37,6 +41,7 @@
     "rowDiskPerServer": "Disco / Server (GB)",
     "rowSafetyPct": "Sicurezza %",
     "rowHaReserve": "Riserva HA",
+    "rowMaxVmsPerHost": "VM max / Host",
     "rowAvgVcpuPerVm": "Media vCPU/VM",
     "rowAvgRamPerVm": "Media RAM/VM (GiB)",
     "rowAvgDiskPerVm": "Media Disco/VM (GiB)",

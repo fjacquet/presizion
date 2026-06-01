@@ -3,6 +3,8 @@
   "slide": {
     "title": "Cluster Sizing Report",
     "executiveSummary": "Executive Summary",
+    "execSummaryComparison": "Executive Summary & Comparison",
+    "configAppendix": "Configuration & Assumptions",
     "comparison": "As-Is vs To-Be Comparison",
     "capacityBreakdown": "Capacity Breakdown — {{name}}",
     "minNodes": "Minimum Nodes per Constraint — {{name}}"
@@ -11,7 +13,9 @@
     "asIsServers": "As-Is Servers",
     "targetServers": "{{name}} Servers",
     "cpuUtilization": "CPU Utilization",
-    "ramUtilization": "RAM Utilization"
+    "ramUtilization": "RAM Utilization",
+    "cpuUtilizationToBe": "To-Be CPU Utilization",
+    "ramUtilizationToBe": "To-Be RAM Utilization"
   },
   "summary": {
     "colScenario": "Scenario",
@@ -37,6 +41,7 @@
     "rowDiskPerServer": "Disk / Server (GB)",
     "rowSafetyPct": "Safety %",
     "rowHaReserve": "HA Reserve",
+    "rowMaxVmsPerHost": "Max VMs / Host",
     "rowAvgVcpuPerVm": "Avg vCPU/VM",
     "rowAvgRamPerVm": "Avg RAM/VM (GiB)",
     "rowAvgDiskPerVm": "Avg Disk/VM (GiB)",
