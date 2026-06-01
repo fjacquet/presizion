@@ -88,7 +88,8 @@
     "cancelButton": "Abbrechen",
     "nextButton": "Weiter",
     "backButton": "Zurück",
-    "applyButton": "Anwenden"
+    "applyButton": "Anwenden",
+    "noteLabel": "Hinweis:"
   },
   "scopeBadge": {
     "label": "Umfang",

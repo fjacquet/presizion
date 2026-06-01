@@ -88,7 +88,8 @@
     "cancelButton": "Annuler",
     "nextButton": "Suivant",
     "backButton": "Retour",
-    "applyButton": "Appliquer"
+    "applyButton": "Appliquer",
+    "noteLabel": "Remarque :"
   },
   "scopeBadge": {
     "label": "Périmètre",

@@ -88,7 +88,8 @@
     "cancelButton": "Annulla",
     "nextButton": "Avanti",
     "backButton": "Indietro",
-    "applyButton": "Applica"
+    "applyButton": "Applica",
+    "noteLabel": "Nota:"
   },
   "scopeBadge": {
     "label": "Ambito",

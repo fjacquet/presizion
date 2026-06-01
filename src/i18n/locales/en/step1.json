@@ -88,7 +88,8 @@
     "cancelButton": "Cancel",
     "nextButton": "Next",
     "backButton": "Back",
-    "applyButton": "Apply"
+    "applyButton": "Apply",
+    "noteLabel": "Note:"
   },
   "scopeBadge": {
     "label": "Scope",

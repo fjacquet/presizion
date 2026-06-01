@@ -20,10 +20,18 @@ describe('locale number formatting', () => {
     );
   });
 
-  it('falls back to en-CH locale for an unknown language', async () => {
-    await i18n.changeLanguage('en');
-    expect(formatInt(1000)).toBe(
-      new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(1000),
-    );
+  it('falls back to en-CH locale for an unmapped language tag', async () => {
+    // supportedLngs blocks changeLanguage from accepting an unknown code, so set
+    // the language directly to an unmapped tag to exercise activeLocale()'s
+    // `LOCALE_MAP[lng] ?? LOCALE_MAP[FALLBACK_LNG]` fallback branch.
+    const original = i18n.language;
+    (i18n as unknown as { language: string }).language = 'zz';
+    try {
+      expect(formatInt(1000)).toBe(
+        new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(1000),
+      );
+    } finally {
+      (i18n as unknown as { language: string }).language = original;
+    }
   });
 });

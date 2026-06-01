@@ -334,7 +334,7 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
 
       {!isJson && !pcoresKnown && (
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          <strong>Note:</strong> {t('importPreview.noPcoresNote')}
+          <strong>{t('importPreview.noteLabel')}</strong> {t('importPreview.noPcoresNote')}
         </p>
       )}
     </>

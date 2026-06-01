@@ -90,6 +90,10 @@ i18n
     supportedLngs: [...SUPPORTED_LANGUAGES],
     ns: [...NAMESPACES],
     defaultNS: DEFAULT_NS,
+    // Resources are bundled (no async backend), so initialize synchronously.
+    // i18next v26 defaults initAsync:true, which would defer init past the boot
+    // toast's i18n.t() in main.tsx and return raw keys.
+    initAsync: false,
     detection: {
       order: ['querystring', 'localStorage', 'navigator'],
       lookupQuerystring: 'lang',
