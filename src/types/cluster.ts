@@ -20,6 +20,8 @@ export interface OldCluster {
   readonly cpuFrequencyGhz?: number; // avg CPU clock frequency in GHz — required for GHz sizing mode
   readonly cpuModel?: string; // display-only CPU model string extracted from import (e.g. "Xeon Gold 6526Y")
   readonly isStretchCluster?: boolean; // stretched topology — each site must carry the full workload on failure
+  readonly largestVmVcpus?: number; // largest single VM by vCPU (import only) — single-VM fit check
+  readonly largestVmRamGb?: number; // largest single VM by RAM in GiB (import only) — single-VM fit check
 }
 
 /**

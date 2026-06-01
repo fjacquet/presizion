@@ -145,6 +145,12 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         }),
         ...(previewCluster.isStretchCluster === true &&
           stretchConfirmed && { isStretchCluster: true }),
+        ...(previewCluster.largestVmVcpus != null && {
+          largestVmVcpus: previewCluster.largestVmVcpus,
+        }),
+        ...(previewCluster.largestVmRamMib != null && {
+          largestVmRamGb: Math.round((previewCluster.largestVmRamMib / 1024) * 10) / 10,
+        }),
       };
       setCurrentCluster(cluster);
       seedFromCluster(cluster);

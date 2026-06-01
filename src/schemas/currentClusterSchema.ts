@@ -64,6 +64,8 @@ export const currentClusterSchema = z.object({
   ramUtilizationPercent: optionalPercent,
   cpuFrequencyGhz: optionalPositiveNumber,
   isStretchCluster: z.boolean().optional(),
+  largestVmVcpus: optionalNonNegativeNumber,
+  largestVmRamGb: optionalNonNegativeNumber,
 });
 
 export type CurrentClusterInput = z.infer<typeof currentClusterSchema>;
