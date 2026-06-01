@@ -67,6 +67,7 @@
     "title": "Import Preview",
     "description": "Review the extracted data before populating the form.",
     "filterByCluster": "Filter by cluster",
+    "largestVm": "Largest VM: {{vcpu}} vCPU / {{ram}} GiB",
     "stretchDetected": "Stretch cluster detected",
     "stretchSizingNote": "Sizing will double the server count for site symmetry.",
     "confirmStretchAriaLabel": "Confirm stretch cluster topology",

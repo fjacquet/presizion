@@ -70,6 +70,14 @@
       "ghz": "Limitato da GHz"
     }
   },
+  "singleVmFit": {
+    "titleWarn": "La VM più grande entra a malapena",
+    "titleFail": "La VM più grande non entra in un host",
+    "vcpuWarn": "La VM più grande ({{vcpu}} vCPU) supera i {{cores}} core fisici di questo host — si baserebbe su SMT / si estenderebbe su più nodi NUMA ({{logical}} CPU logiche).",
+    "vcpuFail": "La VM più grande ({{vcpu}} vCPU) supera le {{logical}} CPU logiche di questo host — non può funzionare su un singolo host.",
+    "ramWarn": "La VM più grande richiede {{ram}} GiB di RAM; l'host offre {{usable}} GiB utilizzabili (su {{nameplate}} GiB) — entra nella capacità nominale ma non dopo l'overhead.",
+    "ramFail": "La VM più grande richiede {{ram}} GiB di RAM; l'host offre solo {{nameplate}} GiB — non può funzionare su un singolo host."
+  },
   "vsan": {
     "heading": "Impostazioni vSAN",
     "fttPolicy": "Policy FTT",

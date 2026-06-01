@@ -70,6 +70,14 @@
       "ghz": "GHz-limited"
     }
   },
+  "singleVmFit": {
+    "titleWarn": "Largest VM is a tight fit",
+    "titleFail": "Largest VM does not fit one host",
+    "vcpuWarn": "Largest VM ({{vcpu}} vCPU) exceeds this host's {{cores}} physical cores — it would rely on SMT / span NUMA nodes ({{logical}} logical CPUs).",
+    "vcpuFail": "Largest VM ({{vcpu}} vCPU) exceeds this host's {{logical}} logical CPUs — it cannot run on a single host.",
+    "ramWarn": "Largest VM needs {{ram}} GiB RAM; host offers {{usable}} GiB usable (of {{nameplate}} GiB) — fits nameplate but not after overhead.",
+    "ramFail": "Largest VM needs {{ram}} GiB RAM; host offers only {{nameplate}} GiB — it cannot run on a single host."
+  },
   "vsan": {
     "heading": "vSAN Settings",
     "fttPolicy": "FTT Policy",
