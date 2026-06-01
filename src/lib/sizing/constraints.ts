@@ -188,21 +188,22 @@ export function computeScenarioResult(
   // CALC-05: Raw count is the maximum of all active constraints
   const rawCount = Math.max(cpuLimitedCount, ramLimitedCount, diskLimitedCount);
 
-  // CALC-STRETCH: stretched topology — each site must carry the full workload,
-  // so the raw count is doubled for site symmetry. Stretch provides site-level
-  // fault tolerance; any explicit haReserveCount set by the user adds on top
-  // (belt-and-suspenders) but is not implied.
+  // CALC-STRETCH + CALC-04: stretched topology — each site carries the full
+  // workload, so the workload is doubled for site symmetry (stretchPairedCount).
+  // The HA reserve is a PER-SITE intent ("N+1 local"): in a stretch cluster it
+  // applies to each site independently, so it is doubled along with the workload
+  // (N+1 local → +2 total). Non-stretch clusters add the reserve once.
   const stretchApplied = cluster.isStretchCluster === true;
-  let effectiveRaw = rawCount;
-  let stretchPairedCount: number | undefined;
-  if (stretchApplied) {
-    effectiveRaw = rawCount * 2;
-    stretchPairedCount = effectiveRaw;
-  }
-
-  // CALC-04: HA reserve — add 0, 1, or 2 servers after the constraint max
   const haReserveCount = scenario.haReserveCount ?? 0;
-  const withHA = effectiveRaw + haReserveCount;
+
+  let stretchPairedCount: number | undefined;
+  let withHA: number;
+  if (stretchApplied) {
+    stretchPairedCount = rawCount * 2; // doubled workload (reserve-independent)
+    withHA = (rawCount + haReserveCount) * 2; // one spare host per site
+  } else {
+    withHA = rawCount + haReserveCount;
+  }
 
   // Pin floor: finalCount is never less than minServerCount when set
   const finalCount =

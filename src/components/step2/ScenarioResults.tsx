@@ -49,9 +49,6 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
     growthPercent: scenario.growthPercent,
     targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
     coresPerServer,
-    ...(currentCluster.cpuUtilizationPercent !== undefined && {
-      cpuUtilizationPercent: currentCluster.cpuUtilizationPercent,
-    }),
   });
 
   const effectiveVmCount = currentCluster.totalVms;

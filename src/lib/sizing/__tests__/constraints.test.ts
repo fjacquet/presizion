@@ -740,12 +740,13 @@ describe('computeScenarioResult — stretch cluster', () => {
     expect(result.requiredCount).toBe(24);
   });
 
-  it('stretch + haReserveCount=1 adds the reserve on top of the paired count', () => {
+  it('stretch + haReserveCount=1 applies the reserve per-site (doubled): (rawCount + 1) × 2', () => {
     const stretchedCluster = { ...CPU_LIMITED_CLUSTER, isStretchCluster: true };
     const stretchedScenario = { ...CPU_LIMITED_SCENARIO, haReserveCount: 1 as const };
     const result = computeScenarioResult(stretchedCluster, stretchedScenario);
-    expect(result.stretchPairedCount).toBe(48);
-    expect(result.finalCount).toBe(49);
+    // workload doubling is reserve-independent; reserve is one spare host per site
+    expect(result.stretchPairedCount).toBe(48); // rawCount(24) × 2
+    expect(result.finalCount).toBe(50); // (24 + 1) × 2
     expect(result.haReserveApplied).toBe(true);
   });
 

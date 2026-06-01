@@ -16,7 +16,6 @@ export interface CpuFormulaParams {
   readonly safetyPercent: number;
   readonly targetVcpuToPCoreRatio: number;
   readonly coresPerServer: number;
-  readonly cpuUtilizationPercent?: number;
   readonly growthPercent?: number;
 }
 
@@ -46,28 +45,21 @@ export interface SpecintFormulaParams {
 
 /**
  * Returns a human-readable formula string for the CPU-limited server count (CALC-01).
- * When cpuUtilizationPercent is provided and not 100, includes utilization factor.
  *
- * Format without utilization: ceil(totalVcpus × headroom% / ratio / coresPerServer)
- * Format with utilization:    ceil(totalVcpus × utilPct% × headroom% / ratio / coresPerServer)
+ * vCPU sizing is a pure assignment-density cap: the count never depends on observed
+ * CPU utilization (a parked VM still consumes its vCPU assignment). Utilization is
+ * therefore NOT rendered here — doing so previously produced a formula string that
+ * evaluated to a different number than the count shown beside it. Observed CPU % is
+ * surfaced separately as a result output metric (CALC-06), not inside this formula.
  *
- * Example (no util): "ceil(2000 × 120% / 4 / 48)"
- * Example (with util): "ceil(2000 × 70% × 120% / 4 / 48)"
+ * Format: ceil(totalVcpus × headroom% [× +growth% growth] / ratio / coresPerServer)
+ * Example: "ceil(2000 × 120% / 4 / 48)"
  */
 export function cpuFormulaString(params: CpuFormulaParams): string {
-  const {
-    totalVcpus,
-    safetyPercent,
-    targetVcpuToPCoreRatio,
-    coresPerServer,
-    cpuUtilizationPercent,
-    growthPercent,
-  } = params;
+  const { totalVcpus, safetyPercent, targetVcpuToPCoreRatio, coresPerServer, growthPercent } =
+    params;
   const headroomDisplay = `${100 + safetyPercent}%`;
   const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : '';
-  if (cpuUtilizationPercent !== undefined && cpuUtilizationPercent !== 100) {
-    return `ceil(${totalVcpus} × ${cpuUtilizationPercent}% × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
-  }
   return `ceil(${totalVcpus} × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
 }
 
