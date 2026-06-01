@@ -13,7 +13,8 @@ import { useScenariosResults } from '../useScenariosResults';
 // totalVcpus=3200, totalVms=100, totalPcores=800
 // sockets=2, coresPerSocket=20 (40 pCores/server), ram=1024GB/server, disk=50000GB/server
 // ratio=4, ramPerVm=2GB, diskPerVm=10GB, headroom=20%, haReserve=false
-// Expected: finalCount=24, limitingResource='cpu'
+// vCPU mode: CPU uses growth only (safety excluded — the ratio is the CPU headroom).
+// Expected: finalCount=ceil(3200×1.00/4/40)=20, limitingResource='cpu'
 const CPU_LIMITED_CLUSTER = { totalVcpus: 3200, totalVms: 100, totalPcores: 800 };
 const CPU_LIMITED_SCENARIO = {
   id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
@@ -73,14 +74,14 @@ describe('useScenariosResults', () => {
     expect(result.current[0]).toEqual(expected);
   });
 
-  it('result returns finalCount=24 for CPU-limited fixture', () => {
+  it('result returns finalCount=20 for CPU-limited fixture', () => {
     act(() => {
       useClusterStore.setState({ currentCluster: CPU_LIMITED_CLUSTER });
       useScenariosStore.setState({ scenarios: [CPU_LIMITED_SCENARIO] });
     });
 
     const { result } = renderHook(() => useScenariosResults());
-    expect(result.current[0]?.finalCount).toBe(24);
+    expect(result.current[0]?.finalCount).toBe(20);
   });
 
   it('result updates when cluster store changes', () => {
@@ -97,7 +98,7 @@ describe('useScenariosResults', () => {
     });
 
     expect(result.current[0]?.finalCount).not.toBe(initialCount);
-    expect(result.current[0]?.finalCount).toBe(24);
+    expect(result.current[0]?.finalCount).toBe(20);
   });
 
   it('result updates when scenarios store changes', () => {

@@ -86,8 +86,13 @@ export function computeScenarioResult(
   sizingMode: SizingMode = 'vcpu',
   layoutMode: LayoutMode = 'hci',
 ): ScenarioResult {
-  const demandFactor =
-    (1 + (scenario.growthPercent ?? 0) / 100) * (1 + (scenario.safetyPercent ?? 0) / 100);
+  const growthFactor = 1 + (scenario.growthPercent ?? 0) / 100;
+  const safetyFactor = 1 + (scenario.safetyPercent ?? 0) / 100;
+  const demandFactor = growthFactor * safetyFactor;
+  // In vCPU mode the vCPU:pCore ratio is itself the CPU headroom, so the safety
+  // buffer must not also inflate the CPU count — CPU scales with growth only.
+  // RAM/disk (and CPU in performance mode) keep the full growth×safety factor.
+  const cpuDemandFactor = sizingMode === 'vcpu' ? growthFactor : demandFactor;
   const coresPerServer = scenario.socketsPerServer * scenario.coresPerSocket;
 
   const effectiveVmCount = cluster.totalVms;
@@ -127,10 +132,11 @@ export function computeScenarioResult(
       );
     }
   } else {
-    // 'vcpu': ratio is a hard assignment-density cap; cpuUtilPct not used here
+    // 'vcpu': ratio is a hard assignment-density cap; cpuUtilPct not used here.
+    // cpuDemandFactor excludes the safety buffer (headroom comes from the ratio).
     cpuLimitedCount = serverCountByCpu(
       effectiveVcpus,
-      demandFactor,
+      cpuDemandFactor,
       scenario.targetVcpuToPCoreRatio,
       coresPerServer,
     );

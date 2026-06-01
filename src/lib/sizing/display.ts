@@ -17,6 +17,8 @@ export interface CpuFormulaParams {
   readonly targetVcpuToPCoreRatio: number;
   readonly coresPerServer: number;
   readonly growthPercent?: number;
+  /** vCPU mode excludes the safety buffer from CPU (headroom is the ratio). Default true. */
+  readonly applySafety?: boolean;
 }
 
 export interface RamFormulaParams {
@@ -56,11 +58,18 @@ export interface SpecintFormulaParams {
  * Example: "ceil(2000 × 120% / 4 / 48)"
  */
 export function cpuFormulaString(params: CpuFormulaParams): string {
-  const { totalVcpus, safetyPercent, targetVcpuToPCoreRatio, coresPerServer, growthPercent } =
-    params;
-  const headroomDisplay = `${100 + safetyPercent}%`;
+  const {
+    totalVcpus,
+    safetyPercent,
+    targetVcpuToPCoreRatio,
+    coresPerServer,
+    growthPercent,
+    applySafety = true,
+  } = params;
   const growthSuffix = (growthPercent ?? 0) !== 0 ? ` × +${growthPercent}% growth` : '';
-  return `ceil(${totalVcpus} × ${headroomDisplay}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
+  // vCPU mode: no safety multiplier — the vCPU:pCore ratio is the CPU headroom.
+  const headroomPrefix = applySafety ? ` × ${100 + safetyPercent}%` : '';
+  return `ceil(${totalVcpus}${headroomPrefix}${growthSuffix} / ${targetVcpuToPCoreRatio} / ${coresPerServer})`;
 }
 
 /**
