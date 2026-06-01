@@ -3,10 +3,20 @@
  * Requirements: EXPO-02, EXPO-03
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 import type { ResourceBreakdown, StorageBreakdown, VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
 import { buildCsvContent, buildJsonContent, csvEscape, downloadCsv, downloadJson } from '../export';
+
+const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
+  vcpu: 'unknown',
+  ram: 'unknown',
+  overall: 'unknown',
+  coresPerServer: 0,
+  logicalCpus: 0,
+  usableRamGb: 0,
+};
 
 const cluster: OldCluster = {
   totalVcpus: 2000,
@@ -45,6 +55,7 @@ const result: ScenarioResult = {
   ramUtilizationPercent: 60.0,
   diskUtilizationPercent: 35.0,
   stretchApplied: false,
+  singleVmFit: UNKNOWN_SINGLE_VM_FIT,
 };
 
 const resourceBd: ResourceBreakdown = {

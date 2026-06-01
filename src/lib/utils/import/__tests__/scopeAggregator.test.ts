@@ -284,4 +284,64 @@ describe('aggregateScopes', () => {
     const result = aggregateScopes(map, ['CL-A', 'CL-B']);
     expect(result.isStretchCluster).toBeUndefined();
   });
+
+  it('takes the MAX largest-VM vCPU and RAM across selected scopes (not the sum)', () => {
+    const map = new Map<string, ScopeEntry>([
+      [
+        'A',
+        makeScope({
+          totalVcpus: 10,
+          totalVms: 5,
+          avgRamPerVmGb: 4,
+          vmCount: 5,
+          largestVmVcpus: 16,
+          largestVmRamMib: 32768,
+        }),
+      ],
+      [
+        'B',
+        makeScope({
+          totalVcpus: 10,
+          totalVms: 5,
+          avgRamPerVmGb: 4,
+          vmCount: 5,
+          largestVmVcpus: 48,
+          largestVmRamMib: 16384,
+        }),
+      ],
+    ]);
+    const agg = aggregateScopes(map, ['A', 'B']);
+    expect(agg.largestVmVcpus).toBe(48); // max, not 64
+    expect(agg.largestVmRamMib).toBe(32768); // max, not 49152
+  });
+
+  it('omits largest-VM fields when no selected scope has them', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['A', makeScope({ totalVcpus: 10, totalVms: 5, avgRamPerVmGb: 4, vmCount: 5 })],
+    ]);
+    const agg = aggregateScopes(map, ['A']);
+    expect(agg.largestVmVcpus).toBeUndefined();
+    expect(agg.largestVmRamMib).toBeUndefined();
+  });
+
+  it('uses the largest-VM values from the only scope that has them (mixed presence)', () => {
+    const map = new Map<string, ScopeEntry>([
+      ['A', makeScope({ totalVcpus: 10, totalVms: 5, avgRamPerVmGb: 4, vmCount: 5 })],
+      [
+        'B',
+        makeScope({
+          totalVcpus: 10,
+          totalVms: 5,
+          avgRamPerVmGb: 4,
+          vmCount: 5,
+          largestVmVcpus: 24,
+          largestVmRamMib: 8192,
+        }),
+      ],
+    ]);
+    const agg = aggregateScopes(map, ['A', 'B']);
+    // Scope A lacks the fields and must be skipped (not treated as 0-and-winning).
+    expect(agg.largestVmVcpus).toBe(24);
+    expect(agg.largestVmRamMib).toBe(8192);
+  });
 });

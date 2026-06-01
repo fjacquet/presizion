@@ -66,6 +66,18 @@ describe('currentClusterSchema', () => {
       currentClusterSchema.parse({ totalVcpus: -1, totalPcores: 50, totalVms: 20 }),
     ).toThrow();
   });
+
+  it('parses and preserves largestVmVcpus and largestVmRamGb', () => {
+    const result = currentClusterSchema.parse({
+      totalVcpus: 100,
+      totalPcores: 50,
+      totalVms: 20,
+      largestVmVcpus: 48,
+      largestVmRamGb: 512,
+    });
+    expect(result.largestVmVcpus).toBe(48);
+    expect(result.largestVmRamGb).toBe(512);
+  });
 });
 
 // Valid RFC 4122 v4 UUID for test fixtures

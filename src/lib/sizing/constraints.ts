@@ -7,6 +7,7 @@ import {
   serverCountByRam,
   serverCountBySpecint,
 } from './formulas';
+import { assessSingleVmFit } from './singleVmFit';
 import { VSAN_DEFAULT_SLACK_PERCENT } from './vsanConstants';
 import {
   computeVsanEffectiveGhzPerNode,
@@ -254,6 +255,7 @@ export function computeScenarioResult(
     ramUtilizationPercent,
     diskUtilizationPercent,
     stretchApplied,
+    singleVmFit: assessSingleVmFit(cluster, scenario),
     ...(stretchPairedCount !== undefined && { stretchPairedCount }),
   });
 }

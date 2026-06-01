@@ -2,6 +2,8 @@
  * The resource type that drove the final server count.
  * Whichever constraint produces the highest server count is the limiting resource.
  */
+import type { SingleVmFit } from '../lib/sizing/singleVmFit';
+
 export type LimitingResource = 'cpu' | 'ram' | 'disk' | 'specint' | 'ghz';
 
 /**
@@ -35,4 +37,6 @@ export interface ScenarioResult {
   readonly stretchApplied: boolean;
   /** Server count after stretch doubling + even-rounding, before HA reserve. Undefined when not applied. */
   readonly stretchPairedCount?: number;
+  /** Non-blocking single-VM feasibility verdict (largest VM vs one host). */
+  readonly singleVmFit: SingleVmFit;
 }

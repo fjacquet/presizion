@@ -60,6 +60,8 @@ export function parsePresizionJson(buffer: ArrayBuffer): JsonImportResult {
       ramUtilizationPercent: num(c.ramUtilizationPercent, 'ramUtilizationPercent'),
     }),
     ...(typeof c.isStretchCluster === 'boolean' && { isStretchCluster: c.isStretchCluster }),
+    ...(c.largestVmVcpus != null && { largestVmVcpus: num(c.largestVmVcpus, 'largestVmVcpus') }),
+    ...(c.largestVmRamGb != null && { largestVmRamGb: num(c.largestVmRamGb, 'largestVmRamGb') }),
   };
 
   if (!Array.isArray(scenarios)) {

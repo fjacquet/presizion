@@ -32,6 +32,10 @@ export interface ClusterImportResult {
   ramUtilizationPercent?: number;
   cpuFrequencyGhz?: number; // avg CPU clock frequency in GHz (from vHost / ESX Hosts)
   cpuModel?: string; // display-only CPU model string from first host
+  /** Largest single VM by vCPU count across this scope's VM rows (import only). */
+  largestVmVcpus?: number;
+  /** Largest single VM by RAM in MiB across this scope's VM rows (import only). */
+  largestVmRamMib?: number;
   // Topology detection (Phase: stretch cluster)
   isStretchCluster?: boolean; // detected stretched-cluster topology (vSAN sheet or heuristics)
   stretchSignals?: string[]; // human-readable reasons feeding the preview tooltip

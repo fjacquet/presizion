@@ -6,9 +6,19 @@
  * Visual assertions target the Midnight Executive palette + Arial/Consolas fonts.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SingleVmFit } from '@/lib/sizing/singleVmFit';
 import type { ResourceBreakdown, StorageBreakdown, VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ScenarioResult } from '@/types/results';
+
+const UNKNOWN_SINGLE_VM_FIT: SingleVmFit = {
+  vcpu: 'unknown',
+  ram: 'unknown',
+  overall: 'unknown',
+  coresPerServer: 0,
+  logicalCpus: 0,
+  usableRamGb: 0,
+};
 
 // ---------------------------------------------------------------------------
 // Mock pptxgenjs
@@ -85,6 +95,7 @@ const result: ScenarioResult = {
   cpuUtilizationPercent: 74.4,
   ramUtilizationPercent: 67.2,
   diskUtilizationPercent: 10.7,
+  singleVmFit: UNKNOWN_SINGLE_VM_FIT,
 };
 
 const resourceBd: ResourceBreakdown = {

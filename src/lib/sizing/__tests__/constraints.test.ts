@@ -798,6 +798,21 @@ describe('computeScenarioResult — stretch cluster', () => {
   });
 });
 
+describe('computeScenarioResult — singleVmFit', () => {
+  it('includes a singleVmFit verdict on every result', () => {
+    const result = computeScenarioResult(CPU_LIMITED_CLUSTER, CPU_LIMITED_SCENARIO);
+    expect(result.singleVmFit).toBeDefined();
+    // CPU_LIMITED_CLUSTER has no largestVm* fields -> both dimensions unknown.
+    expect(result.singleVmFit.overall).toBe('unknown');
+  });
+
+  it('flags a monster VM that exceeds the host', () => {
+    const cluster = { ...CPU_LIMITED_CLUSTER, largestVmVcpus: 999, largestVmRamGb: 99999 };
+    const result = computeScenarioResult(cluster, CPU_LIMITED_SCENARIO);
+    expect(result.singleVmFit.overall).toBe('fail');
+  });
+});
+
 export {
   CPU_LIMITED_CLUSTER,
   CPU_LIMITED_SCENARIO,

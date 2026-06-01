@@ -67,6 +67,7 @@
     "title": "Anteprima importazione",
     "description": "Verificare i dati estratti prima di popolare il modulo.",
     "filterByCluster": "Filtra per cluster",
+    "largestVm": "VM più grande: {{vcpu}} vCPU / {{ram}} GiB",
     "stretchDetected": "Cluster esteso rilevato",
     "stretchSizingNote": "Il dimensionamento raddoppierà il numero di server per la simmetria dei siti.",
     "confirmStretchAriaLabel": "Conferma topologia cluster esteso",

@@ -11,6 +11,7 @@ import { useClusterStore } from '@/store/useClusterStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import type { LimitingResource } from '@/types/results';
+import { SingleVmFitBanner } from './SingleVmFitBanner';
 
 interface ScenarioResultsProps {
   scenarioId: string;
@@ -118,6 +119,7 @@ export function ScenarioResults({ scenarioId }: ScenarioResultsProps) {
           </div>
         </div>
       </div>
+      <SingleVmFitBanner fit={result.singleVmFit} nameplateRamGb={scenario.ramPerServerGb} />
     </div>
   );
 }

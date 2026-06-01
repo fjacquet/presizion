@@ -145,6 +145,12 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
         }),
         ...(previewCluster.isStretchCluster === true &&
           stretchConfirmed && { isStretchCluster: true }),
+        ...(previewCluster.largestVmVcpus != null && {
+          largestVmVcpus: previewCluster.largestVmVcpus,
+        }),
+        ...(previewCluster.largestVmRamMib != null && {
+          largestVmRamGb: Math.round((previewCluster.largestVmRamMib / 1024) * 10) / 10,
+        }),
       };
       setCurrentCluster(cluster);
       seedFromCluster(cluster);
@@ -310,6 +316,19 @@ export function ImportPreviewModal({ result, open, onClose }: ImportPreviewModal
               <p>
                 <span className="font-medium">{t('importPreview.avgRamUtil')}:</span>{' '}
                 {result.ramUtilizationPercent}%
+              </p>
+            )}
+            {previewCluster.largestVmVcpus != null && (
+              <p>
+                <span className="font-medium">
+                  {t('importPreview.largestVm', {
+                    vcpu: previewCluster.largestVmVcpus,
+                    ram:
+                      previewCluster.largestVmRamMib != null
+                        ? Math.round((previewCluster.largestVmRamMib / 1024) * 10) / 10
+                        : 0,
+                  })}
+                </span>
               </p>
             )}
           </>

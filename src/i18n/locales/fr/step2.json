@@ -70,6 +70,14 @@
       "ghz": "Limité GHz"
     }
   },
+  "singleVmFit": {
+    "titleWarn": "La plus grande VM tient tout juste",
+    "titleFail": "La plus grande VM ne tient pas sur un hôte",
+    "vcpuWarn": "La plus grande VM ({{vcpu}} vCPU) dépasse les {{cores}} cœurs physiques de cet hôte — elle reposerait sur le SMT / s'étendrait sur plusieurs nœuds NUMA ({{logical}} CPU logiques).",
+    "vcpuFail": "La plus grande VM ({{vcpu}} vCPU) dépasse les {{logical}} CPU logiques de cet hôte — elle ne peut pas tenir sur un seul hôte.",
+    "ramWarn": "La plus grande VM nécessite {{ram}} Gio de RAM ; l'hôte offre {{usable}} Gio utilisables (sur {{nameplate}} Gio) — tient sur la capacité nominale mais pas après surcharge.",
+    "ramFail": "La plus grande VM nécessite {{ram}} Gio de RAM ; l'hôte n'offre que {{nameplate}} Gio — elle ne peut pas tenir sur un seul hôte."
+  },
   "vsan": {
     "heading": "Paramètres vSAN",
     "fttPolicy": "Politique FTT",

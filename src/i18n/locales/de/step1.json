@@ -67,6 +67,7 @@
     "title": "Import-Vorschau",
     "description": "Extrahierte Daten vor dem Ausfüllen des Formulars prüfen.",
     "filterByCluster": "Nach Cluster filtern",
+    "largestVm": "Größte VM: {{vcpu}} vCPU / {{ram}} GiB",
     "stretchDetected": "Stretched Cluster erkannt",
     "stretchSizingNote": "Die Dimensionierung verdoppelt die Serveranzahl für Standortsymmetrie.",
     "confirmStretchAriaLabel": "Stretched-Cluster-Topologie bestätigen",

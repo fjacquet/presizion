@@ -336,6 +336,31 @@ describe('ImportPreviewModal', () => {
     });
   });
 
+  describe('Largest-VM info line', () => {
+    const RESULT_WITH_LARGEST: ClusterImportResult = {
+      totalVcpus: 100,
+      totalVms: 20,
+      totalDiskGb: 500,
+      avgRamPerVmGb: 8,
+      sourceFormat: 'rvtools',
+      vmCount: 20,
+      warnings: [],
+      largestVmVcpus: 48,
+      largestVmRamMib: 262144, // 256 GiB
+    };
+
+    it('shows the largest-VM line (vCPU / GiB) when data is present', () => {
+      render(<ImportPreviewModal result={RESULT_WITH_LARGEST} {...defaultProps} />);
+      expect(screen.getByText(/Largest VM:\s*48 vCPU\s*\/\s*256 GiB/i)).toBeInTheDocument();
+    });
+
+    it('omits the largest-VM line when no per-VM data (manual-equivalent import)', () => {
+      const { largestVmVcpus: _v, largestVmRamMib: _r, ...withoutLargest } = RESULT_WITH_LARGEST;
+      render(<ImportPreviewModal result={withoutLargest} {...defaultProps} />);
+      expect(screen.queryByText(/Largest VM:/i)).not.toBeInTheDocument();
+    });
+  });
+
   describe('mobile drawer (FORM-04)', () => {
     it('renders Drawer with "Import Preview" title on mobile viewport', () => {
       mockMatchMedia(true);

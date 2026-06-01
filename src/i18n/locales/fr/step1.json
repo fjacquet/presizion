@@ -67,6 +67,7 @@
     "title": "Aperçu de l'import",
     "description": "Vérifiez les données extraites avant de remplir le formulaire.",
     "filterByCluster": "Filtrer par cluster",
+    "largestVm": "Plus grande VM : {{vcpu}} vCPU / {{ram}} Gio",
     "stretchDetected": "Cluster étendu détecté",
     "stretchSizingNote": "Le dimensionnement doublera le nombre de serveurs pour la symétrie des sites.",
     "confirmStretchAriaLabel": "Confirmer la topologie de cluster étendu",
