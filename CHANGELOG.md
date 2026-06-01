@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.10.0] -- 2026-06-01
+
+### Added
+
+- **Biggest-VM feasibility check**: a non-blocking, two-tier warning when the cluster's largest single VM — by vCPU or by RAM, independently — cannot fit on one proposed target host. The largest VM (by vCPU and by RAM) is captured at import (RVTools / LiveOptics per-VM rows) and aggregated as the max across selected scopes; manual entry has no per-VM data, so the check is silently skipped (`unknown`).
+  - **vCPU fit** vs the host's physical cores (`sockets × cores/socket`): `ok` ≤ cores, `warn` ≤ cores × SMT(2) (relies on SMT / spans NUMA), `fail` > logical CPUs.
+  - **RAM fit** vs usable (vSAN-aware) and nameplate RAM: `ok` ≤ usable, `warn` ≤ nameplate, `fail` > nameplate.
+  - Surfaced as an amber (`warn`) / red (`fail`) per-scenario banner in Step 2 and a largest-VM info line in the Step 1 import preview. Always non-blocking — never gates advancing or export. The vCPU:pCore ratio (an aggregate consolidation cap) is deliberately not used for single-VM fit. Localized in en / fr / de / it.
+
+## [2.9.1] -- 2026-06-01
+
+### Fixed
+
+- **vCPU formula is a pure density cap**: removed a spurious `× util%` factor from the displayed CPU formula so the string evaluates to the result shown beside it. vCPU sizing is a hard assignment-density cap; observed CPU utilization never affects the count. Compute and the achieved-CPU-% output metric are unchanged.
+- **Stretch HA reserve is now per-site**: a stretch cluster now computes `(rawCount + haReserve) × 2` (`2N + 2`) instead of `rawCount × 2 + haReserve` (`2N + 1`), since "N+1 local" means one spare host per site. The doubled-workload figure (`stretchPairedCount`) is unchanged.
+
+### Internal
+
+- Refreshed Serena project memory; enabled the TypeScript language server.
+
 ## [2.9.0] -- 2026-06-01
 
 ### Added
