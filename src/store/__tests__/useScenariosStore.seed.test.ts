@@ -29,6 +29,38 @@ describe('useScenariosStore.seedFromCluster', () => {
     });
   });
 
+  it('derives ramPerVmGb from totalRamGb / totalVms when totalRamGb is present', () => {
+    const cluster: OldCluster = {
+      totalVcpus: 400,
+      totalPcores: 100,
+      totalVms: 50,
+      totalRamGb: 800,
+      avgRamPerVmGb: 12, // present but ignored — totalRamGb takes precedence
+    };
+
+    useScenariosStore.getState().seedFromCluster(cluster);
+
+    useScenariosStore.getState().scenarios.forEach((s) => {
+      expect(s.ramPerVmGb).toBe(16); // 800 / 50
+    });
+  });
+
+  it('falls back to avgRamPerVmGb when totalRamGb is absent (back-compat)', () => {
+    const cluster: OldCluster = {
+      totalVcpus: 400,
+      totalPcores: 100,
+      totalVms: 50,
+      avgRamPerVmGb: 9.5,
+      // totalRamGb intentionally omitted (old session/import)
+    };
+
+    useScenariosStore.getState().seedFromCluster(cluster);
+
+    useScenariosStore.getState().scenarios.forEach((s) => {
+      expect(s.ramPerVmGb).toBe(9.5);
+    });
+  });
+
   it('Test 2: sets all scenarios diskPerVmGb when totalDiskGb and totalVms provided', () => {
     const cluster: OldCluster = {
       totalVcpus: 400,

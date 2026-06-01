@@ -16,6 +16,8 @@ export interface DerivedClusterMetrics {
   vcpuToPcoreRatio: number | null;
   /** Total vCPUs ÷ total VMs. */
   avgVcpuPerVm: number | null;
+  /** Total RAM GB ÷ total VMs (null when no cluster total RAM). */
+  avgRamPerVmGb: number | null;
   /** Total disk GB ÷ total VMs. */
   avgDiskPerVmGb: number | null;
 }
@@ -24,6 +26,10 @@ export function deriveClusterMetrics(cluster: OldCluster): DerivedClusterMetrics
   return {
     vcpuToPcoreRatio: cluster.totalPcores > 0 ? cluster.totalVcpus / cluster.totalPcores : null,
     avgVcpuPerVm: cluster.totalVms > 0 ? cluster.totalVcpus / cluster.totalVms : null,
+    avgRamPerVmGb:
+      cluster.totalRamGb != null && cluster.totalVms > 0
+        ? cluster.totalRamGb / cluster.totalVms
+        : null,
     avgDiskPerVmGb:
       cluster.totalDiskGb != null && cluster.totalVms > 0
         ? cluster.totalDiskGb / cluster.totalVms

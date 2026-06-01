@@ -39,8 +39,12 @@ export function toBeDisaggregatedDiskGb(cluster: OldCluster, scenario: Scenario)
   return Math.round(effectiveVmCount * scenario.diskPerVmGb * demandFactor);
 }
 
-/** As-Is total RAM (GB), derived from server count × RAM per server. */
+/**
+ * As-Is total RAM (GB). Prefers the explicit cluster total (works for manual
+ * entry); otherwise falls back to server count × RAM per server.
+ */
 export function asIsRamGb(cluster: OldCluster): number | undefined {
+  if (cluster.totalRamGb != null) return cluster.totalRamGb;
   if (cluster.existingServerCount && cluster.ramPerServerGb) {
     return cluster.existingServerCount * cluster.ramPerServerGb;
   }

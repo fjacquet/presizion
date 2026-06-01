@@ -59,7 +59,12 @@ export const useScenariosStore = create<ScenariosStore>((set) => ({
 
   seedFromCluster: (cluster) =>
     set((state) => {
-      const ramPerVmGb = cluster.avgRamPerVmGb;
+      // Prefer the explicit cluster total (mirrors diskPerVmGb); fall back to the
+      // imported per-VM average for older sessions/imports that lack totalRamGb.
+      const ramPerVmGb =
+        cluster.totalRamGb && cluster.totalVms
+          ? Math.round((cluster.totalRamGb / cluster.totalVms) * 10) / 10
+          : cluster.avgRamPerVmGb;
       const diskPerVmGb =
         cluster.totalDiskGb && cluster.totalVms
           ? Math.round((cluster.totalDiskGb / cluster.totalVms) * 10) / 10

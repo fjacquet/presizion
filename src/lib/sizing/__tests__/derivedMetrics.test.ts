@@ -12,16 +12,19 @@ describe('deriveClusterMetrics', () => {
       totalPcores: 128,
       totalVms: 200,
       totalDiskGb: 10000,
+      totalRamGb: 3200,
     });
     expect(m.vcpuToPcoreRatio).toBe(4);
     expect(m.avgVcpuPerVm).toBe(512 / 200);
     expect(m.avgDiskPerVmGb).toBe(50);
+    expect(m.avgRamPerVmGb).toBe(16); // 3200 / 200
   });
 
-  it('returns null when divisors are zero or disk is absent', () => {
+  it('returns null when divisors are zero or disk/ram is absent', () => {
     const m = deriveClusterMetrics({ ...base, totalVcpus: 100 });
     expect(m.vcpuToPcoreRatio).toBeNull(); // pcores = 0
     expect(m.avgVcpuPerVm).toBeNull(); // vms = 0
     expect(m.avgDiskPerVmGb).toBeNull(); // disk absent
+    expect(m.avgRamPerVmGb).toBeNull(); // ram absent
   });
 });
