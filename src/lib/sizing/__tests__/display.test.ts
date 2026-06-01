@@ -6,6 +6,7 @@
  * Conversion to multiplicative factor (1 + percent/100) is internal to display module.
  */
 import { describe, expect, it } from 'vitest';
+import { computeScenarioResult } from '../constraints';
 import {
   cpuFormulaString,
   diskFormulaString,
@@ -247,21 +248,8 @@ describe('Growth annotations (GROW-04)', () => {
   });
 });
 
-describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
-  it('includes utilization factor when cpuUtilizationPercent is not 100: ceil(2000 × 70% × 120% / 4 / 48)', () => {
-    const result = cpuFormulaString({
-      totalVcpus: 2000,
-      growthPercent: 0,
-      safetyPercent: 20,
-      targetVcpuToPCoreRatio: 4,
-      coresPerServer: 48,
-      cpuUtilizationPercent: 70,
-    });
-    expect(result).toContain('70%');
-    expect(result).toContain('ceil');
-    expect(result).toContain('2000');
-  });
-  it('omits utilization factor when cpuUtilizationPercent is absent', () => {
+describe('cpuFormulaString — pure density cap (no utilization factor)', () => {
+  it('never renders a utilization factor: ceil(2000 × 120% / 4 / 48)', () => {
     const result = cpuFormulaString({
       totalVcpus: 2000,
       growthPercent: 0,
@@ -269,7 +257,60 @@ describe('cpuFormulaString with utilization (UTIL-03 display)', () => {
       targetVcpuToPCoreRatio: 4,
       coresPerServer: 48,
     });
-    // Should not contain a separate utilization percentage (only the headroom)
     expect(result).toBe('ceil(2000 × 120% / 4 / 48)');
+  });
+});
+
+// Regression: the displayed CPU formula must equal the number it sits next to.
+// Evaluates the rendered string's arithmetic for the growth=0 case and compares
+// it to computeScenarioResult's cpuLimitedCount. Before the fix, util≠100 made
+// the string evaluate to a different (smaller) number than the count shown.
+describe('cpuFormulaString — displayed value equals computed count (regression)', () => {
+  function evalCpuFormula(s: string): number {
+    // "ceil(3200 × 120% / 4 / 40)" -> 3200 * 1.20 / 4 / 40 -> Math.ceil
+    const inner = s.replace(/^ceil\(/, '').replace(/\)$/, '');
+    const parts = inner.split(' / ');
+    const factorPart = parts[0] ?? '';
+    const divisors = parts.slice(1);
+    const pieces = factorPart.split(' × ').map((p) => p.trim());
+    let value = Number(pieces[0]);
+    for (const p of pieces.slice(1)) {
+      const pct = p.match(/^([\d.]+)%$/);
+      if (pct) value *= Number(pct[1]) / 100;
+    }
+    for (const d of divisors) value /= Number(d);
+    return Math.ceil(value);
+  }
+
+  it('util≠100, growth=0: rendered CPU formula evaluates to cpuLimitedCount', () => {
+    const cluster = {
+      totalVcpus: 3200,
+      totalVms: 100,
+      totalPcores: 800,
+      cpuUtilizationPercent: 10,
+    };
+    const scenario = {
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'CPU-Limited',
+      socketsPerServer: 2,
+      coresPerSocket: 20,
+      ramPerServerGb: 1024,
+      diskPerServerGb: 50000,
+      targetVcpuToPCoreRatio: 4,
+      ramPerVmGb: 2,
+      diskPerVmGb: 10,
+      growthPercent: 0,
+      safetyPercent: 20,
+      haReserveCount: 0 as const,
+    };
+    const result = computeScenarioResult(cluster, scenario);
+    const formula = cpuFormulaString({
+      totalVcpus: cluster.totalVcpus,
+      safetyPercent: scenario.safetyPercent,
+      growthPercent: scenario.growthPercent,
+      targetVcpuToPCoreRatio: scenario.targetVcpuToPCoreRatio,
+      coresPerServer: scenario.socketsPerServer * scenario.coresPerSocket,
+    });
+    expect(evalCpuFormula(formula)).toBe(result.cpuLimitedCount); // 24, not 3
   });
 });
