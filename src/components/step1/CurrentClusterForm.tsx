@@ -110,6 +110,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       totalVcpus: 0,
       totalPcores: 0,
       totalVms: 0,
+      totalRamGb: undefined,
       totalDiskGb: undefined,
       socketsPerServer: undefined,
       coresPerSocket: undefined,
@@ -129,6 +130,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.totalVcpus !== (currentCluster.totalVcpus ?? 0) ||
       formVals.totalPcores !== (currentCluster.totalPcores ?? 0) ||
       formVals.totalVms !== (currentCluster.totalVms ?? 0) ||
+      formVals.totalRamGb !== currentCluster.totalRamGb ||
       formVals.totalDiskGb !== currentCluster.totalDiskGb ||
       formVals.existingServerCount !== currentCluster.existingServerCount ||
       formVals.socketsPerServer !== currentCluster.socketsPerServer ||
@@ -144,6 +146,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         totalVcpus: currentCluster.totalVcpus ?? 0,
         totalPcores: currentCluster.totalPcores ?? 0,
         totalVms: currentCluster.totalVms ?? 0,
+        totalRamGb: currentCluster.totalRamGb,
         totalDiskGb: currentCluster.totalDiskGb,
         existingServerCount: currentCluster.existingServerCount,
         socketsPerServer: currentCluster.socketsPerServer,
@@ -262,6 +265,14 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
                 label={t('currentClusterForm.fields.totalVms')}
                 tooltip={t('currentClusterForm.tooltips.totalVms')}
                 testId="input-totalVms"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalRamGb"
+                label={t('currentClusterForm.fields.totalRamGb')}
+                tooltip={t('currentClusterForm.tooltips.totalRamGb')}
+                testId="input-totalRamGb"
+                optional
               />
               <NumericFormField
                 control={form.control}

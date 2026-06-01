@@ -36,6 +36,21 @@ describe('DerivedMetricsPanel — avg per-VM metrics', () => {
     expect(screen.getByText('12.5')).toBeInTheDocument();
   });
 
+  it('Test 2b: Avg RAM/VM prefers totalRamGb/totalVms over the imported average', () => {
+    useClusterStore.setState({
+      currentCluster: {
+        totalVcpus: 100,
+        totalPcores: 50,
+        totalVms: 10,
+        totalRamGb: 160, // 160 / 10 = 16.0 (wins)
+        avgRamPerVmGb: 12.5, // present but ignored
+      },
+    });
+    render(<DerivedMetricsPanel />);
+    expect(screen.getByText('16.0')).toBeInTheDocument();
+    expect(screen.queryByText('12.5')).not.toBeInTheDocument();
+  });
+
   it('Test 3: displays Avg Disk/VM with GiB unit when totalDiskGb=5000 and totalVms=100', () => {
     useClusterStore.setState({
       currentCluster: { totalVcpus: 400, totalPcores: 100, totalVms: 100, totalDiskGb: 5000 },

@@ -36,7 +36,7 @@ const AGGREGATED_RESULT = {
   totalVcpus: 40,
   totalVms: 20,
   totalDiskGb: 400,
-  totalRamGb: 0,
+  totalRamGb: 256,
   avgRamPerVmGb: 10,
   vmCount: 20,
   warnings: [],
@@ -106,7 +106,7 @@ const NO_SCOPE_RESULT: ClusterImportResult = {
   totalVcpus: 80,
   totalVms: 40,
   totalDiskGb: 800,
-  totalRamGb: 0,
+  totalRamGb: 320,
   avgRamPerVmGb: 8,
   sourceFormat: 'liveoptics-csv',
   vmCount: 40,
@@ -263,8 +263,16 @@ describe('ImportPreviewModal', () => {
       fireEvent.click(applyBtn);
 
       expect(mockSetCurrentCluster).toHaveBeenCalledWith(
-        expect.objectContaining({ totalVcpus: 80, totalVms: 40 }),
+        expect.objectContaining({ totalVcpus: 80, totalVms: 40, totalRamGb: 320 }),
       );
+    });
+  });
+
+  describe('Total Memory preview row', () => {
+    it('renders the Total Memory row with the cluster total', () => {
+      render(<ImportPreviewModal result={NO_SCOPE_RESULT} {...defaultProps} />);
+      expect(screen.getByText('Total Memory:')).toBeInTheDocument();
+      expect(screen.getByText(/320 GB/)).toBeInTheDocument();
     });
   });
 
