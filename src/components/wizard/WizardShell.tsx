@@ -17,6 +17,7 @@ import { STORE_PREDICT_URL } from '@/lib/config';
 import { isClusterSizingReady } from '@/lib/sizing/clusterReadiness';
 import { createDefaultScenario } from '@/lib/sizing/defaults';
 import { useClusterStore } from '@/store/useClusterStore';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
 import { useImportStore } from '@/store/useImportStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
@@ -51,6 +52,7 @@ export function WizardShell() {
     useClusterStore.getState().resetCluster();
     useScenariosStore.getState().setScenarios([createDefaultScenario()]);
     useImportStore.getState().clearImport();
+    useExclusionsStore.getState().reset();
     goToStep(1);
     setSizingMode('vcpu');
     setLayoutMode('hci');
