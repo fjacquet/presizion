@@ -11,6 +11,12 @@ export const RVTOOLS_ALIASES: ColumnAliasMap = {
   power_state: ['Powerstate', 'Power State', 'Power'],
 };
 
+/** RVTools vMemory sheet — per-VM host-consumed (in-use) RAM, joined to vInfo by VM name. */
+export const RVTOOLS_VMEMORY_ALIASES: ColumnAliasMap = {
+  vm_name: ['VM', 'VM Name'],
+  consumed_mib: ['Consumed', 'Consumed MiB', 'Consumed MB'],
+};
+
 export const LIVEOPTICS_ALIASES: ColumnAliasMap = {
   vm_name: ['VM Name'],
   num_cpus: ['Virtual CPU', 'vCPU', 'CPUs'],

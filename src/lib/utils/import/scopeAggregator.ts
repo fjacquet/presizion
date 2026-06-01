@@ -75,6 +75,9 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   let maxLargestVmVcpus: number | undefined;
   let maxLargestVmRamMib: number | undefined;
 
+  // Host-consumed RAM: summed across scopes when present (RVTools vMemory only).
+  let consumedRamGbAcc: number | undefined;
+
   // Stretch: any selected scope being stretched poisons the aggregate (conservative).
   let anyStretch = false;
   const stretchSignalsAcc: string[] = [];
@@ -87,6 +90,10 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
     totalVmCount += scope.vmCount;
     weightedRamSum += scope.avgRamPerVmGb * scope.vmCount;
     allWarnings.push(...scope.warnings);
+
+    if (scope.consumedRamGb !== undefined) {
+      consumedRamGbAcc = (consumedRamGbAcc ?? 0) + scope.consumedRamGb;
+    }
 
     // Additive fields
     if (scope.totalPcores !== undefined) {
@@ -176,6 +183,9 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   // Largest-VM fields: max across scopes
   if (maxLargestVmVcpus !== undefined) esxFields.largestVmVcpus = maxLargestVmVcpus;
   if (maxLargestVmRamMib !== undefined) esxFields.largestVmRamMib = maxLargestVmRamMib;
+  if (consumedRamGbAcc !== undefined) {
+    esxFields.consumedRamGb = Math.round(consumedRamGbAcc * 10) / 10;
+  }
 
   // Weighted average utilization
   if (cpuUtilServerCount > 0) {
