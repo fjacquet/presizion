@@ -1,0 +1,107 @@
+{
+  "title": "Schritt 1: Aktuellen Cluster eingeben",
+  "subtitle": "Geben Sie die Metriken Ihres bestehenden Clusters ein. Pflichtfelder sind gekennzeichnet.",
+  "currentClusterForm": {
+    "sections": {
+      "clusterTotals": "Cluster-Gesamtwerte",
+      "existingServerConfig": "Bestehende Serverkonfiguration (optional)",
+      "currentUtilization": "Aktuelle Auslastung (erforderlich)",
+      "performanceMode": "Leistungsmodus (optional)"
+    },
+    "fields": {
+      "totalVcpus": "Gesamt-vCPUs",
+      "totalPcores": "Gesamt-pCores",
+      "totalVms": "Gesamt-VMs",
+      "totalDiskGb": "Gesamtdisk GB (optional)",
+      "existingServerCount": "Anzahl vorhandener Server",
+      "socketsPerServer": "Sockets/Server",
+      "coresPerSocket": "Kerne/Socket (physisch)",
+      "ramPerServerGb": "RAM/Server GB",
+      "cpuUtilizationPercent": "CPU-Auslastung %",
+      "ramUtilizationPercent": "RAM-Auslastung %",
+      "specintPerServer": "SPECrate2017_int_base / Server (bestehend)",
+      "cpuFrequencyGhz": "CPU-Frequenz (GHz)"
+    },
+    "tooltips": {
+      "totalVcpus": "Gesamte vCPU-Reservierungen über alle VMs hinweg. In der vCenter-Zusammenfassung oder Cluster-Übersicht zu finden.",
+      "totalPcores": "Physische CPU-Kerne im Cluster. Spezifikationsblatt-Kerne verwenden — NICHT hyperthreaded logische CPUs.",
+      "totalVms": "Gesamtanzahl der eingeschalteten VMs im Cluster.",
+      "totalDiskGb": "Gesamt bereitgestellter Speicherplatz über alle VMs (GB).",
+      "existingServerCount": "Anzahl der physischen Server im Cluster (wird für SPECint-Dimensionierung verwendet).",
+      "socketsPerServer": "Anzahl physischer CPU-Sockets pro vorhandenem Server.",
+      "coresPerSocket": "Physische Kerne pro Socket laut Spezifikationsblatt — NICHT die vom OS gemeldeten logischen Prozessoren.",
+      "ramPerServerGb": "Gesamter installierter RAM pro vorhandenem Server (GB).",
+      "cpuUtilizationPercent": "Aktueller durchschnittlicher CPU-Auslastungsprozentsatz (0–100). Wird zur Skalierung der effektiven vCPU-Nachfrage verwendet.",
+      "ramUtilizationPercent": "Aktueller durchschnittlicher RAM-Auslastungsprozentsatz (0–100). Wird zur Skalierung der effektiven RAM-Nachfrage verwendet.",
+      "cpuFrequencyGhz": "Durchschnittliche CPU-Taktfrequenz vorhandener Server in GHz. Wird beim Import von RVTools/LiveOptics automatisch ausgefüllt.",
+      "specintPerServer": "SPECrate2017_int_base-Score pro vorhandenem Server. Zu finden auf fjacquet.github.io/spec-search → nach Prozessor filtern. Standard ist Dell R660 mit 2x Xeon Gold 6526Y (~337). Bestehende und Zielserver müssen dieselbe Metrik verwenden."
+    },
+    "detectedCpu": "Erkannte CPU:",
+    "lookupSpecrate": "SPECrate nachschlagen",
+    "utilizationHint": "Die meisten Umgebungen laufen deutlich unter 100%. Gemessenen Wert (LiveOptics) oder eine sorgfältige Schätzung eingeben.",
+    "utilizationHintStretch": "Stretched Cluster laufen oft mit <50% pro Standort.",
+    "nextButton": "Weiter: Szenarien definieren"
+  },
+  "derivedMetrics": {
+    "title": "Abgeleitete Metriken",
+    "vcpuRatio": "vCPU:pCore-Verhältnis",
+    "vmsPerServer": "VMs/Server (CPU)",
+    "avgVcpuPerVm": "Ø vCPU/VM",
+    "avgRamPerVm": "Ø RAM/VM",
+    "avgDiskPerVm": "Ø Disk/VM",
+    "footnote": "Aktualisiert sich live bei der Eingabe. VMs/Server basiert auf den Standardwerten des ersten Szenarios. Durchschnittswerte aus Importdaten."
+  },
+  "fileImport": {
+    "buttonLabel": "Aus Datei importieren",
+    "ariaLabel": "Aus Datei importieren",
+    "uploadAriaLabel": "Cluster-Exportdatei hochladen",
+    "importing": "Importiere…",
+    "errorFallback": "Datei konnte nicht gelesen werden. Bitte Datei prüfen und erneut versuchen.",
+    "dropzone": {
+      "instruction": "Cluster-Export hierher ziehen und ablegen",
+      "active": "Zum Importieren ablegen",
+      "hint": "oder zum Durchsuchen klicken · .xlsx, .csv, .zip, .json"
+    }
+  },
+  "importPreview": {
+    "title": "Import-Vorschau",
+    "description": "Extrahierte Daten vor dem Ausfüllen des Formulars prüfen.",
+    "filterByCluster": "Nach Cluster filtern",
+    "stretchDetected": "Stretched Cluster erkannt",
+    "stretchSizingNote": "Die Dimensionierung verdoppelt die Serveranzahl für Standortsymmetrie.",
+    "confirmStretchAriaLabel": "Stretched-Cluster-Topologie bestätigen",
+    "source": "Quelle",
+    "totalVcpus": "Gesamt-vCPUs",
+    "totalPcores": "Gesamt-pCores",
+    "totalVms": "Gesamt-VMs",
+    "totalDisk": "Gesamtdisk",
+    "scenarios": "Szenarien",
+    "vmsFound": "VMs gefunden",
+    "avgRamPerVm": "Ø RAM/VM (informativ)",
+    "existingServers": "Vorhandene Server",
+    "socketsPerServer": "Sockets/Server",
+    "coresPerSocket": "Kerne/Socket",
+    "ramPerServer": "RAM/Server",
+    "avgCpuUtil": "Ø CPU-Auslastung",
+    "avgRamUtil": "Ø RAM-Auslastung",
+    "noPcoresNote": "Gesamt-pCores konnten aus dieser Datei nicht ausgelesen werden und müssen vor dem Weiterschalten zu Schritt 2 manuell eingegeben werden.",
+    "cancelButton": "Abbrechen",
+    "nextButton": "Weiter",
+    "backButton": "Zurück",
+    "applyButton": "Anwenden",
+    "noteLabel": "Hinweis:",
+    "formats": {
+      "rvtools": "RVTools",
+      "liveoptics-xlsx": "LiveOptics (xlsx)",
+      "liveoptics-csv": "LiveOptics (csv)",
+      "presizion-json": "Presizion-JSON-Export"
+    }
+  },
+  "scopeBadge": {
+    "label": "Umfang",
+    "editAriaLabel": "Umfang bearbeiten",
+    "dialogTitle": "Aktive Cluster auswählen",
+    "cancelButton": "Abbrechen",
+    "applyButton": "Anwenden"
+  }
+}

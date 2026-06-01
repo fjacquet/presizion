@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useScenariosResults } from '@/hooks/useScenariosResults';
@@ -13,6 +14,7 @@ import { useScenariosStore } from '@/store/useScenariosStore';
  * Data labels appear above bars.
  */
 export function CoreCountChart() {
+  const { t } = useTranslation('step3');
   const scenarios = useScenariosStore((s) => s.scenarios);
   const results = useScenariosResults();
   const currentCluster = useClusterStore((s) => s.currentCluster);
@@ -29,7 +31,7 @@ export function CoreCountChart() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-          Total Physical Cores per Scenario
+          {t('coreCountChart.title')}
         </h3>
         <Button
           variant="outline"
@@ -37,15 +39,15 @@ export function CoreCountChart() {
           onClick={() =>
             chartInstance.current && downloadChartSvg(chartInstance.current, 'core-count-chart.svg')
           }
-          aria-label="Download chart as SVG"
+          aria-label={t('coreCountChart.downloadSvgAriaLabel')}
         >
-          Download SVG
+          {t('coreCountChart.downloadSvg')}
         </Button>
       </div>
       <div className="h-48 sm:h-72">
         <Chart
           option={buildCoreCountOption(chartData, { asIsPcores: currentCluster.totalPcores })}
-          ariaLabel="Total physical cores per scenario"
+          ariaLabel={t('coreCountChart.ariaLabel')}
           onReady={(i) => {
             chartInstance.current = i;
           }}

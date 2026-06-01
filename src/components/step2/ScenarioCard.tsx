@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Copy, Info, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { SpecResultsPanel } from '@/components/common/SpecResultsPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -27,30 +28,24 @@ import { useWizardStore } from '@/store/useWizardStore';
 import type { Scenario } from '@/types/cluster';
 import { VsanSection } from './VsanSection';
 
-const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
-  socketsPerServer: 'Physical CPU sockets per target server. Check the vendor spec sheet.',
-  coresPerSocket: 'Physical cores per socket — NOT hyperthreaded logical CPUs.',
-  ramPerServerGb: 'Total RAM installed per target server (GB).',
-  diskPerServerGb: 'Total usable storage per target server (GB).',
-  targetVcpuToPCoreRatio:
-    'Hard assignment-density cap: no more than N vCPUs per physical core. VMware recommends 4:1 for mixed workloads; use 2:1 for databases.',
-  ramPerVmGb:
-    'Average RAM per VM in your current cluster. In vCenter: Monitor → Memory Used ÷ VM count. Available from LiveOptics/RVTools import.',
-  diskPerVmGb:
-    'Average provisioned disk per VM. Auto-filled from Total Disk GB ÷ Total VMs when available. Or read from RVTools/LiveOptics import.',
-  growthPercent:
-    'Future workload growth. 0% = size for today only. Scales all demand (CPU, RAM, disk).',
-  safetyPercent:
-    'Operational buffer so the cluster never runs hot. 20% → sized to run ~83% under current load.',
-  targetSpecint:
-    'SPECrate2017_int_base score for the target server. Find at spec.org/cpu2017/results/ → filter by the new server model. Default is Dell R660 with 2× Xeon Gold 6526Y (337).',
-  targetCpuFrequencyGhz:
-    'Target server CPU clock frequency in GHz. Used with current frequency to compute GHz demand ratio.',
-  minServerCount:
-    'Pin a minimum floor: the final server count will never go below this value, regardless of the computed sizing.',
-};
-
 function FieldLabel({ name, children }: { name: keyof ScenarioInput; children: React.ReactNode }) {
+  const { t } = useTranslation('step2');
+
+  const TOOLTIPS: Partial<Record<keyof ScenarioInput, string>> = {
+    socketsPerServer: t('scenarioCard.tooltips.socketsPerServer'),
+    coresPerSocket: t('scenarioCard.tooltips.coresPerSocket'),
+    ramPerServerGb: t('scenarioCard.tooltips.ramPerServerGb'),
+    diskPerServerGb: t('scenarioCard.tooltips.diskPerServerGb'),
+    targetVcpuToPCoreRatio: t('scenarioCard.tooltips.targetVcpuToPCoreRatio'),
+    ramPerVmGb: t('scenarioCard.tooltips.ramPerVmGb'),
+    diskPerVmGb: t('scenarioCard.tooltips.diskPerVmGb'),
+    growthPercent: t('scenarioCard.tooltips.growthPercent'),
+    safetyPercent: t('scenarioCard.tooltips.safetyPercent'),
+    targetSpecint: t('scenarioCard.tooltips.targetSpecint'),
+    targetCpuFrequencyGhz: t('scenarioCard.tooltips.targetCpuFrequencyGhz'),
+    minServerCount: t('scenarioCard.tooltips.minServerCount'),
+  };
+
   const tip = TOOLTIPS[name];
   return (
     <FormLabel className="flex items-center gap-1">
@@ -79,6 +74,7 @@ interface ScenarioCardProps {
 }
 
 export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
+  const { t } = useTranslation('step2');
   const scenario = useScenariosStore((s) => s.scenarios.find((sc) => sc.id === scenarioId));
   const updateScenario = useScenariosStore((s) => s.updateScenario);
   const removeScenario = useScenariosStore((s) => s.removeScenario);
@@ -223,7 +219,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                       <Input
                         {...field}
                         className="text-lg font-semibold border-0 p-0 h-auto focus-visible:ring-0 bg-transparent"
-                        placeholder="Scenario name"
+                        placeholder={t('scenarioCard.namePlaceholder')}
                       />
                     </FormControl>
                     <FormMessage />
@@ -238,7 +234,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 size="icon"
                 className="h-9 w-9"
                 onClick={() => duplicateScenario(scenarioId)}
-                aria-label="Duplicate scenario"
+                aria-label={t('scenarioCard.duplicateAriaLabel')}
               >
                 <Copy className="h-3.5 w-3.5" />
               </Button>
@@ -248,7 +244,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 size="icon"
                 className="h-9 w-9"
                 onClick={() => removeScenario(scenarioId)}
-                aria-label="Remove scenario"
+                aria-label={t('scenarioCard.removeAriaLabel')}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -258,16 +254,18 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
           <CardContent className="space-y-6">
             {currentCluster.totalVms > 0 && (
               <p className="text-xs text-slate-500 dark:text-slate-400 border-l-2 border-primary-600/40 dark:border-primary-500/40 pl-2">
-                Seeded from your import: {scenario.targetVcpuToPCoreRatio}:1 ratio,{' '}
-                {scenario.growthPercent}% growth, {scenario.safetyPercent}% safety — adjust as
-                needed.
+                {t('scenarioCard.seededNotice', {
+                  ratio: scenario.targetVcpuToPCoreRatio,
+                  growth: scenario.growthPercent,
+                  safety: scenario.safetyPercent,
+                })}
               </p>
             )}
 
             {/* Server Configuration */}
             <section>
               <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-                Target Server Config
+                {t('scenarioCard.serverConfig.heading')}
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <FormField
@@ -275,7 +273,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="socketsPerServer"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="socketsPerServer">Sockets/Server</FieldLabel>
+                      <FieldLabel name="socketsPerServer">
+                        {t('scenarioCard.serverConfig.socketsPerServer')}
+                      </FieldLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -293,7 +293,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="coresPerSocket"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="coresPerSocket">Cores/Socket</FieldLabel>
+                      <FieldLabel name="coresPerSocket">
+                        {t('scenarioCard.serverConfig.coresPerSocket')}
+                      </FieldLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -311,7 +313,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="ramPerServerGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="ramPerServerGb">RAM/Server GB</FieldLabel>
+                      <FieldLabel name="ramPerServerGb">
+                        {t('scenarioCard.serverConfig.ramPerServerGb')}
+                      </FieldLabel>
                       <FormControl>
                         <Input type="number" min={1} {...numericField(field)} />
                       </FormControl>
@@ -325,7 +329,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     name="diskPerServerGb"
                     render={({ field }) => (
                       <FormItem>
-                        <FieldLabel name="diskPerServerGb">Disk/Server GB</FieldLabel>
+                        <FieldLabel name="diskPerServerGb">
+                          {t('scenarioCard.serverConfig.diskPerServerGb')}
+                        </FieldLabel>
                         <FormControl>
                           <Input type="number" min={1} {...numericField(field)} />
                         </FormControl>
@@ -337,7 +343,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
               </div>
               {totalCores !== null && (
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                  Total cores/server:{' '}
+                  {t('scenarioCard.serverConfig.totalCores')}{' '}
                   <span className="font-semibold tabular-nums">{totalCores}</span>
                 </p>
               )}
@@ -346,18 +352,18 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 (currentCluster.socketsPerServer == null ||
                   currentCluster.coresPerSocket == null) && (
                   <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
-                    No socket/core data from import — enter manually.
+                    {t('scenarioCard.serverConfig.noSocketCoreData')}
                   </p>
                 )}
               {sizingMode === 'vcpu' && (
                 <div className="mt-3 space-y-2">
                   <Label htmlFor={`${scenarioId}-vcpuTargetCpu`}>
-                    Look up target CPU (optional)
+                    {t('scenarioCard.serverConfig.lookupTargetCpu')}
                   </Label>
                   <Input
                     id={`${scenarioId}-vcpuTargetCpu`}
                     type="text"
-                    placeholder="e.g. Xeon Gold 6526Y"
+                    placeholder={t('scenarioCard.serverConfig.cpuModelPlaceholder')}
                     value={targetCpuModel}
                     onChange={(e) => setTargetCpuModel(e.target.value)}
                   />
@@ -386,7 +392,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
             {/* Sizing Assumptions */}
             <section>
               <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-                Sizing Assumptions
+                {t('scenarioCard.sizingAssumptions.heading')}
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -396,7 +402,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     name="targetVcpuToPCoreRatio"
                     render={({ field }) => (
                       <FormItem>
-                        <FieldLabel name="targetVcpuToPCoreRatio">vCPU:pCore Ratio</FieldLabel>
+                        <FieldLabel name="targetVcpuToPCoreRatio">
+                          {t('scenarioCard.sizingAssumptions.vcpuToPCoreRatio')}
+                        </FieldLabel>
                         <FormControl>
                           <Input type="number" min={0.1} step={0.5} {...numericField(field)} />
                         </FormControl>
@@ -410,7 +418,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="ramPerVmGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="ramPerVmGb">RAM/VM GB</FieldLabel>
+                      <FieldLabel name="ramPerVmGb">
+                        {t('scenarioCard.sizingAssumptions.ramPerVmGb')}
+                      </FieldLabel>
                       <FormControl>
                         <Input type="number" min={0.1} {...numericField(field)} />
                       </FormControl>
@@ -423,7 +433,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="diskPerVmGb"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="diskPerVmGb">Disk/VM GB</FieldLabel>
+                      <FieldLabel name="diskPerVmGb">
+                        {t('scenarioCard.sizingAssumptions.diskPerVmGb')}
+                      </FieldLabel>
                       <FormControl>
                         <Input type="number" min={0.1} {...numericField(field)} />
                       </FormControl>
@@ -436,7 +448,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="growthPercent"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="growthPercent">Growth %</FieldLabel>
+                      <FieldLabel name="growthPercent">
+                        {t('scenarioCard.sizingAssumptions.growthPercent')}
+                      </FieldLabel>
                       <FormControl>
                         <Input type="number" min={0} max={200} {...numericField(field)} />
                       </FormControl>
@@ -449,7 +463,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="safetyPercent"
                   render={({ field }) => (
                     <FormItem>
-                      <FieldLabel name="safetyPercent">Safety buffer %</FieldLabel>
+                      <FieldLabel name="safetyPercent">
+                        {t('scenarioCard.sizingAssumptions.safetyPercent')}
+                      </FieldLabel>
                       <FormControl>
                         <Input type="number" min={0} max={100} {...numericField(field)} />
                       </FormControl>
@@ -466,7 +482,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                   name="haReserveCount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>HA Reserve</FormLabel>
+                      <FormLabel>{t('scenarioCard.sizingAssumptions.haReserve')}</FormLabel>
                       <div className="flex gap-0.5 border border-slate-200 dark:border-surface-700 rounded-md p-0.5 bg-slate-100/40 dark:bg-surface-700/40 w-fit">
                         {([0, 1, 2] as const).map((n) => (
                           <button
@@ -481,7 +497,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                                 : 'bg-transparent hover:bg-slate-100 dark:hover:bg-surface-700',
                             ].join(' ')}
                           >
-                            {n === 0 ? 'N (None)' : `N+${n}`}
+                            {n === 0 ? t('scenarioCard.sizingAssumptions.haNone') : `N+${n}`}
                           </button>
                         ))}
                       </div>
@@ -495,7 +511,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
             {sizingMode === 'performance' && (
               <div className="border-t pt-4">
                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-                  Performance Target (required)
+                  {t('scenarioCard.performance.heading')}
                 </p>
                 <div className="space-y-3">
                   <FormField
@@ -504,7 +520,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FieldLabel name="targetCpuFrequencyGhz">
-                          New CPU Frequency (GHz)
+                          {t('scenarioCard.performance.targetCpuFrequencyGhz')}
                         </FieldLabel>
                         <FormControl>
                           <Input
@@ -536,7 +552,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                       htmlFor={`${scenarioId}-spec-enabled`}
                       className="cursor-pointer text-sm"
                     >
-                      I have SPEC scores (more precise)
+                      {t('scenarioCard.performance.specScoresCheckbox')}
                     </Label>
                   </div>
 
@@ -544,11 +560,13 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                     <div className="space-y-3">
                       {/* Target CPU Model search input */}
                       <div className="space-y-1">
-                        <Label htmlFor={`${scenarioId}-targetCpuModel`}>Target CPU Model</Label>
+                        <Label htmlFor={`${scenarioId}-targetCpuModel`}>
+                          {t('scenarioCard.performance.targetCpuModel')}
+                        </Label>
                         <Input
                           id={`${scenarioId}-targetCpuModel`}
                           type="text"
-                          placeholder="e.g. Xeon Gold 6526Y"
+                          placeholder={t('scenarioCard.serverConfig.cpuModelPlaceholder')}
                           value={targetCpuModel}
                           onChange={(e) => setTargetCpuModel(e.target.value)}
                         />
@@ -572,7 +590,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                         render={({ field, fieldState }) => (
                           <div className="space-y-1">
                             <Label htmlFor={`${scenarioId}-targetSpecint`}>
-                              SPECrate2017_int_base / Server (target)
+                              {t('scenarioCard.performance.targetSpecint')}
                             </Label>
                             <Input
                               id={`${scenarioId}-targetSpecint`}
@@ -606,7 +624,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                 aria-controls={`${scenarioId}-advanced`}
                 className="flex w-full items-center gap-1 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
               >
-                Advanced
+                {t('scenarioCard.advanced.label')}
                 <span aria-hidden="true">{advancedOpen ? '▾' : '▸'}</span>
               </button>
 
@@ -627,7 +645,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                         htmlFor={`${scenarioId}-pin-enabled`}
                         className="flex items-center gap-1 cursor-pointer text-sm"
                       >
-                        Pin minimum servers
+                        {t('scenarioCard.advanced.pinMinServers')}
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger
@@ -639,7 +657,9 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                               <Info className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="max-w-xs text-sm">{TOOLTIPS.minServerCount}</p>
+                              <p className="max-w-xs text-sm">
+                                {t('scenarioCard.tooltips.minServerCount')}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -656,7 +676,7 @@ export function ScenarioCard({ scenarioId }: ScenarioCardProps) {
                                 type="number"
                                 min={1}
                                 step={1}
-                                placeholder="Minimum server count"
+                                placeholder={t('scenarioCard.advanced.minServerCountPlaceholder')}
                                 data-testid={`input-minServerCount-${scenarioId}`}
                                 {...field}
                                 value={field.value ?? ''}

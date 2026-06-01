@@ -1,5 +1,6 @@
 import { Database, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Step1CurrentCluster } from '@/components/step1/Step1CurrentCluster';
 import { Step2Scenarios } from '@/components/step2/Step2Scenarios';
 import { Step3ReviewExport } from '@/components/step3/Step3ReviewExport';
@@ -16,14 +17,17 @@ import { STORE_PREDICT_URL } from '@/lib/config';
 import { isClusterSizingReady } from '@/lib/sizing/clusterReadiness';
 import { createDefaultScenario } from '@/lib/sizing/defaults';
 import { useClusterStore } from '@/store/useClusterStore';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
 import { useImportStore } from '@/store/useImportStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { SizingModeToggle } from './SizingModeToggle';
 import { StepIndicator } from './StepIndicator';
 import { ThemeToggle } from './ThemeToggle';
 
 export function WizardShell() {
+  const { t } = useTranslation('wizard');
   const currentStep = useWizardStore((s) => s.currentStep);
   const prevStep = useWizardStore((s) => s.prevStep);
   const nextStep = useWizardStore((s) => s.nextStep);
@@ -48,9 +52,10 @@ export function WizardShell() {
     useClusterStore.getState().resetCluster();
     useScenariosStore.getState().setScenarios([createDefaultScenario()]);
     useImportStore.getState().clearImport();
+    useExclusionsStore.getState().reset();
     goToStep(1);
     setSizingMode('vcpu');
-    setLayoutMode('hci');
+    setLayoutMode('disaggregated');
     try {
       localStorage.removeItem('presizion-session');
     } catch {
@@ -60,37 +65,45 @@ export function WizardShell() {
   }
 
   return (
-    <div className="bg-white dark:bg-surface-900 overflow-x-hidden" style={{ minHeight: '100dvh' }}>
+    <div className="overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <header className="relative mb-6 text-center print:hidden">
-          <div className="absolute left-0 top-0 flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setResetOpen(true)}
-              aria-label="Reset"
-              className="h-11 w-11 p-0"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-            <a
-              href={STORE_PREDICT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Storage Calculator (Store-Predict)"
-              className="inline-flex items-center justify-center rounded-md h-11 w-11 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-surface-700 transition-colors"
-            >
-              <Database className="h-4 w-4" />
-            </a>
+        <header className="mb-8 print:hidden">
+          {/* Cockpit top bar: brand mark + wordmark on the left, controls on the right. */}
+          <div className="flex items-center justify-between gap-2 mb-9 border-b border-slate-300/40 dark:border-surface-700/60 pb-4">
+            <div className="flex items-center gap-2.5">
+              <img src="/presizion/logo.svg" alt="Presizion" className="h-7 w-auto" />
+            </div>
+            <div className="flex items-center gap-1 [&_button]:h-11 [&_button]:w-11">
+              <a
+                href={STORE_PREDICT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t('header.storePredictTitle')}
+                className="inline-flex items-center justify-center rounded-md h-11 w-11 text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-500/10 transition-colors"
+              >
+                <Database className="h-4 w-4" />
+              </a>
+              <LanguageSwitcher />
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setResetOpen(true)}
+                aria-label={t('header.resetAriaLabel')}
+                className="h-11 w-11 p-0"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="absolute right-0 top-0 [&_button]:h-11 [&_button]:w-11">
-            <ThemeToggle />
+
+          {/* Hero */}
+          <div className="text-center">
+            <h1 className="cockpit-title text-4xl sm:text-5xl">{t('header.tagline')}</h1>
+            <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 mt-2">
+              {t('header.subtitle')}
+            </p>
           </div>
-          <img src="/presizion/logo.svg" alt="Presizion" className="mx-auto mb-3 h-8 w-auto" />
-          <h1 className="text-2xl font-bold tracking-tight">Cluster Refresh Sizing</h1>
-          <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Size your refreshed cluster based on existing metrics
-          </p>
           <SizingModeToggle />
         </header>
 
@@ -110,11 +123,11 @@ export function WizardShell() {
             style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
           >
             <Button type="button" variant="outline" onClick={prevStep} className="min-h-[44px]">
-              Back
+              {t('nav.back')}
             </Button>
             {currentStep === 2 && (
               <Button type="button" onClick={nextStep} className="min-h-[44px]">
-                Next: Review &amp; Export
+                {t('nav.nextReview')}
               </Button>
             )}
           </div>
@@ -124,17 +137,15 @@ export function WizardShell() {
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset all data?</DialogTitle>
+            <DialogTitle>{t('reset.title')}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            All cluster data and scenarios will be cleared. This cannot be undone.
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('reset.body')}</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setResetOpen(false)}>
-              Cancel
+              {t('reset.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleConfirmReset}>
-              Reset
+              {t('reset.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

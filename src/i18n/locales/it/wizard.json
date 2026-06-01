@@ -1,0 +1,52 @@
+{
+  "header": {
+    "appName": "Presizion",
+    "tagline": "Dimensionamento del rinnovo del cluster",
+    "subtitle": "Dimensiona il tuo cluster rinnovato in base alle metriche esistenti",
+    "resetAriaLabel": "Reimposta",
+    "storePredictTitle": "Calcolatore di storage (Store-Predict)"
+  },
+  "nav": {
+    "back": "Indietro",
+    "nextReview": "Avanti: Revisione ed esportazione"
+  },
+  "reset": {
+    "title": "Reimpostare tutti i dati?",
+    "body": "Tutti i dati del cluster e gli scenari verranno eliminati. Questa operazione non può essere annullata.",
+    "confirm": "Reimposta",
+    "cancel": "Annulla"
+  },
+  "sizingMode": {
+    "groupAriaLabel": "Modalità di dimensionamento",
+    "vcpu": "vCPU",
+    "performance": "Prestazioni",
+    "performanceTooltip": "Dimensiona in base alle prestazioni per core (GHz per impostazione predefinita; aggiungere i punteggi SPEC nello scenario per maggiore precisione)."
+  },
+  "layoutMode": {
+    "groupAriaLabel": "Modalità layout",
+    "hci": "HCI",
+    "disaggregated": "Disaggregato"
+  },
+  "stretch": {
+    "label": "Cluster esteso",
+    "tooltip": "Cluster esteso: ogni sito deve supportare il carico completo in caso di guasto. Il dimensionamento raddoppia il numero di server e arrotonda a un numero pari."
+  },
+  "stepIndicator": {
+    "navAriaLabel": "Passaggi della procedura guidata",
+    "step1Label": "Cluster attuale",
+    "step2Label": "Definisci scenari",
+    "step3Label": "Revisione ed esportazione",
+    "stepAriaLabel": "Passaggio {{step}}: {{label}}"
+  },
+  "themeToggle": {
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema",
+    "ariaLabel": "Tema: {{theme}}. Fare clic per cambiare.",
+    "title": "Tema: {{theme}}"
+  },
+  "toast": {
+    "exclusionsTrimmed": "Alcune regole di esclusione sono state rimosse dall'URL condiviso a causa delle dimensioni. Reimportare il file sorgente per riprodurre le selezioni esatte per VM."
+  },
+  "infoAria": "Info: {{label}}"
+}

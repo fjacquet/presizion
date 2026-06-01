@@ -1,0 +1,88 @@
+{
+  "title": "Schritt 3: Überprüfen und exportieren",
+  "reviewExport": {
+    "heading": "Überprüfen & Exportieren",
+    "subheading": "Vergleichen Sie Ihre Zielszenarien nebeneinander und exportieren Sie dann die Ergebnisse.",
+    "exportShare": "Exportieren / Teilen",
+    "exportResults": "Ergebnisse exportieren",
+    "copySummary": "Zusammenfassung kopieren",
+    "copied": "Kopiert!",
+    "downloadCsv": "CSV herunterladen",
+    "downloadJson": "JSON herunterladen",
+    "share": "Teilen",
+    "linkCopied": "Link kopiert!",
+    "exportPptx": "PPTX exportieren",
+    "generating": "Wird erstellt...",
+    "close": "Schließen",
+    "pptxSafariWarning": "Der PPTX-Download wird in Safari nicht unterstützt. Verwenden Sie Chrome oder einen Desktop-Browser.",
+    "pptxExportError": "PPTX-Export fehlgeschlagen. Details finden Sie in der Browser-Konsole."
+  },
+  "comparisonTable": {
+    "modeLabel": "Modus:",
+    "layoutLabel": "Layout:",
+    "layoutHci": "HCI",
+    "layoutDisaggregated": "Disaggregiert",
+    "metricHeader": "Kennzahl",
+    "asIs": "Ist-Zustand"
+  },
+  "nodeSizingRows": {
+    "serversRequired": "Benötigte Server",
+    "serverConfig": "Server-Konfiguration",
+    "limitingResource": "Begrenzende Ressource",
+    "vcpuPcoreRatio": "vCPU:pCore-Verhältnis",
+    "vmsPerServer": "VMs/Server",
+    "growthSafety": "Wachstum / Sicherheit",
+    "notApplicable": "N/A",
+    "resourceCpu": "CPU-begrenzt",
+    "resourceRam": "RAM-begrenzt",
+    "resourceDisk": "Festplatten-begrenzt",
+    "resourceSpecint": "SPECrate2017",
+    "resourceGhz": "GHz-begrenzt",
+    "cpuBarPerformance": "Leistungs-begrenzt",
+    "cpuBarVcpu": "CPU-begrenzt"
+  },
+  "utilizationRows": {
+    "sizingDriver": "Dimensionierungstreiber",
+    "cpuUtil": "CPU-Auslastung %",
+    "ramUtil": "RAM-Auslastung %",
+    "diskUtil": "Festplatten-Auslastung %"
+  },
+  "clusterTotalRows": {
+    "totalVcpus": "vCPUs gesamt",
+    "totalPcores": "pCores gesamt",
+    "totalVms": "VMs gesamt",
+    "totalRamGb": "RAM gesamt (GB)",
+    "totalDiskGb": "Festplatte gesamt (GB)",
+    "totalDiskRequired": "Benötigte Festplattenkapazität"
+  },
+  "sizingChart": {
+    "serverCountTitle": "Serveranzahl-Vergleich",
+    "serverCountAriaLabel": "Serveranzahl-Vergleich",
+    "constraintBreakdownTitle": "Einschränkungsaufschlüsselung pro Szenario",
+    "constraintBreakdownAriaLabel": "Einschränkungsaufschlüsselung pro Szenario",
+    "downloadSvg": "SVG herunterladen",
+    "downloadSvgAriaLabel": "Diagramm als SVG herunterladen",
+    "downloadConstraintAriaLabel": "Einschränkungsdiagramm als SVG herunterladen"
+  },
+  "coreCountChart": {
+    "title": "Physische Kerne gesamt pro Szenario",
+    "ariaLabel": "Physische Kerne gesamt pro Szenario",
+    "downloadSvg": "SVG herunterladen",
+    "downloadSvgAriaLabel": "Diagramm als SVG herunterladen"
+  },
+  "capacityStackedChart": {
+    "titlePrefix": "Kapazitätsaufschlüsselung -- {{scenarioName}}",
+    "ariaLabel": "Kapazitätsaufschlüsselung für {{scenarioName}}",
+    "downloadSvg": "SVG herunterladen",
+    "downloadSvgAriaLabel": "Kapazitätsdiagramm als SVG herunterladen",
+    "legendRequired": "Erforderlich",
+    "legendSpare": "Reserve",
+    "legendExcess": "Überschuss"
+  },
+  "minNodesChart": {
+    "titlePrefix": "Min. Knoten nach Einschränkung -- {{scenarioName}}",
+    "ariaLabel": "Min. Knoten nach Einschränkung für {{scenarioName}}",
+    "downloadSvg": "SVG herunterladen",
+    "downloadSvgAriaLabel": "Min.-Knoten-Diagramm als SVG herunterladen"
+  }
+}

@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { ExclusionRules } from '@/types/exclusions';
@@ -36,28 +37,29 @@ export function buildCsvContent(
   results: readonly ScenarioResult[],
   breakdowns: readonly VsanCapacityBreakdown[] = [],
 ): string {
+  const t = i18n.t.bind(i18n);
   const headers = [
-    'Name',
-    'Sockets/Server',
-    'Cores/Socket',
-    'RAM/Server (GB)',
-    'Disk/Server (GB)',
-    'vCPU:pCore Ratio',
-    'RAM/VM (GB)',
-    'Disk/VM (GB)',
-    'Growth (%)',
-    'Safety (%)',
-    'N+1 HA',
-    'CPU-limited',
-    'RAM-limited',
-    'Disk-limited',
-    'Final Count',
-    'Limiting Resource',
-    'Achieved vCPU:pCore',
-    'VMs/Server',
-    'CPU util (%)',
-    'RAM util (%)',
-    'Disk util (%)',
+    t('export:csv.headers.name'),
+    t('export:csv.headers.socketsPerServer'),
+    t('export:csv.headers.coresPerSocket'),
+    t('export:csv.headers.ramPerServer'),
+    t('export:csv.headers.diskPerServer'),
+    t('export:csv.headers.vcpuToPCoreRatio'),
+    t('export:csv.headers.ramPerVm'),
+    t('export:csv.headers.diskPerVm'),
+    t('export:csv.headers.growth'),
+    t('export:csv.headers.safety'),
+    t('export:csv.headers.ha'),
+    t('export:csv.headers.cpuLimited'),
+    t('export:csv.headers.ramLimited'),
+    t('export:csv.headers.diskLimited'),
+    t('export:csv.headers.finalCount'),
+    t('export:csv.headers.limitingResource'),
+    t('export:csv.headers.achievedRatio'),
+    t('export:csv.headers.vmsPerServer'),
+    t('export:csv.headers.cpuUtil'),
+    t('export:csv.headers.ramUtil'),
+    t('export:csv.headers.diskUtil'),
   ];
 
   const rows: string[] = [headers.map(csvEscape).join(',')];
@@ -95,7 +97,17 @@ export function buildCsvContent(
 
   breakdowns.forEach((bd, i) => {
     const name = scenarios[i]?.name ?? `Scenario ${i + 1}`;
-    rows.push('', `Capacity Breakdown,${csvEscape(name)}`, 'Resource,Required,Spare,Excess,Total');
+    const sectionLabel = t('export:csv.breakdown.sectionLabel');
+    const resourceCol = t('export:csv.breakdown.resourceCol');
+    const required = t('export:csv.breakdown.required');
+    const spare = t('export:csv.breakdown.spare');
+    const excess = t('export:csv.breakdown.excess');
+    const total = t('export:csv.breakdown.total');
+    rows.push(
+      '',
+      `${sectionLabel},${csvEscape(name)}`,
+      `${resourceCol},${required},${spare},${excess},${total}`,
+    );
     const line = (
       label: string,
       r: { required: number; spare: number; excess: number; total: number },
@@ -105,9 +117,9 @@ export function buildCsvContent(
         .map((v) => (typeof v === 'number' ? v.toFixed(1) : v))
         .map(csvEscape)
         .join(',');
-    rows.push(line('CPU GHz', bd.cpu));
-    rows.push(line('Memory GiB', bd.memory));
-    rows.push(line('Raw Storage TiB', bd.storage, 1024));
+    rows.push(line(t('export:csv.breakdown.cpuGhz'), bd.cpu));
+    rows.push(line(t('export:csv.breakdown.memoryGib'), bd.memory));
+    rows.push(line(t('export:csv.breakdown.rawStorageTib'), bd.storage, 1024));
   });
 
   return rows.join('\n');

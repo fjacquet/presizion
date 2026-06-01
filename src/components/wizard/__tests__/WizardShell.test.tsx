@@ -7,6 +7,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useClusterStore } from '@/store/useClusterStore';
+import { useExclusionsStore } from '@/store/useExclusionsStore';
 import { useImportStore } from '@/store/useImportStore';
 import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
@@ -287,12 +288,14 @@ describe('WizardShell', () => {
     const resetClusterSpy = vi.fn();
     const setScenariosSpy = vi.fn();
     const clearImportSpy = vi.fn();
+    const resetExclusionsSpy = vi.fn();
 
     beforeEach(() => {
       // Set up store spies
       useClusterStore.setState({ resetCluster: resetClusterSpy });
       useScenariosStore.setState({ setScenarios: setScenariosSpy });
       useImportStore.setState({ clearImport: clearImportSpy });
+      useExclusionsStore.setState({ reset: resetExclusionsSpy });
 
       // Set up localStorage test data
       localStorageStore['presizion-theme'] = 'dark';
@@ -302,6 +305,7 @@ describe('WizardShell', () => {
       resetClusterSpy.mockClear();
       setScenariosSpy.mockClear();
       clearImportSpy.mockClear();
+      resetExclusionsSpy.mockClear();
       localStorageMock.removeItem.mockClear();
     });
 
@@ -347,6 +351,7 @@ describe('WizardShell', () => {
       expect(resetClusterSpy).not.toHaveBeenCalled();
       expect(setScenariosSpy).not.toHaveBeenCalled();
       expect(clearImportSpy).not.toHaveBeenCalled();
+      expect(resetExclusionsSpy).not.toHaveBeenCalled();
     });
 
     it('confirming clears cluster store (resetCluster called)', async () => {
@@ -378,6 +383,16 @@ describe('WizardShell', () => {
       const confirmBtn = dialogButtons[dialogButtons.length - 1];
       await userEvent.click(confirmBtn!);
       expect(clearImportSpy).toHaveBeenCalled();
+    });
+
+    it('confirming resets the VM-exclusions store', async () => {
+      useWizardStore.setState({ currentStep: 2 });
+      render(<WizardShell />);
+      await userEvent.click(screen.getByRole('button', { name: /reset/i }));
+      const dialogButtons = screen.getAllByRole('button', { name: /reset/i });
+      const confirmBtn = dialogButtons[dialogButtons.length - 1];
+      await userEvent.click(confirmBtn!);
+      expect(resetExclusionsSpy).toHaveBeenCalled();
     });
 
     it('confirming removes presizion-session from localStorage', async () => {

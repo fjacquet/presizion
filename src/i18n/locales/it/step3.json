@@ -1,0 +1,88 @@
+{
+  "title": "Passaggio 3: Rivedere ed esportare",
+  "reviewExport": {
+    "heading": "Revisione ed esportazione",
+    "subheading": "Confronta i tuoi scenari target affiancati, quindi esporta i risultati.",
+    "exportShare": "Esporta / Condividi",
+    "exportResults": "Esporta risultati",
+    "copySummary": "Copia riepilogo",
+    "copied": "Copiato!",
+    "downloadCsv": "Scarica CSV",
+    "downloadJson": "Scarica JSON",
+    "share": "Condividi",
+    "linkCopied": "Link copiato!",
+    "exportPptx": "Esporta PPTX",
+    "generating": "Generazione in corso...",
+    "close": "Chiudi",
+    "pptxSafariWarning": "Il download PPTX non è supportato in Safari. Usa Chrome o un browser desktop.",
+    "pptxExportError": "Esportazione PPTX non riuscita. Controlla la console del browser per i dettagli."
+  },
+  "comparisonTable": {
+    "modeLabel": "Modalità:",
+    "layoutLabel": "Layout:",
+    "layoutHci": "HCI",
+    "layoutDisaggregated": "Disaggregato",
+    "metricHeader": "Metrica",
+    "asIs": "Attuale"
+  },
+  "nodeSizingRows": {
+    "serversRequired": "Server richiesti",
+    "serverConfig": "Config. server",
+    "limitingResource": "Risorsa limitante",
+    "vcpuPcoreRatio": "Rapporto vCPU:pCore",
+    "vmsPerServer": "VM/Server",
+    "growthSafety": "Crescita / Sicurezza",
+    "notApplicable": "N/D",
+    "resourceCpu": "Limitato da CPU",
+    "resourceRam": "Limitato da RAM",
+    "resourceDisk": "Limitato da disco",
+    "resourceSpecint": "SPECrate2017",
+    "resourceGhz": "Limitato da GHz",
+    "cpuBarPerformance": "Limitato dalle prestazioni",
+    "cpuBarVcpu": "Limitato da CPU"
+  },
+  "utilizationRows": {
+    "sizingDriver": "fattore di dimensionamento",
+    "cpuUtil": "Utilizzo CPU %",
+    "ramUtil": "Utilizzo RAM %",
+    "diskUtil": "Utilizzo disco %"
+  },
+  "clusterTotalRows": {
+    "totalVcpus": "vCPU totali",
+    "totalPcores": "pCore totali",
+    "totalVms": "VM totali",
+    "totalRamGb": "RAM totale (GB)",
+    "totalDiskGb": "Disco totale (GB)",
+    "totalDiskRequired": "Disco totale richiesto"
+  },
+  "sizingChart": {
+    "serverCountTitle": "Confronto conteggio server",
+    "serverCountAriaLabel": "Confronto conteggio server",
+    "constraintBreakdownTitle": "Ripartizione vincoli per scenario",
+    "constraintBreakdownAriaLabel": "Ripartizione vincoli per scenario",
+    "downloadSvg": "Scarica SVG",
+    "downloadSvgAriaLabel": "Scarica il grafico come SVG",
+    "downloadConstraintAriaLabel": "Scarica il grafico dei vincoli come SVG"
+  },
+  "coreCountChart": {
+    "title": "Core fisici totali per scenario",
+    "ariaLabel": "Core fisici totali per scenario",
+    "downloadSvg": "Scarica SVG",
+    "downloadSvgAriaLabel": "Scarica il grafico come SVG"
+  },
+  "capacityStackedChart": {
+    "titlePrefix": "Ripartizione capacità -- {{scenarioName}}",
+    "ariaLabel": "Ripartizione capacità per {{scenarioName}}",
+    "downloadSvg": "Scarica SVG",
+    "downloadSvgAriaLabel": "Scarica il grafico della capacità come SVG",
+    "legendRequired": "Richiesto",
+    "legendSpare": "Disponibile",
+    "legendExcess": "Eccedente"
+  },
+  "minNodesChart": {
+    "titlePrefix": "Nodi min. per vincolo -- {{scenarioName}}",
+    "ariaLabel": "Nodi min. per vincolo per {{scenarioName}}",
+    "downloadSvg": "Scarica SVG",
+    "downloadSvgAriaLabel": "Scarica il grafico nodi min. come SVG"
+  }
+}

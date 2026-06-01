@@ -1,0 +1,75 @@
+{
+  "deckTitle": "Dimensionnement du renouvellement de cluster",
+  "slide": {
+    "title": "Rapport de dimensionnement du cluster",
+    "executiveSummary": "Résumé Exécutif",
+    "comparison": "Comparaison État Actuel vs Cible",
+    "capacityBreakdown": "Répartition de la capacité — {{name}}",
+    "minNodes": "Nœuds minimaux par contrainte — {{name}}"
+  },
+  "kpi": {
+    "asIsServers": "Serveurs Actuels",
+    "targetServers": "Serveurs {{name}}",
+    "cpuUtilization": "Utilisation CPU",
+    "ramUtilization": "Utilisation RAM"
+  },
+  "summary": {
+    "colScenario": "Scénario",
+    "colServers": "Serveurs",
+    "colLimitingResource": "Ressource Limitante",
+    "colCpuUtil": "Util. CPU %",
+    "colRamUtil": "Util. RAM %"
+  },
+  "comparison": {
+    "colMetric": "Métrique",
+    "colAsIs": "État Actuel",
+    "rowServers": "Serveurs",
+    "rowLimitingResource": "Ressource Limitante",
+    "rowVmsPerServer": "VMs/Serveur",
+    "rowVcpuRatio": "Ratio vCPU:pCore",
+    "rowCpuUtil": "Util. CPU %",
+    "rowRamUtil": "Util. RAM %",
+    "rowTotalDisk": "Disque Total",
+    "rowSocketsPerServer": "Sockets / Serveur",
+    "rowCoresPerSocket": "Cœurs / Socket",
+    "rowTotalCoresPerServer": "Cœurs Totaux / Serveur",
+    "rowRamPerServer": "RAM / Serveur (Go)",
+    "rowDiskPerServer": "Disque / Serveur (Go)",
+    "rowSafetyPct": "Sécurité %",
+    "rowHaReserve": "Réserve HA",
+    "rowAvgVcpuPerVm": "Moy. vCPU/VM",
+    "rowAvgRamPerVm": "Moy. RAM/VM (Gio)",
+    "rowAvgDiskPerVm": "Moy. Disque/VM (Gio)",
+    "rowFttPolicy": "Politique FTT",
+    "rowCompressionFactor": "Facteur de compression",
+    "rowSlackPct": "Marge %",
+    "rowGrowthPct": "Croissance %",
+    "valueNone": "Aucun",
+    "valueNA": "N/A"
+  },
+  "capacityTable": {
+    "colResource": "Ressource",
+    "colRequired": "Requis",
+    "colSpare": "Disponible",
+    "colExcess": "Excédent",
+    "colTotal": "Total",
+    "rowCpuGhz": "CPU GHz",
+    "rowMemoryGib": "Mémoire Gio",
+    "rowRawStorageTib": "Stockage Brut Tio"
+  },
+  "legend": {
+    "required": "Requis",
+    "spare": "Disponible",
+    "excess": "Excédent"
+  },
+  "minNodesTable": {
+    "colConstraint": "Contrainte",
+    "colMinNodes": "Nœuds Min.",
+    "colBinding": "Limitant ?",
+    "valueYes": "Oui",
+    "subtitle": "La contrainte limitante détermine la taille minimale du cluster."
+  },
+  "footer": {
+    "slide": "Diapositive {{num}}"
+  }
+}

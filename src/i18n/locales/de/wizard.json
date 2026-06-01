@@ -1,0 +1,52 @@
+{
+  "header": {
+    "appName": "Presizion",
+    "tagline": "Cluster-Refresh-Dimensionierung",
+    "subtitle": "Dimensionieren Sie Ihren erneuerten Cluster anhand vorhandener Metriken",
+    "resetAriaLabel": "Zurücksetzen",
+    "storePredictTitle": "Speicherrechner (Store-Predict)"
+  },
+  "nav": {
+    "back": "Zurück",
+    "nextReview": "Weiter: Überprüfung & Export"
+  },
+  "reset": {
+    "title": "Alle Daten zurücksetzen?",
+    "body": "Alle Cluster-Daten und Szenarien werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "confirm": "Zurücksetzen",
+    "cancel": "Abbrechen"
+  },
+  "sizingMode": {
+    "groupAriaLabel": "Dimensionierungsmodus",
+    "vcpu": "vCPU",
+    "performance": "Leistung",
+    "performanceTooltip": "Dimensioniert nach neuer vs. alter Kernleistung (standardmäßig GHz; fügen Sie SPEC-Werte im Szenario für mehr Präzision hinzu)."
+  },
+  "layoutMode": {
+    "groupAriaLabel": "Layout-Modus",
+    "hci": "HCI",
+    "disaggregated": "Disaggregiert"
+  },
+  "stretch": {
+    "label": "Stretched Cluster",
+    "tooltip": "Stretched Cluster: Jeder Standort muss bei einem Ausfall die volle Last tragen. Die Dimensionierung verdoppelt die Serveranzahl und rundet auf eine gerade Zahl auf."
+  },
+  "stepIndicator": {
+    "navAriaLabel": "Assistentenschritte",
+    "step1Label": "Aktueller Cluster",
+    "step2Label": "Szenarien definieren",
+    "step3Label": "Überprüfung & Export",
+    "stepAriaLabel": "Schritt {{step}}: {{label}}"
+  },
+  "themeToggle": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
+    "ariaLabel": "Design: {{theme}}. Klicken zum Wechseln.",
+    "title": "Design: {{theme}}"
+  },
+  "toast": {
+    "exclusionsTrimmed": "Einige Ausschlussregeln wurden aufgrund der Größe aus der geteilten URL entfernt. Importieren Sie die Quelldatei erneut, um genaue Pro-VM-Auswahlen zu reproduzieren."
+  },
+  "infoAria": "Info: {{label}}"
+}

@@ -1,15 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from '@/components/ui/table';
 import type { SizingMode } from '@/lib/sizing/constraints';
 import type { OldCluster, Scenario } from '@/types/cluster';
 import type { LimitingResource, ScenarioResult } from '@/types/results';
-
-const RESOURCE_LABELS: Record<LimitingResource, string> = {
-  cpu: 'CPU-limited',
-  ram: 'RAM-limited',
-  disk: 'Disk-limited',
-  specint: 'SPECrate2017',
-  ghz: 'GHz-limited',
-};
 
 const STICKY = 'font-medium sticky left-0 bg-white dark:bg-surface-900 z-10';
 const ASIS = 'text-center bg-slate-100/30 dark:bg-surface-700/30';
@@ -22,13 +15,22 @@ interface NodeSizingRowsProps {
 }
 
 export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: NodeSizingRowsProps) {
+  const { t } = useTranslation('step3');
   const showRatioRow = sizingMode === 'vcpu';
+
+  const RESOURCE_LABELS: Record<LimitingResource, string> = {
+    cpu: t('nodeSizingRows.resourceCpu'),
+    ram: t('nodeSizingRows.resourceRam'),
+    disk: t('nodeSizingRows.resourceDisk'),
+    specint: t('nodeSizingRows.resourceSpecint'),
+    ghz: t('nodeSizingRows.resourceGhz'),
+  };
 
   return (
     <>
       {/* Servers Required */}
       <TableRow>
-        <TableCell className={STICKY}>Servers Required</TableCell>
+        <TableCell className={STICKY}>{t('nodeSizingRows.serversRequired')}</TableCell>
         <TableCell className={ASIS}>{cluster.existingServerCount ?? '—'}</TableCell>
         {results.map((result, i) => {
           const base =
@@ -59,7 +61,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
 
       {/* Server Config */}
       <TableRow>
-        <TableCell className={STICKY}>Server Config</TableCell>
+        <TableCell className={STICKY}>{t('nodeSizingRows.serverConfig')}</TableCell>
         <TableCell className={ASIS}>
           {cluster.socketsPerServer && cluster.coresPerSocket
             ? `${cluster.socketsPerServer}s × ${cluster.coresPerSocket}c`
@@ -74,8 +76,8 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
 
       {/* Limiting Resource */}
       <TableRow>
-        <TableCell className={STICKY}>Limiting Resource</TableCell>
-        <TableCell className={ASIS}>N/A</TableCell>
+        <TableCell className={STICKY}>{t('nodeSizingRows.limitingResource')}</TableCell>
+        <TableCell className={ASIS}>{t('nodeSizingRows.notApplicable')}</TableCell>
         {results.map((result, i) => (
           <TableCell key={scenarios[i]?.id ?? i} className="text-center font-bold">
             {RESOURCE_LABELS[result.limitingResource]}
@@ -86,7 +88,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
       {/* vCPU:pCore Ratio */}
       {showRatioRow && (
         <TableRow>
-          <TableCell className={STICKY}>vCPU:pCore Ratio</TableCell>
+          <TableCell className={STICKY}>{t('nodeSizingRows.vcpuPcoreRatio')}</TableCell>
           <TableCell className={ASIS}>
             {cluster.totalPcores > 0
               ? `${(cluster.totalVcpus / cluster.totalPcores).toFixed(1)}:1`
@@ -115,7 +117,7 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
 
       {/* VMs/Server */}
       <TableRow>
-        <TableCell className={STICKY}>VMs/Server</TableCell>
+        <TableCell className={STICKY}>{t('nodeSizingRows.vmsPerServer')}</TableCell>
         <TableCell className={ASIS}>
           {cluster.existingServerCount && cluster.existingServerCount > 0
             ? (cluster.totalVms / cluster.existingServerCount).toFixed(1)
@@ -130,8 +132,8 @@ export function NodeSizingRows({ cluster, scenarios, results, sizingMode }: Node
 
       {/* Growth / Safety buffers */}
       <TableRow>
-        <TableCell className={STICKY}>Growth / Safety</TableCell>
-        <TableCell className={ASIS}>N/A</TableCell>
+        <TableCell className={STICKY}>{t('nodeSizingRows.growthSafety')}</TableCell>
+        <TableCell className={ASIS}>{t('nodeSizingRows.notApplicable')}</TableCell>
         {scenarios.map((s) => (
           <TableCell key={s.id} className="text-center">
             {s.growthPercent}% / {s.safetyPercent}%

@@ -6,6 +6,7 @@
  * All data flows from Zustand stores -- no props.
  */
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ import { MinNodesChart } from './MinNodesChart';
 import { SizingChart } from './SizingChart';
 
 export function Step3ReviewExport() {
+  const { t } = useTranslation('step3');
   const currentCluster = useClusterStore((state) => state.currentCluster);
   const scenarios = useScenariosStore((state) => state.scenarios);
   const results = useScenariosResults();
@@ -109,7 +111,7 @@ export function Step3ReviewExport() {
   const handleExportPptx = async (): Promise<void> => {
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (isIOS) {
-      toast.info('PPTX download is not supported in Safari. Use Chrome or a desktop browser.');
+      toast.info(t('reviewExport.pptxSafariWarning'));
       return;
     }
     setPptxLoading(true);
@@ -129,7 +131,7 @@ export function Step3ReviewExport() {
       );
     } catch (err) {
       console.error('PPTX export failed:', err);
-      toast.error('PPTX export failed. Check browser console for details.');
+      toast.error(t('reviewExport.pptxExportError'));
     } finally {
       setPptxLoading(false);
     }
@@ -138,10 +140,8 @@ export function Step3ReviewExport() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Review &amp; Export</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Compare your target scenarios side-by-side, then export the results.
-        </p>
+        <h2 className="text-2xl font-bold tracking-tight">{t('reviewExport.heading')}</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">{t('reviewExport.subheading')}</p>
       </div>
 
       {isMobile ? (
@@ -149,12 +149,12 @@ export function Step3ReviewExport() {
           <Drawer>
             <DrawerTrigger asChild>
               <Button variant="outline" className="w-full">
-                Export / Share
+                {t('reviewExport.exportShare')}
               </Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
-                <DrawerTitle>Export Results</DrawerTitle>
+                <DrawerTitle>{t('reviewExport.exportResults')}</DrawerTitle>
               </DrawerHeader>
               <div className="flex flex-col gap-3 p-4 overflow-y-auto">
                 <Button
@@ -163,13 +163,13 @@ export function Step3ReviewExport() {
                     void handleCopy();
                   }}
                 >
-                  {copied ? 'Copied!' : 'Copy Summary'}
+                  {copied ? t('reviewExport.copied') : t('reviewExport.copySummary')}
                 </Button>
                 <Button variant="outline" onClick={handleDownloadCsv}>
-                  Download CSV
+                  {t('reviewExport.downloadCsv')}
                 </Button>
                 <Button variant="outline" onClick={handleDownloadJson}>
-                  Download JSON
+                  {t('reviewExport.downloadJson')}
                 </Button>
                 <Button
                   variant="outline"
@@ -177,7 +177,7 @@ export function Step3ReviewExport() {
                     void handleShare();
                   }}
                 >
-                  {shared ? 'Link Copied!' : 'Share'}
+                  {shared ? t('reviewExport.linkCopied') : t('reviewExport.share')}
                 </Button>
                 <Button
                   variant="outline"
@@ -186,12 +186,12 @@ export function Step3ReviewExport() {
                   }}
                   disabled={pptxLoading}
                 >
-                  {pptxLoading ? 'Generating...' : 'Export PPTX'}
+                  {pptxLoading ? t('reviewExport.generating') : t('reviewExport.exportPptx')}
                 </Button>
               </div>
               <DrawerFooter>
                 <DrawerClose asChild>
-                  <Button variant="outline">Close</Button>
+                  <Button variant="outline">{t('reviewExport.close')}</Button>
                 </DrawerClose>
               </DrawerFooter>
             </DrawerContent>
@@ -205,13 +205,13 @@ export function Step3ReviewExport() {
               void handleCopy();
             }}
           >
-            {copied ? 'Copied!' : 'Copy Summary'}
+            {copied ? t('reviewExport.copied') : t('reviewExport.copySummary')}
           </Button>
           <Button variant="outline" onClick={handleDownloadCsv}>
-            Download CSV
+            {t('reviewExport.downloadCsv')}
           </Button>
           <Button variant="outline" onClick={handleDownloadJson}>
-            Download JSON
+            {t('reviewExport.downloadJson')}
           </Button>
           <Button
             variant="outline"
@@ -219,7 +219,7 @@ export function Step3ReviewExport() {
               void handleShare();
             }}
           >
-            {shared ? 'Link Copied!' : 'Share'}
+            {shared ? t('reviewExport.linkCopied') : t('reviewExport.share')}
           </Button>
           <Button
             variant="outline"
@@ -228,7 +228,7 @@ export function Step3ReviewExport() {
             }}
             disabled={pptxLoading}
           >
-            {pptxLoading ? 'Generating...' : 'Export PPTX'}
+            {pptxLoading ? t('reviewExport.generating') : t('reviewExport.exportPptx')}
           </Button>
         </div>
       )}

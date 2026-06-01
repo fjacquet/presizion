@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ExternalLink, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { type Control, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { SpecResultsPanel } from '@/components/common/SpecResultsPanel';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSpecLookup } from '@/hooks/useSpecLookup';
 import { SPEC_SEARCH_WEB_URL } from '@/lib/config';
@@ -27,36 +27,12 @@ import { useScenariosStore } from '@/store/useScenariosStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import type { OldCluster } from '@/types/cluster';
 
-// Tooltip text constants (UX-03)
-const TOOLTIPS: Record<keyof CurrentClusterInput, string> = {
-  totalVcpus:
-    'Total vCPU reservations across all VMs. Found in vCenter Summary or cluster overview.',
-  totalPcores:
-    'Physical CPU cores in the cluster. Use spec sheet cores — NOT hyperthreaded logical CPUs.',
-  totalVms: 'Total number of powered-on VMs in the cluster.',
-  totalDiskGb: 'Total provisioned disk space across all VMs (GB).',
-  socketsPerServer: 'Number of physical CPU sockets per existing server.',
-  coresPerSocket: 'Physical cores per socket from spec sheet — NOT OS-reported logical processors.',
-  ramPerServerGb: 'Total RAM installed per existing server (GB).',
-  existingServerCount:
-    'Number of physical servers currently in the cluster (used for SPECint sizing).',
-  specintPerServer:
-    'SPECrate2017_int_base score per existing server. Find at fjacquet.github.io/spec-search → filter by processor. Default is Dell R660 with 2x Xeon Gold 6526Y (~337). Both existing and target must use the same metric.',
-  cpuUtilizationPercent:
-    'Current average CPU utilization percent (0–100). Used to scale effective vCPU demand.',
-  ramUtilizationPercent:
-    'Current average RAM utilization percent (0–100). Used to scale effective RAM demand.',
-  cpuFrequencyGhz:
-    'Average CPU clock frequency of existing servers in GHz. Auto-filled from RVTools/LiveOptics import when available.',
-  isStretchCluster:
-    'Stretched cluster: each site must carry the full workload on failure. Sizing doubles the server count and rounds up to an even number.',
-};
-
 interface NumericFieldProps {
   // biome-ignore lint/suspicious/noExplicitAny: react-hook-form Control's transform-type generic requires any
   control: Control<CurrentClusterInput, any, CurrentClusterInput>;
   name: keyof CurrentClusterInput;
   label: string;
+  tooltip: string;
   testId: string;
   optional?: boolean;
 }
@@ -68,7 +44,7 @@ function toInputValue(val: unknown, optional: boolean): string | number {
   return val as string | number;
 }
 
-function NumericFormField({ control, name, label, testId, optional }: NumericFieldProps) {
+function NumericFormField({ control, name, label, tooltip, testId, optional }: NumericFieldProps) {
   return (
     <FormField
       control={control}
@@ -86,7 +62,7 @@ function NumericFormField({ control, name, label, testId, optional }: NumericFie
                   />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="max-w-xs text-sm">{TOOLTIPS[name]}</p>
+                  <p className="max-w-xs text-sm">{tooltip}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -113,6 +89,7 @@ interface CurrentClusterFormProps {
 }
 
 export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
+  const { t } = useTranslation('step1');
   const setCurrentCluster = useClusterStore((s) => s.setCurrentCluster);
   const currentCluster = useClusterStore((s) => s.currentCluster);
   const seedFromCluster = useScenariosStore((s) => s.seedFromCluster);
@@ -142,7 +119,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       ramUtilizationPercent: undefined,
       existingServerCount: undefined,
       cpuFrequencyGhz: undefined,
-      isStretchCluster: undefined,
     },
   });
 
@@ -161,8 +137,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
       formVals.cpuUtilizationPercent !== currentCluster.cpuUtilizationPercent ||
       formVals.ramUtilizationPercent !== currentCluster.ramUtilizationPercent ||
       formVals.specintPerServer !== currentCluster.specintPerServer ||
-      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz ||
-      formVals.isStretchCluster !== currentCluster.isStretchCluster;
+      formVals.cpuFrequencyGhz !== currentCluster.cpuFrequencyGhz;
     if (changed) {
       form.reset({
         ...formVals,
@@ -178,7 +153,6 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         ramUtilizationPercent: currentCluster.ramUtilizationPercent,
         specintPerServer: currentCluster.specintPerServer,
         cpuFrequencyGhz: currentCluster.cpuFrequencyGhz,
-        isStretchCluster: currentCluster.isStretchCluster,
       });
     }
   }, [currentCluster, form]);
@@ -260,49 +234,83 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
 
   return (
     <Form {...form}>
-      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-            Cluster Totals
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <NumericFormField
-              control={form.control}
-              name="totalVcpus"
-              label="Total vCPUs"
-              testId="input-totalVcpus"
-            />
-            <NumericFormField
-              control={form.control}
-              name="totalPcores"
-              label="Total pCores"
-              testId="input-totalPcores"
-            />
-            <NumericFormField
-              control={form.control}
-              name="totalVms"
-              label="Total VMs"
-              testId="input-totalVms"
-            />
-          </div>
-          <div className="mt-4">
-            <NumericFormField
-              control={form.control}
-              name="totalDiskGb"
-              label="Total Disk GB (optional)"
-              testId="input-totalDiskGb"
-              optional
-            />
-          </div>
-        </section>
+      <form className="space-y-4 text-left" onSubmit={(e) => e.preventDefault()}>
+        {/* Required-first: the two required input groups sit side by side. */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
+              {t('currentClusterForm.sections.clusterTotals')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField
+                control={form.control}
+                name="totalVcpus"
+                label={t('currentClusterForm.fields.totalVcpus')}
+                tooltip={t('currentClusterForm.tooltips.totalVcpus')}
+                testId="input-totalVcpus"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalPcores"
+                label={t('currentClusterForm.fields.totalPcores')}
+                tooltip={t('currentClusterForm.tooltips.totalPcores')}
+                testId="input-totalPcores"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalVms"
+                label={t('currentClusterForm.fields.totalVms')}
+                tooltip={t('currentClusterForm.tooltips.totalVms')}
+                testId="input-totalVms"
+              />
+              <NumericFormField
+                control={form.control}
+                name="totalDiskGb"
+                label={t('currentClusterForm.fields.totalDiskGb')}
+                tooltip={t('currentClusterForm.tooltips.totalDiskGb')}
+                testId="input-totalDiskGb"
+                optional
+              />
+            </div>
+          </section>
 
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-            Existing Server Config (optional)
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
+              {t('currentClusterForm.sections.currentUtilization')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <NumericFormField
+                control={form.control}
+                name="cpuUtilizationPercent"
+                label={t('currentClusterForm.fields.cpuUtilizationPercent')}
+                tooltip={t('currentClusterForm.tooltips.cpuUtilizationPercent')}
+                testId="input-cpuUtilizationPercent"
+              />
+              <NumericFormField
+                control={form.control}
+                name="ramUtilizationPercent"
+                label={t('currentClusterForm.fields.ramUtilizationPercent')}
+                tooltip={t('currentClusterForm.tooltips.ramUtilizationPercent')}
+                testId="input-ramUtilizationPercent"
+              />
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+              {currentCluster.isStretchCluster
+                ? t('currentClusterForm.utilizationHintStretch')
+                : t('currentClusterForm.utilizationHint')}
+            </p>
+          </section>
+        </div>
+
+        <section className="panel">
+          <h3 className="cockpit-eyebrow mb-4">
+            {t('currentClusterForm.sections.existingServerConfig')}
           </h3>
           {currentCluster.cpuModel && (
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Detected CPU:</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {t('currentClusterForm.detectedCpu')}
+              </span>
               <Badge variant="secondary">{currentCluster.cpuModel}</Badge>
             </div>
           )}
@@ -312,7 +320,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               onClick={handleSpecLookup}
               className="inline-flex items-center gap-1 text-sm text-primary-600 dark:text-primary-300 underline-offset-3 hover:underline mb-3"
             >
-              Look up SPECrate <ExternalLink className="h-3 w-3" />
+              {t('currentClusterForm.lookupSpecrate')} <ExternalLink className="h-3 w-3" />
             </button>
           )}
           {currentCluster.cpuModel && (
@@ -327,113 +335,61 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
               }}
             />
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <NumericFormField
               control={form.control}
               name="existingServerCount"
-              label="Existing Server Count"
+              label={t('currentClusterForm.fields.existingServerCount')}
+              tooltip={t('currentClusterForm.tooltips.existingServerCount')}
               testId="input-existingServerCount"
               optional
             />
             <NumericFormField
               control={form.control}
               name="socketsPerServer"
-              label="Sockets/Server"
+              label={t('currentClusterForm.fields.socketsPerServer')}
+              tooltip={t('currentClusterForm.tooltips.socketsPerServer')}
               testId="input-socketsPerServer"
               optional
             />
             <NumericFormField
               control={form.control}
               name="coresPerSocket"
-              label="Cores/Socket (physical)"
+              label={t('currentClusterForm.fields.coresPerSocket')}
+              tooltip={t('currentClusterForm.tooltips.coresPerSocket')}
               testId="input-coresPerSocket"
               optional
             />
             <NumericFormField
               control={form.control}
               name="ramPerServerGb"
-              label="RAM/Server GB"
+              label={t('currentClusterForm.fields.ramPerServerGb')}
+              tooltip={t('currentClusterForm.tooltips.ramPerServerGb')}
               testId="input-ramPerServerGb"
               optional
             />
           </div>
-          <FormField
-            control={form.control}
-            name="isStretchCluster"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-3 mt-4">
-                <FormControl>
-                  <Switch
-                    checked={field.value === true}
-                    onCheckedChange={(v) => field.onChange(v)}
-                    aria-label="Stretch cluster"
-                    data-testid="input-isStretchCluster"
-                  />
-                </FormControl>
-                <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
-                  Stretch cluster
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info
-                          className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 cursor-help"
-                          aria-label="Info: Stretch cluster"
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs text-sm">{TOOLTIPS.isStretchCluster}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </FormLabel>
-              </FormItem>
-            )}
-          />
-        </section>
-
-        <section>
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-            Current Utilization (required)
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <NumericFormField
-              control={form.control}
-              name="cpuUtilizationPercent"
-              label="CPU Utilization %"
-              testId="input-cpuUtilizationPercent"
-            />
-            <NumericFormField
-              control={form.control}
-              name="ramUtilizationPercent"
-              label="RAM Utilization %"
-              testId="input-ramUtilizationPercent"
-            />
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Most environments run well below 100%.{' '}
-            {currentCluster.isStretchCluster
-              ? 'Stretch clusters often run <50% per site.'
-              : 'Enter measured (LiveOptics) or a careful estimate.'}
-          </p>
         </section>
 
         {sizingMode === 'performance' && (
-          <section>
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
-              Performance Mode (optional)
+          <section className="panel">
+            <h3 className="cockpit-eyebrow mb-4">
+              {t('currentClusterForm.sections.performanceMode')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <NumericFormField
                 control={form.control}
                 name="specintPerServer"
-                label="SPECrate2017_int_base / Server (existing)"
+                label={t('currentClusterForm.fields.specintPerServer')}
+                tooltip={t('currentClusterForm.tooltips.specintPerServer')}
                 testId="input-specintPerServer"
                 optional
               />
               <NumericFormField
                 control={form.control}
                 name="cpuFrequencyGhz"
-                label="CPU Frequency (GHz)"
+                label={t('currentClusterForm.fields.cpuFrequencyGhz')}
+                tooltip={t('currentClusterForm.tooltips.cpuFrequencyGhz')}
                 testId="input-cpuFrequencyGhz"
                 optional
               />
@@ -442,7 +398,7 @@ export function CurrentClusterForm({ onNext }: CurrentClusterFormProps) {
         )}
 
         <Button type="button" onClick={handleNext} className="w-full sm:w-auto">
-          Next: Define Scenarios
+          {t('currentClusterForm.nextButton')}
         </Button>
       </form>
     </Form>

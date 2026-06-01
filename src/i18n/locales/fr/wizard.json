@@ -1,0 +1,52 @@
+{
+  "header": {
+    "appName": "Presizion",
+    "tagline": "Dimensionnement du renouvellement de cluster",
+    "subtitle": "Dimensionnez votre cluster renouvelé à partir des métriques existantes",
+    "resetAriaLabel": "Réinitialiser",
+    "storePredictTitle": "Calculateur de stockage (Store-Predict)"
+  },
+  "nav": {
+    "back": "Retour",
+    "nextReview": "Suivant : Révision et export"
+  },
+  "reset": {
+    "title": "Réinitialiser toutes les données ?",
+    "body": "Toutes les données du cluster et les scénarios seront effacés. Cette action est irréversible.",
+    "confirm": "Réinitialiser",
+    "cancel": "Annuler"
+  },
+  "sizingMode": {
+    "groupAriaLabel": "Mode de dimensionnement",
+    "vcpu": "vCPU",
+    "performance": "Performance",
+    "performanceTooltip": "Dimensionne en fonction des performances par cœur (GHz par défaut ; ajoutez des scores SPEC dans le scénario pour plus de précision)."
+  },
+  "layoutMode": {
+    "groupAriaLabel": "Mode de disposition",
+    "hci": "HCI",
+    "disaggregated": "Désagrégé"
+  },
+  "stretch": {
+    "label": "Cluster étendu",
+    "tooltip": "Cluster étendu : chaque site doit supporter la charge totale en cas de panne. Le dimensionnement double le nombre de serveurs et arrondit à un nombre pair."
+  },
+  "stepIndicator": {
+    "navAriaLabel": "Étapes de l'assistant",
+    "step1Label": "Cluster actuel",
+    "step2Label": "Définir les scénarios",
+    "step3Label": "Révision et export",
+    "stepAriaLabel": "Étape {{step}} : {{label}}"
+  },
+  "themeToggle": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "ariaLabel": "Thème : {{theme}}. Cliquer pour changer.",
+    "title": "Thème : {{theme}}"
+  },
+  "toast": {
+    "exclusionsTrimmed": "Certaines règles d'exclusion ont été supprimées de l'URL partagée en raison de leur taille. Réimportez le fichier source pour reproduire exactement les sélections par VM."
+  },
+  "infoAria": "Infos : {{label}}"
+}

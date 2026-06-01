@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computeScenarioResult } from '../../lib/sizing/constraints';
 import { useClusterStore } from '../../store/useClusterStore';
 import { useScenariosStore } from '../../store/useScenariosStore';
+import { useWizardStore } from '../../store/useWizardStore';
 import { useScenariosResults } from '../useScenariosResults';
 
 // CPU-limited fixture (from Plan 02 constraints.test.ts)
@@ -38,6 +39,9 @@ vi.stubGlobal('crypto', {
 beforeEach(() => {
   useClusterStore.setState({ currentCluster: { totalVcpus: 0, totalPcores: 0, totalVms: 0 } });
   useScenariosStore.setState({ scenarios: [] });
+  // Pin to the computeScenarioResult() defaults so hook output equals the direct
+  // call (the app default is now 'disaggregated'; this test asserts equivalence).
+  useWizardStore.setState({ sizingMode: 'vcpu', layoutMode: 'hci' });
 });
 
 describe('useScenariosResults', () => {

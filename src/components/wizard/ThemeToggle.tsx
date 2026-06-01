@@ -1,13 +1,9 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { type Theme, useThemeStore } from '@/store/useThemeStore';
 
 const CYCLE: Theme[] = ['light', 'dark', 'system'];
-const LABELS: Record<Theme, string> = {
-  light: 'Light',
-  dark: 'Dark',
-  system: 'System',
-};
 
 /**
  * 3-way theme toggle: light → dark → system (follows browser).
@@ -15,8 +11,15 @@ const LABELS: Record<Theme, string> = {
  * Requirements: THEME-01, THEME-03
  */
 export function ThemeToggle() {
+  const { t } = useTranslation('wizard');
   const { theme, setTheme, resolvedTheme } = useThemeStore();
   const resolved = resolvedTheme();
+
+  const LABELS: Record<Theme, string> = {
+    light: t('themeToggle.light'),
+    dark: t('themeToggle.dark'),
+    system: t('themeToggle.system'),
+  };
 
   function handleToggle() {
     const idx = CYCLE.indexOf(theme);
@@ -38,8 +41,8 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={handleToggle}
-      aria-label={`Theme: ${LABELS[theme]}. Click to switch.`}
-      title={`Theme: ${LABELS[theme]}`}
+      aria-label={t('themeToggle.ariaLabel', { theme: LABELS[theme] })}
+      title={t('themeToggle.title', { theme: LABELS[theme] })}
     >
       {icon}
     </Button>

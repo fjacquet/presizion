@@ -1,24 +1,37 @@
 /**
  * SizingModeToggle — Unit tests
  * Requirements: PERF-02, PERF-03
+ *
+ * The mode controls are on/off switches (consistent with the Step 1
+ * "Stretch cluster" switch): sizing OFF=vCPU / ON=Performance,
+ * layout OFF=HCI / ON=Disaggregated.
  */
 
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useClusterStore } from '@/store/useClusterStore';
 import { useWizardStore } from '@/store/useWizardStore';
 import { SizingModeToggle } from '../SizingModeToggle';
 
-/** Returns the actual ModeBtn (the one with aria-pressed) from among matched buttons. */
-function getModeBtn(container: HTMLElement, name: string | RegExp): HTMLElement {
-  const all = within(container).getAllByRole('button', { name });
-  const btn = all.find((el) => el.hasAttribute('aria-pressed'));
-  if (!btn) throw new Error(`No button with aria-pressed found for: ${String(name)}`);
-  return btn;
-}
+// Capture the real store actions once so each test starts from the genuine
+// implementation — individual cases swap in vi.fn() spies, which would
+// otherwise leak across cases and make the suite order-dependent.
+const realSetSizingMode = useWizardStore.getState().setSizingMode;
+const realSetLayoutMode = useWizardStore.getState().setLayoutMode;
+const realSetCurrentCluster = useClusterStore.getState().setCurrentCluster;
 
 describe('SizingModeToggle', () => {
   beforeEach(() => {
-    useWizardStore.setState({ sizingMode: 'vcpu' });
+    useWizardStore.setState({
+      sizingMode: 'vcpu',
+      layoutMode: 'hci',
+      setSizingMode: realSetSizingMode,
+      setLayoutMode: realSetLayoutMode,
+    });
+    useClusterStore.setState({
+      currentCluster: { ...useClusterStore.getState().currentCluster, isStretchCluster: false },
+      setCurrentCluster: realSetCurrentCluster,
+    });
   });
 
   it('renders only vCPU and Performance modes', () => {
@@ -30,40 +43,64 @@ describe('SizingModeToggle', () => {
     expect(screen.queryByText('SPECrate2017')).not.toBeInTheDocument();
   });
 
-  it('renders vCPU button with aria-pressed=true when sizingMode is vcpu', () => {
+  it('sizing switch is unchecked when sizingMode is vcpu', () => {
     useWizardStore.setState({ sizingMode: 'vcpu' });
     render(<SizingModeToggle />);
     const sizingGroup = screen.getByRole('group', { name: /sizing mode/i });
-    const vcpuBtn = getModeBtn(sizingGroup, /vcpu/i);
-    expect(vcpuBtn).toHaveAttribute('aria-pressed', 'true');
-    const perfBtn = getModeBtn(sizingGroup, 'Performance');
-    expect(perfBtn).toHaveAttribute('aria-pressed', 'false');
+    const sw = within(sizingGroup).getByRole('switch');
+    expect(sw).not.toBeChecked();
   });
 
-  it('renders Performance button with aria-pressed=true when sizingMode is performance', () => {
+  it('sizing switch is checked when sizingMode is performance', () => {
     useWizardStore.setState({ sizingMode: 'performance' });
     render(<SizingModeToggle />);
     const sizingGroup = screen.getByRole('group', { name: /sizing mode/i });
-    const perfBtn = getModeBtn(sizingGroup, 'Performance');
-    expect(perfBtn).toHaveAttribute('aria-pressed', 'true');
-    const vcpuBtn = getModeBtn(sizingGroup, /vcpu/i);
-    expect(vcpuBtn).toHaveAttribute('aria-pressed', 'false');
+    const sw = within(sizingGroup).getByRole('switch');
+    expect(sw).toBeChecked();
   });
 
-  it('clicking Performance button calls setSizingMode with performance', () => {
+  it('toggling the sizing switch from vcpu calls setSizingMode with performance', () => {
     const setSizingMode = vi.fn();
     useWizardStore.setState({ sizingMode: 'vcpu', setSizingMode });
     render(<SizingModeToggle />);
-    fireEvent.click(screen.getByText('Performance'));
+    const sizingGroup = screen.getByRole('group', { name: /sizing mode/i });
+    fireEvent.click(within(sizingGroup).getByRole('switch'));
     expect(setSizingMode).toHaveBeenCalledWith('performance');
   });
 
-  it('clicking vCPU button calls setSizingMode with vcpu', () => {
+  it('toggling the sizing switch from performance calls setSizingMode with vcpu', () => {
     const setSizingMode = vi.fn();
     useWizardStore.setState({ sizingMode: 'performance', setSizingMode });
     render(<SizingModeToggle />);
-    fireEvent.click(screen.getByText('vCPU'));
+    const sizingGroup = screen.getByRole('group', { name: /sizing mode/i });
+    fireEvent.click(within(sizingGroup).getByRole('switch'));
     expect(setSizingMode).toHaveBeenCalledWith('vcpu');
+  });
+
+  it('layout switch toggles between hci and disaggregated', () => {
+    const setLayoutMode = vi.fn();
+    useWizardStore.setState({ layoutMode: 'hci', setLayoutMode });
+    render(<SizingModeToggle />);
+    const layoutGroup = screen.getByRole('group', { name: /layout mode/i });
+    expect(within(layoutGroup).getByRole('switch')).not.toBeChecked();
+    fireEvent.click(within(layoutGroup).getByRole('switch'));
+    expect(setLayoutMode).toHaveBeenCalledWith('disaggregated');
+  });
+
+  it('stretch switch reflects and toggles currentCluster.isStretchCluster', () => {
+    const setCurrentCluster = vi.fn();
+    useClusterStore.setState({
+      currentCluster: { ...useClusterStore.getState().currentCluster, isStretchCluster: false },
+      setCurrentCluster,
+    });
+    render(<SizingModeToggle />);
+    const stretchGroup = screen.getByRole('group', { name: /stretch cluster/i });
+    const sw = within(stretchGroup).getByRole('switch');
+    expect(sw).not.toBeChecked();
+    fireEvent.click(sw);
+    expect(setCurrentCluster).toHaveBeenCalledWith(
+      expect.objectContaining({ isStretchCluster: true }),
+    );
   });
 
   describe('Phase 28: Mobile foundation', () => {
@@ -71,13 +108,6 @@ describe('SizingModeToggle', () => {
       render(<SizingModeToggle />);
       const group = screen.getByRole('group', { name: /sizing mode/i });
       expect(group.className).toMatch(/flex-wrap/);
-    });
-
-    it('MOBILE-03: mode buttons have min-h-[44px] touch target', () => {
-      render(<SizingModeToggle />);
-      const sizingGroup = screen.getByRole('group', { name: /sizing mode/i });
-      const vcpuBtn = getModeBtn(sizingGroup, /vcpu/i);
-      expect(vcpuBtn.className).toMatch(/min-h-\[44px\]/);
     });
 
     it('NAV-03: layout mode group has flex-wrap class', () => {

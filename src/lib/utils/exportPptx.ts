@@ -10,6 +10,7 @@
  * → write the file.
  */
 
+import i18n from '@/i18n';
 import type { ChartCapture } from '@/lib/utils/chartImage';
 import { getLogoDataUrl } from '@/lib/utils/logoDataUrl';
 import type { VsanCapacityBreakdown } from '@/types/breakdown';
@@ -48,7 +49,7 @@ export async function exportPptx(
 
   const pptx = new PptxGenJS();
   pptx.author = 'Presizion';
-  pptx.title = 'Cluster Sizing Report';
+  pptx.title = i18n.t('pptx:slide.title');
 
   buildDeck(pptx, {
     cluster,

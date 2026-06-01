@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { toast } from 'sonner';
+import i18n from './i18n';
 import './index.css';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import App from './App.tsx';
@@ -34,9 +35,7 @@ if (saved) {
   }
   if (saved.truncated) {
     queueMicrotask(() => {
-      toast.warning(
-        'Some exclusion rules were trimmed from the shared URL due to size. Re-import the source file to reproduce exact per-VM selections.',
-      );
+      toast.warning(i18n.t('wizard:toast.exclusionsTrimmed'));
     });
   }
 }

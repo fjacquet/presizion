@@ -1,0 +1,88 @@
+{
+  "title": "Step 3: Review & Export",
+  "reviewExport": {
+    "heading": "Review & Export",
+    "subheading": "Compare your target scenarios side-by-side, then export the results.",
+    "exportShare": "Export / Share",
+    "exportResults": "Export Results",
+    "copySummary": "Copy Summary",
+    "copied": "Copied!",
+    "downloadCsv": "Download CSV",
+    "downloadJson": "Download JSON",
+    "share": "Share",
+    "linkCopied": "Link Copied!",
+    "exportPptx": "Export PPTX",
+    "generating": "Generating...",
+    "close": "Close",
+    "pptxSafariWarning": "PPTX download is not supported in Safari. Use Chrome or a desktop browser.",
+    "pptxExportError": "PPTX export failed. Check browser console for details."
+  },
+  "comparisonTable": {
+    "modeLabel": "Mode:",
+    "layoutLabel": "Layout:",
+    "layoutHci": "HCI",
+    "layoutDisaggregated": "Disaggregated",
+    "metricHeader": "Metric",
+    "asIs": "As-Is"
+  },
+  "nodeSizingRows": {
+    "serversRequired": "Servers Required",
+    "serverConfig": "Server Config",
+    "limitingResource": "Limiting Resource",
+    "vcpuPcoreRatio": "vCPU:pCore Ratio",
+    "vmsPerServer": "VMs/Server",
+    "growthSafety": "Growth / Safety",
+    "notApplicable": "N/A",
+    "resourceCpu": "CPU-limited",
+    "resourceRam": "RAM-limited",
+    "resourceDisk": "Disk-limited",
+    "resourceSpecint": "SPECrate2017",
+    "resourceGhz": "GHz-limited",
+    "cpuBarPerformance": "Performance-limited",
+    "cpuBarVcpu": "CPU-limited"
+  },
+  "utilizationRows": {
+    "sizingDriver": "sizing driver",
+    "cpuUtil": "CPU Util %",
+    "ramUtil": "RAM Util %",
+    "diskUtil": "Disk Util %"
+  },
+  "clusterTotalRows": {
+    "totalVcpus": "Total vCPUs",
+    "totalPcores": "Total pCores",
+    "totalVms": "Total VMs",
+    "totalRamGb": "Total RAM (GB)",
+    "totalDiskGb": "Total Disk (GB)",
+    "totalDiskRequired": "Total Disk Required"
+  },
+  "sizingChart": {
+    "serverCountTitle": "Server Count Comparison",
+    "serverCountAriaLabel": "Server count comparison",
+    "constraintBreakdownTitle": "Constraint Breakdown per Scenario",
+    "constraintBreakdownAriaLabel": "Constraint breakdown per scenario",
+    "downloadSvg": "Download SVG",
+    "downloadSvgAriaLabel": "Download chart as SVG",
+    "downloadConstraintAriaLabel": "Download constraint chart as SVG"
+  },
+  "coreCountChart": {
+    "title": "Total Physical Cores per Scenario",
+    "ariaLabel": "Total physical cores per scenario",
+    "downloadSvg": "Download SVG",
+    "downloadSvgAriaLabel": "Download chart as SVG"
+  },
+  "capacityStackedChart": {
+    "titlePrefix": "Capacity Breakdown -- {{scenarioName}}",
+    "ariaLabel": "Capacity breakdown for {{scenarioName}}",
+    "downloadSvg": "Download SVG",
+    "downloadSvgAriaLabel": "Download capacity chart as SVG",
+    "legendRequired": "Required",
+    "legendSpare": "Spare",
+    "legendExcess": "Excess"
+  },
+  "minNodesChart": {
+    "titlePrefix": "Min Nodes by Constraint -- {{scenarioName}}",
+    "ariaLabel": "Min nodes by constraint for {{scenarioName}}",
+    "downloadSvg": "Download SVG",
+    "downloadSvgAriaLabel": "Download min nodes chart as SVG"
+  }
+}

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chart, type EChartsInstance } from '@/components/charts/Chart';
 import { Button } from '@/components/ui/button';
 import { useVsanBreakdowns } from '@/hooks/useVsanBreakdowns';
@@ -20,6 +21,7 @@ interface CapacityStackedChartProps {
  * One chart per scenario, each with a Download SVG button.
  */
 export function CapacityStackedChart({ onChartReady }: CapacityStackedChartProps = {}) {
+  const { t } = useTranslation('step3');
   const scenarios = useScenariosStore((s) => s.scenarios);
   const layoutMode = useWizardStore((s) => s.layoutMode);
   const breakdowns = useVsanBreakdowns();
@@ -96,7 +98,7 @@ export function CapacityStackedChart({ onChartReady }: CapacityStackedChartProps
           <div key={scenarioId} className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Capacity Breakdown -- {scenarioName}
+                {t('capacityStackedChart.titlePrefix', { scenarioName })}
               </h3>
               <Button
                 variant="outline"
@@ -105,15 +107,15 @@ export function CapacityStackedChart({ onChartReady }: CapacityStackedChartProps
                   const inst = instances.current[scenarioId];
                   if (inst) downloadChartSvg(inst, `capacity-${scenarioName}.svg`);
                 }}
-                aria-label="Download capacity chart as SVG"
+                aria-label={t('capacityStackedChart.downloadSvgAriaLabel')}
               >
-                Download SVG
+                {t('capacityStackedChart.downloadSvg')}
               </Button>
             </div>
             <div className={showStorage ? 'h-[140px] sm:h-[220px]' : 'h-[100px] sm:h-[130px]'}>
               <Chart
                 option={buildCapacityOption(absRows)}
-                ariaLabel={`Capacity breakdown for ${scenarioName}`}
+                ariaLabel={t('capacityStackedChart.ariaLabel', { scenarioName })}
                 onReady={(inst) => {
                   instances.current[scenarioId] = inst;
                   onChartReady?.(`capacity-${scenarioId}`, inst);
@@ -126,21 +128,21 @@ export function CapacityStackedChart({ onChartReady }: CapacityStackedChartProps
                   className="inline-block w-3 h-3 rounded-sm"
                   style={{ backgroundColor: CHART_COLORS[0] }}
                 />
-                Required
+                {t('capacityStackedChart.legendRequired')}
               </span>
               <span className="flex items-center gap-1.5">
                 <span
                   className="inline-block w-3 h-3 rounded-sm"
                   style={{ backgroundColor: CHART_COLORS[1] }}
                 />
-                Spare
+                {t('capacityStackedChart.legendSpare')}
               </span>
               <span className="flex items-center gap-1.5">
                 <span
                   className="inline-block w-3 h-3 rounded-sm"
                   style={{ backgroundColor: CHART_COLORS[2] }}
                 />
-                Excess
+                {t('capacityStackedChart.legendExcess')}
               </span>
             </div>
           </div>

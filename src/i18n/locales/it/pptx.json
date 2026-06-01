@@ -1,0 +1,75 @@
+{
+  "deckTitle": "Pianificazione del rinnovo del cluster",
+  "slide": {
+    "title": "Report di dimensionamento del cluster",
+    "executiveSummary": "Sommario Esecutivo",
+    "comparison": "Confronto Stato Attuale vs Obiettivo",
+    "capacityBreakdown": "Distribuzione della capacità — {{name}}",
+    "minNodes": "Nodi minimi per vincolo — {{name}}"
+  },
+  "kpi": {
+    "asIsServers": "Server Attuali",
+    "targetServers": "Server {{name}}",
+    "cpuUtilization": "Utilizzo CPU",
+    "ramUtilization": "Utilizzo RAM"
+  },
+  "summary": {
+    "colScenario": "Scenario",
+    "colServers": "Server",
+    "colLimitingResource": "Risorsa Limitante",
+    "colCpuUtil": "Util. CPU %",
+    "colRamUtil": "Util. RAM %"
+  },
+  "comparison": {
+    "colMetric": "Metrica",
+    "colAsIs": "Stato Attuale",
+    "rowServers": "Server",
+    "rowLimitingResource": "Risorsa Limitante",
+    "rowVmsPerServer": "VM/Server",
+    "rowVcpuRatio": "Rapporto vCPU:pCore",
+    "rowCpuUtil": "Util. CPU %",
+    "rowRamUtil": "Util. RAM %",
+    "rowTotalDisk": "Disco Totale",
+    "rowSocketsPerServer": "Socket / Server",
+    "rowCoresPerSocket": "Core / Socket",
+    "rowTotalCoresPerServer": "Core Totali / Server",
+    "rowRamPerServer": "RAM / Server (GB)",
+    "rowDiskPerServer": "Disco / Server (GB)",
+    "rowSafetyPct": "Sicurezza %",
+    "rowHaReserve": "Riserva HA",
+    "rowAvgVcpuPerVm": "Media vCPU/VM",
+    "rowAvgRamPerVm": "Media RAM/VM (GiB)",
+    "rowAvgDiskPerVm": "Media Disco/VM (GiB)",
+    "rowFttPolicy": "Politica FTT",
+    "rowCompressionFactor": "Fattore di compressione",
+    "rowSlackPct": "Margine %",
+    "rowGrowthPct": "Crescita %",
+    "valueNone": "Nessuno",
+    "valueNA": "N/A"
+  },
+  "capacityTable": {
+    "colResource": "Risorsa",
+    "colRequired": "Richiesto",
+    "colSpare": "Disponibile",
+    "colExcess": "Eccedenza",
+    "colTotal": "Totale",
+    "rowCpuGhz": "CPU GHz",
+    "rowMemoryGib": "Memoria GiB",
+    "rowRawStorageTib": "Storage Grezzo TiB"
+  },
+  "legend": {
+    "required": "Richiesto",
+    "spare": "Disponibile",
+    "excess": "Eccedenza"
+  },
+  "minNodesTable": {
+    "colConstraint": "Vincolo",
+    "colMinNodes": "Nodi Min.",
+    "colBinding": "Vincolante?",
+    "valueYes": "Sì",
+    "subtitle": "Il vincolo vincolante determina la dimensione minima del cluster."
+  },
+  "footer": {
+    "slide": "Diapositiva {{num}}"
+  }
+}
