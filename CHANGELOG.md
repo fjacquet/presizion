@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.9.0] -- 2026-06-01
+
+### Added
+
+- **Internationalization (en / fr / de / it)**: full UI + CSV/clipboard/PPTX localization via i18next + react-i18next, with a header language selector, `?lang=` / `localStorage` / navigator detection, a locale-aware `Intl.NumberFormat` helper (Swiss `*-CH`), and key-parity tests across all four locales. fr/de/it are machine-translated (flagged for human review).
+- **Precision Cockpit UI**: dark/light atmospheric field (gradient + masked grid + glow), Oxanium display headings + JetBrains Mono numeric readouts, translucent glowing panels with accent-tick eyebrow headers, glowing step indicator, and instrument-style derived metrics.
+- **Drag-and-drop file import** (`FileDropzone`) replacing the import button — native `<label>` + `onDrop` (no programmatic `.click()`), fixing a Chrome case where the file dialog never opened.
+
+### Changed
+
+- **Default layout mode is now `disaggregated`** (external storage); HCI is opt-in.
+- **Sizing / layout mode controls are switches** (consistent with the Stretch-cluster switch); the **Stretch-cluster control moved to the global header** ([ADR-022](docs/adr/ADR-022-stretch-cluster-control-in-global-header.md)).
+- **Step 1 inputs reorganized required-first**: Cluster Totals | Current Utilization side-by-side, Existing Server Config (optional) full-width.
+- Derived-metric ratio formulas extracted to `src/lib/sizing/derivedMetrics.ts` (panel is now presentational).
+
+### Fixed
+
+- **Reset now clears the VM-exclusions store** too (previously the rules survived a full reset).
+- **Dark-mode headings** rendered near-black on the dark field — legacy text tokens now follow the `.dark` class instead of `prefers-color-scheme`.
+- Nested-`<button>` hydration error in the sizing toggle; doubled-base PWA manifest/apple-touch-icon 404s.
+- i18n boot-toast init race (synchronous `initAsync: false`).
+
+---
+
 ## [2.8.1] -- 2026-05-01
 
 ### Fixed
