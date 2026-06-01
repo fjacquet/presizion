@@ -11,6 +11,7 @@ type RawByScopeMap = Map<string, ScopeData>;
  * - Representative: socketsPerServer, coresPerSocket, cpuModel, cpuFrequencyGhz (first scope)
  * - Weighted average by host count: ramPerServerGb (warns if heterogeneous)
  * - Weighted average by server count: cpuUtilizationPercent, ramUtilizationPercent
+ * - Max across scopes: largestVmVcpus, largestVmRamMib (a VM lives in exactly one scope)
  */
 export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[]): ScopeData {
   if (selectedKeys.length === 0) {
@@ -67,6 +68,10 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
   let cpuUtilServerCount = 0;
   let ramUtilServerCount = 0;
 
+  // Largest-VM fields: MAX across scopes (a single VM lives in exactly one scope).
+  let maxLargestVmVcpus: number | undefined;
+  let maxLargestVmRamMib: number | undefined;
+
   // Stretch: any selected scope being stretched poisons the aggregate (conservative).
   let anyStretch = false;
   const stretchSignalsAcc: string[] = [];
@@ -121,6 +126,13 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       ramUtilServerCount += scope.existingServerCount;
     }
 
+    if (scope.largestVmVcpus !== undefined) {
+      maxLargestVmVcpus = Math.max(maxLargestVmVcpus ?? 0, scope.largestVmVcpus);
+    }
+    if (scope.largestVmRamMib !== undefined) {
+      maxLargestVmRamMib = Math.max(maxLargestVmRamMib ?? 0, scope.largestVmRamMib);
+    }
+
     if (scope.isStretchCluster === true) {
       anyStretch = true;
       if (scope.stretchSignals) {
@@ -156,6 +168,10 @@ export function aggregateScopes(rawByScope: RawByScopeMap, selectedKeys: string[
       );
     }
   }
+
+  // Largest-VM fields: max across scopes
+  if (maxLargestVmVcpus !== undefined) esxFields.largestVmVcpus = maxLargestVmVcpus;
+  if (maxLargestVmRamMib !== undefined) esxFields.largestVmRamMib = maxLargestVmRamMib;
 
   // Weighted average utilization
   if (cpuUtilServerCount > 0) {
