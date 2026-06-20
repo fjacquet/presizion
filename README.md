@@ -1,5 +1,8 @@
 # Presizion -- Cluster Refresh Sizing Tool
 
+[![CI](https://github.com/fjacquet/presizion/actions/workflows/ci.yml/badge.svg)](https://github.com/fjacquet/presizion/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/fjacquet/presizion?sort=semver)](https://github.com/fjacquet/presizion/releases/latest)
+
 ![Deploy](https://github.com/fjacquet/presizion/actions/workflows/deploy.yml/badge.svg)
 ![Tests](https://img.shields.io/badge/tests-757%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
