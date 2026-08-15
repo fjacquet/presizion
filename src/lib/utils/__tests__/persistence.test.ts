@@ -135,7 +135,8 @@ describe('deserializeSession', () => {
     });
     const result = deserializeSession(withExtra);
     expect(result).not.toBeNull();
-    expect((result?.cluster as unknown as Record<string, unknown>).unknownField).toBeUndefined();
+    const cluster = result?.cluster as unknown as Record<string, unknown> | undefined;
+    expect(cluster?.unknownField).toBeUndefined();
   });
 
   it('defaults sizingMode to "vcpu" when absent', () => {
