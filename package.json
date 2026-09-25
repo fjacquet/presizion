@@ -65,6 +65,7 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "image-size": "^2.0.4"
   }
 }
