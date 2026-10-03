@@ -5,6 +5,65 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+---
+
+## [2.12.4] -- 2026-10-02
+
+### Security
+
+- **Refreshed the lockfile** for the `undici` advisory GHSA-w293-vg96-wgc3 (dev dependency;
+  lockfile-only, no range changes).
+- **Dropped the two `image-size` osv-scanner waivers** (GHSA-5p2g-fcmc-qvqq,
+  GHSA-w3rx-r6r6-pgpr): they are fixed upstream, `osv-scanner` reports them as unused ignores
+  and the scan is clean without them.
+
+### Changed
+
+- Overrode `image-size` to `^2.0.4` (the unused `pptxgenjs` transitive dependency).
+
+---
+
+## [2.12.3] -- 2026-09-13
+
+### Security
+
+- **`vitest` / `@vitest/coverage-v8` bumped to 4.1.11**, closing GHSA-82fw-gwwq-j7x9 (a stale
+  transitive `@vitest/mocker`).
+- **`sharp` bumped to 0.35.4**, closing GHSA-rgj7-g3m4-5g8c.
+
+### Changed
+
+- **Biome bumped to 2.5.8**; `biome.json` migrated from the deprecated `rules.recommended` to
+  `preset`, and `public/` excluded from linting (build-copied static assets).
+
+---
+
+## [2.12.2] -- 2026-08-10
+
+### Security
+
+- **`undici` bumped to 7.29.0** (dev dependency), clearing five Dependabot alerts including
+  GHSA-4cwx-7wf7-3272 (HIGH, cache interceptor cross-user disclosure).
+- **`sharp` overridden to 0.35.3** (libvips advisory GHSA-f88m-g3jw-g9cj) and the `postcss`
+  path-traversal advisory GHSA-r28c-9q8g-f849 fixed via `npm audit fix`.
+- **`nanoid` bumped to 3.3.17**, closing GHSA-2v37-7h3g-55p8 (HIGH).
+- Added `osv-scanner.toml` with waivers for the `pptxgenjs` -> `image-size` advisories
+  GHSA-5p2g-fcmc-qvqq and GHSA-w3rx-r6r6-pgpr (no fix available at the time).
+
+---
+
+## [2.12.1] -- 2026-06-20
+
+### Changed
+
+- CI standardized on the central `fjacquet/ci@v1` workflows, including `web-release.yml`
+  (with `packages: write` granted for startup validation).
+- Standard status badges added to the README.
+
+---
+
 ## [2.12.0] -- 2026-06-01
 
 ### Fixed
