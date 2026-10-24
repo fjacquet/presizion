@@ -7,14 +7,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+---
+
 ## [2.12.5] -- 2026-10-24
 
 ### Security
 
-- Lockfile refresh within existing ranges: `vite` moves to its patched release, closing three
-  Dependabot advisories. `osv-scanner` recursive scan is clean.
-- `@biomejs/biome` held at 2.5.15 in the lockfile (range unchanged): 2.6 starts formatting
-  Markdown and YAML, which belongs in its own change, not a security refresh.
+- `vite` 8.3.2 → 8.3.5 for GHSA-587h-7wmj-h5pm, GHSA-r825-w8mm-5pxw and GHSA-698v-4r3x-3vcv.
+- `undici` for GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472 and GHSA-xjj6-f33q-929c.
+- `@vitest/mocker` for GHSA-qxg6-89mg-rqv8 and GHSA-xp26-3454-mjgp.
+- `zod` 4.6.5 → 4.6.7 for GHSA-mrhx-c7xc-m3w5.
+
+### Changed
+
+- `@biomejs/biome` pinned to `~2.5.15`: 2.6 formats Markdown and YAML and fails CI on files
+  this release never touched. Adopting 2.6 is its own change.
+- Lockfile refresh within existing ranges, including @base-ui/react 1.9.0 and the hoisted
+  `@babel/runtime` 8.0.8.
 
 ---
 
