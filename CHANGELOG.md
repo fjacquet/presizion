@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.12.5] -- 2026-10-24
+
+### Security
+
+- Lockfile refresh within existing ranges: `vite` moves to its patched release, closing three
+  Dependabot advisories. `osv-scanner` recursive scan is clean.
+
 ---
 
 ## [2.12.4] -- 2026-10-02
